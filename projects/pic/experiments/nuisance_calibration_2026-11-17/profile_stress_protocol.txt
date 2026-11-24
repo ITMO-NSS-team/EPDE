@@ -1,0 +1,13 @@
+Posthoc numerical stress test, preserving all frozen outcomes
+==========================================================
+Concern: initial-score changes missed optimizer basins in archived tests, so
+gradient convergence alone is insufficient evidence for a model-based coverage
+failure. Reprofile the true noise pair for all64 positive ODE validation fields
+and all24 paired bootstrap fields. Use the Cartesian80-start nuisance grid:
+log kappa in[-15,-11,-7,-3,0], p1 in[-.5,0,.9,.99], p2 in[-.99,-.5,0,.5].
+Retain the original selected restricted fit as an incumbent. Same exact
+objective, bounds, tolerances and original-Python selected-score check.
+Do not change the unrestricted denominator, calibration cutoffs, primary
+results or bootstrap regions. Record objective improvements and changed
+membership under frozen cutoffs as a retrospective numerical diagnostic.
+This strengthens finite-search robustness; it is not a global-optimality proof.

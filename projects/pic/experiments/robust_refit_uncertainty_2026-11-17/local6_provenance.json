@@ -1,0 +1,14 @@
+{
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\prepare_local6.py": "7c163862cafc1640a49bbbc065d4366fd83fca9d4c22a4240f3a4921d6894949",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\robust_fit.py": "c7f46c1e462a239b0e2d78b4048a1f6e24d14a8c069fa4a98fb4516f2c2a8927",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\checks.py": "f6f818bd38d2f1b2a76e3911a9e54640bc27c3667641155f40e8da5577f0a9a1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\screen.py": "e9c1fed0ad295253e40a03e17f51daf7c6b7eefc76244914ab94ceb84ffb9511",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_protocol.txt": "aadeacf2a33dc4c68dd9a5d3b0a8e994129fb4f8f91d6b770a609104cb64198c"
+  },
+  "generated_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\checks6.py": "b7e50d2bdf57e8dc62f111175db4b652fb0d27cf90d839541ad83abbbd2f447d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\screen6.py": "6b527a8a20c2bda6228efe453f2a8304cc17e142b33747d68db19342cc3fcac0"
+  }
+}

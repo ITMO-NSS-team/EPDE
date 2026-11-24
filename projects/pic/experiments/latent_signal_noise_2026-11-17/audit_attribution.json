@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "records": 6,
+  "skipped": 1,
+  "operator_scores": 2560,
+  "matrix_replays": 20,
+  "hash_links": 45,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_attribution.py": "95cf3c45326742f6cf84afd0b5d58b3fa5e448b155f623eb2227eaf72907ac12"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\failure_attribution_summary.json": "97d484475c69a8b38a269ea9aa1a1a51e403f2970cfe1f7f0bf3337c54bd13a3"
+  }
+}

@@ -1,0 +1,202 @@
+Completed 2026-11-17: coefficient contrasts normalized by measurement noise
+
+Do not replace dyad with the tested normalized contrast score. It removes
+the coefficient-level denominator and passes the mathematical checks, but
+performs much worse as a structural ranking objective. Uncertainty also
+remains miscalibrated when generated around the reconstructed field.
+These are separate failures, requiring separate responses.
+
+Scope and frozen design
+
+All 15 default systems, fresh anchor seeds 21/22/23, 5% Gaussian measurement
+noise: 45 records and 60 equation/seed cases. Full panels contain 1050
+candidate/anchor entries, including constants, registered equivalents and
+9 equations without fitted features. Historical seed0 freezes geometry
+and candidate fitting bank/method. Anchor data rebuilds other fit inputs.
+This is a finite-panel conditional study, not a new evolutionary search.
+
+The new score uses the same raw weak matrix, partitions, common slab floor
+and minimum-norm slab solves as production dyad. It measures coefficient
+differences between sibling slabs, with 256 full-field bootstrap draws
+estimating each difference's noise bias and variance. Q_bias averages the
+bias-corrected squared difference divided by (1+1/256)*variance, first
+within partitions, then over levels and axes. Q_raw omits bias correction.
+No coefficient-median denominator, covariance ridge or tuned mixing weight.
+Joint field draws retain cross-window and cross-candidate dependencies;
+the general score is not assumed chi-square.
+
+Each anchor also has 128 independent bootstrap-check fields and 128 actual
+benchmark noise fields. Main discrepancy is evaluated with fixed and
+refitted coefficients; the latter reselects reconstruction smoothing.
+Correction maps, geometry, weights and fitting-bank/method stay fixed.
+Final runs used 11,520 calibration and 11,520 evaluation measurements.
+Clean data is used only after method-input freezing, for diagnostics.
+
+Structural comparison
+
+Every arm below includes identical discrepancy D and main coefficient fits.
+"Retained" means at least one registered law/equivalent remains on the
+Pareto front. It does not mean unique identification or accurate coefficients.
+
+Additional objective(s)       Retained/60   Mean front   Actual-noise refit
+                                                     mean retention/front
+dyad                              57          3.17       92.54% / 3.23
+feature count                     55          2.85       93.01% / 2.82
+Q_bias (primary)                  29          3.28       54.74% / 3.38
+Q_raw                             27          3.17       52.62% / 3.31
+feature_count * Q_bias            44          3.28       72.36% / 3.31
+feature_count * Q_raw             46          3.08       73.67% / 3.13
+none (D alone)                    17          1.00       37.10% / 1.00
+Q_bias, feature count             58          5.47       97.68% / 5.44
+dyad, feature count               57          3.83       93.41% / 3.89
+
+The final two are three-objective fronts, without scalarization. Their
+larger fronts are part of the result. Adding Q and complexity raises anchor
+retention by one case relative to dyad, but increases the mean number of
+unregistered front members from 2.07 to 4.25. It is not established as a
+better discriminator. Unregistered candidates are not automatically invalid.
+
+Dyad misses AC21, AC23 and forced-KdV21. Complexity also misses forced-KdV22
+and 23. Thus dyad retains two additional fresh cases, while complexity has
+slightly better repeated-noise retention and smaller fronts. Previous seeds
+18/19/20 tied at 54/60; these results do not establish a universal winner.
+
+Why the primary replacement loses
+
+Relative to dyad, Q_bias has 28 losses and no gains. Every loss has a
+dominating candidate whose support strictly adds terms to the reference
+with the same target. There are 55 such superset-dominator pairs, plus two
+other dominators. Only two lost cases have any rank-deficient dominator;
+this is not mainly a singular-solver failure.
+
+Noise normalization asks whether a change is large relative to uncertainty.
+It does not reward a precise, parsimonious representation. Averaging also
+allows extra terms with small standardized changes to reduce the score.
+In 46/55 superset pairs, median contrast variance for the shared reference
+features increases; the median ratio across pairs is 1.094, with examples
+above 20. Larger uncertainty can reduce the standardized evidence of drift.
+These observations support the mechanism, rather than isolating a single
+cause for every pair. Summing instead of averaging partially helps (44/60),
+but its null expectation scales with feature count, adding a complexity
+preference, and it still trails dyad.
+
+Example: Lorenz21, equation0, reference -> add_10:
+  features: 2 -> 3
+  D:        0.00045109 -> 0.00037203
+  Q_bias:   0.16233 -> 0.06524
+  dyad:     0.004258 -> 0.256454
+  shared-feature median contrast-variance ratio: 1.933
+Q gives the larger model both better objectives, removing the reference.
+Dyad retains a tradeoff. That is useful structural behavior, even though
+dyad's near-zero coefficient denominator is unsuitable for straightforward
+uncertainty interpretation. A test statistic is not automatically a good
+model-selection objective.
+
+Uncertainty calibration
+
+The diagnostic uses independent-bootstrap 95th-percentile noise radii.
+Benchmark errors are measured relative to clean coefficient contrasts,
+whereas bootstrap errors are measured relative to pilot contrasts. This
+tests the distribution of contrast noise, not whether a candidate is true.
+No cutoff is used for search or pruning.
+
+Mean coverage over 1041 candidate/anchor entries with contrasts: 73.58%.
+Over registered entries: 53.48%; over the 60 references: 65.87%.
+Mean per-coordinate coverage is 83.48%, and the median bootstrap/actual
+coordinate SD ratio is 1.011. Reasonable variance scale does not imply
+correct centering or correct multivariate coverage. These are different
+diagnostics from the previous study's scalar-dyad intervals and must not be
+compared as if they measured the same confidence statement.
+
+Reference contrast-noise coverage is zero across all three anchors for
+Burgers, KdV, forced KdV, KS, compound PDE and divide PDE. Other systems
+have much better coverage, including Lorenz 94.36%, ODE 94.27%, LV 95.83%
+and VDP 96.88%. Structural losses also occur on these better-calibrated
+systems: reconstruction bias cannot explain the whole ranking failure.
+
+Oracle attribution (diagnostic, unavailable in deployment)
+
+Four core systems at anchor21 were rerun with known clean fields, first
+keeping estimated noise and then using the known benchmark noise law.
+Each control used 256 calibration and 128 check fields. To resolve the
+short check run's sampling variation, a frozen follow-up added 1024 new
+check and 1024 independent actual fields per system, for references only.
+Both controls preserve the original 256 calibration draws. No oracle
+choice feeds back into deployable scores or structural selection.
+
+Reference coverage on the new 1024 actual measurements:
+                 Reconstructed +   Clean + estimated   Clean + true noise
+                 estimated noise  noise               extended check
+AC                   100.00%           100.00%             96.97%
+forced KdV             0.00%            93.75%             93.26%
+KS                     0.00%            92.29%             96.09%
+wave                  90.04%            87.40%             92.77%
+
+First two columns reuse their original 128-check radii; the last uses
+1024 independent check fields. The clean/true-noise original-radius
+coverages were 94.82%, 93.85%, 91.21% and 90.82%, respectively. Reported
+differences include finite Monte Carlo error; draws across candidates and
+systems are not pooled as independent evidence.
+
+For forced KdV and KS, changing the field center while retaining estimated
+noise repairs the severe failure. This supports sensitivity of the noisy
+coefficient-fit bias to reconstruction error. Simply estimating variance
+more precisely or changing the dyad denominator does not address it.
+Wave has a mixed result: a clean center alone does not improve coverage,
+and the original 128-draw result had appreciable sampling variation.
+The larger true-model control gives roughly 93-97% across the four cases.
+It verifies the diagnostic's behavior under known inputs, not practical
+calibration from noisy data.
+
+Fixes and checks
+
+The initial research extractor used a mathematically equivalent smaller QR
+layout. Tiny arithmetic differences were amplified by near-zero medians
+in production dyad replay. The extractor now reproduces production's full
+QR column layout, including the unused intercept column, column indexing,
+median arithmetic and axis reduction. Replay tolerance was not changed.
+All initial attempts were archived in implementation_initial and all 45
+cases rerun under the corrected sources; initial results are excluded.
+This repairs the experimental implementation, not production dyad.
+
+Checks cover zero and nonzero constant nulls, noise-scale invariance,
+feature/target units, axis transposition, drift and explicit ODE_simple
+energy/phase identities with constants. The known Gaussian toy gives
+mean Q=0.98767 and nominal95% coverage=95.285% on 32768 independent draws.
+819 real-panel replays have exactly zero dyad discrepancy. Explicit
+constants and valid identities remain in scope; no constant ban was added.
+
+All 45 final processes and four extension processes exited successfully.
+Main audit PASS: 539700 score values, 1050 candidate coverage checks,
+277020 fronts, source/input/array hashes and fresh noise replay. Direct
+production dyad replay error is zero. No nonfinite scores were hidden.
+There are 114 candidate/anchor entries with deficient observed slab fits;
+none is registered. Minimum-norm coefficients do not establish physical
+identifiability in those cases.
+Follow-up audit PASS: 32896 original-oracle and 16384 extension score
+values, 128 coverage rows, 16 fresh field replays, 57 domination rows and
+source/input/array hashes. All work remains solver-free. No candidate
+ODE/PDE integration, PINNs, production edits or commits.
+
+Decision and next research question
+
+Keep dyad as the current structural heuristic, with feature count as a
+serious comparator. Do not promote Q, its summed variant, or the larger
+three-objective front as a validated replacement. Preserve constants.
+Separate support preference from uncertainty: a broad uncertainty band
+means insufficient information, not stronger evidence for a larger model.
+
+The next focused hypothesis is to calibrate raw weak residual moments for
+fixed coefficient vectors before inverting them into coefficient confidence
+sets. This may avoid bootstrapping a sensitive coefficient-fit map around
+a biased reconstructed field. Existing Gaussian moment corrections can be
+reused, but this extension is NOT implemented or validated here. It should
+first pass independent raw-moment coverage checks on the failing systems;
+any resulting coefficient sets may legitimately be broad or unbounded.
+No new gate or penalty is justified by the current evidence.
+
+Artifacts: protocol.txt, checks.json, summary.json, front_summary.csv,
+fronts.csv, candidates.csv, calibration_summary.csv, changes.json,
+loss_dominators.csv, failure_summary.json, oracle_extension_summary.csv,
+audit.json, oracle_audit.json, comparison/calibration/oracle_attribution
+PNG and SVG figures, all frozen inputs and raw replicate arrays.

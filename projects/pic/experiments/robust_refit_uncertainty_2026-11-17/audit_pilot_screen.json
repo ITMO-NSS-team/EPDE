@@ -1,0 +1,84 @@
+{
+  "status": "PASS",
+  "records": [
+    {
+      "seed": 45,
+      "mean_sigma_ratio_old": 1.2393782474462647,
+      "mean_sigma_ratio_new": 1.0038406829993367,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "seed": 46,
+      "mean_sigma_ratio_old": 1.2412121773018432,
+      "mean_sigma_ratio_new": 1.0138485394395138,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "seed": 47,
+      "mean_sigma_ratio_old": 1.2955267287757333,
+      "mean_sigma_ratio_new": 1.0087872134296714,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    }
+  ],
+  "normal_equation_checks": 18,
+  "max_normal_equation_error": 3.6906744327325214e-10,
+  "finite_smoothing_iid_equivalence": true,
+  "bootstrap_score_replays": 48,
+  "hash_links": 30,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_pilot_screen.py": "53ee3ed2faf58b3f473091ed888489e5d7a78b47849bc29ccd7171c03abbb652",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time.py": "d6998b0da32afeee433d4371622e279f9eb09907855b0b7e6ab4059f44e543dc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc"
+  }
+}

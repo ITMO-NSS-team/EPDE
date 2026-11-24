@@ -1,0 +1,48 @@
+Core-15 residual cross-product screening protocol (2026-11-16)
+
+Scope: all datasets.names('core'), unmodified default saved arrays. No solver,
+trajectory integration, new evolutionary search, or production-code change.
+5% additive Gaussian measurement noise; seeds 0,1,2. Each equation is reported
+separately. Registered alternative laws are credited. The finite candidate
+panel is a diagnostic, not a claim of exhaustive structural recovery.
+
+Split raw time frames modulo 3, retaining complete spatial planes. Every group
+is reconstructed independently; each group in turn trains coefficients and
+selects the test bandwidth, while the other two evaluate complete residuals.
+Keep the common interior reached by every group and by required FD stencils.
+
+PDE adaptation: natural cubic smoothing splines in time, with a pooled GCV
+parameter per field, and separable spatial DCT fourth-order shrinkage selected
+by pooled GCV. Bootstrap reselects every smoothing parameter and rebuilds
+nonlinear products. This differs from the original scalar Kepler smoother.
+Noise is estimated from each raw group's differences by the existing AR model.
+Known clean fields and coefficients are used only in diagnostic controls.
+
+Fixed common mathematical test smoothness: q=3 in time and q=5 in space,
+supporting time derivatives through order 2 and space derivatives through 4.
+Local fitting support is the selected LOO spectral half-wavelength, bounded
+below by moment exactness and above by the available interval. Row strides
+are reduced until the production dyad row floor is met. The full-record raw
+dyad uses the same support rule and production dyad_scores, frozen across
+discrepancy arms. This is not a replication of the old Kepler CLSM dyad.
+
+Local training coefficients use signed CLSM corrected moments. The spectral
+evaluation bank is a full tensor product of modulated weak bumps over the
+common interval, including mixed signs in multiple dimensions. Training-only
+DCT projection GCV and exact LOO bandwidths are reported separately. Residual
+mean bias is estimated by independent group bootstrap, including smoothing.
+Cross-product: Re <r_A,r_B> / ||training target||^2, with no clipping.
+Matched control: (||r_A||^2+||r_B||^2)/(2 ||training target||^2).
+
+32 bootstrap draws is an initial computational budget, not a statistical
+threshold. Compare the nested 16-draw and 32-draw estimates; rerun selected
+unstable cases at higher counts. Three noise seeds and three reused rotations
+are not nine independent records. This screening does not provide a full
+uncertainty interval over training, bandwidth and bias estimation.
+
+Candidate menu, applied per equation: reference, catalog alternatives,
+drop-one-term variants, add-one variants (constant, fields, squares, cubes,
+time, time squared, sin(2t), cos(2t)), time-polynomial and harmonic fits,
+field-plus-harmonic fits, and a first-time-derivative polynomial/harmonic fit.
+Exact duplicate term structures are removed. A non-catalog candidate is called
+unregistered, not automatically false. Coefficients are refitted for all.

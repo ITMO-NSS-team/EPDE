@@ -1,0 +1,888 @@
+EPDE solver-free research progress, 2026-11-16
+
+The strongest tested change is local weak evaluation of precision, with the
+continuous weak fit and dyad axis held fixed. It raises default core-15
+registered-structure retention from 53/60 to 54/60 and repairs nonlinear
+diffusion from 1/3 to 3/3. The earlier pre-adaptive baseline was 50/60.
+Retention means finite-panel Pareto survival, not accurate coefficient
+recovery. No production method has been replaced.
+
+The user's discrepancy concern is supported: some accurately fitted equations
+were losing because the spectral residual comparison was too noisy. Local
+weak evaluation materially improves these comparisons. Remaining failures
+also involve fitting and target/predictor error amplification; no single
+tested fitting replacement works reliably across the difficult systems.
+
+Completed research while the user was away:
+
+1. Paired uncertainty of the existing spectral discrepancy.
+   All 15 systems x 3 seeds at 5% noise:45 system runs,60 equation-seed cases.
+   128 covariance draws/group and 512 shared perturbations retain cross-term,
+   cross-candidate and cross-rotation dependence. All 16 unregistered
+   dominators behind the seven failed cases have conditional 95% intervals
+   crossing zero. The intervals diagnose weak comparisons but are not fully
+   calibrated: only 865/990 primary clean-oracle gaps lie inside them.
+   No uncertainty threshold was used to change the 53/60 front.
+   Folder: paired_uncertainty_2026-11-16
+
+2. Local weak discrepancy and continuous raw fitting.
+   Another complete 45-run core-15 comparison. Same fitted coefficients,
+   candidate panels and dyad; only the evaluation representation changes.
+   Local score retains 54/60. Compound nonlinear diffusion becomes 3/3;
+   forced KdV loses its misleading prior survivor with bad coefficients.
+   Example: dropping a required nonlinear-diffusion term at seed 1 gives
+   spectral gap -2.665 +/- SD 7.304, but local gap +0.2164 +/- SD 0.00842.
+   The clean local gap is+0.2023. The correct ranking is now well resolved.
+   Raw-observation continuous fitting also retains 54/60 locally, but worsens
+   wave coefficients severely and loses all AC reference supports. Reject it
+   as a universal replacement.
+   Folder: local_discrepancy_2026-11-16
+
+3. Independent training-replica coefficient fitting.
+   Targeted four systems x 3 seeds,12 cases. Symmetric cross-Gram regression
+   improves wave median frozen clean residual energy 0.0776 ->0.00466, but
+   worsens KS and does not repair forced KdV. Mean correction helps AC while
+   reducing some wave gains. The tradeoff does not justify core-15 promotion.
+   Folder: replica_fitting_2026-11-16
+
+4. Broad supports with minimally identifiable low-frequency moments.
+   Same 12 targeted cases, two smoothness arms. All banks select maximum
+   mode 2 by training-only numerical rank. Broad OLS improves wave energy to
+   0.000774, but KS deteriorates from 4.95e-5 to 85.3 (CLSM:37.97).
+   Numerical rank does not ensure statistical identifiability.
+   Folder: broad_moments_2026-11-16
+
+5. Candidate-specific bank choice by worst predictor-noise direction.
+   Same 12 targeted cases. The invariant generalized noise-to-energy rule
+   picks broad banks for KS and inherits their failure. It looks at predictors
+   while missing target-moment error and coefficient sensitivity. Reject it.
+   Folder: information_selection_2026-11-16
+
+6. Exact algebraic error decomposition, all 12 targeted cases.
+   Target error, predictor error, clean discretization and covariance
+   correction contributions reproduce actual coefficient error to 2.17e-12.
+   KS broad fitting amplifies small target errors; wave has a large target
+   error contribution; forced KdV has a badly corrupted dispersive feature
+   and large opposing covariance-correction contributions. These mechanisms
+   explain why feature stability and rank checks were insufficient.
+   Folder: information_selection_2026-11-16/error_budget
+
+What to keep:
+- Continuous weak quadrature and the local weak precision score as the
+  strongest experimental branch, alongside the fixed old-score control.
+- Paired uncertainty as a diagnostic, not a new confidence gate.
+- Per-equation scoring and credit for registered equivalent laws.
+- Fixed clean-bank fit diagnostics, so easier score representations cannot
+  masquerade as improved coefficients.
+
+What not to promote:
+- The operator-prefix bandwidth selector:52-53/60, no universal gain.
+- Raw continuous fitting as a universal estimator.
+- A single broad low-frequency bank for all systems.
+- Predictor-only information selection or a hard uncertainty threshold.
+- Per-system cherry-picking among the successful-looking fitting arms.
+
+Next fix to develop:
+Candidate-specific multiscale fitting assessed through JOINT target/predictor
+error covariance and its effect on a COMMON weak prediction representation.
+The criterion must reflect residual precision and reconstruction bias, not
+only feature noise, floating-point rank or coefficient stability. A useful
+first test is whether it chooses quiet broad moments for wave while preserving
+the local information needed for KS, without any clean-data selection.
+Keep the successful local held-out score fixed during that fitting study.
+This proposed next method has not yet been implemented or validated.
+
+Limits and provenance:
+All work used saved datasets, independent raw-group reconstructions, weak
+integrals and linear algebra. No candidate ODE/PDE solves, PINNs, clean-data
+regeneration, new evolutionary searches, production edits or commits.
+Tests ran in parallel as authorized, with one BLAS thread/process and
+below-normal priority. Each folder has code, protocol, detailed findings,
+raw results, summaries and audits. Negative outcomes are preserved.
+The 126 method/covariance system runs plus 12 decomposition controls reuse the
+same three noisy records per system; they are not 138 independent datasets.
+One deterministic paired-uncertainty NS run was redundantly repeated and is
+counted once. All experiment processes have finished.
+
+Follow-up update, 2026-11-16: joint prediction risk has now been tested.
+The proposed next study above is no longer pending. Its full report is
+joint_prediction_risk_2026-11-16/findings.txt. All 15 systems x 3 seeds were
+completed, using shared target/predictor perturbations, conditional bootstrap
+optimism and common local weak prediction risk to select fitting banks.
+Primary retention stays 54/60 with exactly the same six failures. Frozen clean
+fit energy improves in 26 cases, worsens in 16, and is unchanged in 18.
+Forced-KdV median energy improves 0.14693 -> 0.09111 and KS accuracy is
+preserved, but wave remains misranked and other accuracy regressions occur.
+The new method is not promoted. Its wave counterexample points to unresolved
+validation/reconstruction bias, despite modeling joint conditional variance.
+All baseline reproduction and source/input checks pass; numerical pilot
+attempts are preserved separately. These 45 runs reuse the same records and
+are additional to the historical counts above, not independent datasets.
+No production changes were made, and all follow-up processes have finished.
+
+Follow-up: raw validation and constants/intercepts, 2026-11-16.
+See raw_validation_constants_2026-11-16/findings.txt. Nine raw-validation
+cases completed (wave/KS/forced KdV x 3 seeds); AC is explicitly infeasible
+on some fixed supports without extrapolation. Wave ranking still fails due
+to high raw-moment variance, so the score was not expanded/promoted.
+The constants audit covers all original 45 core runs: all six failures have
+a nonconstant dominator too. Omitting constant dyad contributions worsens
+retention 54 -> 53/60. This does not justify banning constants.
+
+Dataset correction: the user's ODE_simple_discovery is the analytic
+u=sin(t)+1.3*cos(t) example with max derivative order 1. The old core registry
+'ode' is a different forced oscillator; the earlier 15-system results did
+not include ODE_simple. Its phase invariants u' cos(t)+u sin(t)=1 and
+u cos(t)-u' sin(t)=1.3 contain necessary integration constants, and the
+energy invariant (u')^2+u^2=2.69 is also retained as a correct identity.
+Four additional fixed-panel ODE_simple tests (clean, and 5% seeds 0/1/2)
+confirm that removing these constants destroys the fits. All work remains
+solver-free and experimental; no production settings were changed.
+
+Follow-up: broad raw validation and covariance weighting, 2026-11-16.
+See variance_reduction_2026-11-16/findings.txt. All 45 core-15 runs completed
+on the same three 5% noisy records per system. Using frozen joint-risk fits,
+q0 broad raw validation with a common training-only covariance metric retains
+56/60 registered structures/equivalents versus 54/60 previously. Gains are
+KS seed 0 and forced KdV seed 2, with no losses. The retained cases agree
+between 64 and 128 covariance draws. All arms, including negative outcomes,
+are saved. q0 white128 with old local coefficients alone gives 53/60.
+
+The two gains have different limitations: KS's nearest margin is only 0.81
+conditional SD. Forced KdV's margin is larger but its coefficients remain
+far from truth, with frozen clean energy 0.07693. Remaining failures are
+AC seeds 0/2 and forced KdV seeds 0/1; several competitors also win on clean
+fields with the frozen fitted coefficients. Reduced noise alone is not a
+complete remedy. Conditional SDs hold fits, weights and noise estimates fixed.
+
+As a separate ranking diagnostic, the new score prefers more accurate saved
+wave fits on all three records while preserving local KS fits. Across all
+60 cases, diagnostic fit selection improves accuracy in 21, worsens in 7,
+and is unchanged in 32. This was not promoted to an independently validated
+fit-selection pipeline; it needs an outer split. ODE_simple's valid phase
+and energy identities and their constants remain intact in all new controls.
+The next useful check is fresh-seed validation of the frozen combined method,
+with separate structural and coefficient-accuracy reporting. No production
+changes, candidate ODE/PDE solves, new searches or commits were made.
+
+Follow-up: fresh-seed raw weak errors-in-variables fitting, 2026-11-16.
+See eiv_fitting_2026-11-16/findings.txt. Twelve targeted runs completed on
+AC/forced KdV/wave/KS at new 5% noise seeds 3/4/5, with geometry frozen from
+old seed 0. This is known-support coefficient fitting, including registered
+wave equivalents; no new structural-retention/search count is claimed.
+IRLS uses 512 joint operator draws and iteratively updates the covariance
+of delta_target - delta_features*coefficients. Held-out scoring remains
+separate. No clean/held-out data choose a bank or estimator.
+
+Median frozen clean residual energy, old local CLSM -> broad raw IRLS:
+AC 1.59176e-4 -> 1.11998e-4; forced KdV 0.17017 -> 0.04853;
+wave 0.06109 -> 0.0007801; KS 5.9878e-5 -> 1.3903 (severe regression).
+Broad IRLS beats broad corrected OLS on all three forced-KdV seeds; most of
+the wave gain already exists in broad corrected OLS. KS local IRLS remains
+accurate (median4.8628e-5), but local corrected OLS is already4.3911e-5.
+Five local forced-KdV fits and one local wave-equivalent fit do not converge;
+210/216 total IRLS fits converge. Incomplete cases are not averaged away.
+
+A clean KS control isolates a deterministic representation problem: broad
+OLS on full clean values has energy1.05e-10; after clean subsampling and
+fixed interpolation it has0.2124, versus5.43e-8 locally. The broad bank
+amplifies approximation error in the fourth-derivative coefficient. Broad
+validation can also prefer a less accurate fit even on clean fields. More
+noise weighting alone will not repair this. Keep the method experimental.
+Next focused test: native-sample quadrature and local/broad constraints with
+joint covariance; neither is tested here. ODE_simple constants/identities
+remain intact. All processes finished; no production edits or commits.
+
+Follow-up: native-sample quadrature and combined moments, 2026-11-16.
+See native_moments_2026-11-16/findings.txt. Twelve targeted runs completed on
+the SAME AC/forced-KdV/wave/KS noise seeds 3/4/5 as the preceding EIV study.
+This is a paired known-support coefficient experiment, not another fresh
+replication or 15-system structural screen. Native and interpolated arms
+use matched new physical geometries; broad geometry changed for wave/KS.
+
+Clean broad KS fitting improves from 0.206921 after dense field resampling
+to 9.94347e-5 with native quadrature (about 2,081-fold), versus 1.04277e-10
+with full clean sampling. Native quadrature still interpolates monomials
+within cells. This isolates a major deterministic resampling effect, but
+native broad IRLS remains poor under noise (median energy 1.93822).
+
+Combining local and broad constraints with their full joint covariance
+prevents that KS collapse. Median frozen clean energy, old local CLSM ->
+native mixed IRLS: AC 1.59176e-4 -> 1.14152e-4; forced KdV 0.170166 ->
+0.084697; wave 0.0610893 -> 0.00479533; KS 5.98780e-5 -> 8.09057e-5.
+Nine of 12 reference cases improve, but KS's median is 35% worse than its
+old local baseline. Interpolated mixed performs similarly. Forced-KdV
+coefficients remain inaccurate; no universal estimator is established.
+
+426/432 new IRLS fits converge, with six explicit failures (four local
+forced-KdV fits and two wave-equivalent fits). All new OLS fits succeed.
+No incomplete-case averaging. Baseline-score replay error is zero; all new
+validation covariance matrices are feasible. Native broad validation has
+78.0% descriptive pairwise agreement with clean accuracy versus old broad
+75.1%; native mixed falls to 73.3% and can prefer much worse wave fits.
+These dependent post-hoc comparisons do not validate an automatic selector.
+
+ODE_simple's two phase identities and energy identity retain their additive
+constants. Quadrature, safe-support and shifted-grid checks pass. The
+completion audit records paired-data replay, support/source/input hashes,
+fit coverage and convergence checks. A next study should separately test
+outer-split bank selection and forced-KdV coefficient sensitivity. All
+processes finished; no production edits, candidate solves or commits.
+
+Follow-up: independent outer measurement validation, 2026-11-16.
+See outer_selection_2026-11-16/findings.txt. Twelve fresh-noise targeted runs
+use seeds 6/7/8 for training/inner selection and 9/10/11 for independent
+outer measurement records on the same four clean fields. Fits/decisions and
+weight diagnostics are saved before outer generation; full weight matrices
+remain fixed in memory. Known supports only; no new
+trajectory-generalization or 15-system structural claim.
+
+Automatic selection between native local/broad IRLS FAILS this test.
+Median frozen clean energy, fixed mixed -> native broad-score selection:
+AC 1.46406e-4 -> 2.86873e-4; forced KdV 0.109991 -> 0.077495;
+wave 0.00854436 -> 0.0122141; KS 4.71233e-5 -> 0.510217.
+Selection improves all three forced-KdV records but worsens all nine other
+records versus fixed mixed. The previous interpolated score has the same
+KS failures. Independent outer scores barely distinguish some very wrong
+KS fits, and a clean broad score can also misrank them. Noise independence
+does not repair inadequate validation sensitivity to coefficient directions.
+
+Forced-KdV broad coefficient medians are (-0.4923,-0.4509,0.3739) versus
+(-6,-1,1). Dispersion/forcing errors are about 9-10 conditional SDs; the
+noiseless training pilot itself has inaccurate coefficients. In 64
+independent conditional bootstrap refits per fold/bank, broad mean drift
+from the pilot is (1.0816,0.1495,-0.1782). A post-hoc predictor/target
+noise-moment calculation predicts fixed-weight drift
+(0.8465,0.1364,-0.1628), consistent in direction/scale. Residual-covariance
+IRLS still solves biased weighted normal equations; mean operator
+correction and covariance weighting do not remove this EIV term.
+
+213/216 main IRLS fits and all 216 OLS fits converge. Conditional bootstrap
+IRLS succeeds 1561/1728 times; all 1728 bootstrap OLS fits succeed. Failures
+remain explicit. Frozen-choice replay, fresh noise replay, support/geometry,
+source/input hashes, coefficient immutability, finite scores and covariance
+checks pass. Constants remain intact. Next: matched native joint-noise
+normal-equation correction as an ablation, with explicit infeasibility;
+separately improve validation sensitivity. Neither fix is tested here.
+No production changes, candidate equation solves or commits.
+
+Follow-up: TEST ALL joint correction and sensitive validation, 2026-11-16.
+See joint_correction_core15_2026-11-16/findings.txt. All 15 default systems,
+45 fresh-noise runs (seeds 12/13/14; independent outer 15/16/17), 60 reference
+equation/seed cases, 93 including registered equivalents. Known supports
+only: not a new discovery/structural survival count. Full transforms and
+selection decisions are frozen before outer generation. Seven case workers.
+
+Five estimators on local/broad/mixed banks isolate joint predictor/target
+noise correction from common covariance weighting. Three selectors compare
+the same six IRLS/corrected-GLS options. New transfer scores map weak
+residuals to implied coefficient corrections, then to richer TRAINING
+spectral moments. They are support-specific, not structural objectives.
+
+Mixed corrected GLS vs matched GLS: 33 reference cases improve, 26 worsen,
+one incomplete (median paired energy ratio 0.9764). Versus mixed IRLS,
+correction improves 25, worsens 30, five unpaired. Mixed-transfer selection
+vs mixed IRLS improves 37, worsens 19; four baseline cases incomplete.
+Versus broad-score selection on all 60 cases: 28 improve, 14 worsen, 18 same.
+All selectors complete all cases; improvement counts hide large regressions.
+
+Median clean energy, broad selection -> mixed-transfer selection:
+KS 0.066973 -> 7.16084e-5 (about 935-fold better); wave 0.069532 -> 0.422618;
+forced KdV 0.045494 -> 0.620711. Wave clean transfer validation chooses the
+best fit 9/9 times, noisy validation only 2/9: variance dominates. KS clean
+mixed transfer selects best 8/9 versus broad 5/9; local information matters.
+Forced KdV retains noisy and clean-score misranking. No universal promotion.
+
+Conditional mixed-GLS bootstrap drift decreases from
+(0.8343,0.1208,-0.1399) to (0.0695,-0.01965,0.02295), but SD increases from
+(1.2118,0.03393,0.03821) to (2.1101,0.08079,0.09110). Both mixed methods
+complete 576 refits; other corrected banks can be indefinite. 6912 total
+conditional refits reuse prior seeds 6/7/8 and do not tune the new runs.
+
+4185 main fits: 837 each OLS/GLS succeed; IRLS 811/837; corrected GLS760/837;
+corrected OLS748/837. No tuned ridge, fallback or averaging incomplete cases.
+Three initial Duffing attempts hit float32-coordinate endpoint overshoot;
+a coordinate-only adapter preserves integer plans, avoids extrapolation,
+and all three repaired runs pass. Audit confirms all 45 final results,
+fresh noise replay, source/input hashes, 10845 support checks, immutable
+score transforms/choices and constants. ODE_simple identities remain valid.
+All processes finished; no production edits, candidate solves or commits.
+
+Follow-up: direct dyad replacement and joint objective uncertainty, 2026-11-16.
+See dyad_ablation_2026-11-16/findings.txt. All 15 systems, 45 REUSED full
+candidate panels (noise seeds0/1/2), 60 equation/seed cases. Frozen candidates,
+fits, discrepancy, constants and equivalent laws isolate the second axis.
+Primary q0_white128/joint: production dyad retains 56/60; dyad_mean, tile
+and feature count55; survival and chi2 54; prediction dyad49; discrepancy
+alone21. Prediction dyad has a larger mean front (3.20 versus3.083), yet
+loses seven cases and gains none. Complexity is close and wins one case
+in two control arms; no universal superiority or new search claim. Keep
+dyad provisionally. Explicit ODE_simple phase/energy constants preserved.
+
+Uncertainty: 20 selected records, 25 equation cases, 382 dependent pairs.
+128 pilot-bootstrap plus128 independent actual-noise measurements per
+record (5120 total) vary both objectives with shared noise and recompute
+all dyad slab fits. Main fits, validation weights/corrections and geometry
+stay fixed: conditional, not full-pipeline uncertainty. Mean coverage of
+nominal95% bootstrap error ranges: discrepancy93.54%, dyad71.88%, prediction
+dyad62.89%. Median dyad coverage92.19% hides a subset of severe failures;
+added-term pairs average65.68%. Estimated noise sigma is within0.944--1.043
+of true sigma. Ratio tails and pilot-sensitive moment centers remain.
+
+AC seed1 bootstrap registered retention6/128 versus actual84/128, despite
+accurate discrepancy spread, illustrates why bootstrap winning frequency
+is not a truth probability. Pilot field error1.47% shifts its discrepancy
+margin2.24 actualSDs. Prediction dyad removes the coefficient denominator
+but fails to capture noise bias on KS/forced KdV. Actual conditional mean
+retention across selected cases: dyad80.94%, prediction75.75%; front sizes
+3.205/3.723. Prediction helps forced KdV seed2 (128/128 versus31/128), but
+loses elsewhere; original dyad success there is noise-fragile.
+
+Conditional discrepancy intervals include zero for AC1/2 and KS0 among
+previous closest pairs. AC0 and forced KdV0/1 strongly favor competitors
+even on noiseless discrepancy with frozen fits: uncertainty cannot repair
+that fit/validation bias. Next: separately assess pilot-center bias and
+main-coefficient refit uncertainty before full-pipeline confidence claims.
+No new pruning gate, tuned penalty, constant ban or production promotion.
+
+Audit passes all45+20 processes, raw/source/input/array hashes,1440 original
+fronts,1146 coverage checks and12800 repeated-measurement fronts. Dyad replay
+error0; maximum discrepancy replay error1.1642e-10; all scores finite.
+Research artifacts complete; no candidate solves, PINNs, production edits
+or commits.
+
+Follow-up while user away: fresh pilot correction/refit uncertainty, completed
+2026-11-17. See uncertainty_refit_2026-11-16/findings.txt. All15 systems,
+45 fresh anchors seeds18/19/20,60 equation cases,957 pairs;17,280 measurement
+replicates and1,209,600 main candidate/fold refits. Historical seed0 freezes
+geometry and fitting-bank/method choices; noisy anchors rebuild other inputs.
+Main refit arm reselects GCV and coefficients, while correction maps, bank
+choices, geometry and validation weights stay fixed. Still conditional.
+
+Pilot correction2*S(y)-S(S(y)) adds no tuning parameter and preserves
+constants. Mean nominal95% coverage standard -> corrected pilot: fixed D
+93.94 ->93.96%; refit D93.14 ->93.64%; dyad69.76 ->70.19%. Giving each
+equation case equal weight leaves dyad69.89 ->69.87%. Forced KdV refit D
+improves67.78 ->79.51%, but KS dyad worsens71.81 ->39.44% and wave refit D
+90.18 ->86.72%. No universal pilot promotion.
+
+Actual refit/fixed paired discrepancy SD has median1.754 and90th percentile
+15.36, with severe tails. Forced-KdV seed18 reference SD rises12.64-fold.
+Reference coefficient coverage averages88.52 ->88.76%, but forced KdV only
+8.56 ->5.47%. A replay locates a sensitive indefinite corrected local fit:
+inverse sensitivity8.02 in median versus2112 in worst replicate. Signed
+fits retain explicit indefinite/rank-deficient diagnostics; no hidden drops.
+
+Fresh dyad and complexity BOTH retain54/60, failing all AC and forced-KdV
+anchors. Actual repeated-noise refit retention92.53%/92.83%, mean fronts
+3.240/2.819. This qualifies the older56/60 versus55/60 result: dyad's unique
+advantage over complexity is not confirmed. Unregistered is not necessarily
+invalid, and these remain finite-panel conditional results, not new searches.
+
+Separate follow-up dyad_tail_2026-11-17 analytically exposes the zero-level
+problem. For two iid Gaussian zero-mean slab coefficients, relative MAD is
+|c1-c2|/|c1+c2|: absolute-Cauchy, median1 for every positive noise scale,
+uncapped infinite mean/no finite variance, whereas exactly noiseless code
+returns0. Production float cap is finite; this is a verified counterexample,
+not a distributional assertion for every candidate. Nonzero constants behave
+regularly and remain valid. Production-formula replay error1.84e-14.
+
+Monotone log1p and bounded transforms preserve all43,070,328 checked candidate
+orders, but standard-pilot coverage worsens69.76 ->65.97 ->49.85%. Same arrays,
+exploratory reanalysis, no independent replication claim. More draws or tail
+compression alone cannot fix near-zero-level and pilot-center effects.
+
+Research direction: separate ranking/support preference from uncertainty;
+include main refits in discrepancy uncertainty, and test sampling-normalized
+coefficient contrasts without a coefficient-level denominator. No such new
+criterion is validated yet. No tuned gates/ridge or constant bans promoted.
+Main audit passes5742 coverage,93,120 fronts,1,222,200 support and403,200 energy
+checks, source/input/array hashes and fresh data/innovation replay. All scores
+finite, all workers finished. No candidate solvers, PINNs, production edits
+or commits. Detailed reports and scientific figures are saved in both folders.
+
+Follow-up completed 2026-11-17: contrast_stability_2026-11-17/findings.txt.
+All15 systems, fresh seeds21/22/23,45 records/60 equation cases. Tested
+dyadic sibling coefficient changes normalized by bootstrap noise variance,
+with/without estimated noise bias, mean/sum aggregation, and separate
+complexity controls. Identical main fits/discrepancy and full candidate
+panels; 11,520 calibration plus11,520 independent evaluation measurements.
+
+Primary Q removes the coefficient-level denominator and passes Gaussian
+null/unit/constant/identity checks, but is rejected as a dyad replacement:
+anchor retention dyad57/60, complexity55/60, Q_bias29/60, Q_raw27/60,
+summed Q_bias44/60, summed Q_raw46/60. Actual-noise refit mean retention:
+dyad92.54%, complexity93.01%, Q_bias54.74%. Three-objective D/Q/complexity
+retains58/60 but expands mean front3.17 ->5.47 and unregistered front
+members2.07 ->4.25. Unregistered does not necessarily mean invalid.
+
+All28 primary losses versus dyad have a dominating strict superset of the
+reference support. Mean normalization can dilute drift with extra weak
+terms; broader coefficient uncertainty can also lower standardized drift.
+46/55 superset-dominator pairs increase median shared-feature variance.
+Only2 lost cases have any deficient dominator. Summing helps partially but
+introduces feature-count preference and remains worse than dyad.
+
+Nominal95% contrast-noise radius coverage averages73.58% over all1041
+nonempty candidate/anchor entries,65.87% over60 references. References for
+Burgers/KdV/forced KdV/KS/compound/divide have zero coverage on all3 anchors.
+This is a different target from prior scalar-dyad intervals; no direct
+coverage-improvement comparison is justified. Median coordinate SD ratio
+1.011 shows matching scale alone is insufficient.
+
+Oracle attribution core4 anchor21, then1024 new check+1024 actual fields
+per system: forcedKdV/KS reference coverage0/0% with reconstructed centers
+becomes93.75/92.29% with clean centers and unchanged estimated noise.
+Known field+noise with extended check gives AC96.97%, forcedKdV93.26%,
+KS96.09%, wave92.77%. Wave's clean-center-only result remains mixed.
+The controls diagnose reconstruction-dependent coefficient-fit bias;
+clean inputs are not a deployable fix or used for method selection.
+
+Research extractor now matches production's full QR layout and arithmetic;
+all initial attempts archived and all45 final cases rerun.819 real-panel
+and45 direct-anchor dyad replays have zero error. Main audit PASS539700
+scores,1050 coverages,277020 fronts, hashes and innovation replay; follow-up
+audit PASS49280 oracle score values,128 coverage rows,16 fresh field replays
+and57 domination rows. All processes finished; constants/ODE_simple valid
+identities preserved; no solvers, PINNs, production changes or commits.
+
+Keep dyad provisionally for structural ranking and complexity as comparator.
+Next untested hypothesis: calibrate raw weak residual moments at fixed
+coefficients, then invert moment tests into coefficient sets, avoiding the
+sensitive fitted-coefficient bootstrap center. Do not equate uncertainty
+with preference for a larger model, or promote a new tuned gate/penalty.
+
+Follow-up completed 2026-11-17: residual_moment_uncertainty_2026-11-17/findings.txt.
+Implemented direct native weak-residual noise regions at fixed coefficient
+vectors, avoiding coefficient-level denominators and noisy Gram inverses.
+All15 systems, anchors24/25/26,45 records/60 references/93 registered cases;
+256 calibration+256 check+256 actual fields per record. Two fixed local/broad
+banks, raw/corrected controls, constants and ODE_simple identities preserved.
+Primary AR-model reference coverage: local75.44%, broad91.96%.
+
+Paired core4 control applies coefficient contrasts to EXACT SAME native
+matrices and fields. Direct versus contrast reference coverage: AC97.92/73.31%,
+forcedKdV74.74/0%, KS86.20/0%, wave82.16/94.27%. No deficient reference slabs.
+This supports nonlinear coefficient-map sensitivity for forcedKdV/KS, while
+wave prevents a universal claim. The regions cover different quantities.
+
+Noise-model repair uses benchmark-known iid FAMILY but estimates amplitude
+from noisy high-order differences; it does not use the true5% amplitude.
+Also test studentization by re-estimating amplitude/correction in each field.
+ALL45 paired records and ALL15 fresh anchors27/28/29 (45 confirmation records).
+Paired -> fresh reference coverage: local iid_fixed96.18 ->95.05%; local
+studentized94.71 ->94.28%; broad iid_fixed95.60 ->95.14%; broad studentized
+95.12 ->94.84%. Correct noise-family restriction plus amplitude estimation
+is the main supported repair; studentization is not a universal winner.
+This is conditional benchmark calibration, not generic colored-noise or
+post-search confidence. Fresh local compound studentized coverage85.29%
+and AC90.36% remain failures. Clean-center oracle controls improve them
+partly but do not fully restore95%; no per-system selection is promoted.
+
+Implemented numerical inversion for wave's one-parameter fixed support,
+both banks/all6 anchors, including infinite-beta limits and two-resolution
+root checks. All12 regions finite and include0.04. Fresh seed27 local interval
+[0.02682156,0.05409908], broad[0.03719576,0.04465890]. Mean widths0.028672/
+0.008354; reused actual-field exact inclusion94.92/95.96%. This demonstrates
+solver-free coefficient precision without claiming new independent coverage
+evidence or multicoefficient confidence sets.
+
+Initial iid correction-rescaling shortcut failed strict wave replay; all
+attempts archived and all45 paired cases rerun by direct field-level
+correction. Final90 iid records replay exactly. Main audit PASS859320 scores,
+1260 matrix/372 fit replays; follow-up PASS572136 iid+24576 paired scores,
+2520 matrix replays, source/input/array hashes and fresh innovations.
+All queries finite/complete and all workers finished. No production edits,
+commits, candidate equation integration or PINNs. Dyad remains structural;
+direct residual moments are the experimental uncertainty direction. Next:
+joint coefficient regions/false-model exclusion and correlated-noise tests,
+with iid_fixed retained as a serious comparator.
+
+Follow-up completed 2026-11-17: joint_moment_regions_2026-11-17/findings.txt.
+All15 systems, fresh anchors30/31/32:45 iid records/60 reference cases,
+1050 candidate/anchor cases. Full-library simultaneous weak-moment error
+bound inverted into quadratic joint coefficient regions, with deterministic
+columns/constants/ODE_simple identities preserved. Per record256 calibration,
+256 check and256 fresh actual fields; no candidate ODE/PDE integration.
+
+IID operator coverage local93.96%, broad94.49%. Bounded references51/60
+local and45/60 broad. Combining constraints under a single calibrated cutoff
+gives57 bounded OUTER regions and3 certified unbounded cases, with94.51%
+operator coverage. Compound's3 intersections become bounded although both
+banks individually are unbounded. Outer ellipsoids are not exact intersections;
+47 references have algorithmic witnesses,59 exact anchor laws are accepted,
+and AC32 has another feasible fitted witness, establishing nonemptiness of
+all60 reference intersections after diagnostics. Exact actual-field reference
+acceptance99.954% shows conservatism, not precise identification.
+
+ForcedKdV remains unbounded on all3 anchors with explicit common negative
+rays. KS combined fourth-derivative coefficient bounds span approximately
+[-3.79,3.63],[-4.68,3.08],[-5.22,1.80]. Explicit +1 coefficient witnesses
+satisfy BOTH banks on all3 anchors despite truth-1. Compatibility cannot
+choose sparse support: zero extension to same-target larger supports is
+necessarily feasible, verified4385 times. Keep dyad as structural heuristic.
+
+Correlated stress core4 x3 anchors x rho+/-0.4 x iid/AR/known-rho models:
+72 paired records,24 distinct stress anchors. Positive-rho operator coverage
+local/broad: iid0/0%, estimated AR30.24/36.72%, known-rho with estimated
+amplitude94.66/95.31%. Negative-rho:75/75%,94.11/95.61%,93.10/94.04%.
+Known shape is an attribution control, not an unknown-noise solution.
+
+Positive-rho estimated AR raw sigma/true median0.7657. Pooling with estimated
+rho improves median0.9326 but minimum0.7123, without a coverage claim.
+Pure-noise estimator median0.6833 diagnoses a failure without signal bias.
+Variance guard can reject accurate estimates because demeaned finite-axis
+variance is below marginal noise variance for positive correlation. Removing
+guard improves pure-noise median0.9760 but leaves ALL raw sigma estimates
+unchanged; thus guard deletion is not a complete repair. High differencing
+orders weaken lag-ratio identification; minimum selection across orders/axes
+is a further concern. No production estimator/guard changes made.
+
+Audit PASS117 records:7137 hash links,119808 operator scores,364980 registered
+query scores,4404 candidate regions,2202 joint certificates,4385 nested
+extensions and2106 fresh matrix replays. All workers exit0, all arrays finite.
+Earlier audit comparisons were corrected for explicit floating-point
+roundoff/condition bounds and exact replay operation order; statistical
+results unchanged. Compound unregistered first_order_fit condition~6.2e10
+precludes treating its reported coordinates as high-precision estimates.
+All artifacts/plots/protocols and numerical audit notes saved in the folder.
+
+Next focused repair: joint correlation/amplitude estimation without noisy
+minimum selection, first on pure-noise controls then fresh iid/colored raw
+coverage. Separately improve complementary moments for forcedKdV/KS. Do not
+use broad uncertainty or model compatibility as a replacement for structure.
+
+Follow-up completed 2026-11-17: spectral_noise_2026-11-17/findings.txt.
+Implemented solver-free joint Gaussian correlation/amplitude estimation on
+exact finite-domain DCT contrasts: retain complementary strips outside the
+low-frequency tensor half. Per-variable separable AR covariance fitted
+jointly, no minimum across axis amplitudes/orders, no signal-variance cap.
+Exact diagonal-plus-rank-two covariance/Schur-complement algebra, three starts,
+explicit boundary failures. Corner-only control fails noise identification
+and is not promoted. Original sources/failed adequacy control retained.
+
+69 exploratory anchors30..32/336 fits, then frozen method on162 fresh paired
+records, seeds33..35: all15 iid x2 models=90; core4 colored +/-0.4 x3 models=72.
+Each256 calibration/check/actual fields;69 distinct fresh anchors, paired
+controls reuse fields. All162 noise models/covariance metrics complete.
+Spectral unknown correlation vs known-iid family: operator coverage
+local92.72 vs93.82%, broad87.80 vs94.64%. Positive-rho core4: old AR36.07/59.08%,
+spectral97.10/97.56%, known-rho/estimated-amp94.92/95.83% (local/broad).
+Negative-rho:94.47/96.13%,96.94/96.84%,94.40/95.15%, respectively.
+Conditional improvement for correlated PDEs, rejected as universal replacement.
+
+IID spectral failures include LV/ODE/VDP and compound. Compound broad
+operator coverage0/256 on all3 anchors, but reference-direction coverage100%:
+operator coverage must not be confused with reference confidence. The spectral
+model infers spurious rho_time~0.25 from signal leakage. Mean nonlinear moment
+correction bias alone has score4.15..4.29 times the cutoff. Keeping calibration,
+pilot, whitening, cutoff and actual fields fixed, oracle actual-field covariance
+correction changes0/256 ->256/256 on all3 broad cases. This is attribution,
+not a deployable fix or independent evidence. Pure injected-noise estimates
+recover near-zero correlation. Wrong covariance can shift mean moments even
+when inferred marginal noise amplitude is larger than the true one.
+
+576 further pure-noise draws (n301/320/1001, rho0/+0.4/-0.4,64 each): spectral
+boundary26/576, including23/192 positive and3/192 iid. Positive-rho correlation
+RMSE0.413/0.357/0.327 versus0.052/0.057/0.025 with full-sample zero-mean oracle.
+This diagnoses information discarded by short-series frequency filtering.
+Fresh local rho curvature SD median0.143 for1D vs0.0083 for multidimensional
+axes; these are diagnostics, not calibrated intervals. Noise parameters were
+held fixed during coverage calibration; their uncertainty is not propagated.
+
+Known-iid combined reference geometry remains57 bounded outer/3 unbounded;
+spectral becomes54/6, adding compound's3 unbounded cases. All60 iid reference
+anchors accepted under both models, illustrating that compatibility does not
+establish coefficient precision. Dyad remains provisional for structural ranking.
+
+Main audit PASS162:11340 hash links,165888 operator scores,508200 registered
+scores,6504 regions,3252 joint certificates,2916 fresh matrix replays.
+Follow-up audit PASS69 exploratory records,912 fit replays,1344 fresh fields,
+1536 oracle-correction scores. All workers exit0; finite arrays; paired fields
+verified; no production changes or dynamics solvers. Results/plots/protocols,
+completion audit and artifact manifest saved in the new folder.
+
+Next focused hypothesis: joint nuisance-signal/covariance fitting retaining
+informative frequencies, then propagate noise-parameter uncertainty. Address
+both signal-induced correction bias and short-ODE correlation identification;
+do not promote spectral globally, tune a per-system cutoff, or add a new
+instability penalty to hide these errors. Keep known-iid estimation when that
+family is explicitly specified by the benchmark.
+
+2026-11-17: latent signal/noise follow-up
+latent_signal_noise_2026-11-17/findings.txt
+White-curvature and correlated-curvature solver-free contrast likelihoods;
+69 old-anchor cases per model, then138 fresh paired records on anchors36..38.
+137 complete; 1 incomplete noise fit retained. 576 paired pure-noise draws.
+Pure-noise correlation information largely restored, but raw-signal model
+misspecification remains. No per-system estimator selection or production edit.
+Matched operator coverage (latent/control):
+iid/local: 78.96/94.23% on44 pairs.
+iid/broad: 83.32/94.34% on44 pairs.
+positive/local: 71.71/96.13% on12 pairs.
+positive/broad: 88.96/96.65% on12 pairs.
+negative/local: 70.80/94.50% on12 pairs.
+negative/broad: 93.91/94.99% on12 pairs.
+Compound broad12/25/21 successes of256 become253/251/253 after oracle
+correction alone. NS local4/5 become6/7; calibration second moments are
+underestimated by about1.8..2.0 in affected directions; seed37 is incomplete.
+KS local coverage0 on all9 primary cases; oracle correction on seed36 in
+all3 regimes leaves0/256. Variance errors of19..58% exceed its concentrated
+local calibration distribution; mean correction bias is negligible.
+All main/diagnostic audits pass. Explicit constants/valid identities retained.
+Keep dyad and specified-iid estimation. Reject this latent fit as universal
+default; defer noise-parameter propagation until covariance adequacy is repaired.
+
+
+2026-11-17: AR2 signal/noise follow-up
+ar2_signal_noise_2026-11-17/findings.txt
+Stationary AR2 nuisance curvature plus AR1 observation noise. Exact banded
+likelihood and analytic-score repair; initial finite-difference version retained.
+23 screen cases per version,576 paired pure-noise fields per version.
+138/138 fresh records complete (seeds39..41); all primary/diagnostic audits PASS.
+iid/local: AR2/control 95.89/94.88% on45 pairs.
+iid/broad: AR2/control 89.81/94.37% on45 pairs.
+positive/local: AR2/control 94.04/95.70% on12 pairs.
+positive/broad: AR2/control 96.13/96.19% on12 pairs.
+negative/local: AR2/control 92.68/92.45% on12 pairs.
+negative/broad: AR2/control 94.50/93.36% on12 pairs.
+KS local83..88% (previous study0); NS99.6/99.9% local/broad, conservative.
+Compound broad3.65% ->98.70% with oracle actual-field correction only.
+Compound axis diagnostic: time sigma1.0066x truth, space1.1949x, shared1.0763x.
+Top1% spatial clean curvature holds67.1% energy; localized signal misallocation
+remains a plausible cause. Axis selection unvalidated: NS/u axis1 boundary.
+14/84 primary variable fits have projected-gradient mapping>1e-3;6 have a
+lower-objective unsuccessful start by>1e-5. Optimizer success is not certification.
+IID exact references60/60 accepted;57 bounded outer/3 unbounded.
+No production change or dyad replacement. Keep specified-family control where
+known. Next: conditioning/convergence, robust or nonstationary curvature,
+residual KS local calibration; noise-parameter uncertainty remains unpropagated.
+
+
+2026-11-17: numerical repair, robust refitting and studentization
+robust_refit_uncertainty_2026-11-17/findings.txt
+All84 previous AR2 fits pass verified transformed-score convergence after
+exact innovations evaluation/polishing. Compound correction bias reduced by
+local quintic contrasts, but576 pure-noise controls expose lost positive-rho
+identification.69 fresh anchors42..44,138 paired fixed/refit records;42 boundary
+warnings retained. Correction refit alone does not propagate normalization.
+Studentization tested/audited on all69 anchors: KS iid local86.46->90.89%,
+NS broad100->94.01%; AC-positive fails due bootstrap parameter drift.
+Temporal likelihood + spatial sign correlations tested on69 fresh parameter
+cases45..47,192 bootstrap fields and576 paired pure-noise fields. Correlation-
+aware GCV pilot reduces paired AC bootstrap amplitude bias24..30% to0.4..1.4%.
+Targeted fresh AC-positive coverage48..50,256 draws per stream; studentized
+local 94.27%, broad 94.53%, both 94.53%.
+All recorded numerical/replay audits PASS. Research artifacts only; constants
+and identities retained; no solver, production change or dyad replacement.
+Full-set coverage for the combined temporal estimator/correlated pilot remains
+unvalidated; do not promote globally or treat pooled draws as fitted anchors.
+
+
+2026-11-17: KS pilot attribution and complete nuisance-procedure screen
+full_pipeline_uncertainty_2026-11-17/findings.txt
+Paired KS-positive48 bootstrap fields: correlation-aware GCV reduces median
+noise amplitude ratios1.349->1.035 (temporal),1.080->1.0003 (local6); near-unit
+temporal fits6/48->0. Prior raw fields/noise increments paired exactly.
+69 independent observed datasets, seeds51..53; each recalibrates128 bootstrap
+fields and16-field normalization. Noise fitting/reconstruction repeated within
+bootstrap; fixed/refitted-pilot normalization compared on identical data.
+iid refitted-pilot local/broad/joint: 44/45 / 44/45 / 44/45.
+positive refitted-pilot local/broad/joint: 11/12 / 12/12 / 12/12.
+negative refitted-pilot local/broad/joint: 12/12 / 12/12 / 12/12.
+KS-positive: 2/3 / 3/3 / 3/3.
+Final numerical/replay audits PASS; retained fit warnings 0.
+Primary reference-region geometry: {'fixed_pilot': {'bounded_outer': 75, 'unbounded_certified': 9}, 'refit_pilot': {'bounded_outer': 75, 'unbounded_certified': 9}}.
+Directly checked zero-coefficient witnesses: 21/186 nonzero reference coordinates within bounded outer regions.
+Exploratory fixed-panel calibration uses the same archived draws and a
+maximum over all candidate supports and both banks. Forced-KdV regions remain
+unbounded in all 9 cases: panel cutoff reductions about 1-10% are insufficient
+to remove observed recession directions (about 59-83% reduction needed even
+for those particular directions). This is not a justification to lower cutoffs.
+Repeated-pilot versus fixed-pilot coverage discordance: [{'bank': 'local', 'fixed_only': 0, 'refit_only': 0, 'both': 67, 'neither': 2}, {'bank': 'broad', 'fixed_only': 0, 'refit_only': 0, 'both': 68, 'neither': 1}, {'bank': 'both', 'fixed_only': 0, 'refit_only': 0, 'both': 68, 'neither': 1}].
+Statistical noise-identification warning: ode/iid/seed52 bootstrap draw112
+has sigma72.47x and rho0.999916 despite a small optimizer gradient. It selects
+the local cutoff; diagnostic deletion lowers it14.46%/5.11% for fixed/refit
+pilots, leaving joint cutoffs unchanged. No draw was removed. The anchor also
+overestimates iid noise correlation (rho0.516). Profile-based identification
+checks remain necessary; numerical convergence alone is not identification.
+Exact QR/Wick algebra speeds the same statistical procedure; initial direct
+run stopped before outcomes, sources/logs preserved. Tiny pilot replay variation
+quantified and exact saved inputs used. No production change, solver or dyad
+replacement. Three outer datasets/case are a screen, not95% certification.
+
+
+2026-11-17: Noise optimizer basin repair and frozen weak-design test
+identifiability_design_2026-11-17/findings.txt
+Profile grid84 fits shows old ode seed52 bootstrap112 was a suboptimal basin,
+not the best likelihood fit. Refining all original starts changes sigma
+10.3437->0.160199 and rho0.999916->0.662192; -2loglik improves19.6677.
+Default15 regression:45 datasets/60 fields, all selected fits okay; max relative sigma change 1.47199e-05.
+Archived128 paired refits cutoff ratios {'local': 0.8553511291869274, 'broad': 0.9999990374303404, 'joint': 0.9999990374303404}; no draws dropped.
+Fresh ODE seeds54..56: {'local': 2, 'broad': 3, 'joint': 3} out of3;384 refits; diagnostic extremes {'original': 0, 'repaired': 0}.
+Frozen12-bank KdV screen selects full-time/half-space k2 windows. Fresh9 cases:
+{'local': 9, 'broad': 9, 'selected': 9, 'original': 9, 'replacement': 9}; geometry {'original': {'unbounded_certified': 9}, 'replacement': {'unbounded_certified': 9}}.
+Smaller dimensionless cutoffs do not resolve unbounded coefficient precision.
+All numerical/replay audits PASS; previous773 artifacts unchanged.
+No solver, production edit or dyad replacement. Larger outer validation and
+weak-design criteria targeting poorly identified directions remain next.
+
+
+2026-11-17: Nuisance normalization, weak directions and profile-start guard
+nuisance_direction_2026-11-17/findings.txt
+18 fresh datasets,128 refits each: studentized versus observed fixed-metric
+bootstrap normalization, paired on identical draws; all-start temporal fitter.
+Coverage: {'ode': {'iid': {'studentized': {'local': 3, 'broad': 3, 'original': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'original': 3}}, 'positive': {'studentized': {'local': 3, 'broad': 3, 'original': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'original': 3}}, 'negative': {'studentized': {'local': 3, 'broad': 3, 'original': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'original': 3}}}, 'kdv_cossin': {'iid': {'studentized': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}}, 'positive': {'studentized': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}}, 'negative': {'studentized': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}}}}
+Reference geometry: {'ode': {'iid': {'studentized': {'original': {'bounded_outer': 3}}, 'fixed_metric': {'original': {'bounded_outer': 3}}}, 'positive': {'studentized': {'original': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}}}, 'negative': {'studentized': {'original': {'bounded_outer': 3}}, 'fixed_metric': {'original': {'bounded_outer': 3}}}}, 'kdv_cossin': {'iid': {'studentized': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}}, 'positive': {'studentized': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}}, 'negative': {'studentized': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}}}}
+KDv full_k4 selected by fixed-candidate weak-direction criterion.
+Independent96-field ODE survey exposes19/32 positive-correlation near-unit
+fits versus0/32 IID and0/32 negative. Gradient convergence missed poor basins.
+Conditional profile-start guard, independent48-field test: {'iid': {'n': 8, 'old_near_unit': 0, 'new_near_unit': 0, 'triggered': 0, 'sigma_ratio': {'min': 0.9289392540483326, 'median': 1.0076442546978388, 'max': 1.0362242871903078}, 'rho_error': {'min': -0.060908895120763626, 'median': 0.0022337117615568343, 'max': 0.07775577531884985}, 'innovation_sigma_ratio': {'min': 0.928096218082974, 'median': 1.0069292615844123, 'max': 1.0343003602649563}, 'statuses': {'ok': 8}, 'likelihood_gains': {'min': 0.0, 'median': 0.0, 'max': 0.0}}, 'positive': {'n': 32, 'old_near_unit': 17, 'new_near_unit': 0, 'triggered': 17, 'sigma_ratio': {'min': 0.8591582739201138, 'median': 1.4228469215062933, 'max': 1.6312920641706685}, 'rho_error': {'min': -0.13511426099016716, 'median': 0.3099301359075028, 'max': 0.3766364618457614}, 'innovation_sigma_ratio': {'min': 0.9039337583236925, 'median': 1.1019278132307346, 'max': 1.1510887025287984}, 'statuses': {'ok': 32}, 'likelihood_gains': {'min': 0.0, 'median': 10.760505838748696, 'max': 23.373420315961813}}, 'negative': {'n': 8, 'old_near_unit': 0, 'new_near_unit': 0, 'triggered': 0, 'sigma_ratio': {'min': 0.930269649588277, 'median': 0.9906494239923443, 'max': 1.0333536209123386}, 'rho_error': {'min': -0.1172069258171543, 'median': -0.024449322462818168, 'max': 0.03471980895806931}, 'innovation_sigma_ratio': {'min': 0.921471963731081, 'median': 0.9733010015022463, 'max': 1.0043755076355745}, 'statuses': {'ok': 8}, 'likelihood_gains': {'min': 0.0, 'median': 0.0, 'max': 0.0}}}
+The guard is a noise-fitting safeguard; full bootstrap uncertainty with it
+has not been evaluated here. Original18-case results remain unchanged.
+Local6 median positive amplitude ratio1.05, but10/32 near-unit estimates;
+no global replacement. Exact Gaussian information calculation: at rho+.4,
+local quintic removal raises local rho scale0.0513->0.314 and log-sigma/rho
+correlation0.984. This is a local bound under exact polynomial elimination,
+not a confidence interval or proof of every temporal-model bias.
+Audits PASS. Prior experiment manifests unchanged. No solver, production
+edit, omitted draw or dyad replacement; constants and valid identities retained.
+
+
+2026-11-17: Guarded full bootstrap and finite nuisance sensitivity
+safeguard_envelope_2026-11-17/findings.txt
+12 ODE datasets,128 guarded bootstrap refits each. Three old positive
+observed fields rerun; nine fresh fields under iid,+.4,-.4. Historical3/3
+unbounded reference regions become bounded; all9 fresh regions bounded.
+Fresh full-library error coverage8/9 in both normalizations. Negative/60
+misses both banks but reference-equation projection remains covered.
+1548 selected fits all ok, no near-unit values;7 guard triggers(5 observed).
+Positive observed amplitude remains about40% high on the fresh fields.
+Finite129-point noise sensitivity,128 conditional fields perpoint. Scalar
+envelope covers12/12 but makespositive/57 unbounded. Exploratory separate
+scenario union retains bounded reference regions12/12(all131 components
+bounded each). Median union outer-width ratio1.418 versus original
+studentized outer enclosure. This is a finite sensitivity diagnostic,
+NOT a calibrated nuisance confidence set or adaptive-search guarantee.
+True-noise covariance reducesnegative/60 broad score9.598->7.427;
+changing correction alone barely matters. With both known,7.447 remains
+above its separate known-noise conditional cutoff7.195. One case cannot
+distinguish a chance tail from systematic undercoverage.
+104 native arithmetic checks,54 complete fits and1548 original-Python
+fit replays passed. All396288 conditional generalized scores and3096
+Loewner bounds audited. Previous692+357+773 artifact files unchanged.
+No solver, production edit, clipping or dropped scenarios. Constants and
+valid identities retained. KdV weakness remains unresolved; dyad provisional.
+
+
+2026-11-17: Noise-region calibration and signal-model stress test
+nuisance_calibration_2026-11-17/findings.txt
+384 controlled calibration fields,192 controlled validation fields,
+192 fresh ODE fields. Nominal97.5% noise-pair LR/Wald regions. Controlled
+calibration frozen before validation. Profile LR model-calibrated coverage
+(iid,+.4,-.4): controlled63/64,64/64,64/64; ODE59/64,7/64,63/64.
+Positive noise-amplitude median/truth0.9998 controlled versus1.4242 ODE.
+All768 records passed original-Python likelihood/gradient audits. This
+is a statistical model-transfer failure, not just optimizer convergence.
+Independent24-field bootstrap follow-up,128 refits each. Continuous
+basic ellipses in(log sigma,atanh rho), fixed before truth scoring.
+Noise coverage: {'iid': {'uncorrected': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'basic_nominal': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'basic_empirical': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'finite_hull': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}}, 'positive': {'uncorrected': {'n': 8, 'covered': 0, 'missed': 8, 'unresolved': 0, 'coverage_lower': 0.0, 'coverage_upper': 0.0, 'binomial95_interval': [0.0, 0.36941664755281917]}, 'basic_nominal': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'basic_empirical': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'finite_hull': {'n': 8, 'covered': 4, 'missed': 4, 'unresolved': 0, 'coverage_lower': 0.5, 'coverage_upper': 0.5, 'binomial95_interval': [0.15701277048705795, 0.842987229512942]}}, 'negative': {'uncorrected': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'basic_nominal': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'basic_empirical': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'finite_hull': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}}}
+Paired likelihood coverage: {'iid': {'nominal': {'lr': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'wald': {'n': 8, 'covered': 6, 'missed': 2, 'unresolved': 0, 'coverage_lower': 0.75, 'coverage_upper': 0.75, 'binomial95_interval': [0.3491442055871758, 0.9681459737500557]}}, 'model_calibrated': {'lr': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'wald': {'n': 8, 'covered': 6, 'missed': 2, 'unresolved': 0, 'coverage_lower': 0.75, 'coverage_upper': 0.75, 'binomial95_interval': [0.3491442055871758, 0.9681459737500557]}}}, 'positive': {'nominal': {'lr': {'n': 8, 'covered': 0, 'missed': 8, 'unresolved': 0, 'coverage_lower': 0.0, 'coverage_upper': 0.0, 'binomial95_interval': [0.0, 0.36941664755281917]}, 'wald': {'n': 8, 'covered': 0, 'missed': 8, 'unresolved': 0, 'coverage_lower': 0.0, 'coverage_upper': 0.0, 'binomial95_interval': [0.0, 0.36941664755281917]}}, 'model_calibrated': {'lr': {'n': 8, 'covered': 0, 'missed': 8, 'unresolved': 0, 'coverage_lower': 0.0, 'coverage_upper': 0.0, 'binomial95_interval': [0.0, 0.36941664755281917]}, 'wald': {'n': 8, 'covered': 0, 'missed': 8, 'unresolved': 0, 'coverage_lower': 0.0, 'coverage_upper': 0.0, 'binomial95_interval': [0.0, 0.36941664755281917]}}}, 'negative': {'nominal': {'lr': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'wald': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}}, 'model_calibrated': {'lr': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'wald': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}}}}
+Finite66-scenario propagation per ellipse,128 conditional draws/point;
+keep both original regions in union. This does NOT certify the continuum.
+Weak-error coverage: {'iid': {'studentized': {'n': 8, 'covered': 7, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.875, 'coverage_upper': 0.875, 'binomial95_interval': [0.47349032912479344, 0.9968402764687481]}, 'fixed_metric': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'scalar': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'finite_union': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}}, 'positive': {'studentized': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'fixed_metric': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'scalar': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'finite_union': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}}, 'negative': {'studentized': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'fixed_metric': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'scalar': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}, 'finite_union': {'n': 8, 'covered': 8, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.6305833524471807, 1.0]}}}
+Reference geometry: {'iid': {'studentized': {'bounded_outer': 8}, 'fixed_metric': {'bounded_outer': 8}, 'finite_union': {'bounded_outer': 8}, 'scalar': {'bounded_outer': 8}}, 'positive': {'studentized': {'bounded_outer': 8}, 'fixed_metric': {'bounded_outer': 8}, 'finite_union': {'bounded_outer': 8}, 'scalar': {'unbounded_certified': 7, 'bounded_outer': 1}}, 'negative': {'studentized': {'bounded_outer': 8}, 'fixed_metric': {'bounded_outer': 8}, 'finite_union': {'bounded_outer': 8}, 'scalar': {'bounded_outer': 8}}}
+Rejected2 faster initializer variants after archived basin failures.
+Original guarded fitter retained. Audits and prior manifest checks pass.
+No solver, production edits, clipped parameters or discarded draws.
+Constants/valid identities retained. KdV remains unresolved, dyad provisional.
+An80-start nuisance-profile stress test on88 fields improved some
+profile likelihoods(max LR reduction6.0042) but changed no membership
+decisions; numerical robustness evidence, not a global-optimality proof.
+The stress test exposed one deficient unrestricted fit(positive/234).
+Posthoc release improved-2loglik25.4127 but increased noise bias and
+changed that case to noncoverage(LR20.0859). Original7/64 count retained;
+a truth-seeded retrospective replacement would give6/64, not validation.
+
+
+2026-11-17: Deterministic spline means for noise estimation
+spline_noise_2026-11-17/findings.txt
+264 fresh paired fields(ODE192,VDP48,Duffing24); full AR1 REML with
+cubic spline mean; dimension selected by held-out prediction, no truth.
+Positive ODE median sigma/truth1.4354 ->0.9987; rho error+.2948 ->-.0086.
+Five positive fields selected p24 and retained signal in noise; worst+27.8%.
+All264 point cases independently audited; no selected-boundary warning.
+Fresh12 paired ODE fields x128 refits x2 methods=3072 refits, spline
+selection repeated in every replicate, same correlated-GCV pilot rule.
+Noise coverage: {'guarded': {'iid': {'uncorrected': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_nominal': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_empirical': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_hull': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}, 'positive': {'uncorrected': {'n': 4, 'covered': 1, 'unresolved': 0, 'binomial95': [0.006309463209709865, 0.8058795503167565]}, 'basic_nominal': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_empirical': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_hull': {'n': 4, 'covered': 3, 'unresolved': 0, 'binomial95': [0.19412044968324338, 0.9936905367902902]}}, 'negative': {'uncorrected': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_nominal': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_empirical': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_hull': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}}, 'spline': {'iid': {'uncorrected': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_nominal': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_empirical': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_hull': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}, 'positive': {'uncorrected': {'n': 4, 'covered': 3, 'unresolved': 1, 'binomial95': [0.2924017738212866, 1.0]}, 'basic_nominal': {'n': 4, 'covered': 2, 'unresolved': 1, 'binomial95': [0.09429932405024609, 0.9915962413403874]}, 'basic_empirical': {'n': 4, 'covered': 2, 'unresolved': 1, 'binomial95': [0.09429932405024609, 0.9915962413403874]}, 'finite_hull': {'n': 4, 'covered': 2, 'unresolved': 1, 'binomial95': [0.09429932405024609, 0.9915962413403874]}}, 'negative': {'uncorrected': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_nominal': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'basic_empirical': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_hull': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}}}
+Weak-error coverage: {'guarded': {'iid': {'studentized': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'fixed_metric': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'scalar': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_union': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}, 'positive': {'studentized': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'fixed_metric': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'scalar': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_union': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}, 'negative': {'studentized': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'fixed_metric': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'scalar': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_union': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}}, 'spline': {'iid': {'studentized': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'fixed_metric': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'scalar': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_union': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}, 'positive': {'studentized': {'n': 4, 'covered': 3, 'unresolved': 1, 'binomial95': [0.2924017738212866, 1.0]}, 'fixed_metric': {'n': 4, 'covered': 3, 'unresolved': 1, 'binomial95': [0.2924017738212866, 1.0]}, 'scalar': {'n': 4, 'covered': 3, 'unresolved': 1, 'binomial95': [0.2924017738212866, 1.0]}, 'finite_union': {'n': 4, 'covered': 3, 'unresolved': 1, 'binomial95': [0.2924017738212866, 1.0]}}, 'negative': {'studentized': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'fixed_metric': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'scalar': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}, 'finite_union': {'n': 4, 'covered': 4, 'unresolved': 0, 'binomial95': [0.3976353643835253, 1.0]}}}}
+Paired spline/guarded outer-width ratios: {'studentized': {'n': 33, 'median': 0.9874648685443126, 'mean': 0.9275984777068675, 'min': 0.5632047619356512, 'max': 1.0210905610010288, 'q05': 0.6470312019753105, 'q95': 1.0165716735994654, 'bounded_pairs': 11, 'total_pairs': 12, 'profiles': {'iid': {'n': 12, 'median': 0.9920344713338063, 'mean': 0.9878989272094224, 'min': 0.9394734286062348, 'max': 1.0206410699088535, 'q05': 0.9517249948532212, 'q95': 1.0169107899585812, 'bounded_pairs': 4, 'total_pairs': 4}, 'positive': {'n': 9, 'median': 0.7080727079205698, 'mean': 0.7524967802461663, 'min': 0.5632047619356512, 'max': 0.9430684648470659, 'q05': 0.5882878813216558, 'q95': 0.9412063808242942, 'bounded_pairs': 3, 'total_pairs': 4}, 'negative': {'n': 12, 'median': 0.996209616082437, 'mean': 0.998624301299838, 'min': 0.9843290813768024, 'max': 1.0210905610010288, 'q05': 0.986053764318933, 'q95': 1.0169767326544372, 'bounded_pairs': 4, 'total_pairs': 4}}}, 'fixed_metric': {'n': 33, 'median': 1.0071229276269236, 'mean': 0.9124363898326978, 'min': 0.4326715637852505, 'max': 1.032328728054886, 'q05': 0.5028971553995695, 'q95': 1.0239739684165374, 'bounded_pairs': 11, 'total_pairs': 12, 'profiles': {'iid': {'n': 12, 'median': 0.9975502249408176, 'mean': 0.9896781801938525, 'min': 0.9372274695500248, 'max': 1.0138658065857968, 'q05': 0.9500874489847692, 'q95': 1.0122312865624856, 'bounded_pairs': 4, 'total_pairs': 4}, 'positive': {'n': 9, 'median': 0.5571015969596133, 'mean': 0.6679763599499084, 'min': 0.4326715637852505, 'max': 0.9757059397478416, 'q05': 0.44352427524720084, 'q95': 0.9749712074928417, 'bounded_pairs': 3, 'total_pairs': 4}, 'negative': {'n': 12, 'median': 1.0183487057110105, 'mean': 1.0185396218836351, 'min': 1.0109274195688867, 'max': 1.032328728054886, 'q05': 1.0114974632902838, 'q95': 1.0303532257912706, 'bounded_pairs': 4, 'total_pairs': 4}}}, 'finite_union': {'n': 33, 'median': 0.6640930520147773, 'mean': 0.7278442543439134, 'min': 0.33937318487199214, 'max': 1.0447319317122128, 'q05': 0.39618033156618276, 'q95': 1.02998538203382, 'bounded_pairs': 11, 'total_pairs': 12, 'profiles': {'iid': {'n': 12, 'median': 0.619977262917959, 'mean': 0.6004355860275067, 'min': 0.38596728325647184, 'max': 0.7742625636359544, 'q05': 0.3953292442070402, 'q95': 0.7623215358609243, 'bounded_pairs': 4, 'total_pairs': 4}, 'positive': {'n': 9, 'median': 0.5059402042533071, 'mean': 0.5087404621386136, 'min': 0.33937318487199214, 'max': 0.6462050112590247, 'q05': 0.3760668049260098, 'q95': 0.6393988334751248, 'bounded_pairs': 3, 'total_pairs': 4}, 'negative': {'n': 12, 'median': 1.0188472864545157, 'mean': 1.0195807668142953, 'min': 1.001163117696598, 'max': 1.0447319317122128, 'q05': 1.0012304840989503, 'q95': 1.0378405466258653, 'bounded_pairs': 4, 'total_pairs': 4}}}, 'scalar': {'n': 30, 'median': 0.664218793016984, 'mean': 0.7151640386670224, 'min': 0.23807556518242662, 'max': 1.0450468510990714, 'q05': 0.3188111342212948, 'q95': 1.0300653408892761, 'bounded_pairs': 10, 'total_pairs': 12, 'profiles': {'iid': {'n': 12, 'median': 0.5510896377685601, 'mean': 0.5698296032564512, 'min': 0.38791079472162665, 'max': 0.7239282946644594, 'q05': 0.39243011553648255, 'q95': 0.7119313330780697, 'bounded_pairs': 4, 'total_pairs': 4}, 'positive': {'n': 6, 'median': 0.4364698146766911, 'mean': 0.3984761878641343, 'min': 0.23807556518242662, 'max': 0.551247802415847, 'q05': 0.24412543597616668, 'q95': 0.530015622280826, 'bounded_pairs': 2, 'total_pairs': 4}, 'negative': {'n': 12, 'median': 1.018223939240576, 'mean': 1.018842399479037, 'min': 0.9998379019430922, 'max': 1.0450468510990714, 'q05': 0.9998408845132373, 'q95': 1.0373758563079274, 'bounded_pairs': 4, 'total_pairs': 4}}}}
+Reference geometry: {'guarded': {'iid': {'studentized': {'bounded_outer': 4}, 'fixed_metric': {'bounded_outer': 4}, 'finite_union': {'bounded_outer': 4}, 'scalar': {'bounded_outer': 4}}, 'positive': {'studentized': {'bounded_outer': 4}, 'fixed_metric': {'bounded_outer': 4}, 'finite_union': {'bounded_outer': 4}, 'scalar': {'unbounded_certified': 2, 'bounded_outer': 2}}, 'negative': {'studentized': {'bounded_outer': 4}, 'fixed_metric': {'bounded_outer': 4}, 'finite_union': {'bounded_outer': 4}, 'scalar': {'bounded_outer': 4}}}, 'spline': {'iid': {'studentized': {'bounded_outer': 4}, 'fixed_metric': {'bounded_outer': 4}, 'finite_union': {'bounded_outer': 4}, 'scalar': {'bounded_outer': 4}}, 'positive': {'studentized': {'bounded_outer': 3, 'unresolved_selected_fit': 1}, 'fixed_metric': {'bounded_outer': 3, 'unresolved_selected_fit': 1}, 'finite_union': {'bounded_outer': 3, 'unresolved_selected_fit': 1}, 'scalar': {'bounded_outer': 3, 'unresolved_selected_fit': 1}}, 'negative': {'studentized': {'bounded_outer': 4}, 'fixed_metric': {'bounded_outer': 4}, 'finite_union': {'bounded_outer': 4}, 'scalar': {'bounded_outer': 4}}}}
+66 scenarios per method/field,128 known-noise conditional fields each.
+Finite union retains both primary regions. No continuous-region or95%
+coverage guarantee from this small cohort. Outer widths are enclosures.
+All numerical/provenance audits pass; prior manifests unchanged. No solver,
+production edit, discarded draw or removal of constants/valid identities.
+This is ode, not ode_simple. KdV remains unresolved; dyad provisional.
+
+
+2026-11-17: Common-contrast noise compatibility and noncompact uncertainty
+spline_compatibility_2026-11-17/findings.txt
+1536 controlled calibration fields,768 controlled validation fields,
+264 fresh ODE/VDP/Duffing fields and1024 positive-noise ODE stress fields.
+Compare CV against a fixed-p64 common-contrast compatibility screen.
+Both archived boundary failures repaired, but fresh stress boundary failures
+only2 ->1; five selections changed, median error essentially unchanged.
+No selection changed on the264-field primary cohort. Not a complete repair.
+p64 nominal noise-region coverage995/1024; amplitude unbounded458/1024.
+Grid calibration:996/1024 covered,473/1024 unbounded. Analytic rho->1,
+sigma^2(1-rho)->eta limit verified independently with first differences.
+Exact controlled n320/rho.4 also unbounded27/64: excess mean flexibility
+removes information needed to distinguish low-frequency signal and noise.
+Posthoc fixed-dimension diagnostic, not adaptive-method validation:
+{'32': {'coverage': {'n': 1024, 'count': 1004, 'fraction': 0.98046875, 'binomial95': [0.9699961107857573, 0.9880299977992089]}, 'unbounded': {'n': 1024, 'count': 1, 'fraction': 0.0009765625, 'binomial95': [2.4724116213658914e-05, 0.00542892773706297]}, 'sigma_absolute_error': {'n': 1024, 'median': 0.04304062694673688, 'mean': 0.05035020991619425, 'min': 3.1261829795958818e-06, 'max': 0.28785871896087145, 'q95': 0.12181073910137061, 'q99': 0.16253442393748518}, 'selected_status': {'ok': 1024}}, '48': {'coverage': {'n': 1024, 'count': 997, 'fraction': 0.9736328125, 'binomial95': [0.9618677460868004, 0.982553553747378]}, 'unbounded': {'n': 1024, 'count': 101, 'fraction': 0.0986328125, 'binomial95': [0.08105649587965777, 0.11855392918487484]}, 'sigma_absolute_error': {'n': 1024, 'median': 0.052587798575054856, 'mean': 0.0629253727869803, 'min': 6.0900630153071234e-05, 'max': 0.6572294382029389, 'q95': 0.1570881811679316, 'q99': 0.2323551486034633}, 'selected_status': {'ok': 1024}}, '64': {'coverage': {'n': 1024, 'count': 995, 'fraction': 0.9716796875, 'binomial95': [0.959579173760646, 0.9809531798212371]}, 'unbounded': {'n': 1024, 'count': 458, 'fraction': 0.447265625, 'binomial95': [0.4165128217885642, 0.4783223901733911]}, 'sigma_absolute_error': {'n': 1024, 'median': 0.06177112230289794, 'mean': 0.5598909473327615, 'min': 4.227497816255976e-06, 'max': 488.592478149096, 'q95': 0.2023123975914035, 'q99': 0.4186930396321671}, 'selected_status': {'ok': 1023, 'boundary': 1}}}
+All audits and prior manifests pass. Numerical warning records retained.
+No production edit, equation solver, dropped field, coefficient propagation
+rerun or full15-system claim. Constants/valid identities retained.
+
+
+2026-11-17: Automatic spline adequacy and selection-aware bootstrap
+spline_adequacy_2026-11-17/findings.txt
+1832 fresh noisy fields:264 benchmarks,1024 positive ODE stress,288
+analytic signals,256 exact-model controls. Primary: adjacent-noise GLS
+extra-mean screen(alpha.01), positive-boundary LR exclusion, then CV.
+All1832 selections independently replayed. No dropped cases.
+Positive ODE usable nominal coverage911 ->949/1024; boundary outputs2 ->0.
+Remaining p24 stratum:42 selected,only5 covered; median sigma bias+22.1%.
+Nonrejection of extra signal is not evidence of negligible mean bias.
+All48 highest-frequency analytic cases correctly cause abstention under
+the rule, but broad validity is not established. No solver or production edit.
+48 new general ODE fields,6144 full bootstrap refits:45/48 nominal ->
+48/48 calibrated, but10 whole-space regions. All observed dimensionsp32.
+256 additional positive fields scanned, first8 p24 choices frozen before
+truth scoring;1024 extra refits. Conditional p24 test: all8 calibrated
+regions whole-space. This is not unconditional coverage or useful precision.
+Audits/source hashes/prior manifests pass. Next: address approximation
+bias in selection, rather than further threshold tuning or merely inflating
+cutoffs. Constants/valid identities retained. No dyad/KdV/full15 replacement.
+
+2026-11-17: Solver-free term-deletion profiling and forced-KdV discrimination
+term_resolution_2026-11-17/findings.txt
+Term count has no role in ranking or deletion tests. On 69 archived fields
+across the default set and colored core controls, all 84 reference instances
+are compatible. Of 213 individual deletions, 146 are excluded for every refit
+and 67 admit explicit coefficients. Independent exact rational replay checks
+729 archived parent/deletion/design classifications. AC diffusion can be zero
+in 9/9, while each reaction term is necessary in 9/9 under these constraints.
+Archived forced-KdV tests require dispersion on 27/27 original bank pairs.
+
+24 new forced-KdV observations and 3648 bootstrap noise refits then compare
+fixed-vector discrimination with free coefficient profiling. The independent
+known-forcing projection retains the physical equation in 12/12 and rejects
+the locked dispersion-only coefficient -0.25 in 6/12 (iid 2/4, positive 0/4,
+negative 4/4). Combining three banks and their forcing projections requires
+dispersion in 12/12 yet still admits a dispersion-only law in 12/12 after
+refitting. A single retrospective coefficient -1/5 satisfies all 72 combined
+inequalities. This is measurement ambiguity on one stored trajectory. Full
+data, protocol, figures, certificates, exact and bootstrap replay checks are
+in the experiment folder. No candidate dynamics were integrated.

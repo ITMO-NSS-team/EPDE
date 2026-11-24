@@ -1,0 +1,707 @@
+{
+  "status": "PASS",
+  "records": 69,
+  "totals": {
+    "operator_scores": 70656,
+    "regions": 2868,
+    "direct_metric_checks": 276,
+    "hash_links": 1863
+  },
+  "max_direct_metric_relative_error": 0.0085334830126359,
+  "rows": [
+    {
+      "status": "PASS",
+      "record": "ac_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.00224724398088183,
+      "hash_links": 27,
+      "result_sha256": "7e1bde67d72d1e39796316fdb53286c2bed3929f94fa1210dd9cc4ccf1bbad91"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 2.9976021664879227e-15,
+      "hash_links": 27,
+      "result_sha256": "f35b47119c36098f5a86bf2db0663c75cdeb69fcd4bf0a6931b47ce6756da58e"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.887379141862766e-15,
+      "hash_links": 27,
+      "result_sha256": "0daff3f4e88ebb1b0f50365b57c17c9305bc00ab20976f573bac386d510a92a9"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_negative_seed42",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.003173116147391797,
+      "hash_links": 27,
+      "result_sha256": "7afdf275ddf9c585993256ee7bb7aee187b97b4a97d532c135838275865c617d"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_negative_seed43",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.004662883295250775,
+      "hash_links": 27,
+      "result_sha256": "c72fa7d4f556fc53b346fdd5e03c0d80fa26551541ca4dee2089a23f366c5a13"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_negative_seed44",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0021230067141424502,
+      "hash_links": 27,
+      "result_sha256": "b027bdd3625df3716d292d472019b59221abcb21080f6668223d996aecaa2f5f"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed42",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.5543122344752192e-15,
+      "hash_links": 27,
+      "result_sha256": "020c78b4fabe379c495999a72fed255634d62fa3b2b7660bf1e8bc65ccaeb6ac"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed43",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 4.773959005888173e-15,
+      "hash_links": 27,
+      "result_sha256": "c9e08c5f11840ded57ac1e25ca893014aaa8234bf7e15a9309577ec390bb9535"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed44",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.9984014443252818e-15,
+      "hash_links": 27,
+      "result_sha256": "2572a542b73dc102b1d8ed0bf4826e686f4064a1084ef75f8dd8fda687eb95f9"
+    },
+    {
+      "status": "PASS",
+      "record": "burgers_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0003538058879966055,
+      "hash_links": 27,
+      "result_sha256": "4e4723c2cfa7031f77dd736ec7809a7d32391e8ac07336efad9eae89f010f22c"
+    },
+    {
+      "status": "PASS",
+      "record": "burgers_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0008742358924126448,
+      "hash_links": 27,
+      "result_sha256": "fa4758d6d4ec2fa6f829afe1503df97f1213326b37cb09ea5ce63276bdce406a"
+    },
+    {
+      "status": "PASS",
+      "record": "burgers_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 6.969344294271984e-05,
+      "hash_links": 27,
+      "result_sha256": "20e8b4ccb5b12b499391043cdbf2d6eef0104fe77f595db1d970c9e3d7ef52eb"
+    },
+    {
+      "status": "PASS",
+      "record": "burgers_inviscid_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0019283500339131177,
+      "hash_links": 27,
+      "result_sha256": "ffe66631a27d7ff84b131c33a6833b7ca5b6b9cc686e864d05a440f155aab717"
+    },
+    {
+      "status": "PASS",
+      "record": "burgers_inviscid_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.00026048029784642157,
+      "hash_links": 27,
+      "result_sha256": "289d7657a2ee51cb39442c83ff2917a4a3366f7e62f01c04835f83fea89a6a33"
+    },
+    {
+      "status": "PASS",
+      "record": "burgers_inviscid_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0010476716465730451,
+      "hash_links": 27,
+      "result_sha256": "8029d444e8aaa709022a0c3d502408a37b77ea6079e800214a9edbc1248db24e"
+    },
+    {
+      "status": "PASS",
+      "record": "duffing_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0085334830126359,
+      "hash_links": 27,
+      "result_sha256": "cfad2982d674acc45f54339777d6987c5085357a729228352d5c65a8e36219d5"
+    },
+    {
+      "status": "PASS",
+      "record": "duffing_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.3322676295501878e-15,
+      "hash_links": 27,
+      "result_sha256": "ab2f3f6f3d9acd294e3a71079ac935f52b193ea157dbad9caadbb95340406075"
+    },
+    {
+      "status": "PASS",
+      "record": "duffing_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 8.881784197001252e-16,
+      "hash_links": 27,
+      "result_sha256": "c835619446d250c17a9e585b56722091cda8db254d9f2f122090dd2a6bbccc83"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0029029745416805364,
+      "hash_links": 27,
+      "result_sha256": "5c398edd7c00c5b2821976749ee996ae9b217d120a0718d5806e7b7614819488"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.2212453270876722e-15,
+      "hash_links": 27,
+      "result_sha256": "61ec9a5df457dc33749cfcd237d25425439e1dbe944876ac00f1d415949eb73e"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.003428312219578844,
+      "hash_links": 27,
+      "result_sha256": "5ab4662164e56d37065533e4e7d2fc105574efb620bec816e2cc8ca54a11b37a"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_negative_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0020379396299320396,
+      "hash_links": 27,
+      "result_sha256": "9a813a9e5cba1cc71f502d4f4e6ddd817722d5fe8004a41f758391c722a01e32"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_negative_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.002411274388842588,
+      "hash_links": 27,
+      "result_sha256": "986e8d9ae116ccfa7ecbef8ef3dfb2cdd738cdf7e7806f02cf99d0527a7bf616"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_negative_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.00025546338869864016,
+      "hash_links": 27,
+      "result_sha256": "f5698163df531f1f2558cf486f12470004fdac8b96374e5d30585158fc91c24f"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_positive_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.5543122344752192e-15,
+      "hash_links": 27,
+      "result_sha256": "d6cd4475070e05d4ad43f329578442a70089ab6af70d305e285719d7b1075710"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_positive_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 7.771561172376096e-16,
+      "hash_links": 27,
+      "result_sha256": "f950d027ae165bf2c6ed37e1a4942e3e2bb9b4383c0efc84a39509e1eeff7d0d"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_cossin_positive_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.6653345369377348e-15,
+      "hash_links": 27,
+      "result_sha256": "ab82fb79e3b56b07ceae4773d5acf7953761c988d84a5d5fdff28159c0990ee4"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.000771022232463725,
+      "hash_links": 27,
+      "result_sha256": "91158bb5accbe679163cc0cab8cf8e897849c2233e7b2a63702c4f962c4f80b3"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.005845329741535621,
+      "hash_links": 27,
+      "result_sha256": "7d49a0f22f9a94f439e519fe728eb8bb5ad4a27cf6302a82cf8f739179265922"
+    },
+    {
+      "status": "PASS",
+      "record": "kdv_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0007276909012585708,
+      "hash_links": 27,
+      "result_sha256": "6cba82b5381e60f1c38e9fdda0789dc1a29e1fe2aff452d80a1f255b81a7344a"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0014842824743499516,
+      "hash_links": 27,
+      "result_sha256": "9e9b1ec518c509783136da9cb0c244fb08563b79356b14ca5a4f4e8f81f276db"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.000274237953048706,
+      "hash_links": 27,
+      "result_sha256": "f6306704efa555904ed60526021c88e3eab2cf03d47fd225619644fc6300f9dc"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0003523957086037921,
+      "hash_links": 27,
+      "result_sha256": "303d341d149fce941ee69f8b35c99399d437ebf314183286969d8960b2e83fab"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_negative_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 4.131785521188647e-05,
+      "hash_links": 27,
+      "result_sha256": "6f884375ae16b6664d0ab7e209c19b3d55ab98db9d4966db73cd3d870dff45da"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_negative_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.00024526785348955027,
+      "hash_links": 27,
+      "result_sha256": "09013b2ac7e7979d8b5de6e0bb42f29914d07e785828a7e59e725c382a4de381"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_negative_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 6.889030596946011e-05,
+      "hash_links": 27,
+      "result_sha256": "36870bd92defbf5e3e9bc72290068de0b208f444d8e53fab11b00263a88beb9a"
+    },
+    {
+      "status": "PASS",
+      "record": "lorenz_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 118,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 4.405364961712621e-13,
+      "hash_links": 27,
+      "result_sha256": "de2dc8dae5e17f557b3ef29c32a2f1b670d5b210250f844354accb0fd0de0c72"
+    },
+    {
+      "status": "PASS",
+      "record": "lorenz_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 118,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.27675647831893e-13,
+      "hash_links": 27,
+      "result_sha256": "a2dbaae328842cd9a38d43adff424109b55d1c652f9ee99be5065378d3ede30b"
+    },
+    {
+      "status": "PASS",
+      "record": "lorenz_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 118,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 3.6548541970660153e-13,
+      "hash_links": 27,
+      "result_sha256": "40b980fde40a5d28257d5d45a3b0f7b48bfb93c9d4cd735ad3b1e1c3dc44a6c6"
+    },
+    {
+      "status": "PASS",
+      "record": "lv_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 72,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 2.19824158875781e-14,
+      "hash_links": 27,
+      "result_sha256": "7b479600b48e60d5c803e76a897f9cc0c649d0a45ab05fa01fde8a32295babd0"
+    },
+    {
+      "status": "PASS",
+      "record": "lv_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 72,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.4432899320127035e-14,
+      "hash_links": 27,
+      "result_sha256": "f3a212543c69721c03e68a620a66a597a4d21e976b5f010fd005ab5360c95a47"
+    },
+    {
+      "status": "PASS",
+      "record": "lv_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 72,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.687538997430238e-14,
+      "hash_links": 27,
+      "result_sha256": "7bcebccb205221d766cfda8253b95df2f77ffd16e7fc40acd3c23a7e9c0af774"
+    },
+    {
+      "status": "PASS",
+      "record": "ns_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 136,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.0258460747536446e-13,
+      "hash_links": 27,
+      "result_sha256": "091b57241038a5e6984cec55316c10474efb349f5ef16c3dd8e9f262e0961914"
+    },
+    {
+      "status": "PASS",
+      "record": "ns_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 136,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 5.134781488891349e-13,
+      "hash_links": 27,
+      "result_sha256": "e53c27c93945c86adeb9428803c5788c3854d67b57b5592a199ea67da58b96fa"
+    },
+    {
+      "status": "PASS",
+      "record": "ns_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 136,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.197930643570544e-13,
+      "hash_links": 27,
+      "result_sha256": "18733e5d376534ac71b5247b048f3b8de64d59f60d3da087375314010b03abe8"
+    },
+    {
+      "status": "PASS",
+      "record": "ode_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 5.1514348342607263e-14,
+      "hash_links": 27,
+      "result_sha256": "afca98e68c57869f64170464f75d9793a44b1ee669cb507ba9e30abaa95e080f"
+    },
+    {
+      "status": "PASS",
+      "record": "ode_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.004299291650340598,
+      "hash_links": 27,
+      "result_sha256": "7d2d3b6769bfcb8f9b688e70ce6431e6cc5bccb48bb0ef66594149eebd79ffe3"
+    },
+    {
+      "status": "PASS",
+      "record": "ode_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 2.5424107263916085e-14,
+      "hash_links": 27,
+      "result_sha256": "e13781df5b39d4cad8e94eadfcde99df952b5785502510d8f651b9d53d07c897"
+    },
+    {
+      "status": "PASS",
+      "record": "pde_compound_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.2677636718194663e-12,
+      "hash_links": 27,
+      "result_sha256": "9c144fc852cb1078487ac54b627fdf990815cec7dd76447a034b8edfe2738137"
+    },
+    {
+      "status": "PASS",
+      "record": "pde_compound_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.003970443957013847,
+      "hash_links": 27,
+      "result_sha256": "9b76d79479ba51f6581e5e9de74e5a319d6daf6a7f07d3256854578b0b7d709a"
+    },
+    {
+      "status": "PASS",
+      "record": "pde_compound_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.7286172493413687e-12,
+      "hash_links": 27,
+      "result_sha256": "b4fe5a3ef21f4e0932cb6d46181a95d2c659cf31da286fc4c7d8a1fe0cf20eb5"
+    },
+    {
+      "status": "PASS",
+      "record": "pde_divide_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 4.374278717023117e-14,
+      "hash_links": 27,
+      "result_sha256": "81965051b09e218c6ba9a7fec8b5dd6aa6fc7bec914f985dfe92ce1e78ffd0ff"
+    },
+    {
+      "status": "PASS",
+      "record": "pde_divide_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0005451770578003279,
+      "hash_links": 27,
+      "result_sha256": "2b57c773e4daccc25f2988a6f06423561ce0683cfde4e94afd8a743b29efa3f8"
+    },
+    {
+      "status": "PASS",
+      "record": "pde_divide_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0041786011441959925,
+      "hash_links": 27,
+      "result_sha256": "2a5774ab94a002e89a246cc6fd2a4d32894e4af726277b3c0e49574f6f2951f2"
+    },
+    {
+      "status": "PASS",
+      "record": "vdp_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.5543122344752192e-15,
+      "hash_links": 27,
+      "result_sha256": "64e9a2dac4349947677a43d732117a05bb9efda5af403a6fd3df921fb8df65fe"
+    },
+    {
+      "status": "PASS",
+      "record": "vdp_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.004325944309924834,
+      "hash_links": 27,
+      "result_sha256": "d579070e40a178b1745c6c947e1da795266382c1468a8d118705eccb0165d46b"
+    },
+    {
+      "status": "PASS",
+      "record": "vdp_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 30,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.6653345369377348e-15,
+      "hash_links": 27,
+      "result_sha256": "e86fd3309373259c9136dd423d8592deea3364d4300376c70bccf8c1c5042ea4"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_iid_seed42",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.007162893472743126,
+      "hash_links": 27,
+      "result_sha256": "9977ba9867822cbd8fbe5d48aaf98e6ba465b7b27ecf10b00abe7f401e8699d4"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_iid_seed43",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 8.58113580193276e-12,
+      "hash_links": 27,
+      "result_sha256": "223ca1dde30bc723b4e8c3d71832b8616ab22696ae08fd412588d242ec2a46f2"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_iid_seed44",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.006683710834114676,
+      "hash_links": 27,
+      "result_sha256": "da8f26f2655e84c12a0aca6b7ae78e22344232d46cb4dde9e65e7eff9b18bed2"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_negative_seed42",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.002657818887884078,
+      "hash_links": 27,
+      "result_sha256": "c02a62dc9dfa51ca64bc73e61d0253c13c2652696415e58c069c3ff69122fd1a"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_negative_seed43",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 7.378209154751403e-12,
+      "hash_links": 27,
+      "result_sha256": "f161d149854c57149bbc83e2b6972c023a4bf88388b0677232a748cf7a2e2f8a"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_negative_seed44",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0014386875088179263,
+      "hash_links": 27,
+      "result_sha256": "0d89fc4e78b35470539a02b58bfc8fcad2aeec515ec1a4ab46ecc6ccab1ea18f"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_positive_seed42",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 4.807709785836778e-12,
+      "hash_links": 27,
+      "result_sha256": "d68bc5e757de44529849d251f9e1250758833688e577307b1198fa85bce09d4a"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_positive_seed43",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 1.0997647237331876e-11,
+      "hash_links": 27,
+      "result_sha256": "d58707d782c874b43583364052646145078c8daf40b7f7f5ef5426df369be443"
+    },
+    {
+      "status": "PASS",
+      "record": "wave_positive_seed44",
+      "operator_scores": 1024,
+      "regions": 36,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 3.938183112950355e-12,
+      "hash_links": 27,
+      "result_sha256": "56463304e9347653db6102d6ddd09168bc7c974def84bec7647ab3b78b230e96"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_positive_seed44",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 2.6645352591003757e-15,
+      "hash_links": 27,
+      "result_sha256": "f122c24586c62d2358b0a562d3f2105a5fb4bb1335e4c2d8543c2b85e15b6614"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_positive_seed43",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 3.552713678800501e-15,
+      "hash_links": 27,
+      "result_sha256": "8d52114a140902978762ce5acc0acaf7d4c0d21a0b4b64b819c025201d036659"
+    },
+    {
+      "status": "PASS",
+      "record": "ks_positive_seed42",
+      "operator_scores": 1024,
+      "regions": 32,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 3.552713678800501e-15,
+      "hash_links": 27,
+      "result_sha256": "8fbe7d1ad56d372353ea324c8f89f4ad42fd201a13293ffef647b67dc9c45331"
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_student.py": "ed5a96a77c103fb1d5722edadc719167cfc84cf3b1872a727d8a4f7dc1c74efb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_student_available.py": "3a227f02c14e23fad538f42128ef74ea984a2689ac7d7f83672028ceb57cb066"
+  }
+}

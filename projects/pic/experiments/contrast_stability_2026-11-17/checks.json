@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "production_dyad_replay_error": 0.0,
+  "zero_nonzero_constant_null_same": true,
+  "noise_scale_invariant_null": true,
+  "known_gaussian_null_mean": 0.9876679318943541,
+  "known_gaussian_null_coverage": 0.952850341796875,
+  "feature_target_units_invariant": true,
+  "axis_transposition_invariant": true,
+  "drift_response": [
+    840.7056611335585
+  ],
+  "identities": [
+    {
+      "candidate": "energy",
+      "constant_present": true,
+      "q_bias": 0.48744666459650593
+    },
+    {
+      "candidate": "phase_sin",
+      "constant_present": true,
+      "q_bias": 0.3437251422308624
+    },
+    {
+      "candidate": "phase_cos",
+      "constant_present": true,
+      "q_bias": 1.2435633020219763
+    }
+  ],
+  "real_panel_replay_cases": 819,
+  "real_panel_replay_max_absolute_error": 0.0,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\checks.py": "b60387e0ed8fa47e47d315af856ddde0fd34992fb8f84cc5dbaa1848fef469f8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\metric.py": "138ef56f2e65720237b7d606d6ee08c0a5e205e443a80907ae91e4bcde9bf4ca",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\ode_simple_constants.py": "73146ec4c7d67505ab9b4593f56df021a8fb6f234ed105b4a03468c4d2c4f3da",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\protocol.txt": "6bd9b5ec31d5ccd579f3477a410713e001bca350725309f99974fd2c97df4d30"
+  }
+}

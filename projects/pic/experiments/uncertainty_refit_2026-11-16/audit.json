@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "records": 45,
+  "measurement_records": 17280,
+  "pair_axis_pilot_coverage_checks": 5742,
+  "pareto_front_checks": 93120,
+  "coefficient_support_checks": 1222200,
+  "clean_energy_checks": 403200,
+  "nonfinite": 0,
+  "source_input_array_hashes": true,
+  "fresh_anchor_data_replay": true,
+  "shared_innovation_replay": true,
+  "conditional_scope": "Refitted main coefficients and GCV; frozen bank choices, correction maps, weights and geometry.",
+  "interpreter": "C:\\Users\\NSSLab\\anaconda3\\envs\\EPDE_3_14\\python.exe",
+  "python": "3.14.2 | packaged by Anaconda, Inc. | (main, Dec 19 2025, 11:44:48) [MSC v.1929 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "auxiliary_source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\uncertainty_refit_2026-11-16\\audit.py": "a8dd72c4e98b1fa35139ae84c37262245a3799d47bd7b8a978d0d887768e677b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\uncertainty_refit_2026-11-16\\analyze.py": "8f425ed4a3579450b4b02865a694b95172bbd81b94c49de317f424de47f07b32",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\uncertainty_refit_2026-11-16\\checks.py": "247ee1914ef42cdd31942d05f8993a956a8b5491089f2f74538cbe108afc19dd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\uncertainty_refit_2026-11-16\\run_suite.py": "d9a65e72ab309c2e06cc586afc0796d3dbc2368b5e63c623537ebd83ffc4f0b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\deriv_calculators.py": "5d2a7c105fdb6375da6a1eea39640bd6cc2a6e6c6dcf8bf1d905f17b2a82263d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c"
+  }
+}

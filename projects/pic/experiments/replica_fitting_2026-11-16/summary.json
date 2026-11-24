@@ -1,0 +1,10 @@
+{
+  "legacy_continuous": 7,
+  "legacy_replica_iv": 9,
+  "legacy_replica_iv_mean": 6,
+  "legacy_replica_ols": 7,
+  "local_continuous": 6,
+  "local_replica_iv": 5,
+  "local_replica_iv_mean": 6,
+  "local_replica_ols": 7
+}

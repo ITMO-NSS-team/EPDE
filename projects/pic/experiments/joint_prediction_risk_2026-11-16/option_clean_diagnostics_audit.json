@@ -1,0 +1,20 @@
+{
+  "system_runs": 12,
+  "option_rows": 216,
+  "input_sha256": {
+    "ac_seed0.json": "9ef1762cffd95253c110e6995c6ece8c3b5199220310d8a0f5aedda5976dd194",
+    "ac_seed1.json": "2ae6f0f500f16df8c97708160fbf88facc4ccf0322d7c336a0f0b1ff4101f25c",
+    "ac_seed2.json": "88257696cf13d64903c5943263075d1d4af3e6ac0a867b2189d16a9d39963aa9",
+    "wave_seed0.json": "d94136cc8bd355d5fce65dbeb78e0339d74ecda7f3ae9fd9101be8ee5acc4852",
+    "wave_seed1.json": "ab54402a37e7e301c49005afc370e46a1dda1eb9ac0aad20782c58400bdfd835",
+    "wave_seed2.json": "62f40dcd898dd40cdc70c33496bb83879329193ef3f80d36bc3b720d2b51deab",
+    "kdv_cossin_seed0.json": "8ded7a5ecbdade28836549a8364116ee0fadb69e4a0a493a28ce9538727dd764",
+    "kdv_cossin_seed1.json": "a21f33fa4bf0a603e2506a19df8f4a784931042b3cc2ea5a1ba6082ed56b9c22",
+    "kdv_cossin_seed2.json": "96ad4819243dbfb13ce3b199863a596b7cfd192cf2074facf5d910426a6dc3d9",
+    "ks_seed0.json": "e057f155f0b550a9a70665908f2325ba8a5e2ce2fba3f32a851631eaa3af0feb",
+    "ks_seed1.json": "33fd4ceae8f9b470bc976b4b51e6fe8a099f5b46316731634fa36c71c3085783",
+    "ks_seed2.json": "3a76b0004c00c1866d44dfe31bb99be718ebd9af27abd9c34de49a2a9045d335"
+  },
+  "source_sha256": "79e72c1e46b8ff38f615317f9684d5437ab551c2d7131a2ccf88705eb653b100",
+  "post_selection_only": true
+}

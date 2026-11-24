@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "oracle_score_values": 32896,
+  "oracle_coverage_rows": 128,
+  "extension_score_values": 16384,
+  "field_replays": 16,
+  "dominator_rows": 57,
+  "source_input_array_hashes": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\audit_followups.py": "44034a382c785f46b1c7b004dc9f5fa04d7f6885dbc21c9813269fa106d8626b"
+  }
+}

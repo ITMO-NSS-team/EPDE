@@ -1,0 +1,13 @@
+{
+  "coverage_verified": true,
+  "source_hashes_verified": true,
+  "baseline_hashes_verified": true,
+  "frontiers_unchanged": true,
+  "finite_samples": true,
+  "max_frozen_score_scaled_error": 9.470468929472647e-10,
+  "source_sha256": {
+    "run_paired.py": "5a6b56f1e4bbb5fe88637c543d6f8114ed5f71bba958601190aac060c31abe3b",
+    "summarize.py": "afc6ef4ae2172c77de15653dd561c4ec6be9400e5a7bccd0056ef5a73db23839",
+    "validate_model.py": "5f8a9b7436830c9fe2c923400e98e294690de6d2262bb54099f6b664fa69a22d"
+  }
+}

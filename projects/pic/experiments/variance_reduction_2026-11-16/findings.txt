@@ -1,0 +1,198 @@
+Broad raw validation with a common noise-covariance metric
+Completed 2026-11-16. Entirely solver-free; experimental fixed-panel study.
+
+The best tested combination retains a registered law or equivalent in 56/60
+equation/seed cases, versus the previous 54/60. It combines the previously
+saved joint-risk coefficient fits with q0 broad raw validation and a common
+training-only covariance metric. Gains are KS seed 0 and forced KdV seed 2;
+there are no losses relative to the previous local-score baseline.
+
+This is progress in structural retention, not proof of accurate equation
+recovery. KS's new margin is small relative to conditional noise. Forced
+KdV's gain has a larger margin but its fitted coefficients remain poor.
+All comparisons reuse three noisy records per system, at 5% noise. No new
+evolutionary search or independent replication has been performed.
+
+What changed and what was held fixed
+
+The prior raw-local validation experiment had excessive variance. This study
+evaluates the same coefficients on broad weak moments over the common
+interior of the three raw sample domains. AC, previously infeasible on some
+fixed local supports, is now feasible without extrapolation. Interpolation
+and Gaussian corrections are fixed; validation does not smooth raw data.
+
+For each training rotation, the weak geometry is chosen by the previous
+training-only numerical-rank rule. q0 is minimum weak-test smoothness, q1
+adds one order. Fourier modes increase only as required by the fixed panel.
+The real moment basis preserves the full complex-conjugate inner product.
+
+For each bank, the training pilot and estimated raw-noise model produce 128
+operator perturbations. Their centered, column-normalized row covariances
+are pooled into one C shared by all candidate equations. The validation
+score is <W r_left, W r_right> / ||W pilot_target||^2, with W=C^(-1/2).
+The two residuals come from held-out raw groups. Target and predictor noise
+both enter C. No candidate-dependent residual covariance or tuned ridge is
+used. The 64-draw prefix is a sensitivity control. All covariances passed the
+predefined full-rank numerical check; no null direction was discarded.
+
+The dyad, candidate panels, registered equivalents and coefficients remain
+unchanged. Baseline fits are the old local continuous CLSM fits. Joint fits
+are from joint_prediction_risk_2026-11-16, where training-only conditional
+joint target/predictor prediction risk selected among six existing fits.
+No new coefficient estimator is introduced by this validation experiment.
+
+All 15 systems completed at seeds 0, 1 and 2: 45 system runs, 20 equation
+slots per seed, 60 equation/seed cases. Targeted wave/KS/AC/forced-KdV runs
+are a subset of those 45, not additional independent observations.
+
+Registered-structure retention, with equivalent laws credited per slot:
+
+Validation                 Baseline coefficients    Joint-risk coefficients
+Previous local score             54/60                     54/60
+q0 broad plain                   52/60                     53/60
+q0 broad white64                 55/60                     56/60
+q0 broad white128                53/60                     56/60
+q1 broad plain                   51/60                     51/60
+q1 broad white64                 54/60                     56/60
+q1 broad white128                54/60                     55/60
+
+q0 with joint fits gives the same retained cases with 64 and 128 covariance
+draws. This prefix stability is not independent seed replication. q1 white128
+loses NS seed 1, equation slot 0. q0 white128 with baseline fits loses AC
+seed 1 and NS seed 1 while gaining KS seed 0. Thus whitening alone is not a
+universal score replacement, and q should not be chosen per system from
+these outcomes. All arms are preserved in core_summary.json.
+
+Margins and remaining failures
+
+The following differences are competitor score minus reference score for
+q0 white128 with joint fits. Positive favors the reference. SDs are paired
+conditional perturbation SDs, holding coefficients, geometry, weights and
+noise estimates fixed. They are not calibrated confidence statements.
+
+Case               Closest eligible competitor  Gap        Paired SD128
+KS seed 0          reference plus u^3            +3.505e-6   4.320e-6
+Forced KdV seed 2  drop u*u_x                    +0.058893   0.008180
+AC seed 0          drop diffusion               -0.0001920  0.00005757
+AC seed 2          reference plus cos(2t)       -0.00007451 0.0001414
+Forced KdV seed 0  first_order_fit               -0.353499   0.008444
+Forced KdV seed 1  time_harmonic                 -0.240222   0.004829
+
+KS seed 0 is a tentative gain: its closest gap is only 0.81 SD, and the
+reference-plus-u alternative is also within one SD. The clean full-bank
+gap against adding u^3 is +3.369e-6, consistent in direction but small.
+The 64-draw uncertainty estimate is 4.885e-6 for this closest comparison.
+
+Forced KdV seed 2 has gap/SD about 7.20 against dropping u*u_x. The clean
+full-bank gap is +0.057174, agreeing with the observed +0.058893. However,
+the frozen clean residual energy of the retained reference fit is 0.076932.
+For terms [u*u_x, u_xxx, cos(t)sin(x)], the true coefficients are [-6,-1,1].
+The three frozen training-fold fits are approximately:
+  [10.31154, -0.30340,  0.18364]
+  [ 2.49377, -0.10640, -0.06412]
+  [-1.47782, -0.33486,  0.20059]
+Survival of that support must not be reported as successful recovery of
+these coefficients. The conditional SD also omits their fitting uncertainty.
+
+The four remaining failures are AC seeds 0/2 and forced KdV seeds 0/1.
+For AC seed 0, removing the tiny diffusion term wins even on the clean
+field with the frozen fitted coefficients (clean gap -0.00014461). This
+cannot be repaired solely by reducing stochastic validation variance.
+For AC seed 2, the extra harmonic wins noisily despite losing on the clean
+field (+0.00011056). Dropping diffusion also narrowly wins, with observed
+gap -6.614e-7 and clean gap -8.984e-7. More than one failure mechanism exists.
+For forced KdV seeds 0/1, the leading incorrect alternatives also beat the
+frozen reference fit on clean data: gaps -0.35072 and -0.23699. Coefficient
+bias and the validation representation still need attention.
+
+Saved-fit ranking diagnostics
+
+Separately, score the six already fitted reference options on this new
+validation bank. This assesses discrimination but is NOT a new independently
+validated selection pipeline. Using the lowest score to choose a fit would
+consume the validation groups and require an outer evaluation split.
+
+q0 white128 ranks a more accurate option ahead of local CLSM on all three
+wave records, while preserving local CLSM on all KS and AC records:
+  Wave seed 0: broad0_OLS,  frozen energy 0.077635 -> 0.00019954
+  Wave seed 1: broad0_CLSM, frozen energy 0.156958 -> 0.01242290
+  Wave seed 2: local_OLS,   frozen energy 0.011719 -> 0.00196640
+The corresponding score gaps / paired SD are -0.12062 / 0.07756,
+-0.30478 / 0.12938, and -0.03522 / 0.01012. These margins are diagnostics,
+not post-selection confidence intervals. Across these three records,
+median frozen wave energy is 0.001966 versus baseline 0.077635.
+
+Across all 60 cases the diagnostic lowest-score option improves frozen
+accuracy in 21, worsens it in 7, and leaves it unchanged in 32 relative to
+local CLSM. Regressions include all three unforced KdV records, Lorenz
+seed 1 slots 0/2 and seed 2 slot 2, and inviscid Burgers seed 2. This is
+another reason not to promote this score as a universal fitting selector.
+Forced KdV picks local CLSM on all three records, leaving its substantial
+coefficient error. Actual joint-fit coefficients used for the 56/60 count
+have not changed; do not combine that count with the diagnostic wave gains
+as though they came from one new fitted pipeline.
+
+Noise and clean controls
+
+Broad raw moments substantially reduce the previous raw-local variance in
+some difficult cases. For wave seed 0, the exact-coefficient conditional
+SD falls from 4.140 in the previous raw-local study to 0.13885 with broad
+unweighted moments. Its whitened SD is 0.95350. Whitening changes the
+metric and need not minimize absolute SD; useful pairwise discrimination
+is the relevant check. SD ratios between metrics are not accuracy ratios.
+
+On KS, full clean exact-coefficient energies in the whitened broad metric
+are about 6e-14, while interpolation of clean subsamples gives about 2e-7.
+For forced KdV, clean cross products can be slightly negative because the
+two deterministic interpolation errors differ. Signed cross products are
+preserved, not clipped. Clean results were computed after geometry, weights
+and coefficients were frozen; none were used to select those quantities.
+
+Constants and the user's ODE_simple dataset
+
+The real-basis transform and common weighting preserve each constant's
+actual modulated weak column; no all-ones substitution, centering or global
+constant ban is introduced. The separate ODE_simple control uses
+u=sin(t)+1.3*cos(t), not the core registry's different forced-oscillator ode.
+Its valid identities remain:
+  u' cos(t) + u sin(t) = 1
+  u cos(t) - u' sin(t) = 1.3
+  (u')^2 + u^2 = 2.69
+All use derivative order at most 1. Only the energy law needs derivative
+power 2. In q0/q1, plain/white128 controls, the largest clean residual energy
+is 1.123e-12. Deleting the necessary constants with other coefficients fixed
+raises that energy to 3.51-4.30. These are identity-preservation controls,
+not extra independent search experiments. No accepted identity is removed.
+
+Checks, artifacts and interpretation
+
+Real-basis isometry, feature-unit invariance, full-rank covariance handling,
+constant-column preservation and ODE_simple controls pass. All 45 cases and
+all validation arms are feasible. Maximum empirical whitening identity
+error is 2.810e-11. Source/input hashes and every saved perturbation array
+are audited; coefficients and dyad are verified against frozen inputs.
+See completion_audit.json for the final machine-readable checks.
+
+protocol.txt records the method before outcomes. run_broad_validation.py and
+moments.py implement it; summarize.py and analyze_margins.py produce the
+tables and figure. core_primary_margins.csv contains paired comparisons;
+core_closest_eligible_competitor.csv summarizes reference competitors;
+margin_summary.json records all arm-specific gains/losses and example fits.
+validation_comparison.png/.svg displays structural counts and the separate
+saved-fit ranking diagnostic. All 45 raw JSON/NPZ pairs remain in results/.
+
+Covariance weighting has a methodological precedent in weak-form inference
+(WENDy, https://arxiv.org/abs/2302.13271; WSINDy,
+https://par.nsf.gov/servlets/purl/10327340). This experiment implements a
+common operator-noise validation metric, not WENDy's candidate-specific
+iteratively reweighted parameter fitting. Those papers do not validate
+the particular metric or outcomes reported here.
+
+Next step: freeze q0 white128 with the saved joint-risk fitting rule and
+evaluate fresh noise seeds before considering production use. Any fit
+selection based on the new validation score needs a separate outer split.
+Keep structural retention and coefficient accuracy as separate outcomes.
+The remaining AC/forced-KdV cases need coefficient-bias/representation
+diagnostics; additional dyad penalties or deleting constants would not
+address the evidence above. No production code or defaults were changed,
+no candidate differential equation was solved, and no commit was created.

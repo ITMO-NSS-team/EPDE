@@ -1,0 +1,10 @@
+Post-exploration diagnostic, before its outcomes: quantify information loss
+in short one-dimensional high-frequency contrasts. Shapes301,320,1001,
+rho0,+0.4,-0.4,64 independent noise-only draws each;576 fits per method.
+RNG[950106,n,profile_id,draw]. True sigma0.2 defines only injected noise.
+Compare primary spectral strips with exact full-sample Gaussian AR likelihood
+when the mean is KNOWN zero and no signal exists. This second estimator is
+an oracle attribution control, not a proposal to fit raw EPDE fields.
+Neither fit receives true sigma or rho. Report boundary frequency and errors;
+no use of these draws to choose spectral cutoffs or alter the frozen coverage
+method. Save every row and field hash, including failures.

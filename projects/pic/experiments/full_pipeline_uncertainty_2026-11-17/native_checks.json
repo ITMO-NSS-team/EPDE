@@ -1,0 +1,809 @@
+{
+  "status": "COMPLETE_WITH_NUMERICAL_DIFFERENCES",
+  "inverses": [
+    {
+      "n": 7,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "relative_error": 6.758369881644451e-15,
+      "dense_relative_error": 2.682861643946866e-12,
+      "strict_agreement": true,
+      "python_seconds": 0.00021680002100765705,
+      "native_seconds": 8.03999719209969e-05
+    },
+    {
+      "n": 7,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "relative_error": 1.735427552452551e-15,
+      "dense_relative_error": 4.115132583751414e-13,
+      "strict_agreement": true,
+      "python_seconds": 0.0001498999772593379,
+      "native_seconds": 4.5199994929134846e-05
+    },
+    {
+      "n": 7,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "relative_error": 1.6193819211972642e-15,
+      "dense_relative_error": 1.0705913812360855e-13,
+      "strict_agreement": true,
+      "python_seconds": 0.0001385000068694353,
+      "native_seconds": 4.179996903985739e-05
+    },
+    {
+      "n": 7,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "relative_error": 2.6308205341343136e-16,
+      "dense_relative_error": 9.64634195849258e-15,
+      "strict_agreement": true,
+      "python_seconds": 0.00013679999392479658,
+      "native_seconds": 3.7699996028095484e-05
+    },
+    {
+      "n": 7,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "relative_error": 3.754939277894164e-16,
+      "dense_relative_error": 5.818340993756837e-11,
+      "strict_agreement": true,
+      "python_seconds": 0.00014139997074380517,
+      "native_seconds": 3.779999678954482e-05
+    },
+    {
+      "n": 7,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "relative_error": 1.563791595980448e-16,
+      "dense_relative_error": 1.5637915959804482e-16,
+      "strict_agreement": true,
+      "python_seconds": 0.00013590004527941346,
+      "native_seconds": 3.71999922208488e-05
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "relative_error": 1.4088997317596711e-11,
+      "dense_relative_error": 1.5421720809684393e-09,
+      "strict_agreement": false,
+      "python_seconds": 0.0006407999899238348,
+      "native_seconds": 4.469999112188816e-05
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "relative_error": 8.475054770100114e-13,
+      "dense_relative_error": 4.902321902152332e-11,
+      "strict_agreement": true,
+      "python_seconds": 0.0006390000344254076,
+      "native_seconds": 4.029995761811733e-05
+    },
+    {
+      "n": 32,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "relative_error": 7.202038039441693e-14,
+      "dense_relative_error": 1.5873137784386877e-11,
+      "strict_agreement": true,
+      "python_seconds": 0.0006366000161506236,
+      "native_seconds": 4.0899962186813354e-05
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "relative_error": 1.893821648487258e-15,
+      "dense_relative_error": 8.504980857752417e-14,
+      "strict_agreement": true,
+      "python_seconds": 0.0006439000135287642,
+      "native_seconds": 3.9000005926936865e-05
+    },
+    {
+      "n": 32,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "relative_error": 2.2972607925925995e-11,
+      "dense_relative_error": 4.995092786919601e-08,
+      "strict_agreement": false,
+      "python_seconds": 0.0006686999695375562,
+      "native_seconds": 4.290003562346101e-05
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "relative_error": 1.5606551200061906e-16,
+      "dense_relative_error": 4.681965360018571e-16,
+      "strict_agreement": true,
+      "python_seconds": 0.0006562999915331602,
+      "native_seconds": 4.2300031054764986e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "relative_error": 3.345351695780253e-10,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.005963900010101497,
+      "native_seconds": 6.130000110715628e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "relative_error": 2.327061315637564e-12,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.006064799963496625,
+      "native_seconds": 6.440002471208572e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "relative_error": 8.517482400867581e-11,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.006140800018329173,
+      "native_seconds": 6.849999772384763e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "relative_error": 4.394390879619533e-15,
+      "dense_relative_error": null,
+      "strict_agreement": true,
+      "python_seconds": 0.006005500035826117,
+      "native_seconds": 6.78999931551516e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "relative_error": 2.786771194657862e-08,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.005972399958409369,
+      "native_seconds": 5.8800040278583765e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "relative_error": 1.5606551199811359e-16,
+      "dense_relative_error": null,
+      "strict_agreement": true,
+      "python_seconds": 0.0060258000157773495,
+      "native_seconds": 6.120000034570694e-05
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "relative_error": 6.573401685314748e-10,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.01983429997926578,
+      "native_seconds": 9.769998723641038e-05
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "relative_error": 2.396441603018312e-12,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.019839400018099695,
+      "native_seconds": 0.00010139995720237494
+    },
+    {
+      "n": 1001,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "relative_error": 2.9197858766988845e-10,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.019857300037983805,
+      "native_seconds": 0.00010190001921728253
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "relative_error": 4.394390879565537e-15,
+      "dense_relative_error": null,
+      "strict_agreement": true,
+      "python_seconds": 0.02068780001718551,
+      "native_seconds": 0.00010810000821948051
+    },
+    {
+      "n": 1001,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "relative_error": 3.172026594756944e-07,
+      "dense_relative_error": null,
+      "strict_agreement": false,
+      "python_seconds": 0.02034819999244064,
+      "native_seconds": 9.869999485090375e-05
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "relative_error": 1.5606551199811359e-16,
+      "dense_relative_error": null,
+      "strict_agreement": true,
+      "python_seconds": 0.01981780002824962,
+      "native_seconds": 9.889999637380242e-05
+    }
+  ],
+  "objectives": [
+    {
+      "n": 7,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 1.0394225161909133e-12
+    },
+    {
+      "n": 7,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 5.197112271787541e-13
+    },
+    {
+      "n": 7,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 6.496390726193208e-14
+    },
+    {
+      "n": 7,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 6.572520305780927e-14
+    },
+    {
+      "n": 7,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 8.315380130495314e-12
+    },
+    {
+      "n": 7,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 5.551115123125783e-17
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 9.313225746154785e-10
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 1.4551915228366852e-11
+    },
+    {
+      "n": 32,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 1.6195269951502222e-18
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 2.2737367544323206e-13
+    },
+    {
+      "n": 32,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 2.384185791015625e-07
+    },
+    {
+      "n": 32,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 0.0
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 6.336706270815284e-09
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 2.4752755400925253e-11
+    },
+    {
+      "n": 301,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 6.33670642347095e-09
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 2.4202861936828413e-14
+    },
+    {
+      "n": 301,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 2.595514949987887e-05
+    },
+    {
+      "n": 301,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 0.0
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.0,
+        1e-05,
+        0.99,
+        -0.8
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 7.621772754595746e-09
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.4,
+        0.001,
+        0.95,
+        -0.5
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 1.488631440338395e-11
+    },
+    {
+      "n": 1001,
+      "pars": [
+        -0.4,
+        1e-08,
+        0.9,
+        0.0
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 1.524354551786511e-08
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.95,
+        1.0,
+        0.8,
+        -0.6
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 1.3944401189291966e-12
+    },
+    {
+      "n": 1001,
+      "pars": [
+        -0.95,
+        1e-10,
+        0.99,
+        -0.99
+      ],
+      "strict_agreement": false,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 0.0002497502497504911
+    },
+    {
+      "n": 1001,
+      "pars": [
+        0.1,
+        10.0,
+        -0.3,
+        0.3
+      ],
+      "strict_agreement": true,
+      "objective_difference": 0.0,
+      "max_gradient_difference": 0.0
+    }
+  ],
+  "fits": [
+    {
+      "system": "duffing",
+      "shape": [
+        1001
+      ],
+      "raw_sha256": "63cdfe4510394dc48a770b15453eceddb6ea951328d30b13880a9933583d0b45",
+      "python_model": [
+        0.02392042475127239,
+        [
+          0.014783011245768694
+        ],
+        [
+          2
+        ]
+      ],
+      "native_model": [
+        0.023920435734060632,
+        [
+          0.01478360948121742
+        ],
+        [
+          2
+        ]
+      ],
+      "python_status": "ok",
+      "native_status": "ok",
+      "python_seconds": 12.69424149999395,
+      "native_seconds": 1.038835899962578,
+      "relative_sigma_difference": 4.591385125429781e-07,
+      "max_rho_difference": 5.982354487257119e-07,
+      "python_projected_gradient": 4.154737502481964e-06,
+      "native_projected_gradient": 5.19567576517943e-07,
+      "model_agreement": true
+    },
+    {
+      "system": "lv",
+      "shape": [
+        301
+      ],
+      "raw_sha256": "7a5a58925b6d733e00c72714b2e3e337affdaaec2a2713ad7d00f51df2634c69",
+      "python_model": [
+        0.061761562110912833,
+        [
+          0.03048893636470835
+        ],
+        [
+          2
+        ]
+      ],
+      "native_model": [
+        0.06176156273968058,
+        [
+          0.03048897968616092
+        ],
+        [
+          2
+        ]
+      ],
+      "python_status": "ok",
+      "native_status": "ok",
+      "python_seconds": 0.9231560000334866,
+      "native_seconds": 0.3789671999984421,
+      "relative_sigma_difference": 1.0180567500128745e-08,
+      "max_rho_difference": 4.332145256760733e-08,
+      "python_projected_gradient": 2.9223292008495605e-08,
+      "native_projected_gradient": 3.807242898723473e-08,
+      "model_agreement": true
+    },
+    {
+      "system": "lorenz",
+      "shape": [
+        1041
+      ],
+      "raw_sha256": "2bd9f51394e0de9c0e1c1b2832c735c373a2a1dd6051a5af7d0b1a2304d31f07",
+      "python_model": [
+        0.37237095103093587,
+        [
+          -0.0032527157681372784
+        ],
+        [
+          2
+        ]
+      ],
+      "native_model": [
+        0.3723709158124671,
+        [
+          -0.003252466332534189
+        ],
+        [
+          2
+        ]
+      ],
+      "python_status": "ok",
+      "native_status": "ok",
+      "python_seconds": 5.102351999958046,
+      "native_seconds": 0.9959090999909677,
+      "relative_sigma_difference": 9.457899075027143e-08,
+      "max_rho_difference": 2.494356030895324e-07,
+      "python_projected_gradient": 1.4702482786788096e-07,
+      "native_projected_gradient": 1.495246746863188e-06,
+      "model_agreement": true
+    },
+    {
+      "system": "pde_compound",
+      "shape": [
+        251,
+        100
+      ],
+      "raw_sha256": "4e604684a79282b177890893b8b920a77982120d0576a71fe372cdcc81f7fade",
+      "python_model": [
+        0.008949877412798934,
+        [
+          0.0036334549253095746,
+          -0.009699690260747332
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "native_model": [
+        0.008949878098577772,
+        [
+          0.003633484781666998,
+          -0.009699690260747332
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "python_status": "ok",
+      "native_status": "ok",
+      "python_seconds": 5.3670546999783255,
+      "native_seconds": 0.945981600030791,
+      "relative_sigma_difference": 7.662438350486411e-08,
+      "max_rho_difference": 2.98563574232559e-08,
+      "python_projected_gradient": 2.0545461208200388e-07,
+      "native_projected_gradient": 2.6220438437878427e-07,
+      "model_agreement": true
+    }
+  ],
+  "interpretation": "Optional runtime probe, not used in the primary 69-dataset experiment. Timings measured under concurrent workload; numerical agreement does not imply bit-identical fits.",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\native_checks.py": "d474c17d3ead2b3e5a493fb766b8fa9136195c8a9039ff54a96f323576a90935",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\native_inverse.py": "e926728d6def32661c74e7d0aed163f10f0ebf5edcfeb721a899862176a76fd5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\native_probe\\selected_inverse.c": "76246accb70dcb2e24d70515b4926e546395816f4340f2aa425ca2d76065993b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\native_probe\\selected_inverse.dll": "cfe65cacf938ce972510adab067ab5e067816fc85a8021a8a0576f9932d20e59",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\native_probe\\build.cmd": "7ce93885432b03dd77ae90476acf8ec126b17b8177d85afb9eda6768f8d627fb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\native_probe\\protocol.txt": "58e143c667af0c4f166080aa08a20a537d0b51d8fa53dca6a8cc1a301d50fbe4"
+  }
+}

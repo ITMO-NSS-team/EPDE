@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "scope": "Exploratory clean-center attribution only; no method change.",
+  "rows": [
+    {
+      "system": "ac",
+      "seed": 28,
+      "baseline_coverage": 0.8984375,
+      "oracle_coverage": 0.921875,
+      "oracle_radius": 1.1863279396243636,
+      "oracle_median_sd_ratio": 1.0051753994464623
+    },
+    {
+      "system": "pde_compound",
+      "seed": 28,
+      "baseline_coverage": 0.8359375,
+      "oracle_coverage": 0.90625,
+      "oracle_radius": 1.10770504817664,
+      "oracle_median_sd_ratio": 0.9967521939830764
+    },
+    {
+      "system": "pde_compound",
+      "seed": 29,
+      "baseline_coverage": 0.8359375,
+      "oracle_coverage": 0.91796875,
+      "oracle_radius": 1.110309131721995,
+      "oracle_median_sd_ratio": 0.9943553021060487
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\remaining_oracle.py": "42a55cc0122203ee7d31675edd44b00be2eadb77a5e1ac74ebecbddb78c2ecc5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\remaining_oracle_protocol.txt": "1e64b37e09aee8141f3911bc0b59dd8d470323ec950a871ef9ad98affbd174ba"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\ac_seed28.json": "944bbbb040ee5d853368f79bd0776b3635805c2b6b1c63323b70c1a3a0f130e9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\ac_seed28.npz": "440be3f1c90d6dbf3925079ac1e565cc649eb112b00992f9fb52c50a26f49478",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\ac_seed28_frozen.json": "e6fe6635ff537ac2ee494ff932307bfdc5ca279675980a4ebdbb7a88c17d5d5c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\pde_compound_seed28.json": "781816c30bf10f2e737f874cfbb889741c76b7c33f9eba91a23c0bd698a2eab8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\pde_compound_seed28.npz": "50c9a74fa61337c1232642a27b1aad8dc5ca94e037c4ed8fabf3ae0a9ea2fd7e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\pde_compound_seed28_frozen.json": "7e73679c25111b06a168ce73fba275dde2a1f859f82c31b11c731548613146db",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\pde_compound_seed29.json": "b3846c725a1277f4008ee91879edd7e3878905dd495250a391ae3612e11eb893",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\pde_compound_seed29.npz": "2ad60d546cc0120b04ff7d685fcc4958064e7a8a0cda72b562d5c7d28b181930",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\pde_compound_seed29_frozen.json": "7df40b255de2865ce72348b6466f9c109c65f1fcb038c45b92a8c5d5c3599f89"
+  },
+  "array_sha256": "a6af17cda7df66a90bc302ae6da5a605d72375db898d646057be4409ce3c10ba"
+}

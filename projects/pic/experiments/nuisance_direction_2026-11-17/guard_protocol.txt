@@ -1,0 +1,22 @@
+Conditional profile-start guard, fixed before independent evaluation
+===================================================================
+The survey profile probe found another missed optimum: positive seed102 drops
+noise sigma10.32->0.133 with20.93 units of improved -2log likelihood. Refining
+the same original basins is insufficient. Preserve the original18-case test.
+
+Candidate safeguard: run the existing repaired fitter. If absolute temporal
+rho exceeds0.95 (the pre-existing diagnostic threshold), or status is not ok,
+run additional fixed-rho nuisance optimizations at [-.8,-.4,0,.4,.8]. At each
+rho use the previous nuisance solution and four original fixed nuisance starts;
+certify/polish its nuisance optimum using the exact innovations objective.
+Then release rho and refine each of the five fixed-rho optima with the same exact
+objective and bounds. Include the original repaired estimate in the comparison
+and choose the lowest exact objective. Preserve all intermediate warnings.
+The threshold triggers extra work only: it does not cap rho, reject the old
+fit, change likelihood, or force a moderate-rho answer.
+
+Evaluate all96 archived survey observations for regression, and independent
+positive seeds132..163 (32), iid132..139 (8), negative132..139 (8).
+Record fitted parameters and all optimization details before scoring truth.
+No threshold tuning after outcomes. This validates noise fitting only; the
+full bootstrap uncertainty procedure with this new guard is not tested here.

@@ -1,0 +1,62 @@
+{
+  "legacy_continuous": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "legacy_old": {
+    "cross": 50,
+    "ordinary": 46,
+    "oracle": 52,
+    "uncorrected_cross": 45
+  },
+  "legacy_raw_clsm": {
+    "cross": 51,
+    "ordinary": 46,
+    "oracle": 53,
+    "uncorrected_cross": 48
+  },
+  "legacy_raw_clsm_half": {
+    "cross": 52,
+    "ordinary": 46,
+    "oracle": 53,
+    "uncorrected_cross": 48
+  },
+  "legacy_raw_ols": {
+    "cross": 52,
+    "ordinary": 48,
+    "oracle": 54,
+    "uncorrected_cross": 50
+  },
+  "local_continuous": {
+    "cross": 54,
+    "ordinary": 53,
+    "oracle": 55,
+    "uncorrected_cross": 54
+  },
+  "local_old": {
+    "cross": 51,
+    "ordinary": 51,
+    "oracle": 52,
+    "uncorrected_cross": 52
+  },
+  "local_raw_clsm": {
+    "cross": 54,
+    "ordinary": 52,
+    "oracle": 56,
+    "uncorrected_cross": 55
+  },
+  "local_raw_clsm_half": {
+    "cross": 54,
+    "ordinary": 53,
+    "oracle": 56,
+    "uncorrected_cross": 54
+  },
+  "local_raw_ols": {
+    "cross": 54,
+    "ordinary": 54,
+    "oracle": 56,
+    "uncorrected_cross": 54
+  }
+}

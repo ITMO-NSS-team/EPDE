@@ -1,0 +1,132 @@
+Joint prediction-risk fitting: tested, mixed gains, no structural recovery gain
+2026-11-16
+
+Completed the default 15 systems at 5% noise, seeds 0/1/2: 45 system runs,
+20 equation slots and 60 equation/seed cases. The primary joint-risk selector
+retains registered structures in 54/60 cases, exactly the same cases as the
+existing local continuous CLSM fit with local held-out discrepancy and dyad.
+This is a finite-candidate Pareto-panel result, not 54 accurately recovered
+equations or a new evolutionary-search benchmark. Registered equivalents
+are credited, and slots of multi-equation systems are assessed separately.
+
+The new method selects between local/broad-minimum-q/broad-q+1 weak fitting
+banks and OLS/CLSM estimators. It jointly perturbs target and predictor moments,
+refits coefficients, and estimates noise-corrected prediction risk plus
+conditional bootstrap optimism on a COMMON LOCAL training weak bank. There
+are 128 shared operator-error draws. No clean or held-out score selects a fit.
+The original 32/128-draw prefix still defines the point-fit correction. All
+options and ablations were frozen before testing; see protocol.txt.
+
+The four difficult systems were tested first. Their KS preservation and
+partial forced-KdV gains justified running the unchanged method on the other
+11 default systems. This sequential expansion is exploratory and reuses the
+same noise seeds; it is not an independent confirmation dataset.
+
+Primary structural result, local cross discrepancy plus fixed dyad:
+  Existing local CLSM                         54/60
+  Joint prediction risk, all fitting options  54/60
+  Joint prediction risk, CLSM options only    54/60
+  Joint prediction risk, OLS options only     53/60
+  Prediction-spread-only selection            53/60
+The primary 64-draw average also retains 54/60, with the same failure cases.
+The separate ordinary-score control increases 53 -> 54/60. The old spectral
+cross-score control increases 53 -> 54/60, but is not the primary comparison.
+
+Unresolved cases are AC seeds 0 and 2, forced KdV seeds 0/1/2, and KS seed 0.
+All are slot 0. There are no new primary structural losses or recoveries.
+
+Accuracy uses residual energy of the fitted reference coefficients on the
+same frozen clean bank, evaluated only AFTER selection. Lower is better.
+Across 60 cases it improves in 26, worsens in 16, and is exactly unchanged in
+18. These counts include small changes and are not significance claims.
+Median energy over three seeds for selected equation slots:
+
+  System/slot         Existing CLSM       Joint risk
+  AC                  1.36763e-4          1.42923e-4
+  wave                7.76346e-2          7.76346e-2
+  forced KdV          1.46930e-1          9.11119e-2
+  KS                  4.95190e-5          4.95190e-5
+  compound PDE        8.09010e-4          4.61250e-4
+  van der Pol         2.09188e-3          1.41923e-3
+  Duffing             1.23740e-4          8.72542e-5
+  Lorenz slot 1       5.63224e-5          9.25994e-5
+  NS slot 0           1.53726e-4          2.11652e-4
+
+Forced-KdV median energy improves by about 38%, and compound PDE and van der
+Pol improve in all three seeds. However, forced KdV remains inaccurate and
+its registered structure still fails all three cases. Improvements in median
+accuracy can also hide regressions: Duffing seed 0 worsens 5.30x, from
+1.53894e-5 to 8.15698e-5; division-PDE seed 0 worsens 3.74x, from 7.64061e-6
+to 2.85494e-5. Both still retain their registered structures. These ratios
+start from small errors; they are not catastrophic failures on the scale of
+the earlier broad-bank KS results. See accuracy_comparison.csv and
+accuracy_per_slot.csv for every case/slot, rather than just these examples.
+
+The important positive result is KS: all nine reference fits choose local
+CLSM and preserve its previous accuracy. Unlike predictor-only information
+selection, common-bank prediction risk recognizes the large residual error
+of broad fits. For seed 0/fold 0, local CLSM has estimated risk -0.0001907
+and local clean energy 7.56e-6; broad-minimum-q CLSM has risk 0.27663 and local
+clean energy 0.27631. Signed negative risk estimates are retained as specified.
+This supports including the complete fitted residual, but does not by itself
+prove the bootstrap optimism component is what prevents the KS failure.
+
+Wave supplies a direct counterexample to the risk ranking. Seed 0/fold 0:
+  Option             coefficient  estimated risk  local clean energy
+  Local CLSM         0.0481738     0.0098484       0.0416918
+  Broad-min-q OLS    0.0408289     0.0376281       0.00042494
+The true coefficient is 0.04. The selector prefers the
+less accurate fit; the same ordering error exists on the fixed spectral
+clean bank. It therefore cannot be explained by comparing two different
+evaluation representations. The local training proxy and its noise/bias
+correction misrank these options. This is consistent with the previously
+diagnosed reconstruction target error; these data do not uniquely isolate
+every source of risk-estimation bias. Conditional variance modeling cannot
+guarantee correction of a common reconstruction bias. No calibrated
+confidence interpretation is assigned to these risk estimates.
+
+Some forced-KdV perturbation fits are also sensitive. Seed 0/fold 0 broad-min-q
+CLSM has estimated risk 0.7224 but optimism Monte Carlo SE 1.2462. The SE is
+conditional and is not an uncertainty interval for physical-model validity
+or for a paired difference between fitting options. Half/full comparisons
+change 198/3150 candidate/fold choices, including 8/180 reference choices,
+while leaving all primary retention indicators unchanged. Half/full averaging
+shares fitted coefficients, noise covariance, data, and nested draws; it
+checks numerical averaging sensitivity, not independent replication.
+
+Validation and provenance:
+All 45 cases reproduce the saved local baseline scores exactly (maximum
+scaled difference 0). Stored point-coefficient checks pass. Source and input
+hash checks pass. All score and risk entries are finite, and all 270 proposed
+broad fold/bank arms are feasible under the frozen numerical-rank rule.
+Fixed-X optimism equals 2*sigma_eff^2*rank(X), fixed-coefficient mean optimism
+is zero to rounding, and feature-unit rescaling/solver agreement checks pass.
+These are mathematical and implementation checks, not evidence that the
+conditional model captures all real reconstruction errors.
+
+An initial equivalent arithmetic implementation failed the predefined
+coefficient-reproduction check on an ill-conditioned extra AC candidate.
+The original operation order was restored, without changing the statistical
+method or tolerance. The seven earlier results and original source/checks
+are preserved separately and excluded from the 45 reported runs. Details
+are in implementation_notes.txt. Post-selection option diagnostics cover
+the 12 targeted cases and are independently saved with their input hashes.
+
+Recommendation: keep local continuous CLSM plus local held-out discrepancy
+and dyad as the working baseline. Preserve joint risk as an experimental
+fitting selector with partial accuracy gains; do not promote it as a fix for
+the remaining failures. The next focused test should examine validation
+moment bias, especially wave: compare reconstructed moments against independent
+raw-observation weak moments for fixed candidate coefficients. Prior raw-data
+coefficient fitting already failed as a universal replacement; validating
+existing fits with raw moments is a different, as-yet untested use. Its
+quadrature error and variance must be measured explicitly. Do not substitute
+another arbitrary stability threshold for this bias diagnosis.
+
+All work used saved fields, reconstruction, weak quadrature and linear
+algebra. No candidate equation integration, PINNs, clean-data regeneration,
+production edits, or commits. Worker processes have finished. Code, per-case
+results, audit JSON, CSV summaries and scientific figures are in this folder.
+Remaining limits include frozen bootstrap correction maps, reused records,
+three seeds, a finite candidate pool and conditional rather than calibrated
+uncertainty.

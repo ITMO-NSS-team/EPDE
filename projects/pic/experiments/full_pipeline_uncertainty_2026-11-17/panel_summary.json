@@ -1,0 +1,216 @@
+{
+  "status": "COMPLETE",
+  "scope": "Exploratory post hoc comparison; fixed candidate panel only",
+  "datasets": 69,
+  "summary": [
+    {
+      "profile": "iid",
+      "mode": "fixed_pilot",
+      "datasets": 45,
+      "covered": 44,
+      "original_covered": 44,
+      "original_only": 0,
+      "panel_only": 0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit_pilot",
+      "datasets": 45,
+      "covered": 44,
+      "original_covered": 44,
+      "original_only": 0,
+      "panel_only": 0
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed_pilot",
+      "datasets": 12,
+      "covered": 12,
+      "original_covered": 12,
+      "original_only": 0,
+      "panel_only": 0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit_pilot",
+      "datasets": 12,
+      "covered": 12,
+      "original_covered": 12,
+      "original_only": 0,
+      "panel_only": 0
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed_pilot",
+      "datasets": 12,
+      "covered": 12,
+      "original_covered": 12,
+      "original_only": 0,
+      "panel_only": 0
+    },
+    {
+      "profile": "negative",
+      "mode": "refit_pilot",
+      "datasets": 12,
+      "covered": 12,
+      "original_covered": 12,
+      "original_only": 0,
+      "panel_only": 0
+    }
+  ],
+  "failures": [
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "covered": false,
+      "original_covered": false,
+      "cutoff_ratio": 0.90647213910275
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "covered": false,
+      "original_covered": false,
+      "cutoff_ratio": 0.9148776708889955
+    }
+  ],
+  "reference_failures": [],
+  "geometry": {
+    "fixed_pilot": {
+      "bounded_outer": 75,
+      "unbounded_certified": 9
+    },
+    "refit_pilot": {
+      "bounded_outer": 75,
+      "unbounded_certified": 9
+    }
+  },
+  "geometry_changes": [],
+  "cutoff_ratios": {
+    "fixed_pilot": [
+      0.41154370866057205,
+      0.9089991087462055,
+      1.0000000000000013
+    ],
+    "refit_pilot": [
+      0.4089042816165813,
+      0.9149662260751054,
+      1.0000000000000027
+    ]
+  },
+  "width_ratios": {
+    "fixed_pilot": [
+      0.6068005642794583,
+      0.9247863858326951,
+      29.967423430572904
+    ],
+    "refit_pilot": [
+      0.6045426913207561,
+      0.9251789134893476,
+      29.796240999989973
+    ]
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\analyze_panel.py": "5f06645449954a943a54cb4109f63021944359d6c4ee250259776dbc29071ade"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_iid_seed51.json": "fb607adec13156697fd6a336878e234a2d517908c958a9e578e851511bd64306",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_iid_seed52.json": "376fea9f13a9eae74da53f26e40159fbba1c1b492be1513da69026319325ce42",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_iid_seed53.json": "a9a91a13d539f095f24be7b19537c0463eac1c50cd2a2f8714ca0347d1450fab",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_negative_seed51.json": "ab89056b30614d95f177a038826fe283d9d54b06327de9dabb337a3950ecee5d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_negative_seed52.json": "87508d7a4151062c8081e11fdd5fd923bf29b36c08b50cdb7dd3ea0b743a46ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_negative_seed53.json": "c0a8be5ba0c95cb19bdca2b26c518218ad6844cb019f0910bfa5fbe15a874ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_positive_seed51.json": "0daa30505a7eaa71dc69f0945073c8cac4d3c05334c4333bc20e7dbd50b755e6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_positive_seed52.json": "81d3b090f0c121a7044f1a26c9e4d71de4fa92b7d46a9dfc3631f5e638e34c85",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_positive_seed53.json": "38bd3b34e45d68861293fd3a74ae360f8116e8d625d33b525702bad92c252aa4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_iid_seed51.json": "6d041bbdcb685ffbe490394dffed158f37f4a73415a4cf45e39111bc76b68024",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_iid_seed52.json": "718f37787e416a8f5efb3bc4db221574be346d8931e50a2fcfd017c01f56e782",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_iid_seed53.json": "0aade39960629f2b96ebea5e7bdb99ccc9a3e0159ffe0a6266b5f5a5a9fe5a13",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_inviscid_iid_seed51.json": "55a49f2e07f46766678fb3d7f85dd0efca815f97c43dbc9850994d3a2303037f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_inviscid_iid_seed52.json": "2f885f15e3e787685c8ce0c0a00c7a0d7cf13a38542910c9fdd18679b475c474",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_inviscid_iid_seed53.json": "de4fb3a45956abcd91401a195ae3063fcd834ba7129e04293a1016e51ebba011",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\duffing_iid_seed51.json": "64aa33bc9004f792901563885f5d4c94d9e0362b8eb1a6ed153322a2ed347d1e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\duffing_iid_seed52.json": "14fed928df12571e3032787a5a876ca2e74d9fb8541077c6b3fd07b5594e4703",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\duffing_iid_seed53.json": "ab5ca20d854d0de2d00a16a8974a08941776142b3f653f97c3938e0f23468163",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_iid_seed51.json": "57b923bf0cfc294fd898d591c8a8bb034345e6f7f06ce069f013542ec38e44ed",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_iid_seed52.json": "ce01bf6c1800b54eb652664dfdd9f1cad8db66a00a2bb17c5f7d39ee0db63f1b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_iid_seed53.json": "6dfb469700fc9379a699d30ae4e340a5e5a86c62002e4f2adc661d091fe6ed02",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_negative_seed51.json": "f1b5bff791799ea8b1b1e5585a321c2c822219e028825558a64453b2830d86d0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_negative_seed52.json": "2f5b5cbc4442137b97552eb3d370d31f081c7fa6480c72bb6650a06b8c50939e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_negative_seed53.json": "3a77d7597f2ad254937cee8011d7384b41eec8c03790100176ff5344ba5c740e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_positive_seed51.json": "abe2dfe8c3e40612f71e2156b3d08a15adc80e5f523ac9a8de70b70a6e9242b4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_positive_seed52.json": "728f0d8caac02737e9405e39426d27f5ccac84f532c9d220ea0c90fe210fd4ae",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_positive_seed53.json": "f6b42077c186768cfcfa03e72414aae74e5f601ce3b9a803317b7587914750f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_iid_seed51.json": "9fb9ea519846ca489b689f98d099820330a3746e1852b4e717582c6723af0763",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_iid_seed52.json": "9cdff758669c6e64e901b549fa3e439e6644dd07f057c69d0889ddb84630744b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_iid_seed53.json": "c94d849fba70030b21978f9526541c5e9cdddd30f2a3fbe5b8dbe527d9f29a4c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_iid_seed51.json": "415492ca574ab60b621d94d5bda0536b8f51005b09d0a031fc2eb60f40009434",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_iid_seed52.json": "dcc080165aaa23d3c24195f5def15c02f3752c4787644eac14545e6ebf85a2de",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_iid_seed53.json": "d9c43463960705a2c535cf36fd9f1f2d6360904b868fe61bac96400f65412885",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_negative_seed51.json": "b5f94305b8bdc2804d6fbd3bddba78b770d155775593f73693d68f728ef14004",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_negative_seed52.json": "b092ea0213778d41446737245d9b86fd394046d242558b6b7a456b1ea20512b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_negative_seed53.json": "017003dad8ba7dc1e35c4088b47d26830d0dac5826c90e67dbcb742a4fc05d85",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_positive_seed51.json": "a7c5a2b79a84ba54c9aa0272ad56e5259fa561d04082a3d3f3efeae70fcbb43e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_positive_seed52.json": "068d5636c2a1aeb20932cdc02289fdd71012183fdfccc4e5ee7604d6c2a7ef1f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_positive_seed53.json": "a9e1b254fee57fe3bbc9cbb345b98925f028dbb9d03336934d093953d27e99ad",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lorenz_iid_seed51.json": "a20e9f3855373ef862aaad9674614a74a2cf89cfd618e39cf298668125d7248a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lorenz_iid_seed52.json": "0f8254d9b338580db4023ee97741e8a9a9179b1d67d93d60ceea05e3f593da09",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lorenz_iid_seed53.json": "e76fa5ac719cf84567191e6041766ac264290624eb04d6c0f27ddbec9a54b971",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lv_iid_seed51.json": "e15355b2c8109fb7e10b325af135af08a5f870f26650f546fc9604635d844187",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lv_iid_seed52.json": "4c6b6a111947bb19ca91e2f87b4170e21d690796649d3ae1e998a64e4793007a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lv_iid_seed53.json": "575a49c07554785c7b56b546804f56debdc817d2dee62d9d9d1d0ccbe3f3966b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ns_iid_seed51.json": "45a975e4d572f1c7e0950883d3cd2562ea321e42c6a3c0aae20596de0a79df49",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ns_iid_seed52.json": "117794cc113fb850671d8fe56b689e979336b91e4a8a0f10e1f76dfb862bba19",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ns_iid_seed53.json": "17f2fe4eebcd0f61bc3dfc78bd33858aacf4c22981f55f5dacd94df59d63aadf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ode_iid_seed51.json": "0da8d718acc7d401e8db5833fe15f85623bbb370b13d92a0543e063a06b728bd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ode_iid_seed52.json": "591a43166b4737979a9cb59849244f62ba44efc88b2e14d822bc289e767c746e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ode_iid_seed53.json": "36a89bfe1cca5cab576d1da44ad88b6371d981939a858e3b50a50fd369e94e41",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_compound_iid_seed51.json": "c848ee452947f326ab2b799b3b475d599ecf9fa44bc4b963740a06245e17706e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_compound_iid_seed52.json": "152ee918243bfa9e0d4c4a21d6ff274cdf0e5c234e0ad5907b0ece36fbf7089c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_compound_iid_seed53.json": "0000001160ec26a2d464c41e64a7d355c3f18db995dbe7d01cadde807e43c13d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_divide_iid_seed51.json": "b33f941a59c50618486caf22481d2aa9b75550649bd300f2b3f59e7aee6172cd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_divide_iid_seed52.json": "347c351f449f2a8ba21345a2aeb654035bd857517bceac7e146a274731c71ce7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_divide_iid_seed53.json": "dc7a4cc6668f07510785dc04b5b98eae4394e7f1502966166e17fb3da3e4befc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\vdp_iid_seed51.json": "94e21fc461c943a484b69157eac3a0bb0fc9e2d28605fa44a566862acfa09557",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\vdp_iid_seed52.json": "0c52ce245de5b8572b7d1ce3d5cceddbc5d650a6e2b8026e2b3ebe189aebc7e0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\vdp_iid_seed53.json": "c967ece6465096abb399a31b76613680ce49d63a606532f8eeb6f2f44058fc29",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_iid_seed51.json": "e3465b138669e03a7a9e1ea58514d6bdf070bbb6bd5c414eb10899b34593735f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_iid_seed52.json": "27d9c3e34c2f3fe8f7995486866c3e9c73902056f936e0498f212a4e44d5b4c8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_iid_seed53.json": "47a3b7c12982122a7ad52819fd0d5a37f6347f349821469562f5a5a1a4de37a9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_negative_seed51.json": "6c1830aa67c9842e6c7098a49d078ba38f466ef5b60d6cbf7f2cb60193b0dcac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_negative_seed52.json": "82937c83b8c466da78b430ca84f6e7f91add9231f3b02b403508df1af1383c0b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_negative_seed53.json": "175a7743f5ffec24bd0605cfc4de4902e8e2daaad725463fc93ea51bd8db7e22",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_positive_seed51.json": "8951d5b9915bfd90e02fd28b0893853fc3e50e5295afc56d9511de17bdd9bb62",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_positive_seed52.json": "eb6178d6a493f2f656772269e1d1e16241a9f6e46e73711a0c9e5bd98c23aaca",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_positive_seed53.json": "9de02fb05a143e9502e56fc3709b9cc52e28c5203bc2f501e09cd30719016134"
+  }
+}

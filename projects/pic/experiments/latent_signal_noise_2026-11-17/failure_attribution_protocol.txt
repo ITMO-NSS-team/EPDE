@@ -1,0 +1,15 @@
+Posthoc mechanism experiment, defined after partial fresh coverage revealed
+NS iid and compound iid undercoverage. Keep the full primary138 records fixed.
+On both systems and all three fresh anchors36..38, replace ONLY the Gaussian
+moment correction with the known generating covariance. Reuse identical actual
+evaluation fields, pilot, calibration metric, check cutoff and banks. This is
+an oracle attribution control, not a deployable repair or selection rule.
+
+Save original and oracle-correction error Grams/scores, their empirical means,
+and the clean-field correction difference. Compare original coverage with
+oracle-correction coverage and the metric-normalized mean error. If correcting
+the mean leaves undercoverage, fixed calibration variance/shape also matters.
+No new model is selected, no confidence cutoff is inflated and no candidate
+dynamics is integrated. All primary outcomes including failures remain intact.
+If an anchor noise fit is incomplete, attribution is explicitly unavailable:
+save a SKIPPED record with the original reason, without filling it from truth.

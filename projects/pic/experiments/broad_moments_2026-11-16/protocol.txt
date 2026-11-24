@@ -1,0 +1,35 @@
+Broad compact weak moments with numerical-rank selection, 2026-11-16
+Targeted test: ac, wave, kdv_cossin, ks; seeds0/1/2; saved 5% noisy fields.
+
+Motivation: the current raw-grid PCR selector requires more natural-stride
+window centers than the ENTIRE library width. It can exclude physically
+broad windows even when a particular candidate has few coefficients. Local
+evaluation exposed an inherited radius4 forced-KdV window with enormous
+derivative noise. Test broad support without selecting its size from truth.
+
+For each outer training group, take its full observed time span, the full
+spatial span, and only the edge crop required by remaining pointwise finite
+differences. Use one compact weak-test support per axis. Polynomial smoothness
+q equals the maximum integration-by-parts derivative order of the shared
+library. Independently report q+1 as an ablation; do not pick between them
+using clean fields or scores on held-out groups.
+
+Use Fourier modulations exp(i*pi*k*s) on normalized support coordinate s.
+Expand the same integer maximum mode k across all axes from zero upward.
+Choose the FIRST bank in which every candidate feature matrix is full rank
+under the existing unit-diagonal Gram numerical cutoff (1e-12). The maximum
+mode is bounded by the smallest existing training-only field bandwidth.
+If no bank meets this numerical condition, report infeasibility rather than
+choosing an oracle or undocumented fallback. Rank checks are on training data.
+Numerical rank is not statistical identifiability; no such guarantee is made.
+
+Fit ordinary and bootstrap mean/covariance-corrected least squares on these
+complex weak moments, using real Hermitian Grams for real coefficients.
+Use original 32/128 bootstrap budgets and independently reconstructed fields.
+No equation integration occurs. No structural penalty or uncertainty gate.
+
+Score all new coefficients on BOTH unchanged old spectral and unchanged local
+weak banks. Keep dyad fixed. Diagnose coefficient accuracy on the OLD clean
+bank; broad-bank clean regression controls are read only after selection.
+Neither held-out residuals nor clean fields choose the training moment bank.
+Report all 12 targeted cases and both smoothness arms, including failures.

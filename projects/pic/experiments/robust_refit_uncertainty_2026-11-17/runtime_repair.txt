@@ -1,0 +1,14 @@
+All69 initial paired jobs completed simulation but failed in the reporting
+line: two quadratic contractions omitted their final coefficient vector.
+No primary results were saved. The frozen calibration files and logs remain
+under frozen/ and logs/; processes.json records all69 failures. Correct the
+two einsum calls without changing any fitted model, metric, cutoff or stream.
+
+The rerun also replaces dense identity-map covariance contractions by exact
+finite-stencil contractions: for each row and lag l, sum a_i*b_j over |i-j|=l,
+then evaluate sum_l coefficient_l*rho^l. No approximation, truncation, changed
+derivative stencil or covariance family. Fast and dense moment matrices agree
+on120 pairs (all15 systems, four rhos, two banks), max scaled error1.17e-14.
+Use separate *_fast sources/frozen directory, preserving initial artifacts.
+Keep the statistical model and all seed streams fixed; refits are repeated
+deterministically. A four-draw old-seed preflight tests the entire output path.

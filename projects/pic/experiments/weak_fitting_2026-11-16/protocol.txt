@@ -1,0 +1,65 @@
+Solver-free weak fitting experiment, 2026-11-16
+
+Hypothesis: bandwidth chosen for reconstructing the observed field does not
+control noise in its weak derivative columns. The previous short-window fits
+therefore attenuate physical coefficients. Test a train-only weak-window
+selection rule that measures noise amplification and grid sensitivity.
+
+Freeze the previous core-15 candidate panel, raw noise seeds, modulo-3 time
+splits, reconstructed evaluation fields, bootstrap biases, spectral bandwidths,
+training-target normalization, and the full-record raw dyad axis. Retain both
+GCV and LOO evaluation bands. No evolutionary search or equation solves.
+Use the previous latest budget: 128 draws for ac, kdv_cossin, pde_compound,
+pde_divide and ns; 32 for the other ten. Nested half-count fits assess MC
+sensitivity. These are computational budgets, not confidence guarantees.
+
+New fitting operates directly on each raw training grid (complete spatial
+planes), avoiding interpolation and smoothing of the regression observations.
+Build the same symbolic weak terms using production integration by parts.
+Select a common window for every candidate in that training group using the
+existing WF.choose_window PCR criterion: perturb the measured data with its
+estimated AR noise, compare to step-doubled data, and score coefficient
+changes and noise shares. Targets are the actual candidate target columns.
+All library columns participate; no known coefficients or clean data enter.
+
+Compare raw weak OLS, mean-corrected weak OLS, and signed CLSM weak regression.
+The existing independent reconstruction is used only as a bootstrap pilot.
+Bootstrap draws add the estimated measurement noise on the raw training grid
+and rebuild weak nonlinear columns without re-smoothing. Their mean and
+covariance correct the observed raw weak matrix. Both raw fitting arms and
+the old fit are evaluated on IDENTICAL held-out quadratic forms. Verify that
+the frozen forms reproduce the previous saved scores before interpreting.
+
+Settings audit:
+- Window half-widths, smoothness and stride: production data-driven selector.
+- Window candidates: powers-of-two lattice (numerical search structure).
+- Smoothness begins at minimum IBP derivative order and extends while the
+  best score is on the largest level; production J_GUARD is a compute guard.
+- Edge crop: derived from remaining FD stencil reach, doubled for step doubling.
+- Rows: production dyad floor at the same maximum candidate width (8).
+- Noise sigma, correlations and difference orders: estimated from raw training
+  data. Do not use the injected 5% sigma in fitting; it is diagnostic only.
+- Gram rank cutoff: existing numerical rcond, no structural penalty or tuning.
+- No clipping of negative corrected Gram eigenvalues or residual products.
+
+Primary questions: (1) Are reference coefficients better on the clean field?
+(2) Does catalog-valid structural nondominance improve on the unchanged noisy
+evaluation? A positive answer to (1) does not imply a positive answer to (2).
+Clean fields and known coefficients are diagnostic controls only. Report all
+equations separately, credit catalog equivalents, and do not label every
+unregistered competitor false.
+
+Matched reconstruction ablation (added after the seed-0 raw-fit probe):
+Also fit the independently reconstructed training field on the exact SAME
+selected raw-grid window. Reconstruct each bootstrap draw and apply its
+mean/covariance corrections there. This separates the adaptive window change
+from the removal of smoothing. Raw and reconstructed arms share bootstrap
+draws seeded identically to the original study. The final battery includes
+both arms for every system; no system-specific method choice is made.
+
+Separate numerical follow-up, after main results:
+Require m_coarse >= q in the PCR candidate lattice so quadrature can represent
+every declared polynomial moment through 2q on both grids. This constraint is
+mathematically derived, not tuned using a ranking. The follow-up is recorded
+separately because its feasibility can fail on short training grids. Main
+candidate, fit and discrepancy results are not replaced by this diagnostic.

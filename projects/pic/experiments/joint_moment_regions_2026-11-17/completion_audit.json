@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "records": 117,
+  "source_and_input_links_checked": 4890,
+  "all_reference_intersections_nonempty_after_diagnostics": true,
+  "ks_positive_sign_witnesses": 3,
+  "raw_guard_ablation_unchanged": 24,
+  "primary_audit_totals": {
+    "hash_links": 7137,
+    "operator_scores": 119808,
+    "query_scores": 364980,
+    "regions": 4404,
+    "nested_pairs": 4385,
+    "matrix_replays": 2106,
+    "intersection_certificates": 2202
+  },
+  "master_log_sha256": "3cc84e7567ec16283bcc2516bb1f02bb1d75a4a5325db6a9aa993232d2f7c391",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\complete.py": "a08040d3215499189d2fcb3b26fc749e162625deba7dc3af14fa4730ae9a6f78"
+  },
+  "findings_sha256": "548d44ae10dab7f6e502be4e008ca3b527d9280295d62c0c90907aa146a1858d"
+}

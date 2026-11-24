@@ -1,0 +1,39 @@
+2026-11-17: address convergence, localized signal leakage, and parameter uncertainty.
+All prior completed artifacts remain immutable. Research code only, solver-free.
+
+Numerical track: reoptimize the previous AR2 model in Fisher coordinates for
+correlations, retaining finite failed starts as starting points. Require a small
+projected gradient in these coordinates, report original-coordinate diagnostics,
+and retain unresolved fits. Use old seeds39..41, not fresh validation. No clean
+signal in the objective, starts or numerical selection.
+
+Statistical track: observed-field block polynomial contrasts of degree3 in
+nonoverlapping axis segments of length16 (merge tails shorter than8). Eliminate
+the polynomial mean exactly by orthogonal projection. Fit a shared marginal
+noise amplitude and one AR1 correlation per axis. Use a multivariate t radial
+loss with nu4, Gaussian-consistent score normalization for each contrast rank.
+This is a robust estimating objective, not a Gaussian likelihood-ratio statistic.
+No signal prior, axis selection, clean-truth cutoff, candidate equation solve,
+or derivative power restriction. Constants and valid identities are preserved.
+Three correlation starts0,+.4,-.4, analytic derivatives, transformed coordinates.
+The fixed block/degree/loss specification is global across all15 systems.
+
+First verify dense contrasts, analytic score, scale/trend invariance, and screen
+old anchor36 across all15 iid plus the colored core4 (23 cases). Also test
+paired pure-noise data. A failure is reported; outcomes do not silently redefine
+the protocol. Any later model change requires a separate archived version.
+
+Uncertainty track: bootstrap around the observed-data pilot and fitted noise
+covariance, reestimate noise on every bootstrap field, and apply its own Gaussian
+moment correction. Compare with the fixed-noise calibration on paired fields.
+Evaluate both fixed and fully refitted procedures separately: a refit bootstrap
+must be evaluated against refitted fresh fields, not a fixed-covariance target.
+Bootstrap includes correlations between noise estimation and weak moments.
+Observed estimator/correction and nuisance pilot use no clean evaluation truth.
+
+Fresh confirmation after screening: anchors42..44; RNG domains980101 anchor,
+980102 calibration,980103 check,980104 actual; paired fixed/refit fields. All15
+iid and core4(AC,forcedKdV,KS,wave) correlated +/-0.4.256 draws per stream.
+Report failures, bias correction, covariance shape, local/broad simultaneous
+coverage, reference compatibility, and finite anchor limitations. No per-system
+cutoff tuning. Up to7 one-thread worker processes, no agents.

@@ -1,0 +1,2759 @@
+{
+  "status": "FROZEN",
+  "selected": "full_k4",
+  "ranking": [
+    "full_k4",
+    "broad",
+    "fraction_1_0.5_k2",
+    "full_k6",
+    "fraction_0.5_1_k2",
+    "fraction_0.5_0.5_k2",
+    "fraction_0.25_1_k2",
+    "full_k1",
+    "fraction_1_0.25_k2",
+    "fraction_0.25_0.25_k2",
+    "full_k0"
+  ],
+  "rows": [
+    {
+      "bank": "local",
+      "score": 0.1325011563757762,
+      "mean": 1.6234736322037242,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.14817915528489856,
+          "log_minimum": 0.13817734433203527
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.1516734065378843,
+          "log_minimum": 0.14121602081042015
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 316.58951509290836,
+          "log_minimum": 5.760759715896393
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 0.14960807931889342,
+          "log_minimum": 0.1394210836971728
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.14808034089031086,
+          "log_minimum": 0.13809127880258332
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.13956781029978238,
+          "log_minimum": 0.1306490767524891
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.1369322339745569,
+          "log_minimum": 0.12833361226622175
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.14334504615003407,
+          "log_minimum": 0.13395821690335882
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 0.13385342651463183,
+          "log_minimum": 0.12562194343717095
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.14112597181685832,
+          "log_minimum": 0.13201546953324866
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.1481530312060208,
+          "log_minimum": 0.13815459145766232
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.14789777138842483,
+          "log_minimum": 0.1379322446190304
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 6506.02359194734,
+          "log_minimum": 8.780637425114252
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 814.3869837472616,
+          "log_minimum": 6.703662827230102
+        }
+      ]
+    },
+    {
+      "bank": "broad",
+      "score": 0.9000883917368777,
+      "mean": 2.6409578961386124,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8227789679146156,
+          "log_minimum": 1.0377218493284202
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8552285859458457,
+          "log_minimum": 1.0491519050328255
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 8003.7592263209,
+          "log_minimum": 8.987791547067273
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 4.289761741717655,
+          "log_minimum": 1.665773205483061
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 1.5227811298595668,
+          "log_minimum": 0.9253619159393528
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 1.1964762103568631,
+          "log_minimum": 0.7868543536702248
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 1.4391847964588464,
+          "log_minimum": 0.891663883669386
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 1.0088204892460766,
+          "log_minimum": 0.6975477285533851
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 1.7828680700010011,
+          "log_minimum": 1.0234820757431022
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.163907758977426,
+          "log_minimum": 0.7719157348342685
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.6035480022649684,
+          "log_minimum": 0.9568751310406173
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.7317772345166667,
+          "log_minimum": 1.0049523990416687
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 10357.875385159165,
+          "log_minimum": 9.245598956365045
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 2774.8710259977724,
+          "log_minimum": 7.928719860171936
+        }
+      ]
+    },
+    {
+      "bank": "full_k0",
+      "score": 0.0,
+      "mean": 0.0,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": -1.793662034335766e-43,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": -3.587324068671532e-43,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": -7.174648137343064e-43,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": -7.174648137343064e-43,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 0.0,
+          "log_minimum": 0.0
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": -1.5414283107572988e-44,
+          "log_minimum": 0.0
+        }
+      ]
+    },
+    {
+      "bank": "full_k1",
+      "score": 0.24427248830375115,
+      "mean": 2.53878423399249,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9702562359582303,
+          "log_minimum": 0.6781636033059865
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9704111207684872,
+          "log_minimum": 0.6782422117224377
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 27292.836394214188,
+          "log_minimum": 10.214416182576759
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 58.04297591857277,
+          "log_minimum": 4.078265584146799
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.9402379937509896,
+          "log_minimum": 0.6628106427422372
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.12584915794432971,
+          "log_minimum": 0.11853755799442496
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.17887125812091442,
+          "log_minimum": 0.16455741976673918
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.23614095316889094,
+          "log_minimum": 0.21199439231411366
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 0.40650341403659995,
+          "log_minimum": 0.34110677627266356
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.18190045389175868,
+          "log_minimum": 0.16712369707165436
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.5259219568310992,
+          "log_minimum": 0.42259878924193567
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.956593795374309,
+          "log_minimum": 0.6712051019098775
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 19491.077820529852,
+          "log_minimum": 9.877763396389751
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 1415.8536041839297,
+          "log_minimum": 7.256193920439478
+        }
+      ]
+    },
+    {
+      "bank": "full_k4",
+      "score": 1.0578268818361627,
+      "mean": 2.3810103038163453,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8931862483448931,
+          "log_minimum": 1.062358402886467
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8963323924774367,
+          "log_minimum": 1.0634452443451166
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 906.0256138181915,
+          "log_minimum": 6.810170689868752
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 1.9313697032977686,
+          "log_minimum": 1.0754697893245808
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 1.880410479650557,
+          "log_minimum": 1.0579328116481965
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 1.8709511693818355,
+          "log_minimum": 1.054643392767826
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 1.8800036799251263,
+          "log_minimum": 1.0577915718988182
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 1.8637236054818933,
+          "log_minimum": 1.0521227379755311
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 1.892299238455589,
+          "log_minimum": 1.062051770055643
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8724636647416153,
+          "log_minimum": 1.0551700813105926
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8866126397206862,
+          "log_minimum": 1.0600837176989921
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.8882785432923652,
+          "log_minimum": 1.0606606648881582
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 2365.633129348237,
+          "log_minimum": 7.769223603562964
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 1202.5367289422356,
+          "log_minimum": 7.093019775197195
+        }
+      ]
+    },
+    {
+      "bank": "full_k6",
+      "score": 0.8659877675276602,
+      "mean": 2.023477994493443,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.3777183404284736,
+          "log_minimum": 0.8661413473630933
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.3777470611207914,
+          "log_minimum": 0.8661534263879176
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 235.1792128924795,
+          "log_minimum": 5.464590893508083
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 1.38040155081542,
+          "log_minimum": 0.8672691922819706
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 1.3773796091301271,
+          "log_minimum": 0.8659988765654304
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 1.3770999554941525,
+          "log_minimum": 0.8658812386063243
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 1.3773443955244247,
+          "log_minimum": 0.8659840645150702
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 1.3769079251300707,
+          "log_minimum": 0.8658004518810987
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 1.3776886219470459,
+          "log_minimum": 0.8661288485457835
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.377481791061745,
+          "log_minimum": 0.8660418565486658
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.3769453296671585,
+          "log_minimum": 0.8658161883942318
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.3777156683556722,
+          "log_minimum": 0.8661402235654351
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 1078.662895431428,
+          "log_minimum": 6.984404137534564
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 572.8345860702892,
+          "log_minimum": 6.352341177210536
+        }
+      ]
+    },
+    {
+      "bank": "fraction_0.5_1_k2",
+      "score": 0.693056498397535,
+      "mean": 2.285875569338399,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.0552131085946612,
+          "log_minimum": 0.7203795450506214
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.0804762126789609,
+          "log_minimum": 0.7325968159118871
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 3353.577319992358,
+          "log_minimum": 8.118081056369844
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 2.381503067808313,
+          "log_minimum": 1.2183203052654235
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.9977190851687774,
+          "log_minimum": 0.6920060723279096
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.9841237667736084,
+          "log_minimum": 0.6851773893633523
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 1.0211757156543502,
+          "log_minimum": 0.7036793795476604
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.9341934754897184,
+          "log_minimum": 0.6596904310604788
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 1.052644377252317,
+          "log_minimum": 0.7191289020154097
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9445876463806154,
+          "log_minimum": 0.6650499475914939
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.0061305689048627,
+          "log_minimum": 0.6962077766064114
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.0266039164129168,
+          "log_minimum": 0.706361444534366
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 3997.654380948161,
+          "log_minimum": 8.293713178742292
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 1621.7308621082643,
+          "log_minimum": 7.391865726350437
+        }
+      ]
+    },
+    {
+      "bank": "fraction_1_0.5_k2",
+      "score": 0.8871406442893841,
+      "mean": 2.5216537813669353,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.4339042335917043,
+          "log_minimum": 0.8894966485126143
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.4470563190100374,
+          "log_minimum": 0.8948857997290026
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 2876.6648208083875,
+          "log_minimum": 7.9647344181245066
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 1.4361897286161138,
+          "log_minimum": 0.8904352321251389
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 1.4167502795006115,
+          "log_minimum": 0.8824237780140085
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 1.4291813487546392,
+          "log_minimum": 0.8875543070744782
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 1.433619750405498,
+          "log_minimum": 0.8893797582055648
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 1.4207780015571885,
+          "log_minimum": 0.8840889767490938
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 1.4278419022784021,
+          "log_minimum": 0.8870027566943527
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.4301117685494535,
+          "log_minimum": 0.8879372515825472
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.4219537681618204,
+          "log_minimum": 0.8845745566587995
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1.4338481338384164,
+          "log_minimum": 0.8894735989615872
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 16006.567929315543,
+          "log_minimum": 9.68081688497699
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 2670.3759927313686,
+          "log_minimum": 7.890348971728411
+        }
+      ]
+    },
+    {
+      "bank": "fraction_0.5_0.5_k2",
+      "score": 0.6508468752630253,
+      "mean": 2.1650439448168037,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9204968903208126,
+          "log_minimum": 0.6525839495996022
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9205116437968047,
+          "log_minimum": 0.6525916316840658
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 979.4621060528756,
+          "log_minimum": 6.888023997314731
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 0.9301599840294372,
+          "log_minimum": 0.6576028927608373
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.9119263044809145,
+          "log_minimum": 0.6481112702048527
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.9196712280191299,
+          "log_minimum": 0.652153935970531
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.9204608612694933,
+          "log_minimum": 0.6525651891478345
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.9158906893525725,
+          "log_minimum": 0.6501826264350395
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 0.916581596887589,
+          "log_minimum": 0.6505431809235779
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9189112315230645,
+          "log_minimum": 0.6517579582813677
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.916279682338055,
+          "log_minimum": 0.6503856408885159
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.9197543047832594,
+          "log_minimum": 0.6521972115925909
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 7490.695718633941,
+          "log_minimum": 8.921550448568611
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 1524.9390866814913,
+          "log_minimum": 7.330365294063093
+        }
+      ]
+    },
+    {
+      "bank": "fraction_0.25_1_k2",
+      "score": 0.4934315189543482,
+      "mean": 1.94504642956062,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.6489885635749708,
+          "log_minimum": 0.5001621081834732
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.662041080409757,
+          "log_minimum": 0.5080464135825126
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 1454.236656769649,
+          "log_minimum": 7.282923817080191
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 1.3001265656209355,
+          "log_minimum": 0.8329641499519315
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.6455528069318275,
+          "log_minimum": 0.4980763806103204
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.6361965295137184,
+          "log_minimum": 0.4923743590303772
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.6431300644875304,
+          "log_minimum": 0.49660299872626146
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.6254491111539726,
+          "log_minimum": 0.4857841536916157
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 0.644773407699966,
+          "log_minimum": 0.49760262865042476
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.6189346795907479,
+          "log_minimum": 0.48176832773626344
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.6256617839534587,
+          "log_minimum": 0.4859149845409168
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.6434309083477526,
+          "log_minimum": 0.4967860739003106
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 1814.9989021745998,
+          "log_minimum": 7.50439095463165
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 785.2325890936335,
+          "log_minimum": 6.667252663532431
+        }
+      ]
+    },
+    {
+      "bank": "fraction_1_0.25_k2",
+      "score": 0.1872367470183734,
+      "mean": 1.7890524893513455,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.20691500821852316,
+          "log_minimum": 0.1880675239099294
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.21626619438439862,
+          "log_minimum": 0.19578566944230005
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 535.4011898609505,
+          "log_minimum": 6.284882369639497
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 0.20691661304776687,
+          "log_minimum": 0.18806885360437003
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.20494617489277367,
+          "log_minimum": 0.18643489780619027
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.2054692644792695,
+          "log_minimum": 0.18686892223713533
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.2058230523282205,
+          "log_minimum": 0.18716236476090045
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.20544441423363047,
+          "log_minimum": 0.18684830744212272
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 0.20684982879344815,
+          "log_minimum": 0.1880135174681324
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.2067173962923271,
+          "log_minimum": 0.18790377741210457
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.206389484176621,
+          "log_minimum": 0.18763200153646598
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.2061818730683472,
+          "log_minimum": 0.1874598937907922
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 13149.168532225165,
+          "log_minimum": 9.484189853662581
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 1348.4021185771935,
+          "log_minimum": 7.207416898206317
+        }
+      ]
+    },
+    {
+      "bank": "fraction_0.25_0.25_k2",
+      "score": 0.11407250647398726,
+      "mean": 1.4066531612630833,
+      "supports": [
+        {
+          "candidate_index": 0,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.12109171057962964,
+          "log_minimum": 0.11430295214385762
+        },
+        {
+          "candidate_index": 1,
+          "stochastic_features": [
+            3
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.12304382451345756,
+          "log_minimum": 0.11604269949483235
+        },
+        {
+          "candidate_index": 2,
+          "stochastic_features": [
+            5
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 85.05450909785394,
+          "log_minimum": 4.454980922189422
+        },
+        {
+          "candidate_index": 3,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [],
+          "minimum": 0.12118997494883521,
+          "log_minimum": 0.11439059891000897
+        },
+        {
+          "candidate_index": 4,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            0
+          ],
+          "minimum": 0.12091614752545987,
+          "log_minimum": 0.11414633979846023
+        },
+        {
+          "candidate_index": 5,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            10
+          ],
+          "minimum": 0.12062522002778397,
+          "log_minimum": 0.11388676172105269
+        },
+        {
+          "candidate_index": 6,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            11
+          ],
+          "minimum": 0.12072713754475828,
+          "log_minimum": 0.1139777045990881
+        },
+        {
+          "candidate_index": 7,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            6
+          ],
+          "minimum": 0.120555121095824,
+          "log_minimum": 0.11382420635172646
+        },
+        {
+          "candidate_index": 8,
+          "stochastic_features": [
+            5,
+            3
+          ],
+          "deterministic_features": [
+            2,
+            1
+          ],
+          "minimum": 0.12094589424131597,
+          "log_minimum": 0.11417287730639215
+        },
+        {
+          "candidate_index": 9,
+          "stochastic_features": [
+            5,
+            3,
+            7
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.12080580500268286,
+          "log_minimum": 0.1140478953658296
+        },
+        {
+          "candidate_index": 10,
+          "stochastic_features": [
+            5,
+            3,
+            8
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.12107562148319503,
+          "log_minimum": 0.11428860076498878
+        },
+        {
+          "candidate_index": 11,
+          "stochastic_features": [
+            5,
+            3,
+            9
+          ],
+          "deterministic_features": [
+            2
+          ],
+          "minimum": 0.12098017062817214,
+          "log_minimum": 0.11420345493104798
+        },
+        {
+          "candidate_index": 14,
+          "stochastic_features": [
+            7
+          ],
+          "deterministic_features": [
+            0,
+            6,
+            1
+          ],
+          "minimum": 2930.2028853494517,
+          "log_minimum": 7.983168158837081
+        },
+        {
+          "candidate_index": 15,
+          "stochastic_features": [
+            7,
+            8,
+            9
+          ],
+          "deterministic_features": [
+            0,
+            10,
+            11,
+            6,
+            1
+          ],
+          "minimum": 401.50643538677565,
+          "log_minimum": 5.997711085269375
+        }
+      ]
+    }
+  ],
+  "specs": {
+    "local": {
+      "q": [
+        3,
+        5
+      ],
+      "radii": [
+        0.05,
+        0.07500000000000001
+      ],
+      "centers": [
+        [
+          0.07500000000000001,
+          0.125,
+          0.17500000000000002,
+          0.225,
+          0.275,
+          0.325,
+          0.375,
+          0.42500000000000004,
+          0.47500000000000003,
+          0.525,
+          0.5750000000000001,
+          0.625,
+          0.675,
+          0.7250000000000001,
+          0.775,
+          0.8250000000000001,
+          0.875,
+          0.925
+        ],
+        [
+          0.07500000000000001,
+          0.15000000000000002,
+          0.225,
+          0.30000000000000004,
+          0.375,
+          0.45,
+          0.525,
+          0.6000000000000001,
+          0.675,
+          0.75,
+          0.8250000000000001,
+          0.9
+        ]
+      ],
+      "interpolation_cut": [
+        2,
+        0
+      ],
+      "frequencies": [
+        [
+          0.0
+        ],
+        [
+          0.0
+        ]
+      ]
+    },
+    "broad": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ]
+      ]
+    },
+    "full_k0": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0
+        ],
+        [
+          0.0
+        ]
+      ]
+    },
+    "full_k1": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          -6.283185307179586
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          -6.283185307179586
+        ]
+      ]
+    },
+    "full_k4": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345
+        ]
+      ]
+    },
+    "full_k6": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          31.41592653589793,
+          37.69911184307752,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345,
+          -31.41592653589793,
+          -37.69911184307752
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          31.41592653589793,
+          37.69911184307752,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345,
+          -31.41592653589793,
+          -37.69911184307752
+        ]
+      ]
+    },
+    "fraction_0.5_1_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.25,
+          0.5,
+          0.75
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.25,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ]
+      ]
+    },
+    "fraction_1_0.5_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.25,
+          0.5,
+          0.75
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.25
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ],
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ]
+      ]
+    },
+    "fraction_0.5_0.5_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.25,
+          0.5,
+          0.75
+        ],
+        [
+          0.25,
+          0.5,
+          0.75
+        ]
+      ],
+      "radii": [
+        0.25,
+        0.25
+      ],
+      "frequencies": [
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ],
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ]
+      ]
+    },
+    "fraction_0.25_1_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.125,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ]
+      ]
+    },
+    "fraction_1_0.25_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.125
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ],
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ]
+      ]
+    },
+    "fraction_0.25_0.25_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ],
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ]
+      ],
+      "radii": [
+        0.125,
+        0.125
+      ],
+      "frequencies": [
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ],
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ]
+      ]
+    }
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_engine.py": "af312ffe431c428f6dae6f20aebb550aa731b445561281f1004b4d8aa4ad7c8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_metric.py": "a372ae02a7d55602930befa0c1fd02774973850e060e32537540b59d159d0ffd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\run_repair.py": "839f17f417ed29c2e4cb52e6e1470f63dc6cc169e5c9edad6c40a484d4a6d8f4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\context.py": "77f7ef2c9e6e4737475adf4669e868a4edd5b3fbfe3113b61e88e94980146ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\protocol.txt": "5d38aca706ae1716a33308027e8377e34d84434c9c21281fdafbd953b665742c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\screen.py": "d039767c959f4db060fb9bb5c560097853850c2e26fe82103b7c7ab9befd993e"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_screen.json": "1f3f83bd5f598cf1c1ea9897f3d980581805eb7c8a3feab06f03fa3e4867f594",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_screen.npz": "9f2b298855af213b24d2eca0120e6aed236962c1fa7ffec4132366447946ea7c"
+  }
+}

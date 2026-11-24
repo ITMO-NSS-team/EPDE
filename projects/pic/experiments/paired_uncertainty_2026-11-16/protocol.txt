@@ -1,0 +1,57 @@
+Paired discrepancy uncertainty, frozen before execution, 2026-11-16
+
+Default core-15, saved 5% noisy records, seeds 0/1/2; fixed candidate panels,
+dyad, continuous CLSM coefficients, full continuous spectral banks, and
+training denominators from operator_weak_2026-11-16/unit_results.
+No fitting, window selection, structural threshold, or PDE/ODE solve occurs.
+
+Reconstruct the three raw modulo-3 groups independently. Replay the original
+bootstrap RNG and verify every frozen score using its original 32/128 draws.
+Extend each group's operator bootstrap to 128 draws for covariance estimation.
+All nonlinear weak operators are rebuilt after every field reconstruction.
+
+Use a centered empirical operator-error distribution, symmetrized by one
+Rademacher sign per raw group. Scale its deviations by
+sqrt((1+1/B_original)*128/127). This matches the sample covariance including
+the same approximate finite-bootstrap-mean factor as the earlier experiment.
+It is a local wild/empirical covariance model, not a nested bootstrap of the
+complete bias-correction procedure. Symmetrization changes higher moments.
+
+For 512 joint draws, independently select an operator-error replicate and
+sign for each raw group. Reuse that group index/sign across all candidates,
+equation slots and evaluation rotations. This preserves cross-operator,
+cross-moment, cross-candidate and cross-rotation dependence in the model.
+Groups are independent under the fitted groupwise noise model. Potential
+cross-group measurement correlation is not modeled.
+
+Add those errors to each group's original bias-corrected operator estimate.
+Compute each cross-product exactly, including the noise-times-noise term.
+Keep coefficients, training normalizations and selected banks fixed. Thus
+this estimates CONDITIONAL evaluation uncertainty; it excludes variability
+from refitting, selection, denominator estimation, and common reconstruction
+bias. It is not unconditional confidence in discovery or a physical law.
+
+For every registered candidate versus every same-equation candidate, report
+the observed score gap, dyad eligibility, paired standard deviation, model
+sign frequency, and basic 90/95% uncertainty intervals obtained by subtracting
+the simulated error quantiles from the observed gap. Also report the incorrect
+independent-candidate and independent-rotation standard deviations as controls,
+and exact first-order variance within the empirical covariance model.
+No uncertainty interval changes the Pareto front. There is no selected
+confidence level for structural decisions and no tuned penalty.
+
+The primary panel excludes known coefficients. Add exact-law coefficient
+vectors only as post-selection diagnostics. Clean fields enter only after
+everything above is frozen: compare model intervals with fixed-fit clean
+oracle score gaps under the SAME noisy training denominator. Summaries of
+coverage are descriptive; pairs and rotations are correlated, only three
+noise seeds are available, and these are reused data.
+
+Validation: frozen-score reproduction, zero uncertainty for identical
+candidates, exhaustive small discrete-noise checks of cross-product variance
+and shared-rotation covariance, and finite score checks. Report sensitivity
+to half/full covariance draws on the seven previously failed trials.
+Monte Carlo uncertainty remains; 512 draws are not 512 observed records.
+
+Compute in parallel processes as previously authorized, one BLAS thread each,
+below-normal priority. Preserve all previous results and production files.

@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "matrix_pairs": 20,
+  "max_relative_to_matrix_scale": 8.087729861543397e-13,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_tail_checks.py": "67ab9a29b94df1d2fec0ed7007e684fd5e18d95e8f3d86508ad172a8d6a0eacd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc"
+  }
+}

@@ -1,0 +1,8 @@
+After the complete cubic/length16 screen, before a second screen: cubic blocks
+still allocate signal to noise (AC/KS/compound) and all three NS raw variables
+reach correlation boundaries. Preserve this failure. Test ONE global alternative:
+degree5 local polynomials in length12 segments, merging tails shorter than8.
+Same robust nu4 Gaussian-consistent objective, starts, bounds and diagnostics.
+The greater local polynomial flexibility is applied to every dataset and axis;
+no per-system choice, truth-informed axis selection, or fresh evaluation yet.
+Use screen6.py/checks6.py/local6_fit.py as separately hashed sources.

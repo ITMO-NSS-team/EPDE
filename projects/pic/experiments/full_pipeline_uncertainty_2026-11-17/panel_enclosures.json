@@ -1,0 +1,5057 @@
+{
+  "status": "COMPLETE",
+  "audit_status": "PASS",
+  "datasets": 69,
+  "region_checks": 300,
+  "rows": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.004319597474551571,
+        1.160331248422887,
+        0.92096330085365
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.002087753529527245,
+        -5.522580774411911,
+        4.486627160841847
+      ],
+      "retained_upper": [
+        0.0022318439450250715,
+        -4.362249525988822,
+        5.407590461695655
+      ],
+      "retained_width_ratio": 1.0000000000001725,
+      "positive_combination_weights": [
+        [
+          0.0013526156399808885,
+          0.18062273951923435
+        ],
+        [
+          0.0013526156399808885,
+          0.18062273951923435
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.004328927638261595,
+        1.1626374887107254,
+        0.922773401060061
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0020922292457942336,
+        -5.523808394141996,
+        4.485779321655559
+      ],
+      "retained_upper": [
+        0.002236698392467502,
+        -4.361170905431232,
+        5.40855272271565
+      ],
+      "retained_width_ratio": 1.0000000000000326,
+      "positive_combination_weights": [
+        [
+          0.0013523459650778076,
+          0.1806506973033187
+        ],
+        [
+          0.0013523459650778076,
+          0.1806506973033187
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.003769803408477712,
+        1.047039601518847,
+        0.8336627228952018
+      ],
+      "original_panel_width_ratio": 1.00000000753707,
+      "retained_lower": [
+        -0.0018306240914097113,
+        -5.5475101015654875,
+        4.59438432864529
+      ],
+      "retained_upper": [
+        0.001939179313041673,
+        -4.500470500046694,
+        5.4280470515404495
+      ],
+      "retained_width_ratio": 0.9999999999999488,
+      "positive_combination_weights": [
+        [
+          0.001389561515993542,
+          0.17461639469536305
+        ],
+        [
+          0.0013895614743528694,
+          0.17461640002453843
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.003794012783883961,
+        1.053319592854269,
+        0.8386178182177222
+      ],
+      "original_panel_width_ratio": 0.999999999969769,
+      "retained_lower": [
+        -0.001842249899381023,
+        -5.5508402922674245,
+        4.592057634936312
+      ],
+      "retained_upper": [
+        0.0019517628845013542,
+        -4.497520699445151,
+        5.43067545311359
+      ],
+      "retained_width_ratio": 0.9999999999696239,
+      "positive_combination_weights": [
+        [
+          0.001388866748172613,
+          0.17468953778052784
+        ],
+        [
+          0.0013888667483384373,
+          0.17468953775930451
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.003675703015156182,
+        1.033772317755112,
+        0.8239037638020914
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0016300845086760995,
+        -5.582186588693647,
+        4.642934755068737
+      ],
+      "retained_upper": [
+        0.0020456185064812215,
+        -4.548414270938213,
+        5.466838518871084
+      ],
+      "retained_width_ratio": 1.0000000000003104,
+      "positive_combination_weights": [
+        [
+          0.001373586885541791,
+          0.17215613552406364
+        ],
+        [
+          0.001373586885541791,
+          0.17215613552406364
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.003683859043404735,
+        1.0359233046432177,
+        0.8256033593181158
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0016339759615067906,
+        -5.583327282695625,
+        4.642136819100892
+      ],
+      "retained_upper": [
+        0.0020498830818979443,
+        -4.547403978052407,
+        5.467740178419008
+      ],
+      "retained_width_ratio": 1.0,
+      "positive_combination_weights": [
+        [
+          0.0013733594392121942,
+          0.1721798617923901
+        ],
+        [
+          0.0013733594392121942,
+          0.1721798617923901
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0015448499484409194,
+        0.4410901935705507,
+        0.35386757514812395
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0006719150421900265,
+        -5.2371008920288675,
+        4.831307635065084
+      ],
+      "retained_upper": [
+        0.0008729349062505423,
+        -4.796010698458416,
+        5.185175210213128
+      ],
+      "retained_width_ratio": 0.9999999999997741,
+      "positive_combination_weights": [
+        [
+          0.0014598855364962764,
+          0.16614824019278893
+        ],
+        [
+          0.0014598855364962764,
+          0.16614824019278893
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0015640442024084946,
+        0.4465059027997391,
+        0.35820575944976696
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0006813226820857276,
+        -5.239887541892818,
+        4.829201235677625
+      ],
+      "retained_upper": [
+        0.0008827215203228535,
+        -4.793381639093054,
+        5.187406995127412
+      ],
+      "retained_width_ratio": 1.0000000000000553,
+      "positive_combination_weights": [
+        [
+          0.0014596278696299275,
+          0.16617506513598437
+        ],
+        [
+          0.0014596278696299275,
+          0.16617506513598437
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.001522201055790037,
+        0.43678476489129814,
+        0.35115599812515796
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0006138628125513185,
+        -5.237329842828535,
+        4.839664955583126
+      ],
+      "retained_upper": [
+        0.0009083382432373123,
+        -4.800545077937642,
+        5.190820953707959
+      ],
+      "retained_width_ratio": 0.9999999999990743,
+      "positive_combination_weights": [
+        [
+          0.0014631366588109497,
+          0.16561281384220009
+        ],
+        [
+          0.0014631366588109497,
+          0.16561281384220009
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0015209514365002402,
+        0.4364302526151942,
+        0.35087140576838216
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0006132508552072225,
+        -5.237147438325579,
+        4.839803143039711
+      ],
+      "retained_upper": [
+        0.0009077005812929299,
+        -4.800717185710409,
+        5.190674548808073
+      ],
+      "retained_width_ratio": 0.999999999999943,
+      "positive_combination_weights": [
+        [
+          0.0014631534439936223,
+          0.16561106399652867
+        ],
+        [
+          0.0014631534439936223,
+          0.16561106399652867
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0014990125664116575,
+        0.42960658682372355,
+        0.345355475889221
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0005901016859663886,
+        -5.247490410418662,
+        4.856031119337081
+      ],
+      "retained_upper": [
+        0.0009089108804448193,
+        -4.817883823595068,
+        5.201386595226199
+      ],
+      "retained_width_ratio": 0.9999999999997001,
+      "positive_combination_weights": [
+        [
+          0.0014598728196307021,
+          0.16371722916773512
+        ],
+        [
+          0.0014598728196307021,
+          0.16371722916773512
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.001498446464251304,
+        0.42944612064936116,
+        0.3452266623789715
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0005898245091710429,
+        -5.24740785047816,
+        4.856093667581105
+      ],
+      "retained_upper": [
+        0.0009086219550810714,
+        -4.817961729828568,
+        5.201320329960263
+      ],
+      "retained_width_ratio": 1.0000000000005402,
+      "positive_combination_weights": [
+        [
+          0.0014598802635147497,
+          0.16371645630413756
+        ],
+        [
+          0.0014598802635147497,
+          0.16371645630413756
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.006759693992705786,
+        1.8407248193997354,
+        1.4645545828787068
+      ],
+      "original_panel_width_ratio": 0.9999999955934351,
+      "retained_lower": [
+        -0.0032250894898554648,
+        -5.918407947449601,
+        4.270848502324183
+      ],
+      "retained_upper": [
+        0.003534604502850141,
+        -4.0776831361611565,
+        5.735403061190667
+      ],
+      "retained_width_ratio": 0.9999999955934255,
+      "positive_combination_weights": [
+        [
+          0.0013135938198080217,
+          0.17949413381156776
+        ],
+        [
+          0.0013135939216374624,
+          0.1794941207311899
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.006754129589766633,
+        1.8393591224335903,
+        1.4634858885157804
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0032224439385952534,
+        -5.917656502579867,
+        4.2713310962974385
+      ],
+      "retained_upper": [
+        0.003531685651171785,
+        -4.078297380146163,
+        5.7348169848133095
+      ],
+      "retained_width_ratio": 1.0000000000000617,
+      "positive_combination_weights": [
+        [
+          0.0013137405891372798,
+          0.1794811945727942
+        ],
+        [
+          0.0013137405891372798,
+          0.1794811945727942
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.006812619159814478,
+        1.8785505037160384,
+        1.509348266182089
+      ],
+      "original_panel_width_ratio": 1.000000002167585,
+      "retained_lower": [
+        -0.003077526017962835,
+        -6.101020061715748,
+        4.389913877128121
+      ],
+      "retained_upper": [
+        0.0037350930881499675,
+        -4.22246955799966,
+        5.899262143310251
+      ],
+      "retained_width_ratio": 1.0000000000000264,
+      "positive_combination_weights": [
+        [
+          0.0013544709659336388,
+          0.1687100966956088
+        ],
+        [
+          0.0013544709180391325,
+          0.16871010272830086
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.006995308726897313,
+        1.923503038712516,
+        1.5447890684059384
+      ],
+      "original_panel_width_ratio": 0.999999999877734,
+      "retained_lower": [
+        -0.0031627349541910594,
+        -6.126117635031145,
+        4.374271552762666
+      ],
+      "retained_upper": [
+        0.0038325737727062984,
+        -4.202614596554072,
+        5.919060620539479
+      ],
+      "retained_width_ratio": 0.9999999998775965,
+      "positive_combination_weights": [
+        [
+          0.0013488544851784766,
+          0.16923434593424774
+        ],
+        [
+          0.0013488544878162572,
+          0.1692343456018875
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.007157552394770662,
+        1.8809494719068276,
+        1.4825534047583737
+      ],
+      "original_panel_width_ratio": 0.999999999070358,
+      "retained_lower": [
+        -0.003482756796167773,
+        -5.864221194387823,
+        4.1859750019626265
+      ],
+      "retained_upper": [
+        0.003674795598602293,
+        -3.983271724715107,
+        5.668528398425723
+      ],
+      "retained_width_ratio": 0.9999999988122427,
+      "positive_combination_weights": [
+        [
+          0.001298768483702017,
+          0.18469203328882022
+        ],
+        [
+          0.0012987685220903608,
+          0.1846920283617696
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.007203701390073147,
+        1.891803157906745,
+        1.4909577178124724
+      ],
+      "original_panel_width_ratio": 1.0,
+      "retained_lower": [
+        -0.0035046306978863,
+        -5.8701776892174875,
+        4.182178796540346
+      ],
+      "retained_upper": [
+        0.003699070692186869,
+        -3.9783745313107355,
+        5.673136514352824
+      ],
+      "retained_width_ratio": 1.0000000000000036,
+      "positive_combination_weights": [
+        [
+          0.0012975861024090408,
+          0.1847946591717548
+        ],
+        [
+          0.0012975861024090408,
+          0.1847946591717548
+        ]
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.4881426508133032,
+        0.12829355251110114
+      ],
+      "original_panel_width_ratio": 0.9470926523162708,
+      "retained_lower": [
+        -1.251488207379396,
+        0.0608455430286558
+      ],
+      "retained_upper": [
+        -0.7897172545281967,
+        0.18112564404786932
+      ],
+      "retained_width_ratio": 0.9417567932656732,
+      "positive_combination_weights": [
+        [
+          0.6134789810349799,
+          22.46749416421177
+        ],
+        [
+          0.605113084866024,
+          25.050930402812465
+        ]
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.48784745166464916,
+        0.12819738018832466
+      ],
+      "original_panel_width_ratio": 0.9505930099351971,
+      "retained_lower": [
+        -1.2523378171992459,
+        0.060753188148908045
+      ],
+      "retained_upper": [
+        -0.7891136387751575,
+        0.18146507795329744
+      ],
+      "retained_width_ratio": 0.9455681705861305,
+      "positive_combination_weights": [
+        [
+          0.6130659260597803,
+          22.593353547818072
+        ],
+        [
+          0.6052306309909401,
+          25.01416700318384
+        ]
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.5543603525483891,
+        0.1430624593611019
+      ],
+      "original_panel_width_ratio": 0.9499767226905151,
+      "retained_lower": [
+        -1.2862205737895582,
+        0.05568992007435185
+      ],
+      "retained_upper": [
+        -0.7571736612249804,
+        0.19097205260843308
+      ],
+      "retained_width_ratio": 0.9499767226905129,
+      "positive_combination_weights": [
+        [
+          0.6687230742302996,
+          0.0
+        ],
+        [
+          0.6675049106702589,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.5514886986279848,
+        0.1421708627258388
+      ],
+      "original_panel_width_ratio": 0.9550686732084761,
+      "retained_lower": [
+        -1.286113234904724,
+        0.055700470154966875
+      ],
+      "retained_upper": [
+        -0.7572474799372259,
+        0.19092755683161836
+      ],
+      "retained_width_ratio": 0.9550686732084741,
+      "positive_combination_weights": [
+        [
+          0.6687317290773521,
+          0.0
+        ],
+        [
+          0.667643919348993,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.4758241490014431,
+        0.11822520346347914
+      ],
+      "original_panel_width_ratio": 0.9580838088367482,
+      "retained_lower": [
+        -1.2436769126248741,
+        0.05893817283271466
+      ],
+      "retained_upper": [
+        -0.7864479449213091,
+        0.1718725102195104
+      ],
+      "retained_width_ratio": 0.9580838088367465,
+      "positive_combination_weights": [
+        [
+          0.6743807246708328,
+          0.0
+        ],
+        [
+          0.673509183531011,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.4744973903916464,
+        0.11784498020326092
+      ],
+      "original_panel_width_ratio": 0.9612799043028039,
+      "retained_lower": [
+        -1.243757289182167,
+        0.058929330548692496
+      ],
+      "retained_upper": [
+        -0.7863899298211363,
+        0.17190274441576509
+      ],
+      "retained_width_ratio": 0.9612799043027989,
+      "positive_combination_weights": [
+        [
+          0.674374300872825,
+          0.0
+        ],
+        [
+          0.673571910001297,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.23039637875430996
+      ],
+      "original_panel_width_ratio": 0.9036910621454313,
+      "retained_lower": [
+        -1.1063349722051907
+      ],
+      "retained_upper": [
+        -0.8981278239742473
+      ],
+      "retained_width_ratio": 0.9036910621454313,
+      "positive_combination_weights": [
+        [
+          6.630811866700436e-08,
+          0.0
+        ],
+        [
+          6.620780886462327e-08,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.2291638613261452
+      ],
+      "original_panel_width_ratio": 0.910285520933238,
+      "retained_lower": [
+        -1.106548113938196
+      ],
+      "retained_upper": [
+        -0.8979435690518545
+      ],
+      "retained_width_ratio": 0.9102855209332347,
+      "positive_combination_weights": [
+        [
+          6.630640703541473e-08,
+          0.0
+        ],
+        [
+          6.621363249873526e-08,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.09946062963428015
+      ],
+      "original_panel_width_ratio": 0.8464008973777718,
+      "retained_lower": [
+        -1.030904530227717
+      ],
+      "retained_upper": [
+        -0.9467209640515055
+      ],
+      "retained_width_ratio": 0.8464008973777584,
+      "positive_combination_weights": [
+        [
+          0.0,
+          5.671714135021561e-06
+        ],
+        [
+          0.0,
+          5.66843777263321e-06
+        ]
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0985356181911945
+      ],
+      "original_panel_width_ratio": 0.8476343333482602,
+      "retained_lower": [
+        -1.0305696726112763
+      ],
+      "retained_upper": [
+        -0.9470474995747244
+      ],
+      "retained_width_ratio": 0.8476343333482602,
+      "positive_combination_weights": [
+        [
+          0.0,
+          5.671843758699064e-06
+        ],
+        [
+          0.0,
+          5.668651523290937e-06
+        ]
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.10468218510916172
+      ],
+      "original_panel_width_ratio": 2.030620261777936,
+      "retained_lower": [
+        -1.0539713232676176
+      ],
+      "retained_upper": [
+        -0.9622375871254232
+      ],
+      "retained_width_ratio": 0.8763070435197278,
+      "positive_combination_weights": [
+        [
+          6.637396671387395e-08,
+          0.0
+        ],
+        [
+          0.0,
+          5.482455158548631e-06
+        ]
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.10418671157537507
+      ],
+      "original_panel_width_ratio": 2.0218112141012723,
+      "retained_lower": [
+        -1.0535870603595174
+      ],
+      "retained_upper": [
+        -0.9626113819560278
+      ],
+      "retained_width_ratio": 0.873198482108462,
+      "positive_combination_weights": [
+        [
+          6.638233523505732e-08,
+          0.0
+        ],
+        [
+          0.0,
+          5.4825669583278005e-06
+        ]
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.607471961343309,
+        6.205931653886616,
+        13.569482190382299,
+        3.3427410774825095
+      ],
+      "original_panel_width_ratio": 1.0000000000319305,
+      "retained_lower": [
+        -1.9631718475184032,
+        -4.131815842273317,
+        -7.589629320492019,
+        -1.425760653166778
+      ],
+      "retained_upper": [
+        1.6443001138249007,
+        2.074115811613297,
+        5.979852869890296,
+        1.9169804243157276
+      ],
+      "retained_width_ratio": 0.9999999999999992,
+      "positive_combination_weights": [
+        [
+          0.012331332626784966,
+          2.843090715847253
+        ],
+        [
+          0.012331332626086943,
+          2.8430907177585407
+        ]
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.6609367357923888,
+        6.292464601884702,
+        13.764286168475868,
+        3.3917380951910574
+      ],
+      "original_panel_width_ratio": 1.0000000000580973,
+      "retained_lower": [
+        -1.9886599495856228,
+        -4.176055100279084,
+        -7.680536778741935,
+        -1.451819730845397
+      ],
+      "retained_upper": [
+        1.67227678620677,
+        2.116409501605615,
+        6.083749389733878,
+        1.9399183643456612
+      ],
+      "retained_width_ratio": 0.9999999999999999,
+      "positive_combination_weights": [
+        [
+          0.012175418299205456,
+          2.8321717587837365
+        ],
+        [
+          0.012175418297960115,
+          2.8321717622384575
+        ]
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.4943988241344255,
+        6.000967975402704,
+        12.936263699276632,
+        3.2424379660939806
+      ],
+      "original_panel_width_ratio": 1.000000016061447,
+      "retained_lower": [
+        -1.91366386330461,
+        -3.993547344339456,
+        -7.335104739994847,
+        -1.3637367983277378
+      ],
+      "retained_upper": [
+        1.5807349608298173,
+        2.0074206310632485,
+        5.60115895928177,
+        1.8787011677662415
+      ],
+      "retained_width_ratio": 0.9999999999999999,
+      "positive_combination_weights": [
+        [
+          0.012643452850132231,
+          3.0161899280846844
+        ],
+        [
+          0.012643452466512958,
+          3.0161909358322796
+        ]
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.4806667700779204,
+        5.978740372764075,
+        12.887116922592346,
+        3.2298188989178565
+      ],
+      "original_panel_width_ratio": 1.000000008007162,
+      "retained_lower": [
+        -1.9070928013822175,
+        -3.982203478618688,
+        -7.312076667116976,
+        -1.3570538339818534
+      ],
+      "retained_upper": [
+        1.573573968695705,
+        1.9965368941453896,
+        5.575040255475383,
+        1.8727650649360075
+      ],
+      "retained_width_ratio": 1.0000000000000009,
+      "positive_combination_weights": [
+        [
+          0.012685439480207132,
+          3.018726775296872
+        ],
+        [
+          0.012685439287995004,
+          3.018727278519026
+        ]
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.4376337944323603,
+        5.820364376113951,
+        12.57715436439278,
+        3.2036440196728195
+      ],
+      "original_panel_width_ratio": 1.0000000079996703,
+      "retained_lower": [
+        -1.8792709077532737,
+        -3.994070660188944,
+        -7.003194849441609,
+        -1.344490093167134
+      ],
+      "retained_upper": [
+        1.5583628866790857,
+        1.826293715925039,
+        5.573959514951255,
+        1.8591539265056851
+      ],
+      "retained_width_ratio": 1.0000000000000027,
+      "positive_combination_weights": [
+        [
+          0.012961087341123955,
+          3.3721786148755086
+        ],
+        [
+          0.0129610871496614,
+          3.3721791020428245
+        ]
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.4561974226392644,
+        5.849928198702479,
+        12.642709015094228,
+        3.2208459574592747
+      ],
+      "original_panel_width_ratio": 1.0000000000043658,
+      "retained_lower": [
+        -1.8881504754485692,
+        -4.009134642869121,
+        -7.033922545830595,
+        -1.3536084556221404
+      ],
+      "retained_upper": [
+        1.5680469471906953,
+        1.8407935558333544,
+        5.6087864692636575,
+        1.8672375018371343
+      ],
+      "retained_width_ratio": 1.0,
+      "positive_combination_weights": [
+        [
+          0.012901588598803401,
+          3.368528123597722
+        ],
+        [
+          0.012901588598699663,
+          3.3685281238629528
+        ]
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.2401462971282733,
+        0.41552672143327485
+      ],
+      "original_panel_width_ratio": 29.967423430572904,
+      "retained_lower": [
+        -6.105562463667739,
+        -1.1822969487978878
+      ],
+      "retained_upper": [
+        -5.90405300851842,
+        -0.8336238129397544
+      ],
+      "retained_width_ratio": 0.8391112278417835,
+      "positive_combination_weights": [
+        [
+          0.044418250939736094,
+          1383.3537857737463
+        ],
+        [
+          0.0,
+          1509.5974792521292
+        ]
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.2421039424837481,
+        0.41891404830848755
+      ],
+      "original_panel_width_ratio": 29.796240999989973,
+      "retained_lower": [
+        -6.1056593202743485,
+        -1.1824644973803309
+      ],
+      "retained_upper": [
+        -5.903956464839375,
+        -0.8334567197213473
+      ],
+      "retained_width_ratio": 0.833125030573782,
+      "positive_combination_weights": [
+        [
+          0.044136496385430844,
+          1384.1537614019326
+        ],
+        [
+          0.0,
+          1509.5956244367715
+        ]
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.21245123006008093,
+        0.3675515649013188
+      ],
+      "original_panel_width_ratio": 28.40409791645518,
+      "retained_lower": [
+        -6.071797240633139,
+        -1.125821890737727
+      ],
+      "retained_upper": [
+        -5.912669984436396,
+        -0.8505235482260708
+      ],
+      "retained_width_ratio": 0.7490060444745084,
+      "positive_combination_weights": [
+        [
+          0.06240932217903644,
+          1331.7201378786285
+        ],
+        [
+          0.0,
+          1508.939342597728
+        ]
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.215742511533902,
+        0.37324565152691247
+      ],
+      "original_panel_width_ratio": 28.209554373556404,
+      "retained_lower": [
+        -6.072168835456947,
+        -1.1264646388016955
+      ],
+      "retained_upper": [
+        -5.912299337648064,
+        -0.8498821800723294
+      ],
+      "retained_width_ratio": 0.7410199125800598,
+      "positive_combination_weights": [
+        [
+          0.06150119462624025,
+          1334.2952968026234
+        ],
+        [
+          0.0,
+          1508.9365872871292
+        ]
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        8.374161209474842,
+        11.107191654712949
+      ],
+      "original_panel_width_ratio": 0.6552684550347676,
+      "retained_lower": [
+        -7.929725203823121,
+        -3.4411576437914784
+      ],
+      "retained_upper": [
+        -5.476279024147233,
+        -0.5844994258999847
+      ],
+      "retained_width_ratio": 0.27508405208982445,
+      "positive_combination_weights": [
+        [
+          0.08181633948481086,
+          1276.535074463241
+        ],
+        [
+          0.017435216735852417,
+          1459.5382402153286
+        ]
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        8.362518514518012,
+        11.10046756939946
+      ],
+      "original_panel_width_ratio": 0.6621440209732286,
+      "retained_lower": [
+        -7.952988168744082,
+        -3.4753947865730477
+      ],
+      "retained_upper": [
+        -5.475123666181186,
+        -0.5835240772937982
+      ],
+      "retained_width_ratio": 0.2784119648945016,
+      "positive_combination_weights": [
+        [
+          0.08082657135676756,
+          1279.3449201162825
+        ],
+        [
+          0.01737922568352553,
+          1459.6976332182815
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.021221784515271125,
+        0.1883285247754526,
+        6.831810082709797
+      ],
+      "original_panel_width_ratio": 0.9569024218349664,
+      "retained_lower": [
+        -1.0134102249068442,
+        -1.1374329616987082,
+        -5.431124725916033
+      ],
+      "retained_upper": [
+        -0.9931030720094438,
+        -0.9572208154489301,
+        1.1062508877455146
+      ],
+      "retained_width_ratio": 0.9569024218349664,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1291.9387814559232
+        ],
+        [
+          0.0,
+          1291.9340410129257
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.021229529605021114,
+        0.1883972539762312,
+        6.834303345810968
+      ],
+      "original_panel_width_ratio": 0.9567085645813922,
+      "retained_lower": [
+        -1.0134118944450379,
+        -1.137447692782059,
+        -5.43165595023615
+      ],
+      "retained_upper": [
+        -0.9931014458784145,
+        -0.9572063009070865,
+        1.106780593648467
+      ],
+      "retained_width_ratio": 0.9567085645813922,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1291.9387647493904
+        ],
+        [
+          0.0,
+          1291.9339999799613
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.02217999858226949,
+        0.19724537807465015,
+        7.157583020867189
+      ],
+      "original_panel_width_ratio": 0.9783445386942758,
+      "retained_lower": [
+        -1.0082436706067635,
+        -1.0557197009127801,
+        -4.1634599905588665
+      ],
+      "retained_upper": [
+        -0.9865440042207371,
+        -0.8627456849464363,
+        2.839122268139772
+      ],
+      "retained_width_ratio": 0.9783445386918095,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1296.101944443641
+        ],
+        [
+          0.0,
+          1296.099256031185
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0222201448786975,
+        0.19760237907610612,
+        7.17053801325833
+      ],
+      "original_panel_width_ratio": 0.9780857291921156,
+      "retained_lower": [
+        -1.0082606691212463,
+        -1.0558699313017144,
+        -4.168877731300256
+      ],
+      "retained_upper": [
+        -0.9865274768504269,
+        -0.8625977854068083,
+        2.8445231700595888
+      ],
+      "retained_width_ratio": 0.9780857291868561,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1296.1017587089793
+        ],
+        [
+          0.0,
+          1296.0990286697518
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.022628637833877807,
+        0.20128199700458194,
+        7.317665033161462
+      ],
+      "original_panel_width_ratio": 0.9486627987042406,
+      "retained_lower": [
+        -1.0109430156993575,
+        -1.0812898751419608,
+        -4.294047782884285
+      ],
+      "retained_upper": [
+        -0.989476102655621,
+        -0.8903409449840676,
+        2.6479488074477704
+      ],
+      "retained_width_ratio": 0.9486627987032763,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1289.8190934850545
+        ],
+        [
+          0.0,
+          1289.8126689474393
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.022673741101766676,
+        0.20168317050975848,
+        7.33225009885887
+      ],
+      "original_panel_width_ratio": 0.9459001680127482,
+      "retained_lower": [
+        -1.010932950831818,
+        -1.0812008967977365,
+        -4.290833010519136
+      ],
+      "retained_upper": [
+        -0.9894858910491713,
+        -0.8904285539601358,
+        2.6447435898790035
+      ],
+      "retained_width_ratio": 0.9459001680094811,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1289.819200337245
+        ],
+        [
+          0.0,
+          1289.8124126975715
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.012394457043351625,
+        0.1101358708911051,
+        4.003662918623778
+      ],
+      "original_panel_width_ratio": 0.9588258018996599,
+      "retained_lower": [
+        -1.0066158978733852,
+        -1.0505869278258482,
+        -3.0233362284749505
+      ],
+      "retained_upper": [
+        -0.9947317795827308,
+        -0.9449858078398633,
+        0.8154790800104268
+      ],
+      "retained_width_ratio": 0.9588258018996599,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1291.7654996693293
+        ],
+        [
+          0.0,
+          1291.764465731698
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.012394406922312196,
+        0.11013542552768629,
+        4.003646728737657
+      ],
+      "original_panel_width_ratio": 0.957697562838407,
+      "retained_lower": [
+        -1.00660882599898,
+        -1.0505243518035141,
+        -3.021068032014937
+      ],
+      "retained_upper": [
+        -0.9947387397969988,
+        -0.9450479177992063,
+        0.8132146825174538
+      ],
+      "retained_width_ratio": 0.9576975628270114,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1291.7655274842173
+        ],
+        [
+          0.0,
+          1291.764465835376
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.01220121402008889,
+        0.10841113917739709,
+        3.9445521947226014
+      ],
+      "original_panel_width_ratio": 0.9247863858326951,
+      "retained_lower": [
+        -1.0058508106146091,
+        -1.0400699087577485,
+        -2.478262031280613
+      ],
+      "retained_upper": [
+        -0.9945673054155676,
+        -0.9398127541886859,
+        1.169606136605327
+      ],
+      "retained_width_ratio": 0.9247863858326951,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1291.4430008563304
+        ],
+        [
+          0.0,
+          1291.4412001034405
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.012206943393944125,
+        0.10846204546321103,
+        3.946404428282252
+      ],
+      "original_panel_width_ratio": 0.9251789134893476,
+      "retained_lower": [
+        -1.0058558938087436,
+        -1.040114893873925,
+        -2.4798943282401047
+      ],
+      "retained_upper": [
+        -0.9945622985634459,
+        -0.939768087540918,
+        1.1712358329076191
+      ],
+      "retained_width_ratio": 0.9251789134893476,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1291.4429818224048
+        ],
+        [
+          0.0,
+          1291.4411884191393
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.01252482939479449,
+        0.11143676053316476,
+        4.0457907633404195
+      ],
+      "original_panel_width_ratio": 0.9518977154316347,
+      "retained_lower": [
+        -1.0054117376478524,
+        -1.0465775899441896,
+        -2.774149563409927
+      ],
+      "retained_upper": [
+        -0.9934893894741132,
+        -0.9405011862072461,
+        1.077029421328228
+      ],
+      "retained_width_ratio": 0.9518977154316347,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1293.3859365876663
+        ],
+        [
+          0.0,
+          1293.3847023875662
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.01252111415725743,
+        0.1114037056004431,
+        4.044590679085372
+      ],
+      "original_panel_width_ratio": 0.9515409253417093,
+      "retained_lower": [
+        -1.0054077036535294,
+        -1.0465418496970824,
+        -2.772855763807039
+      ],
+      "retained_upper": [
+        -0.9934933594649397,
+        -0.9405366585779249,
+        1.0757377935878158
+      ],
+      "retained_width_ratio": 0.951540925339115,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1293.3859525746984
+        ],
+        [
+          0.0,
+          1293.3847101847025
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.049526534698764,
+        0.4412753661854394,
+        16.002515849855385
+      ],
+      "original_panel_width_ratio": 0.9365204038791831,
+      "retained_lower": [
+        -1.028149102662649,
+        -1.3368524229662984,
+        -11.167531941331761
+      ],
+      "retained_upper": [
+        -0.9817667606763267,
+        -0.9235862442235439,
+        3.819150665457833
+      ],
+      "retained_width_ratio": 0.9365204038791831,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1289.113260448136
+        ],
+        [
+          0.0,
+          1289.079241449386
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.04964380404156454,
+        0.44232000767400503,
+        16.040403162603443
+      ],
+      "original_panel_width_ratio": 0.9420533640854497,
+      "retained_lower": [
+        -1.0283467065951608,
+        -1.3385900147142675,
+        -11.229811958482308
+      ],
+      "retained_upper": [
+        -0.9815798428078264,
+        -0.921898371771518,
+        3.881103802126595
+      ],
+      "retained_width_ratio": 0.9420533640849162,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1289.1092194207713
+        ],
+        [
+          0.0,
+          1289.0779296272651
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.05657272918810641,
+        0.504633609604321,
+        18.375901824645723
+      ],
+      "original_panel_width_ratio": 0.9472233842404557,
+      "retained_lower": [
+        -1.0235356741318027,
+        -1.2536772644296497,
+        -9.211063681523111
+      ],
+      "retained_upper": [
+        -0.9699489888470173,
+        -0.7756726853502618,
+        8.195020233288176
+      ],
+      "retained_width_ratio": 0.9472233842404557,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1294.8829485522192
+        ],
+        [
+          0.0,
+          1294.8446555331486
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.05634799569891691,
+        0.5026295141229391,
+        18.302912708016358
+      ],
+      "original_panel_width_ratio": 0.951553235974907,
+      "retained_lower": [
+        -1.023551740138535,
+        -1.2538183562138296,
+        -9.216131252180261
+      ],
+      "retained_upper": [
+        -0.9699339208571761,
+        -0.7755361237047457,
+        8.200064562898952
+      ],
+      "retained_width_ratio": 0.951553235974907,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1294.8825599573508
+        ],
+        [
+          0.0,
+          1294.847609455698
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.05139545075644403,
+        0.4573394299029687,
+        16.744081459920093
+      ],
+      "original_panel_width_ratio": 0.9592166248013098,
+      "retained_lower": [
+        -1.0253530368828496,
+        -1.2104612604672427,
+        -8.199588209971678
+      ],
+      "retained_upper": [
+        -0.9760538418740108,
+        -0.7717713228040821,
+        7.86161309341106
+      ],
+      "retained_width_ratio": 0.9592166248013098,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1282.4968369583803
+        ],
+        [
+          0.0,
+          1282.472730331231
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.0519487087117767,
+        0.46226144549549264,
+        16.924310566022367
+      ],
+      "original_panel_width_ratio": 0.9515827712251189,
+      "retained_lower": [
+        -1.025422050014236,
+        -1.2110666181017684,
+        -8.221479506426052
+      ],
+      "retained_upper": [
+        -0.9759887667796845,
+        -0.7711837398915146,
+        7.883402843064073
+      ],
+      "retained_width_ratio": 0.9515827712251189,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1282.4953249126147
+        ],
+        [
+          0.0,
+          1282.46620111821
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        6.5375463816899995,
+        7.379037072018054
+      ],
+      "original_panel_width_ratio": 0.6186879345826126,
+      "retained_lower": [
+        8.000447690777163,
+        -12.301545479522964
+      ],
+      "retained_upper": [
+        12.044992359833499,
+        -7.736047744002992
+      ],
+      "retained_width_ratio": 0.6186879345826055,
+      "positive_combination_weights": [
+        [
+          6.8724562212641576e-06,
+          0.0
+        ],
+        [
+          6.55201052601675e-06,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        33.37738312143432,
+        0.794461677281635,
+        11.530509915227862
+      ],
+      "original_panel_width_ratio": 0.6068005642794583,
+      "retained_lower": [
+        18.39404393526941,
+        -1.2557672789000676,
+        -4.611562680039576
+      ],
+      "retained_upper": [
+        38.62796019689466,
+        -0.7716831063369606,
+        2.3847682561053274
+      ],
+      "retained_width_ratio": 0.6067668288377378,
+      "positive_combination_weights": [
+        [
+          2.922789205231841e-06,
+          0.00030000314811962325
+        ],
+        [
+          2.850358090152913e-06,
+          0.0002727905711687851
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.46044521966132324,
+        1.2555434329319928
+      ],
+      "original_panel_width_ratio": 0.7386511893769537,
+      "retained_lower": [
+        0.8585797948856446,
+        -3.0596205194962383
+      ],
+      "retained_upper": [
+        1.1433922486641621,
+        -2.2827833926326275
+      ],
+      "retained_width_ratio": 0.6186423169387831,
+      "positive_combination_weights": [
+        [
+          1.998059676542899e-06,
+          0.007616599884189384
+        ],
+        [
+          2.054916508685387e-06,
+          0.0029658617414256923
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        6.57607927224273,
+        7.422518959221737
+      ],
+      "original_panel_width_ratio": 0.6166251810353327,
+      "retained_lower": [
+        7.995756055241182,
+        -12.307833215394608
+      ],
+      "retained_upper": [
+        12.0505728755747,
+        -7.730741368973225
+      ],
+      "retained_width_ratio": 0.6166251810353245,
+      "positive_combination_weights": [
+        [
+          6.871377806281503e-06,
+          0.0
+        ],
+        [
+          6.546266944206212e-06,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        33.589119351868376,
+        0.7994235016637088,
+        11.603426936443665
+      ],
+      "original_panel_width_ratio": 0.6045426913207561,
+      "retained_lower": [
+        18.370662766054515,
+        -1.2564525756631295,
+        -4.621403460863681
+      ],
+      "retained_upper": [
+        38.65682659859321,
+        -0.7711262565127388,
+        2.392966570518989
+      ],
+      "retained_width_ratio": 0.6045084844161138,
+      "positive_combination_weights": [
+        [
+          2.9225495330502138e-06,
+          0.00029991584499758936
+        ],
+        [
+          2.8490357054126804e-06,
+          0.00027228104302965973
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.4625915004771657,
+        1.2616113002584033
+      ],
+      "original_panel_width_ratio": 0.7355340065718203,
+      "retained_lower": [
+        0.8583920958200816,
+        -3.0602322060193003
+      ],
+      "retained_upper": [
+        1.1435915520330644,
+        -2.282203080019829
+      ],
+      "retained_width_ratio": 0.6166101491051871,
+      "positive_combination_weights": [
+        [
+          1.999249465969854e-06,
+          0.007554395963319431
+        ],
+        [
+          2.054668398413298e-06,
+          0.002940725319185634
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        7.163842525648465,
+        8.06702209424606
+      ],
+      "original_panel_width_ratio": 0.6297885595194471,
+      "retained_lower": [
+        7.894799621334906,
+        -12.69758766081427
+      ],
+      "retained_upper": [
+        12.406199136994656,
+        -7.6167242391658405
+      ],
+      "retained_width_ratio": 0.629788559519447,
+      "positive_combination_weights": [
+        [
+          6.738642325981667e-06,
+          0.0
+        ],
+        [
+          6.388533124109459e-06,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        37.269088846416594,
+        0.881440176303717,
+        12.931245382373344
+      ],
+      "original_panel_width_ratio": 0.6129032611490228,
+      "retained_lower": [
+        17.289443860438535,
+        -1.2867253347863352,
+        -5.228192050192507
+      ],
+      "retained_upper": [
+        40.10777255161442,
+        -0.7437969653182641,
+        2.697410415383138
+      ],
+      "retained_width_ratio": 0.6129032611490831,
+      "positive_combination_weights": [
+        [
+          2.9443030583235515e-06,
+          0.00026333165681770244
+        ],
+        [
+          2.8573645893588067e-06,
+          0.00023360525969125392
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.4787113925340707,
+        1.3080509341804794
+      ],
+      "original_panel_width_ratio": 0.6486898610966207,
+      "retained_lower": [
+        0.861249956943539,
+        -3.086352717169025
+      ],
+      "retained_upper": [
+        1.1625037055363574,
+        -2.262907809624394
+      ],
+      "retained_width_ratio": 0.6294109602850914,
+      "positive_combination_weights": [
+        [
+          2.0897943044774263e-06,
+          0.0025809117504873337
+        ],
+        [
+          2.056591201676494e-06,
+          0.0019027297732757476
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        7.242278056918604,
+        8.155306677860654
+      ],
+      "original_panel_width_ratio": 0.6243101434570215,
+      "retained_lower": [
+        7.8904221051241095,
+        -12.70358019950258
+      ],
+      "retained_upper": [
+        12.411532432591052,
+        -7.611782187354882
+      ],
+      "retained_width_ratio": 0.6243101434570215,
+      "positive_combination_weights": [
+        [
+          6.737574744624931e-06,
+          0.0
+        ],
+        [
+          6.376700503080644e-06,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        37.71726552905412,
+        0.8918449105314852,
+        13.086201186655993
+      ],
+      "original_panel_width_ratio": 0.6069937843840645,
+      "retained_lower": [
+        17.266932430953126,
+        -1.2873931545498423,
+        -5.23790326784256
+      ],
+      "retained_upper": [
+        40.13611047019682,
+        -0.7432642109775698,
+        2.705339513657295
+      ],
+      "retained_width_ratio": 0.6069937843840872,
+      "positive_combination_weights": [
+        [
+          2.944042447976597e-06,
+          0.0002632457550457289
+        ],
+        [
+          2.8543692563532183e-06,
+          0.00023255083531193704
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.483490738205985,
+        1.3214237731417668
+      ],
+      "original_panel_width_ratio": 0.6435160068095427,
+      "retained_lower": [
+        0.8610239346573764,
+        -3.0869352499756944
+      ],
+      "retained_upper": [
+        1.1626772975204476,
+        -2.2621923364467267
+      ],
+      "retained_width_ratio": 0.6240196298643639,
+      "positive_combination_weights": [
+        [
+          2.0897163502454226e-06,
+          0.0025779973868574743
+        ],
+        [
+          2.055271180736096e-06,
+          0.0018863191374530158
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.7359161982451816,
+        4.1218957633322475
+      ],
+      "original_panel_width_ratio": 1.2115810795621085,
+      "retained_lower": [
+        8.790696668250424,
+        -11.396035384973333
+      ],
+      "retained_upper": [
+        11.234098679495796,
+        -8.700399770239157
+      ],
+      "retained_width_ratio": 0.6540048835489791,
+      "positive_combination_weights": [
+        [
+          6.813324847457853e-06,
+          0.0
+        ],
+        [
+          0.0,
+          0.005783404353051576
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        34.823359985328665,
+        0.8259307944172734,
+        11.946329382976208
+      ],
+      "original_panel_width_ratio": 0.6312638808134974,
+      "retained_lower": [
+        17.544566685547046,
+        -1.2729187816776015,
+        -4.965484063853517
+      ],
+      "retained_upper": [
+        39.49907349941019,
+        -0.749468961366874,
+        2.5758021839225025
+      ],
+      "retained_width_ratio": 0.6312638808136769,
+      "positive_combination_weights": [
+        [
+          2.9868472949538842e-06,
+          0.0002475735381241789
+        ],
+        [
+          2.913547958886696e-06,
+          0.00022174932877912717
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.49569067946521683,
+        1.3484336572076456
+      ],
+      "original_panel_width_ratio": 0.6857863462599445,
+      "retained_lower": [
+        0.8582041900724695,
+        -3.1426358102543226
+      ],
+      "retained_upper": [
+        1.1818760682251628,
+        -2.2618946028719096
+      ],
+      "retained_width_ratio": 0.6530651037375468,
+      "positive_combination_weights": [
+        [
+          2.0409350715704255e-06,
+          0.003414573492068289
+        ],
+        [
+          2.017701309841161e-06,
+          0.002264425258322643
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.6796025537720887,
+        4.059748181606558
+      ],
+      "original_panel_width_ratio": 1.2295896750390367,
+      "retained_lower": [
+        8.791075759068224,
+        -11.395347344006515
+      ],
+      "retained_upper": [
+        11.233475321413128,
+        -8.700817794464603
+      ],
+      "retained_width_ratio": 0.6637428084029857,
+      "positive_combination_weights": [
+        [
+          6.8135493102826934e-06,
+          0.0
+        ],
+        [
+          0.0,
+          0.0057834881085491695
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        34.25396996674823,
+        0.8126438083642841,
+        11.751806880001599
+      ],
+      "original_panel_width_ratio": 0.641424092448062,
+      "retained_lower": [
+        17.54891080063021,
+        -1.2727875563662931,
+        -4.963604774174266
+      ],
+      "retained_upper": [
+        39.493519888021396,
+        -0.7495720051867628,
+        2.574287288457063
+      ],
+      "retained_width_ratio": 0.6414240924481822,
+      "positive_combination_weights": [
+        [
+          2.9868957282688554e-06,
+          0.0002475896328871971
+        ],
+        [
+          2.9171399731112417e-06,
+          0.0002230434863992249
+        ]
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.48921729100800826,
+        1.3303410786732837
+      ],
+      "original_panel_width_ratio": 0.6947298085207985,
+      "retained_lower": [
+        0.8580847291149527,
+        -3.1432391020244244
+      ],
+      "retained_upper": [
+        1.1821631845507694,
+        -2.2617248982347262
+      ],
+      "retained_width_ratio": 0.6625327353802545,
+      "positive_combination_weights": [
+        [
+          2.0409388328623694e-06,
+          0.0034158633211213677
+        ],
+        [
+          2.019308553170471e-06,
+          0.0022993175810065705
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        7.42995796130954,
+        6.3670462225108935
+      ],
+      "original_panel_width_ratio": 0.735235928664286,
+      "retained_lower": [
+        17.03651347121399,
+        -22.30705278286096
+      ],
+      "retained_upper": [
+        22.501877833935094,
+        -17.627993110546388
+      ],
+      "retained_width_ratio": 0.7352359286642366,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004421939274560167
+        ],
+        [
+          0.0,
+          0.00442032783608241
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        6.735804977948085,
+        7.045487466616052
+      ],
+      "original_panel_width_ratio": 0.7361363531950746,
+      "retained_lower": [
+        17.895415771774758,
+        -22.71917077662355
+      ],
+      "retained_upper": [
+        22.851486006461684,
+        -17.530220276327064
+      ],
+      "retained_width_ratio": 0.7361363531950746,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004527691253598628
+        ],
+        [
+          0.0,
+          0.00452463284397902
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        7.759313383405868,
+        6.650503155258711
+      ],
+      "original_panel_width_ratio": 0.7204992013624859,
+      "retained_lower": [
+        16.985837162291503,
+        -22.374746125031216
+      ],
+      "retained_upper": [
+        22.57943014189081,
+        -17.585647111070124
+      ],
+      "retained_width_ratio": 0.7204992013624164,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004421847288521131
+        ],
+        [
+          0.0,
+          0.0044200173987701255
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        7.034202117541632,
+        7.35622848391894
+      ],
+      "original_panel_width_ratio": 0.7214759899682299,
+      "retained_lower": [
+        17.850105552937663,
+        -22.791860896074986
+      ],
+      "retained_upper": [
+        22.922322136773538,
+        -17.48159952729757
+      ],
+      "retained_width_ratio": 0.7214759899682299,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.00452751661859818
+        ],
+        [
+          0.0,
+          0.004524043871997499
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        9.55325120777696,
+        8.071101387959814
+      ],
+      "original_panel_width_ratio": 0.669629623985942,
+      "retained_lower": [
+        17.048947164758562,
+        -22.74436853955965
+      ],
+      "retained_upper": [
+        23.451532700489654,
+        -17.34432062208291
+      ],
+      "retained_width_ratio": 0.6696296239859116,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004409597720047306
+        ],
+        [
+          0.0,
+          0.004406279937739881
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        8.613225840116776,
+        9.190087485945803
+      ],
+      "original_panel_width_ratio": 0.6706186136988377,
+      "retained_lower": [
+        17.557203080446318,
+        -23.765272652840657
+      ],
+      "retained_upper": [
+        23.328221729952286,
+        -17.596711683314375
+      ],
+      "retained_width_ratio": 0.6706186136987882,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004484241238976838
+        ],
+        [
+          0.0,
+          0.004478973287702858
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        9.590278411742476,
+        8.10257155499162
+      ],
+      "original_panel_width_ratio": 0.6417506257831594,
+      "retained_lower": [
+        17.141806645204355,
+        -22.615659238981667
+      ],
+      "retained_upper": [
+        23.302013786369592,
+        -17.420593933144676
+      ],
+      "retained_width_ratio": 0.6417506257831298,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.0044098072217308125
+        ],
+        [
+          0.0,
+          0.004406234965983077
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        8.646660423183292,
+        9.225536707848462
+      ],
+      "original_panel_width_ratio": 0.6427866168389874,
+      "retained_lower": [
+        17.639251719188465,
+        -23.62259774548432
+      ],
+      "retained_upper": [
+        23.191852965153302,
+        -17.68683126510782
+      ],
+      "retained_width_ratio": 0.6427866168389874,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.00448457403381843
+        ],
+        [
+          0.0,
+          0.004478901912456889
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        8.129828461860065,
+        6.819901851727174
+      ],
+      "original_panel_width_ratio": 0.6855953082212775,
+      "retained_lower": [
+        17.494674906165898,
+        -22.300633697074723
+      ],
+      "retained_upper": [
+        23.071757113318313,
+        -17.627717621970675
+      ],
+      "retained_width_ratio": 0.6855953082212775,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004385362745172737
+        ],
+        [
+          0.0,
+          0.004383539608155702
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        6.919503701759332,
+        7.408192424634365
+      ],
+      "original_panel_width_ratio": 0.6875221570135225,
+      "retained_lower": [
+        17.77102000054274,
+        -22.985315347068436
+      ],
+      "retained_upper": [
+        22.525551266764204,
+        -17.889041670803223
+      ],
+      "retained_width_ratio": 0.6875221570135219,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004500594162438464
+        ],
+        [
+          0.0,
+          0.004496394523128317
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        8.157751587257287,
+        6.843428798549496
+      ],
+      "original_panel_width_ratio": 0.6801621863033938,
+      "retained_lower": [
+        17.504617367843885,
+        -22.287681725090103
+      ],
+      "retained_upper": [
+        23.05657528601234,
+        -17.635862047707207
+      ],
+      "retained_width_ratio": 0.6801621863033938,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004385377724510104
+        ],
+        [
+          0.0,
+          0.00438351656021423
+        ]
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        6.943142660944993,
+        7.433390790901363
+      ],
+      "original_panel_width_ratio": 0.6821144452355621,
+      "retained_lower": [
+        17.779473897570192,
+        -22.971763386518177
+      ],
+      "retained_upper": [
+        22.512665635598623,
+        -17.89831443194536
+      ],
+      "retained_width_ratio": 0.6821144452355374,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.004500628685713471
+        ],
+        [
+          0.0,
+          0.004496341459477173
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.25248038551190966,
+        0.3372418930801676,
+        0.5002918108741987,
+        0.0940453634728858,
+        0.031409960115292096
+      ],
+      "original_panel_width_ratio": 0.8000629482580124,
+      "retained_lower": [
+        -1.0992185970718114,
+        -1.147220398091077,
+        -1.2088182969009953,
+        -0.0259359327456773,
+        -0.0026859242805508093
+      ],
+      "retained_upper": [
+        -0.8973710380145044,
+        -0.8772143049631184,
+        -0.8084879514654549,
+        0.04903462013789343,
+        0.022418145969305463
+      ],
+      "retained_width_ratio": 0.7994583763331022,
+      "positive_combination_weights": [
+        [
+          0.0328903254480705,
+          1.9985486300461168
+        ],
+        [
+          0.032709804728902975,
+          2.006312204823715
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        0.10312475793938614,
+        0.4672665471785522,
+        0.2816557001283613,
+        0.05366893433259991,
+        0.08921916489971358
+      ],
+      "original_panel_width_ratio": 0.7966925747113068,
+      "retained_lower": [
+        -1.0416559901712459,
+        -1.1869865672710953,
+        -1.1086940706291577,
+        -0.010920130533918524,
+        -0.026465822386058296
+      ],
+      "retained_upper": [
+        -0.9593925925157368,
+        -0.8144488539856531,
+        -0.8843010657117778,
+        0.03177273802917717,
+        0.0444799638760241
+      ],
+      "retained_width_ratio": 0.7966925747113068,
+      "positive_combination_weights": [
+        [
+          0.010591311013916152,
+          0.0
+        ],
+        [
+          0.010588684844371999,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.09105893921378794
+      ],
+      "original_panel_width_ratio": 0.7936841994037351,
+      "retained_lower": [
+        -1.0375970314903615
+      ],
+      "retained_upper": [
+        -0.9653249902219129
+      ],
+      "retained_width_ratio": 0.7936841994037351,
+      "positive_combination_weights": [
+        [
+          0.02045404030416005,
+          0.0
+        ],
+        [
+          0.020444171465538334,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.25327854776073855,
+        0.3382966838696694,
+        0.501861897069952,
+        0.09434696045266219,
+        0.03150981060571885
+      ],
+      "original_panel_width_ratio": 0.7979520875702699,
+      "retained_lower": [
+        -1.0992709253927184,
+        -1.147290054302634,
+        -1.208922634651786,
+        -0.02595508186817455,
+        -0.0026923069601575682
+      ],
+      "retained_upper": [
+        -0.8973219146695881,
+        -0.8771510241775575,
+        -0.8083943841423583,
+        0.049053200437892366,
+        0.022424715187025067
+      ],
+      "retained_width_ratio": 0.7973395793231685,
+      "positive_combination_weights": [
+        [
+          0.03288999264360041,
+          1.9985629256673967
+        ],
+        [
+          0.03270664790922225,
+          2.0064482133328347
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        0.10345297940017106,
+        0.46875824609458183,
+        0.2825584732145523,
+        0.053842390567254095,
+        0.08950811131851313
+      ],
+      "original_panel_width_ratio": 0.7945658313750167,
+      "retained_lower": [
+        -1.0416776601211735,
+        -1.1870874532766613,
+        -1.1087543980363375,
+        -0.010931427505907034,
+        -0.026484476142719964
+      ],
+      "retained_upper": [
+        -0.9593710838432885,
+        -0.8143538254815181,
+        -0.8842430898545613,
+        0.03178406805348959,
+        0.044498960177311225
+      ],
+      "retained_width_ratio": 0.7945658313750167,
+      "positive_combination_weights": [
+        [
+          0.010591306183504508,
+          0.0
+        ],
+        [
+          0.010588638853463252,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.09135371810052018
+      ],
+      "original_panel_width_ratio": 0.7915501900039853,
+      "retained_lower": [
+        -1.037617053385809
+      ],
+      "retained_upper": [
+        -0.9653060004657716
+      ],
+      "retained_width_ratio": 0.7915501900039853,
+      "positive_combination_weights": [
+        [
+          0.0204540221477854,
+          0.0
+        ],
+        [
+          0.020443998678325255,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.2539884827505986,
+        0.32998664321147186,
+        0.4978133743362674,
+        0.09473623140225984,
+        0.03159077765506689
+      ],
+      "original_panel_width_ratio": 0.7722313547505341,
+      "retained_lower": [
+        -1.0991460458586535,
+        -1.1227934594149305,
+        -1.1811424831778081,
+        -0.024191757617914752,
+        -0.0025770585461747843
+      ],
+      "retained_upper": [
+        -0.9032373492275033,
+        -0.8678258748448953,
+        -0.7967761298783105,
+        0.04864744877846852,
+        0.021783090781074203
+      ],
+      "retained_width_ratio": 0.7713290559852697,
+      "positive_combination_weights": [
+        [
+          0.031800867448922875,
+          2.0751500662354463
+        ],
+        [
+          0.03158563320331574,
+          2.084766760746565
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        0.10005036703694292,
+        0.45200663942550534,
+        0.2744447903033095,
+        0.05204315782698979,
+        0.08614441273905639
+      ],
+      "original_panel_width_ratio": 0.7604630662845391,
+      "retained_lower": [
+        -1.0368926949465174,
+        -1.1739587553774233,
+        -1.1094215228252196,
+        -0.01089037384676248,
+        -0.020188292440168218
+      ],
+      "retained_upper": [
+        -0.9607021115155814,
+        -0.8299441832030559,
+        -0.9007163960653475,
+        0.028623520507801974,
+        0.045190241794611286
+      ],
+      "retained_width_ratio": 0.7604630662845391,
+      "positive_combination_weights": [
+        [
+          0.010579911654674676,
+          0.0
+        ],
+        [
+          0.01057709484831723,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.09184016035662279
+      ],
+      "original_panel_width_ratio": 0.7978441075734041,
+      "retained_lower": [
+        -1.0311702840218435
+      ],
+      "retained_upper": [
+        -0.9578961532427155
+      ],
+      "retained_width_ratio": 0.7978441075734041,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1.831133358309751
+        ],
+        [
+          0.0,
+          1.8307372074538881
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.25343465353646577,
+        0.32927521063102394,
+        0.49673553496148415,
+        0.09452673841151124,
+        0.03152149435047014
+      ],
+      "original_panel_width_ratio": 0.773471920044719,
+      "retained_lower": [
+        -1.0990887790668384,
+        -1.1227194739436042,
+        -1.1810294961318568,
+        -0.024170754876222167,
+        -0.0025700995489293856
+      ],
+      "retained_upper": [
+        -0.9032911590746246,
+        -0.8678941905469039,
+        -0.7968787132855021,
+        0.04862700965322368,
+        0.021775990327685936
+      ],
+      "retained_width_ratio": 0.7725763515763293,
+      "positive_combination_weights": [
+        [
+          0.031801233060232775,
+          2.075133866114954
+        ],
+        [
+          0.031587952669296225,
+          2.084662618904722
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        0.09982416722476128,
+        0.4509819222697694,
+        0.27382019594538987,
+        0.05192382382135336,
+        0.08594650567853825
+      ],
+      "original_panel_width_ratio": 0.761723009991878,
+      "retained_lower": [
+        -1.03686900801408,
+        -1.173848870788134,
+        -1.1093551782780744,
+        -0.010878003217262632,
+        -0.0201680511106965
+      ],
+      "retained_upper": [
+        -0.9607256957751003,
+        -0.8300480769877564,
+        -0.9007800344260164,
+        0.028611174166246475,
+        0.045169541314803385
+      ],
+      "retained_width_ratio": 0.7617230099917677,
+      "positive_combination_weights": [
+        [
+          0.010579916484213593,
+          0.0
+        ],
+        [
+          0.01057712509723504,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.09166055498160341
+      ],
+      "original_panel_width_ratio": 0.7990165322195244,
+      "retained_lower": [
+        -1.031151447921098
+      ],
+      "retained_upper": [
+        -0.9579131491383812
+      ],
+      "retained_width_ratio": 0.7990165322195123,
+      "positive_combination_weights": [
+        [
+          0.0,
+          1.8311340374939336
+        ],
+        [
+          0.0,
+          1.8307414618203026
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.2659764250516763,
+        0.35033772888710024,
+        0.5222329073624454,
+        0.09833338696679358,
+        0.03307503111433253
+      ],
+      "original_panel_width_ratio": 0.7638206657500269,
+      "retained_lower": [
+        -1.099798014253018,
+        -1.1361889321520933,
+        -1.198456420911624,
+        -0.025772440107010006,
+        -0.002980850270200756
+      ],
+      "retained_upper": [
+        -0.8968410892736992,
+        -0.8683680905332898,
+        -0.7994749908401659,
+        0.04899794031399826,
+        0.022249007179505786
+      ],
+      "retained_width_ratio": 0.763063587082526,
+      "positive_combination_weights": [
+        [
+          0.03185038264057165,
+          2.070220221824397
+        ],
+        [
+          0.03165127105836218,
+          2.0779228029145376
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        0.11304177044760966,
+        0.5157504407442882,
+        0.31019544841753544,
+        0.05914708574530675,
+        0.09847377132790482
+      ],
+      "original_panel_width_ratio": 0.7845280737858553,
+      "retained_lower": [
+        -1.0445022552982413,
+        -1.2182642579040213,
+        -1.1258193004097086,
+        -0.013261359940593565,
+        -0.028125511487018716
+      ],
+      "retained_upper": [
+        -0.9556742629928946,
+        -0.8132724668714458,
+        -0.8824622627655598,
+        0.03305077055561666,
+        0.04894386063761922
+      ],
+      "retained_width_ratio": 0.7845280737858553,
+      "positive_combination_weights": [
+        [
+          0.010577408636912245,
+          0.0
+        ],
+        [
+          0.010574114050061372,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.10038878331927503
+      ],
+      "original_panel_width_ratio": 0.78036237204418,
+      "retained_lower": [
+        -1.0416496898341208
+      ],
+      "retained_upper": [
+        -0.9633100607564621
+      ],
+      "retained_width_ratio": 0.78036237204418,
+      "positive_combination_weights": [
+        [
+          0.02047795214149064,
+          0.0
+        ],
+        [
+          0.020465164256290816,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.26523328655693734,
+        0.34936976318298063,
+        0.5207850843814819,
+        0.0980544402094927,
+        0.03298213302438442
+      ],
+      "original_panel_width_ratio": 0.7682404294995187,
+      "retained_lower": [
+        -1.1001128563814664,
+        -1.1366079184165705,
+        -1.1990867250368518,
+        -0.025887963076689016,
+        -0.003017999823345642
+      ],
+      "retained_upper": [
+        -0.8965474669190303,
+        -0.8679864953428349,
+        -0.7989110490889717,
+        0.049109100102304085,
+        0.022287308210322945
+      ],
+      "retained_width_ratio": 0.7674956341452147,
+      "positive_combination_weights": [
+        [
+          0.03184870833025083,
+          2.0702848061002643
+        ],
+        [
+          0.031653910518854564,
+          2.0778206757520956
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e1:reference",
+      "old_full_width": [
+        0.1127531264188546,
+        0.5144287101942964,
+        0.30939668404155984,
+        0.05899324092944975,
+        0.09821703115592649
+      ],
+      "original_panel_width_ratio": 0.7886049157990167,
+      "retained_lower": [
+        -1.0446179295142366,
+        -1.2188080456638377,
+        -1.126143717025776,
+        -0.013322080521654107,
+        -0.028225708808249143
+      ],
+      "retained_upper": [
+        -0.9555594643117693,
+        -0.8127630743716008,
+        -0.8821519710587524,
+        0.033111595603886976,
+        0.04904622919884629
+      ],
+      "retained_width_ratio": 0.7886049157988043,
+      "positive_combination_weights": [
+        [
+          0.010577380966102907,
+          0.0
+        ],
+        [
+          0.010574157918610083,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e2:reference",
+      "old_full_width": [
+        0.10012688763611222
+      ],
+      "original_panel_width_ratio": 0.7845088454918472,
+      "retained_lower": [
+        -1.041758060406388
+      ],
+      "retained_upper": [
+        -0.9632076313842912
+      ],
+      "retained_width_ratio": 0.7845088454918328,
+      "positive_combination_weights": [
+        [
+          0.020477844704339433,
+          0.0
+        ],
+        [
+          0.020465334478745573,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        2.565135984886579,
+        2.5863030140156287,
+        1.039915545623848
+      ],
+      "original_panel_width_ratio": 0.9438919353083897,
+      "retained_lower": [
+        -5.2846387553063385,
+        -2.4545735805996287,
+        1.0313742530332792
+      ],
+      "retained_upper": [
+        -2.9338902992721136,
+        -0.10567749054546205,
+        1.9854904407849587
+      ],
+      "retained_width_ratio": 0.9164225483110855,
+      "positive_combination_weights": [
+        [
+          0.0005762538273594424,
+          0.7717486665816201
+        ],
+        [
+          0.0005703705049558036,
+          0.6695861036808951
+        ]
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        2.5601288614598356,
+        2.5785103680038937,
+        1.0376951783546757
+      ],
+      "original_panel_width_ratio": 0.9525391608300414,
+      "retained_lower": [
+        -5.301699009131664,
+        -2.472704771476973,
+        1.0264941790311064
+      ],
+      "retained_upper": [
+        -2.9228630973640595,
+        -0.09501813178458951,
+        1.9916674187459553
+      ],
+      "retained_width_ratio": 0.929186006055627,
+      "positive_combination_weights": [
+        [
+          0.000575580204340261,
+          0.7589062241990987
+        ],
+        [
+          0.0005706011741242364,
+          0.6732049152228137
+        ]
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.6732847160999533,
+        4.500106798893301,
+        1.5439537874915974
+      ],
+      "original_panel_width_ratio": 0.9684604301526031,
+      "retained_lower": [
+        -5.820575811130214,
+        -3.5109331066266005,
+        0.7379892946306196
+      ],
+      "retained_upper": [
+        -2.2983369279969184,
+        0.7584876542011361,
+        2.2188842865893035
+      ],
+      "retained_width_ratio": 0.958879900513939,
+      "positive_combination_weights": [
+        [
+          0.0005178208732601824,
+          0.19748178595135404
+        ],
+        [
+          0.0005113045911868324,
+          0.17432067651628835
+        ]
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.6944234237477875,
+        4.540492671327797,
+        1.5538681342335359
+      ],
+      "original_panel_width_ratio": 0.9848627876733673,
+      "retained_lower": [
+        -5.871256998968766,
+        -3.6048802204584147,
+        0.7147465869675529
+      ],
+      "retained_upper": [
+        -2.2495466708888974,
+        0.8232570388382432,
+        2.238234140512793
+      ],
+      "retained_width_ratio": 0.980318147833159,
+      "positive_combination_weights": [
+        [
+          0.000513128618546099,
+          0.18053528961361365
+        ],
+        [
+          0.0005099743605297607,
+          0.1699125526712841
+        ]
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        2.6834278384242634,
+        2.483723329961517,
+        1.0635287694927928
+      ],
+      "original_panel_width_ratio": 0.9618958045564607,
+      "retained_lower": [
+        -5.3808682707201765,
+        -2.4776698484288517,
+        1.0026078472550841
+      ],
+      "retained_upper": [
+        -2.847625688327096,
+        -0.1517451968550847,
+        2.007613102156526
+      ],
+      "retained_width_ratio": 0.9440323105094665,
+      "positive_combination_weights": [
+        [
+          0.0005960650757906938,
+          0.862624641711471
+        ],
+        [
+          0.0005918124604487103,
+          0.7873899182103528
+        ]
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        2.664639021800552,
+        2.4562637526291478,
+        1.0553783157371632
+      ],
+      "original_panel_width_ratio": 0.9608401379626369,
+      "retained_lower": [
+        -5.369023322182446,
+        -2.4613284273183047,
+        1.0072367311313726
+      ],
+      "retained_upper": [
+        -2.8580612408384707,
+        -0.16558841145761538,
+        2.0027602246904452
+      ],
+      "retained_width_ratio": 0.9423272949171428,
+      "positive_combination_weights": [
+        [
+          0.0005969812025150067,
+          0.8804229906659641
+        ],
+        [
+          0.0005926813668271981,
+          0.8018556797062093
+        ]
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        9.351727203874242,
+        2.432598910156673
+      ],
+      "original_panel_width_ratio": 0.9441973976668581,
+      "retained_lower": [
+        -2.1842453906743615,
+        0.5994684411440772
+      ],
+      "retained_upper": [
+        6.318338783167009,
+        2.7757556427198304
+      ],
+      "retained_width_ratio": 0.9019169785095802,
+      "positive_combination_weights": [
+        [
+          6.28877024871332e-05,
+          0.3257973011009494
+        ],
+        [
+          5.941061848443445e-05,
+          0.3265711423517523
+        ]
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        9.251111012293356,
+        2.41627177781501
+      ],
+      "original_panel_width_ratio": 0.9393971287707605,
+      "retained_lower": [
+        -2.13583682065647,
+        0.6011619149808027
+      ],
+      "retained_upper": [
+        6.202812676874048,
+        2.7409584667263713
+      ],
+      "retained_width_ratio": 0.8934725599758269,
+      "positive_combination_weights": [
+        [
+          6.380244310152862e-05,
+          0.32559315114014714
+        ],
+        [
+          5.991011356339628e-05,
+          0.32646021333704495
+        ]
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        7.228849633272369,
+        1.9912600833210379
+      ],
+      "original_panel_width_ratio": 0.9314017341625709,
+      "retained_lower": [
+        -1.4779955571767567,
+        0.6281559547684654
+      ],
+      "retained_upper": [
+        4.9518558142833164,
+        2.362540749649555
+      ],
+      "retained_width_ratio": 0.880234761341125,
+      "positive_combination_weights": [
+        [
+          6.923625288382141e-05,
+          0.3241954939051494
+        ],
+        [
+          6.377041823542426e-05,
+          0.32541640974160096
+        ]
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        7.069147362726385,
+        1.9637625402210297
+      ],
+      "original_panel_width_ratio": 0.9379301884733622,
+      "retained_lower": [
+        -1.444736899619529,
+        0.6282021949964683
+      ],
+      "retained_upper": [
+        4.913121874222464,
+        2.3607824347749813
+      ],
+      "retained_width_ratio": 0.890828556633654,
+      "positive_combination_weights": [
+        [
+          7.016563149484972e-05,
+          0.3239873687605286
+        ],
+        [
+          6.508320153423072e-05,
+          0.3251237128649561
+        ]
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        9.130486278300694,
+        2.4054750444273134
+      ],
+      "original_panel_width_ratio": 0.9460798895488098,
+      "retained_lower": [
+        -2.0576351368533987,
+        0.6043290146816509
+      ],
+      "retained_upper": [
+        6.287206463383347,
+        2.7707171864912343
+      ],
+      "retained_width_ratio": 0.9072804493047275,
+      "positive_combination_weights": [
+        [
+          6.293674208206363e-05,
+          0.3259409970921289
+        ],
+        [
+          5.973333694791903e-05,
+          0.32665641675887
+        ]
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        9.101761374718578,
+        2.400656785050537
+      ],
+      "original_panel_width_ratio": 0.9380894823133923,
+      "retained_lower": [
+        -2.01921529489616,
+        0.6061419366598988
+      ],
+      "retained_upper": [
+        6.185694277714587,
+        2.7340010166675732
+      ],
+      "retained_width_ratio": 0.8939146580930375,
+      "positive_combination_weights": [
+        [
+          6.36300685936418e-05,
+          0.32578571935601786
+        ],
+        [
+          5.987262915509861e-05,
+          0.32662538565796145
+        ]
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.5068774447055413,
+        0.05018784319108782
+      ],
+      "original_panel_width_ratio": 0.9796504229488773,
+      "retained_lower": [
+        -2.2356474462502782,
+        0.48054810294890726
+      ],
+      "retained_upper": [
+        -1.7390777838701483,
+        0.5297139556923486
+      ],
+      "retained_width_ratio": 0.9796504229488773,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.057375277474117324
+        ],
+        [
+          0.0,
+          0.05737507541132936
+        ]
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.5080056346795665,
+        0.0502997055865384
+      ],
+      "original_panel_width_ratio": 0.981192842145358,
+      "retained_lower": [
+        -2.236564325393068,
+        0.48046229183370465
+      ],
+      "retained_upper": [
+        -1.7381063429357155,
+        0.5298153603218244
+      ],
+      "retained_width_ratio": 0.9811928421452516,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.0573752407647855
+        ],
+        [
+          0.0,
+          0.057375053046180714
+        ]
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.48091323286149446,
+        0.04737595002599343
+      ],
+      "original_panel_width_ratio": 0.9192438549440688,
+      "retained_lower": [
+        -2.232886461517789,
+        0.4755018672815489
+      ],
+      "retained_upper": [
+        -1.7907879902279136,
+        0.5190497571253067
+      ],
+      "retained_width_ratio": 0.9192438549440688,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.05769313246451018
+        ],
+        [
+          0.0,
+          0.05769239224685041
+        ]
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.4796900714981225,
+        0.04725529960096636
+      ],
+      "original_panel_width_ratio": 0.9220223832290007,
+      "retained_lower": [
+        -2.2329876763067857,
+        0.47549239312673997
+      ],
+      "retained_upper": [
+        -1.7906815779678171,
+        0.5190607569611076
+      ],
+      "retained_width_ratio": 0.9220223832289709,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.05769312866911619
+        ],
+        [
+          0.0,
+          0.05769241651413214
+        ]
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.5040134364604316,
+        0.04957262529760437
+      ],
+      "original_panel_width_ratio": 0.8660746277809341,
+      "retained_lower": [
+        -2.2558268869517537,
+        0.47670937424579335
+      ],
+      "retained_upper": [
+        -1.8192755358729507,
+        0.5196392197268508
+      ],
+      "retained_width_ratio": 0.8660746277809341,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.057277612634471724
+        ],
+        [
+          0.0,
+          0.05727632790220444
+        ]
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.505108415312262,
+        0.04968047374705503
+      ],
+      "original_panel_width_ratio": 0.864195829961008,
+      "retained_lower": [
+        -2.255826886951738,
+        0.47670937424579485
+      ],
+      "retained_upper": [
+        -1.8192755358729655,
+        0.5196392197268493
+      ],
+      "retained_width_ratio": 0.8641958299609482,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.057277612634471724
+        ],
+        [
+          0.0,
+          0.05727630554516515
+        ]
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        2.410830098903482,
+        2.0123332326592656,
+        1.4453883982542983
+      ],
+      "original_panel_width_ratio": 0.9252732065359681,
+      "retained_lower": [
+        -1.279962828776446,
+        -0.7488704940211819,
+        -1.659007537157682
+      ],
+      "retained_upper": [
+        0.9462614009833077,
+        1.1130875287803472,
+        -0.3200242352709537
+      ],
+      "retained_width_ratio": 0.9252732065359681,
+      "positive_combination_weights": [
+        [
+          0.003818526920089687,
+          0.0
+        ],
+        [
+          0.003648436632137867,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        2.3893338210347395,
+        1.994869377524886,
+        1.4330512744085198
+      ],
+      "original_panel_width_ratio": 0.932338940660386,
+      "retained_lower": [
+        -1.2786810344713475,
+        -0.7478498928144516,
+        -1.6583019873881337
+      ],
+      "retained_upper": [
+        0.9450173584447944,
+        1.1120445093829443,
+        -0.3207815780354223
+      ],
+      "retained_width_ratio": 0.932338940660386,
+      "positive_combination_weights": [
+        [
+          0.003820881538884165,
+          0.0
+        ],
+        [
+          0.003668016734828875,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.31570822736463,
+        2.6591565682955984,
+        1.8754820210659933
+      ],
+      "original_panel_width_ratio": 0.9999587320720634,
+      "retained_lower": [
+        -1.894755147644255,
+        -1.1021484284585301,
+        -1.9156717256525824
+      ],
+      "retained_upper": [
+        1.4208092770225191,
+        1.556898401955436,
+        -0.04026468623805601
+      ],
+      "retained_width_ratio": 0.9999587320720634,
+      "positive_combination_weights": [
+        [
+          0.002941216015737218,
+          0.0
+        ],
+        [
+          0.002941116028964065,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.2998923487778558,
+        2.6470831719075782,
+        1.8672307022556924
+      ],
+      "original_panel_width_ratio": 0.9997788548075335,
+      "retained_lower": [
+        -1.8863079805592005,
+        -1.0959987704717948,
+        -1.9115977700309001
+      ],
+      "retained_upper": [
+        1.4128177942528977,
+        1.550499011718257,
+        -0.04476723344885669
+      ],
+      "retained_width_ratio": 0.9997788548075335,
+      "positive_combination_weights": [
+        [
+          0.0029526713722686556,
+          0.0
+        ],
+        [
+          0.0029521360591598642,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.4330822307378748,
+        2.7595474429318094,
+        1.947764593273848
+      ],
+      "original_panel_width_ratio": 0.9765096323575709,
+      "retained_lower": [
+        -1.9605846225812908,
+        -1.0969395169950724,
+        -1.9318251934971578
+      ],
+      "retained_upper": [
+        1.3876196324286827,
+        1.5977851419755433,
+        -0.02834344881766626
+      ],
+      "retained_width_ratio": 0.9765096323575708,
+      "positive_combination_weights": [
+        [
+          0.0029592661115913853,
+          0.0
+        ],
+        [
+          0.002899431724201765,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        3.4452745064618946,
+        2.7688389784605563,
+        1.954103130837309
+      ],
+      "original_panel_width_ratio": 0.9748064662425008,
+      "retained_lower": [
+        -1.9635242766055938,
+        -1.099069549826958,
+        -1.933238776607509
+      ],
+      "retained_upper": [
+        1.3903757194323088,
+        1.6000125903606717,
+        -0.02677691744452404
+      ],
+      "retained_width_ratio": 0.9748064662425004,
+      "positive_combination_weights": [
+        [
+          0.0029552054683433656,
+          0.0
+        ],
+        [
+          0.0028909562080549228,
+          0.0
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.07075963419158587
+      ],
+      "original_panel_width_ratio": 0.6735106942127455,
+      "retained_lower": [
+        0.010103482684097248
+      ],
+      "retained_upper": [
+        0.05776085303071217
+      ],
+      "retained_width_ratio": 0.6735106942127455,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.018360863106287078
+        ],
+        [
+          0.0,
+          0.01434669397076378
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.07037222085255929
+      ],
+      "original_panel_width_ratio": 0.6772185070933672,
+      "retained_lower": [
+        0.010103482684097248
+      ],
+      "retained_upper": [
+        0.05776085303071217
+      ],
+      "retained_width_ratio": 0.6772185070933672,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.018360863106287078
+        ],
+        [
+          0.0,
+          0.014409600106832213
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.08190872588755704
+      ],
+      "original_panel_width_ratio": 0.7447951955441353,
+      "retained_lower": [
+        0.010102228027659976
+      ],
+      "retained_upper": [
+        0.07110745354185397
+      ],
+      "retained_width_ratio": 0.7447951955441349,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.016297554575309542
+        ],
+        [
+          0.0,
+          0.012774858451935637
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.08177585996476483
+      ],
+      "original_panel_width_ratio": 0.7467272844034181,
+      "retained_lower": [
+        0.010071824124153347
+      ],
+      "retained_upper": [
+        0.07113608996539639
+      ],
+      "retained_width_ratio": 0.7467272844034181,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.016286709005668944
+        ],
+        [
+          0.0,
+          0.012794971795228406
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.07248442045715955
+      ],
+      "original_panel_width_ratio": 0.7611302081849625,
+      "retained_lower": [
+        0.014216312463812456
+      ],
+      "retained_upper": [
+        0.06938639449653666
+      ],
+      "retained_width_ratio": 0.7611302081849625,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.015144350822694386
+        ],
+        [
+          0.0,
+          0.012718749854947453
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.07231118344226692
+      ],
+      "original_panel_width_ratio": 0.7629536595369356,
+      "retained_lower": [
+        0.014216312463812456
+      ],
+      "retained_upper": [
+        0.06938639449653666
+      ],
+      "retained_width_ratio": 0.7629536595369356,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.015144350822694386
+        ],
+        [
+          0.0,
+          0.012741893708058992
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.03352963266485588
+      ],
+      "original_panel_width_ratio": 0.6383521401664249,
+      "retained_lower": [
+        0.029297235497484524
+      ],
+      "retained_upper": [
+        0.05070094826808933
+      ],
+      "retained_width_ratio": 0.6383521401664245,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.02410026395183947
+        ],
+        [
+          0.0,
+          0.022073092629208712
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.03369730083441415
+      ],
+      "original_panel_width_ratio": 0.6485965290389193,
+      "retained_lower": [
+        0.029069067067241605
+      ],
+      "retained_upper": [
+        0.05092501942642289
+      ],
+      "retained_width_ratio": 0.6485965290389191,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.02403541723526952
+        ],
+        [
+          0.0,
+          0.022041727704783787
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.034059654058377006
+      ],
+      "original_panel_width_ratio": 0.6517432482752193,
+      "retained_lower": [
+        0.029250364434414734
+      ],
+      "retained_upper": [
+        0.05144851400555162
+      ],
+      "retained_width_ratio": 0.6517432482752193,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.0246283557077951
+        ],
+        [
+          0.0,
+          0.022539172871491455
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.034172602208667816
+      ],
+      "original_panel_width_ratio": 0.6513158624707466,
+      "retained_lower": [
+        0.02922058577898965
+      ],
+      "retained_upper": [
+        0.05147774365939787
+      ],
+      "retained_width_ratio": 0.6513158624707466,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.02461938263922932
+        ],
+        [
+          0.0,
+          0.022517118874193925
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.03696504137842352
+      ],
+      "original_panel_width_ratio": 0.7184833277675418,
+      "retained_lower": [
+        0.02752886597404733
+      ],
+      "retained_upper": [
+        0.054087631914681925
+      ],
+      "retained_width_ratio": 0.7184833277675414,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.02373776795775176
+        ],
+        [
+          0.0,
+          0.0217846381958346
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.036921108163128255
+      ],
+      "original_panel_width_ratio": 0.7198860943673564,
+      "retained_lower": [
+        0.027518640435626636
+      ],
+      "retained_upper": [
+        0.054097632790895724
+      ],
+      "retained_width_ratio": 0.7198860943673555,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.023734307305713437
+        ],
+        [
+          0.0,
+          0.021793441206960053
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 51,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.17697949121586462
+      ],
+      "original_panel_width_ratio": 0.7642721418191836,
+      "retained_lower": [
+        -0.020585951992634438
+      ],
+      "retained_upper": [
+        0.1146745428169838
+      ],
+      "retained_width_ratio": 0.7642721418191836,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.005316976020005475
+        ],
+        [
+          0.0,
+          0.003812983327080146
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 51,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.17662654785530676
+      ],
+      "original_panel_width_ratio": 0.7401514513673338,
+      "retained_lower": [
+        -0.018169633579204286
+      ],
+      "retained_upper": [
+        0.11256076216590286
+      ],
+      "retained_width_ratio": 0.7401514513673338,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.005519494494023265
+        ],
+        [
+          0.0,
+          0.0038232923258125586
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 52,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.17490547407052492
+      ],
+      "original_panel_width_ratio": 0.7310068034406123,
+      "retained_lower": [
+        -0.025754180333442664
+      ],
+      "retained_upper": [
+        0.10210291117111663
+      ],
+      "retained_width_ratio": 0.7310068034406121,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.006178202040155476
+        ],
+        [
+          0.0,
+          0.0041094136667036
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 52,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.1747325531171594
+      ],
+      "original_panel_width_ratio": 0.7300762140416579,
+      "retained_lower": [
+        -0.0256002401361217
+      ],
+      "retained_upper": [
+        0.10196784071348691
+      ],
+      "retained_width_ratio": 0.7300762140416578,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.006194454899906745
+        ],
+        [
+          0.0,
+          0.004115229756355049
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 53,
+      "mode": "fixed_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.17040703541422642
+      ],
+      "original_panel_width_ratio": 0.6999778531237364,
+      "retained_lower": [
+        -0.022395244018917945
+      ],
+      "retained_upper": [
+        0.09688590678751277
+      ],
+      "retained_width_ratio": 0.6999778531237364,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.00772926488359404
+        ],
+        [
+          0.0,
+          0.004684335113370336
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 53,
+      "mode": "refit_pilot",
+      "candidate": "e0:reference",
+      "old_full_width": [
+        0.16969643338033977
+      ],
+      "original_panel_width_ratio": 0.6985169544091633,
+      "retained_lower": [
+        -0.02199984798889669
+      ],
+      "retained_upper": [
+        0.09653598783003572
+      ],
+      "retained_width_ratio": 0.6985169544091633,
+      "positive_combination_weights": [
+        [
+          0.0,
+          0.007790228120911248
+        ],
+        [
+          0.0,
+          0.004714467436388707
+        ]
+      ]
+    }
+  ],
+  "high_precision_checks": [],
+  "retained_width_quantiles": {
+    "fixed_pilot": [
+      0.27508405208982445,
+      0.8660746277809341,
+      1.0000000000003104
+    ],
+    "refit_pilot": [
+      0.2784119648945016,
+      0.8641958299609482,
+      1.0000000000005402
+    ]
+  },
+  "interpretation": "Intersection of coordinate bounds from two separately verified positive-combination ellipsoids. A valid outer enclosure of the unchanged panel joint region, not its exact coordinate extrema.",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_enclosures.py": "1f699182080d4a83a039fb6b9133d2e27ef608ee2203b41fd1f6dfc827989bfa",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\audit_verified.py": "5c74c08f49570c342df551a15f6f8564727c7b4758c673dc51985134393c9c0b"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_iid_seed51.json": "fb607adec13156697fd6a336878e234a2d517908c958a9e578e851511bd64306",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_iid_seed52.json": "376fea9f13a9eae74da53f26e40159fbba1c1b492be1513da69026319325ce42",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_iid_seed53.json": "a9a91a13d539f095f24be7b19537c0463eac1c50cd2a2f8714ca0347d1450fab",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_negative_seed51.json": "ab89056b30614d95f177a038826fe283d9d54b06327de9dabb337a3950ecee5d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_negative_seed52.json": "87508d7a4151062c8081e11fdd5fd923bf29b36c08b50cdb7dd3ea0b743a46ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_negative_seed53.json": "c0a8be5ba0c95cb19bdca2b26c518218ad6844cb019f0910bfa5fbe15a874ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_positive_seed51.json": "0daa30505a7eaa71dc69f0945073c8cac4d3c05334c4333bc20e7dbd50b755e6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_positive_seed52.json": "81d3b090f0c121a7044f1a26c9e4d71de4fa92b7d46a9dfc3631f5e638e34c85",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ac_positive_seed53.json": "38bd3b34e45d68861293fd3a74ae360f8116e8d625d33b525702bad92c252aa4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_iid_seed51.json": "6d041bbdcb685ffbe490394dffed158f37f4a73415a4cf45e39111bc76b68024",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_iid_seed52.json": "718f37787e416a8f5efb3bc4db221574be346d8931e50a2fcfd017c01f56e782",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_iid_seed53.json": "0aade39960629f2b96ebea5e7bdb99ccc9a3e0159ffe0a6266b5f5a5a9fe5a13",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_inviscid_iid_seed51.json": "55a49f2e07f46766678fb3d7f85dd0efca815f97c43dbc9850994d3a2303037f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_inviscid_iid_seed52.json": "2f885f15e3e787685c8ce0c0a00c7a0d7cf13a38542910c9fdd18679b475c474",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\burgers_inviscid_iid_seed53.json": "de4fb3a45956abcd91401a195ae3063fcd834ba7129e04293a1016e51ebba011",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\duffing_iid_seed51.json": "64aa33bc9004f792901563885f5d4c94d9e0362b8eb1a6ed153322a2ed347d1e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\duffing_iid_seed52.json": "14fed928df12571e3032787a5a876ca2e74d9fb8541077c6b3fd07b5594e4703",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\duffing_iid_seed53.json": "ab5ca20d854d0de2d00a16a8974a08941776142b3f653f97c3938e0f23468163",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_iid_seed51.json": "57b923bf0cfc294fd898d591c8a8bb034345e6f7f06ce069f013542ec38e44ed",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_iid_seed52.json": "ce01bf6c1800b54eb652664dfdd9f1cad8db66a00a2bb17c5f7d39ee0db63f1b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_iid_seed53.json": "6dfb469700fc9379a699d30ae4e340a5e5a86c62002e4f2adc661d091fe6ed02",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_negative_seed51.json": "f1b5bff791799ea8b1b1e5585a321c2c822219e028825558a64453b2830d86d0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_negative_seed52.json": "2f5b5cbc4442137b97552eb3d370d31f081c7fa6480c72bb6650a06b8c50939e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_negative_seed53.json": "3a77d7597f2ad254937cee8011d7384b41eec8c03790100176ff5344ba5c740e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_positive_seed51.json": "abe2dfe8c3e40612f71e2156b3d08a15adc80e5f523ac9a8de70b70a6e9242b4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_positive_seed52.json": "728f0d8caac02737e9405e39426d27f5ccac84f532c9d220ea0c90fe210fd4ae",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_cossin_positive_seed53.json": "f6b42077c186768cfcfa03e72414aae74e5f601ce3b9a803317b7587914750f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_iid_seed51.json": "9fb9ea519846ca489b689f98d099820330a3746e1852b4e717582c6723af0763",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_iid_seed52.json": "9cdff758669c6e64e901b549fa3e439e6644dd07f057c69d0889ddb84630744b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\kdv_iid_seed53.json": "c94d849fba70030b21978f9526541c5e9cdddd30f2a3fbe5b8dbe527d9f29a4c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_iid_seed51.json": "415492ca574ab60b621d94d5bda0536b8f51005b09d0a031fc2eb60f40009434",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_iid_seed52.json": "dcc080165aaa23d3c24195f5def15c02f3752c4787644eac14545e6ebf85a2de",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_iid_seed53.json": "d9c43463960705a2c535cf36fd9f1f2d6360904b868fe61bac96400f65412885",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_negative_seed51.json": "b5f94305b8bdc2804d6fbd3bddba78b770d155775593f73693d68f728ef14004",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_negative_seed52.json": "b092ea0213778d41446737245d9b86fd394046d242558b6b7a456b1ea20512b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_negative_seed53.json": "017003dad8ba7dc1e35c4088b47d26830d0dac5826c90e67dbcb742a4fc05d85",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_positive_seed51.json": "a7c5a2b79a84ba54c9aa0272ad56e5259fa561d04082a3d3f3efeae70fcbb43e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_positive_seed52.json": "068d5636c2a1aeb20932cdc02289fdd71012183fdfccc4e5ee7604d6c2a7ef1f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ks_positive_seed53.json": "a9e1b254fee57fe3bbc9cbb345b98925f028dbb9d03336934d093953d27e99ad",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lorenz_iid_seed51.json": "a20e9f3855373ef862aaad9674614a74a2cf89cfd618e39cf298668125d7248a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lorenz_iid_seed52.json": "0f8254d9b338580db4023ee97741e8a9a9179b1d67d93d60ceea05e3f593da09",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lorenz_iid_seed53.json": "e76fa5ac719cf84567191e6041766ac264290624eb04d6c0f27ddbec9a54b971",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lv_iid_seed51.json": "e15355b2c8109fb7e10b325af135af08a5f870f26650f546fc9604635d844187",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lv_iid_seed52.json": "4c6b6a111947bb19ca91e2f87b4170e21d690796649d3ae1e998a64e4793007a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\lv_iid_seed53.json": "575a49c07554785c7b56b546804f56debdc817d2dee62d9d9d1d0ccbe3f3966b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ns_iid_seed51.json": "45a975e4d572f1c7e0950883d3cd2562ea321e42c6a3c0aae20596de0a79df49",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ns_iid_seed52.json": "117794cc113fb850671d8fe56b689e979336b91e4a8a0f10e1f76dfb862bba19",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ns_iid_seed53.json": "17f2fe4eebcd0f61bc3dfc78bd33858aacf4c22981f55f5dacd94df59d63aadf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ode_iid_seed51.json": "0da8d718acc7d401e8db5833fe15f85623bbb370b13d92a0543e063a06b728bd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ode_iid_seed52.json": "591a43166b4737979a9cb59849244f62ba44efc88b2e14d822bc289e767c746e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\ode_iid_seed53.json": "36a89bfe1cca5cab576d1da44ad88b6371d981939a858e3b50a50fd369e94e41",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_compound_iid_seed51.json": "c848ee452947f326ab2b799b3b475d599ecf9fa44bc4b963740a06245e17706e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_compound_iid_seed52.json": "152ee918243bfa9e0d4c4a21d6ff274cdf0e5c234e0ad5907b0ece36fbf7089c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_compound_iid_seed53.json": "0000001160ec26a2d464c41e64a7d355c3f18db995dbe7d01cadde807e43c13d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_divide_iid_seed51.json": "b33f941a59c50618486caf22481d2aa9b75550649bd300f2b3f59e7aee6172cd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_divide_iid_seed52.json": "347c351f449f2a8ba21345a2aeb654035bd857517bceac7e146a274731c71ce7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\pde_divide_iid_seed53.json": "dc7a4cc6668f07510785dc04b5b98eae4394e7f1502966166e17fb3da3e4befc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\vdp_iid_seed51.json": "94e21fc461c943a484b69157eac3a0bb0fc9e2d28605fa44a566862acfa09557",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\vdp_iid_seed52.json": "0c52ce245de5b8572b7d1ce3d5cceddbc5d650a6e2b8026e2b3ebe189aebc7e0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\vdp_iid_seed53.json": "c967ece6465096abb399a31b76613680ce49d63a606532f8eeb6f2f44058fc29",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_iid_seed51.json": "e3465b138669e03a7a9e1ea58514d6bdf070bbb6bd5c414eb10899b34593735f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_iid_seed52.json": "27d9c3e34c2f3fe8f7995486866c3e9c73902056f936e0498f212a4e44d5b4c8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_iid_seed53.json": "47a3b7c12982122a7ad52819fd0d5a37f6347f349821469562f5a5a1a4de37a9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_negative_seed51.json": "6c1830aa67c9842e6c7098a49d078ba38f466ef5b60d6cbf7f2cb60193b0dcac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_negative_seed52.json": "82937c83b8c466da78b430ca84f6e7f91add9231f3b02b403508df1af1383c0b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_negative_seed53.json": "175a7743f5ffec24bd0605cfc4de4902e8e2daaad725463fc93ea51bd8db7e22",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_positive_seed51.json": "8951d5b9915bfd90e02fd28b0893853fc3e50e5295afc56d9511de17bdd9bb62",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_positive_seed52.json": "eb6178d6a493f2f656772269e1d1e16241a9f6e46e73711a0c9e5bd98c23aaca",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\panel_results\\wave_positive_seed53.json": "9de02fb05a143e9502e56fc3709b9cc52e28c5203bc2f501e09cd30719016134",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed51.json": "498d47fe0086a5711cfa4f071eec1e0e3f50f5b5334811bc832b6297cfaeb57f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed52.json": "a3bff4ed390266e9f6717de4ece5b0dc3e8cb5d341e4a327a65f46f06fab8ec3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed53.json": "8977ed39ac9c80d9d4ad4873df184af11de7f9734b77e8f161d66d875c371d67",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed51.json": "3192f0b3f598bfdc3471123b4d984104e761afa19f23d54335d6423b4bfacbb8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed52.json": "13753641da5d09a553e703823ec4b02d1dd863903dedaa8ae9f25f387769dabc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed53.json": "fac17cda922a85faf8e0484248901c1b45c93b1287702e2099fdf53ece51f32a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed51.json": "380bf8ed3bc7cd8452f6d00e82b377311e551e68f28b25aafd773c42ffde21b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed52.json": "db159ebcb2da2de7b9798c4c7c89500040e89ec7c9d0adf505248e25524b21fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed53.json": "34115e19e43648496ee5f9fa4ba7ca9c2476bf2a51da798d408f98007a0e7965",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed51.json": "1426ad5d984acde57ea065f2a4212b5c2341ef23307d6856ade540874514837f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed52.json": "2b51f04a6dd564d4c983ef4cf9961712d9a8ad7d6538abafd99cfe56d1d2b9fd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed53.json": "4ccf319497e345a6373189432df327605da96986058139ef135bdf0631e03a86",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed51.json": "ab702352b379d85e8bdd423655db6166d5545d1823a378e86f6bbac075412764",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed52.json": "469fa8677f476be2e536a517ba745e5f04f22653ca10b45053a76ba5f44b8170",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed53.json": "ba812feea38bf75e8973b8d4a01767b8b16ff62e99b0cda9966d76da095a4755",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed51.json": "d3478440b9dec1483d747be4a66d47192160af2e75a27bcce21801959950c09c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed52.json": "c457b906e32f92380610fd05b7ba6d63d94202e8ea75ea9f49e161e2d579b683",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed53.json": "e23b4d418fb370613a9d5a76479696d4042691d3c9d439ffb6e0cb9324b1935a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed51.json": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed52.json": "57ce7c9c6c94e0f5441c18368a4ebc273a85a0fd64b8d35bc4e530e386072bbf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed53.json": "3d975ec93a803a4e31ab0627921d33766618159e15feb4c63fb959a10b6bda4a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed51.json": "bc35585f99dbda3601ebe7f04770404b9804c44aa9e16973ee1a0a1b0996079b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed52.json": "1ce0a8863b2d950920a548ca1a7cb6cf10f28e9a5bd6c6a8e6effa312c9fd3ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed53.json": "ed52ae894be43bf8f7add3c140c129f3220110e984f25a65cb98ca9ceb08022d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed51.json": "06202e5695e7dc179d6464fc34b8e34421f29fb9978d3bb1e77a21e177a31b1e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed52.json": "423b300266d5b01a32756916271eaf4f8ddfcfae43c1704c707a33b7a4ccf04c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed53.json": "19928a50e8e533bc03d08deb5b8a49a4a0e09829b6d765c10699185c1d251a3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed51.json": "f3be35e3ab286c3a63f94dea22dda9b6a863208cb7fcc7db52df1b23917e4447",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed52.json": "49a31bb1aef3d22a901cc5fcec3dc783158edd3ec6d831e76a5849bddacf8cb6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed53.json": "6f7c25f5492015157c24ccc44acf0a6f682ecd3249f1866af3ce47d3f3331557",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed51.json": "ce950e421600688676628916ff8838fb0d81bd4dad6ec0f858ea5548edfeac4d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed52.json": "d27af38a2d9eafa35e38f8013907013309925017dd529646ca0e14f13c0013c9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed53.json": "a876f605d09d6a13cff9bb2d09223f5d5e9e92a7c6b08da9abc1823cb41dcb60",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed51.json": "ab166cd34475da4ab53a8029aa1b185579529242db560a201a9d9813a8340582",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed52.json": "97766fa4d13a50e18feb6188fc5caa89da03daa102500f1aaa6d40690c547bea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed53.json": "e7beef92b0a50e2b7da28f37afc32c847516bca3888264e801a786722644ca06",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed51.json": "4161dfaa220b50b483405288f89fbab051b2bcf1f9f2fc159dca4a207f1f207f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed52.json": "6d64de561814b19e1a8d3f1ac4e42977c22733e156dc8ee62521784dac0a70d2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed53.json": "d3905071a894cbe01efd4e032aa1335ae065b65c072022fb7867b905ff6d0fc3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed51.json": "369ae48a5f92204934d098db9a2f92a68068ae26387a2ee050ae20b4831106f9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed52.json": "47a643645f9da5557a24b9d19e1bc23b3b8dcf5a5738fa5f76b34dd62b639f6a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed53.json": "d7753c4f89600b1af8755b16ba0dc40f7a77e00857b68cad6003e4ee56280e24",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed51.json": "1c45111e5b59d0d79989a547f471465211260a22ef2333346477db05de6f6a76",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed52.json": "32543936f54316f89ca5de94e6dcb73aaa93c2cdb4f04d1773955fb4d3d90b65",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed53.json": "cc0c8ca48bbad7b8856bb5216ed2666305e684f4d69c19914635efaa594684fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed51.json": "10ba2a00681a3413ef890a0b91a0a593650fed46846e62c49c1af874e48b2a8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed52.json": "c94efb32df67d18b872cda7fbb6bf96bd1bf636fcd17e0013aac2ac831666425",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed53.json": "77055ee179c351cdf4eeb0edc69d26d876bb2793cac58708ddbaf34d65c7a019",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed51.json": "1113e2b1033d52dc97995f20e45bb5ce483011f3fca61642aa2b0d25dcb6f80c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed52.json": "29919957cdf0feadc306f5c6adb8a20f3776c82c0b0f64013bb40cbb8c3f492c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed53.json": "db79e241a5bae603b4ed507f01d1e1b87ae3b1ff72547af5174aaef1ab791900",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed51.json": "316f54823e14586c2b799ccbc827aac71d714258c3529c8fd3029d89a2a2b52f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed52.json": "b6848933f47920bc9e85edda90137077e90350e5f4f9ac4da9bcff1a361abee9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed53.json": "fb0e2cbf5917cc7c9f5bc33cdc8c87283c6f905291e4dc43caeee756b555b581",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed51.json": "34f969508b6b35b233a6198b6593d1f19cb675fc19fe8b2f96d180a4edd4aa63",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed52.json": "c79e640d6d0e4df528ee4012817519fc93d192192bfebb41786b67f4282e45e8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed53.json": "36b29d3c3f761152a4727343251fc46eb8be7ce8c12145e2be5b90a2ed7fe92d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed51.json": "6a6cb6fa63dbd83994c7b3c882cacc077607db78402b0db634e4017f5a76d5db",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed52.json": "7615c580c17bfee2cec4f52882dda69c631034c772a1350f422a0fd1857b4216",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed53.json": "841cb0161274a8691d14a4197494a62f9b30b98033cd3f1bf1f5da3860abc76a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed51.json": "d601cf2151ba8b0cb1fd57b08bbafe7b61028ef3833aacace3d236971558e71b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed52.json": "15554982f11afba6f40abcb0cee3bcf98e7691edb3cd59db7e6627b547f6f6ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed53.json": "4fd8eb2dbabbb3490f3e453a9202add25b603b6880d4d87e60c1b2cb0582a436",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed51.json": "4901f929cfb54cbc40a5bb849e4707c2030bc91451e2fa39661f1e42689e203b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed52.json": "c8beebbc6a727b330c6fda0541122fb279d584c8c434ebeb1d2e6fd146c69330",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed53.json": "e75593f798c551331323536056ee61e9aa198884863c39f9a7e6c87ef01bcb7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed51.json": "8bf9930839ac185a273b0eba6eaf737a4bcbc36b9fb92be9c32c855f39f209f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed52.json": "352fa6edddb50f958bbb05addae4509157cc67ff267b2e2873a09314292e6ef4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed53.json": "966108af9c680eb0385a61f1b2152bc079a0f4a6de96b1b5d318e9ac3e670a4a"
+  }
+}

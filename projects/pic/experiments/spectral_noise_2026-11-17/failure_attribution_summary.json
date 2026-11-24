@@ -1,0 +1,252 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "system": "pde_compound",
+      "seed": 33,
+      "bank": "local",
+      "raw_model": {
+        "u": [
+          0.010398140042417443,
+          [
+            0.24536749667538724,
+            0.04478669308596263
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "noise_only_model": {
+        "u": [
+          0.008751601171115125,
+          [
+            -0.003769000033494603,
+            -0.008756271008264422
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "cutoff": 1.5100094921696994,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.8437693018526243,
+      "analytic_bias_cutoff_ratio": 0.5587841044894565,
+      "empirical_mean_score": 0.8477759391410518,
+      "oracle_mean_score": 0.002142613480822849,
+      "mean_minus_bias_norm": 2.7093580730399456,
+      "oracle_mean_norm": 2.7093580730843723
+    },
+    {
+      "system": "pde_compound",
+      "seed": 33,
+      "bank": "broad",
+      "raw_model": {
+        "u": [
+          0.010398140042417443,
+          [
+            0.24536749667538724,
+            0.04478669308596263
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "noise_only_model": {
+        "u": [
+          0.008751601171115125,
+          [
+            -0.003769000033494603,
+            -0.008756271008264422
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "cutoff": 4.248701560768254,
+      "original_coverage_count": 0,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 18.239116653746088,
+      "analytic_bias_cutoff_ratio": 4.292868395879535,
+      "empirical_mean_score": 18.295591860693904,
+      "oracle_mean_score": 0.004210222082947958,
+      "mean_minus_bias_norm": 0.003999742657094369,
+      "oracle_mean_norm": 0.003999742668235921
+    },
+    {
+      "system": "pde_compound",
+      "seed": 34,
+      "bank": "local",
+      "raw_model": {
+        "u": [
+          0.010510877920298882,
+          [
+            0.2504168180926959,
+            0.051318437405731845
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "noise_only_model": {
+        "u": [
+          0.0089095020412956,
+          [
+            0.015190352209573304,
+            0.0002390985433693787
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "cutoff": 1.5126438445272576,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.9208782303371559,
+      "analytic_bias_cutoff_ratio": 0.6087872129773915,
+      "empirical_mean_score": 0.9228871479105815,
+      "oracle_mean_score": 0.0017870183160857147,
+      "mean_minus_bias_norm": 2.593824141199549,
+      "oracle_mean_norm": 2.5938241412553693
+    },
+    {
+      "system": "pde_compound",
+      "seed": 34,
+      "bank": "broad",
+      "raw_model": {
+        "u": [
+          0.010510877920298882,
+          [
+            0.2504168180926959,
+            0.051318437405731845
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "noise_only_model": {
+        "u": [
+          0.0089095020412956,
+          [
+            0.015190352209573304,
+            0.0002390985433693787
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "cutoff": 4.743702288491037,
+      "original_coverage_count": 0,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 19.668553700771845,
+      "analytic_bias_cutoff_ratio": 4.14624538063673,
+      "empirical_mean_score": 19.58833013798647,
+      "oracle_mean_score": 0.009755534507516709,
+      "mean_minus_bias_norm": 0.010462765399600268,
+      "oracle_mean_norm": 0.01046276541804727
+    },
+    {
+      "system": "pde_compound",
+      "seed": 35,
+      "bank": "local",
+      "raw_model": {
+        "u": [
+          0.010481781845016592,
+          [
+            0.24927350887838345,
+            0.05562470943069856
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "noise_only_model": {
+        "u": [
+          0.008795189603591849,
+          [
+            -0.0031160549542603297,
+            -0.0008481267902573182
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "cutoff": 1.4553421356786296,
+      "original_coverage_count": 252,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.8993262543490077,
+      "analytic_bias_cutoff_ratio": 0.6179483382645619,
+      "empirical_mean_score": 0.9003083746144547,
+      "oracle_mean_score": 0.0017924066926260683,
+      "mean_minus_bias_norm": 2.557792449912044,
+      "oracle_mean_norm": 2.5577924499643587
+    },
+    {
+      "system": "pde_compound",
+      "seed": 35,
+      "bank": "broad",
+      "raw_model": {
+        "u": [
+          0.010481781845016592,
+          [
+            0.24927350887838345,
+            0.05562470943069856
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "noise_only_model": {
+        "u": [
+          0.008795189603591849,
+          [
+            -0.0031160549542603297,
+            -0.0008481267902573182
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      },
+      "cutoff": 4.46557764205935,
+      "original_coverage_count": 0,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 19.166696605914506,
+      "analytic_bias_cutoff_ratio": 4.2920979416843315,
+      "empirical_mean_score": 18.890781957976717,
+      "oracle_mean_score": 0.003712218086307788,
+      "mean_minus_bias_norm": 0.007890375413008383,
+      "oracle_mean_norm": 0.007890375421615178
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\failure_attribution.py": "568fdfb21eb75f6c17a8cd430fa81946b37706f8217984d4166fb1bc7b385f25",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\failure_attribution_protocol.txt": "1a132defe56c79cc8c8ff76e5b0cd4ab0402a20b5df41fa14acdd8ced70593ed",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\coverage.py": "a7ce2412db3d853a66635292abf2ca5a036f82e590b5ec184e2bdc1a551dd84e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\noise_fit.py": "e9180663afdea70060c986aadb7ef6fcaddd3c3eca19da1e955d8c5159f6656b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\stable_fit.py": "473107f4d1ff0afe7be15616f486e8cca4b43b14bc121a298e6405e2a1ed5331"
+  }
+}

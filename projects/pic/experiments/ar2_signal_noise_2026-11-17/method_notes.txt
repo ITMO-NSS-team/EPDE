@@ -1,0 +1,107 @@
+AR2 signal-curvature / AR1 noise: implementation notes
+====================================================
+
+Scope
+-----
+Research-only estimator of observation-noise covariance from a single field.
+No candidate differential equation is integrated. The fit operates on the
+observed field, before candidates, clean truth or evaluation draws are used.
+The model of curvature is a nuisance representation, not a claim that physical
+signal derivatives are stationary random processes. The same representation
+and starts are used on every system. Constants and linear trends are annihilated
+by second differences; constants and valid identities remain in the candidates.
+
+Model and exact likelihood
+--------------------------
+For each axis, d = D2 y and
+Cov(d) = sigma^2 [D2 R_AR1(rho) D2' + kappa R_AR2(p1,p2)].
+R matrices have unit diagonal. The AR2 partial correlations p1,p2 imply
+a1=p1*(1-p2), a2=p2, innovation variance (1-p1^2)*(1-p2^2).
+The correlation sequence is gamma0=1, gamma1=p1,
+gamma_j=a1*gamma_(j-1)+p2*gamma_(j-2).
+One sigma is shared across axes of a variable. rho,kappa,p1,p2 vary by axis.
+Axis likelihoods are added; for multidimensional data this is a composite
+likelihood. Its Hessian is not an independent-axis parameter covariance.
+
+Filtering by A=I-rho L and B=I-a1 L-a2 L^2 preserves determinant 1.
+Cov(B A d)/sigma^2 has bandwidth four, including exact finite boundaries.
+Its stationary noise polynomial is
+[1, -2-a1, 1+2*a1-a2, -a1+2*a2, -a2].
+For lag l, multiply the overlapping polynomial inner product by 1-rho^2.
+The first three columns require boundary corrections. They are constructed
+from the exact bandwidth-two covariance of A D2 noise, with h=1-rho^2:
+diagonal0=2*(1-rho)*(3-rho), remaining diagonals=6h;
+first off-diagonal=-h*(4-rho), remaining first off-diagonals=-4h;
+second off-diagonals=h. Apply B on both sides, including initial boundaries.
+
+The AR2 signal innovations have initial block
+T00=1, T01=p1*p2, T11=1-p1^2*(1-p2^2),
+and subsequent innovation variance v=(1-p1^2)*(1-p2^2).
+The signal contribution is kappa A T A', computed with these initial entries.
+This yields an exact banded Cholesky evaluation, not a large-sample Toeplitz
+or periodic approximation. fit.py and score_fit.py contain the same model.
+
+Given total quadratic q, contrast count N and log determinant l, the profiled
+sigma^2=q/N and normalized objective is log(q/N)+l/N. Data contrasts are scaled
+by their RMS for numerical unit stability, then sigma is restored to data units.
+
+Optimization and numerical repair
+--------------------------------
+Bounds: rho,p1,p2 in [-1+1e-6,1-1e-6], log(kappa) in [-40,20].
+Four starts: the observed-field AR1-curvature fit with p2=0, plus fixed
+(rho,log(kappa),p1,p2)=(0,-5,.99,-.8),(.4,-3,.95,-.5),(-.4,-11,.9,0).
+The best finite successful optimizer result is selected. Noise rho within
+1e-5 of +/-1 or log(kappa)>19.99 makes the result explicitly incomplete.
+Signal-correlation boundaries are reported, but do not alone invalidate noise.
+All starts, termination messages, objectives, boundary flags and source hashes
+are retained. There is no guarantee of global or strict local optimality.
+
+The initial implementation used central finite differences, step1e-4,
+maxiter300, ftol1e-12, gtol2e-6, maxls40. It produced a VDP noise-boundary
+failure on the screen despite lower-objective unsuccessful starts. A separate
+version uses an analytic likelihood score, maxiter500 and the same other
+tolerances/starts/bounds. Both versions and their results are retained.
+
+For filtered covariance C and field z, s=C^-1 z,
+dq = 2 dz' s - s' dC s, dl = trace(C^-1 dC).
+The profile gradient is dq/q + dl/N, summed over axis replicates.
+Only the inverse entries within the covariance band are needed. They are
+computed by backward selected-inverse recursion from the banded Cholesky.
+Polynomial covariance derivatives use complex-step1e-30, before Cholesky;
+field-filter derivatives are analytic. No complex-step Cholesky is used.
+Dense covariance, nested AR1 reduction, selected inverse and score checks
+are archived. The synthetic unit/trend check uses the original tolerance.
+
+Optimizer success is an output status, not a stationary-point certificate.
+The retrospective projected-gradient diagnostic is theta-clip(theta-g,bounds)
+in the optimizer's stated coordinates. Its scale depends on parameterization.
+Fourteen of84 primary variable fits exceed1e-3 in max absolute mapping.
+Six selected fits have objective more than1e-5 above an unsuccessful start.
+These remain in the frozen primary test; outcomes are not replaced post hoc.
+
+Coverage experiment and interpretation
+-------------------------------------
+Three fresh fitted anchors per system/profile (39,40,41), 5% added Gaussian
+noise. IID all15 systems; AR1 correlations +/-0.4 on AC, forced KdV, KS, wave.
+For each complete model:256 calibration,256 check,256 actual evaluation fields.
+Known-family controls estimate amplitude, fixing rho to0 or its generating
+colored-noise value. Noise parameters remain fixed during coverage calibration;
+parameter-estimation uncertainty is not propagated in this round.
+The native weak library, pilot reconstruction, local/broad banks, correction
+algebra and matrix confidence regions are inherited unchanged. Fits, metrics,
+cutoffs and regions are frozen before clean evaluation. Hashes verify pairing.
+The 256 evaluation draws share a fitted anchor, and therefore do not supply
+256 independent estimates of unconditional coverage.
+
+Oracle-correction attribution changes only actual-field Gaussian correction
+to the true noise covariance, retaining the fitted metric/cutoff/calibration.
+It diagnoses mean-correction error; it is not an implementable estimator.
+Axis-specific fits on old anchor36 likewise diagnose signal/noise allocation.
+Clean curvature concentration and true-sigma ratios are evaluation diagnostics,
+never criteria for selecting an axis in the tested estimator.
+
+The analysis harness initially expected a nested dictionary named ar2; the
+estimator uses that key for the AR2 coefficient list. analyze_final.py repairs
+only this reporting mismatch. The original harness is preserved and the
+transformation is hashed in final_analysis_provenance.json. No fit, region,
+cutoff, primary result or independent audit changes as a result.

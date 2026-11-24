@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "records": 45,
+  "calibration_fields": 11520,
+  "independent_evaluation_fields": 11520,
+  "source_input_array_hashes": true,
+  "fresh_data_and_innovation_replay": true,
+  "production_dyad_max_absolute_error": 0.0,
+  "individual_score_checks": 539700,
+  "candidate_coverage_checks": 1050,
+  "pareto_front_checks": 277020,
+  "nonfinite": 0,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\audit.py": "be5a44aec233e4fda53f2de09562d8763ff6f1c0297510da0dd50130299f08a9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\analyze.py": "908ad98c433161439cecec49f6bf68b68b58fde430726e5e5e911548a6add276",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\contrast_stability_2026-11-17\\run_suite.py": "63cfbbb18bdc3fb71b92d3b5bf2954a5d05e97e01e89f38f2606a00dfc53bccc"
+  }
+}

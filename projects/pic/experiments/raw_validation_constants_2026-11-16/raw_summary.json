@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "raw_cross": 5,
+    "smooth_cross": 5,
+    "original_smooth_cross": 5,
+    "uncorrected_cross": 5,
+    "clean_subsample_cross": 7,
+    "clean_full": 7
+  },
+  "joint": {
+    "raw_cross": 6,
+    "smooth_cross": 5,
+    "original_smooth_cross": 5,
+    "uncorrected_cross": 6,
+    "clean_subsample_cross": 6,
+    "clean_full": 6
+  }
+}

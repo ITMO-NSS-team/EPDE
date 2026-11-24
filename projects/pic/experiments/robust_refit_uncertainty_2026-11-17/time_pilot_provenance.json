@@ -1,0 +1,16 @@
+{
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\prepare_time_pilot.py": "2340597370f0cea1b39f6c045d867f7f2edc82935f8660589e84d87e5b89e6e6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_coverage_protocol.txt": "38886e320eca99b11393a41e9e923b71ea44cb38362e4fa4aeb95fed431e2d57",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\run_case_fast.py": "1314c25681f065f1a2ece79351144381440b20e83f2fbd378113cdce197b8e24",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentize_all.py": "100bbde92a49c700200457d9a479ad80ff9ad4dba3d7bab868e2f775f437af54",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_fast.py": "bbe021b7a3e5c13a54fc99f277c5c7cfbfb2385375f8934bb76488e3bdb583f8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_student.py": "ed5a96a77c103fb1d5722edadc719167cfc84cf3b1872a727d8a4f7dc1c74efb"
+  },
+  "generated_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_case.py": "32901d285f28b6de771f5403c4fe7defc81cb320536b6c912ba11d63b33aacb8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_student.py": "e6d8c59bd0c3c5090986a668e279f5620e416b3f51ce710c9b4fefb198a23124",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time_pilot.py": "d3b55bc8220cabaeb737e6bb0cced25efe8003e99886a96542075738142a8fa0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time_pilot_student.py": "2ccc28691b2eca92866ddf33184a98814379ecd252f471de88300218a5fb4794"
+  }
+}

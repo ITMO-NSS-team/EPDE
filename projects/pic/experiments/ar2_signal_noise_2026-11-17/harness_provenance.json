@@ -1,0 +1,20 @@
+{
+  "prior_source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\coverage.py": "cfa35e5bcc39350d05977c66f412dda9954de23a4341917cebe26d295628ad3c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\run_case.py": "fa6f992382b36a810c3669cbe6d9aeaf587b7431fe5bd40861a6119bd81c4835",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\run_suite.py": "13c3c95fbfe6f43b3a21b3540810affe492a6ae491098531c67f9a0fff981514",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit.py": "55f4980794ad9141a1c52544af9bbe955f4d4a82e28c0bd7aebca44276514e3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_live.py": "f97c30b86d159a1e9570d61c8b17e915de24621bf767eacc19fbe006a12f4679",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze.py": "c80db47d068db47cd353cd63df79853b41a60ddb08501388be89b9610ae7f134",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze_pairs.py": "2bce9b991c53526d89488f7cd79554d4378ead730f24a7960fccbbd975296486"
+  },
+  "generated_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\coverage.py": "2035875ae2f89d6db00cfef064636140f35ecb074d1ace40344c7f9f41fea042",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\run_case.py": "95de1089bfa08a5767ce824088451b05c1d62fb3773d3ba1174c3ce448c9ed32",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\run_suite.py": "db23cbd0f020bba699c085d1ae3db1ecf49d4707d6665134bc924fdd4ffe3119",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\audit.py": "85ba0d7d313ebcc49aea7dab91b4dde8d194e2a81fc7cc59e6b920dd25dd4091",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\audit_live.py": "f3e19c0ba24fc3db12bc260293fca44844753d64a925a20bd442ad034bd8e9d4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\analyze.py": "8730936d95ee39d39e5ba9b776230b6b7b52c2fc921aa2f773741b5e495068d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\analyze_pairs.py": "6c3cd69ffa8d86f09d0a5e514b584a160e57ffd620d182053616443d57a918ee"
+  }
+}

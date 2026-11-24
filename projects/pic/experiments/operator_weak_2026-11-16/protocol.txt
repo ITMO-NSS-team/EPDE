@@ -1,0 +1,70 @@
+Continuous weak quadrature and operator-risk evaluation, 2026-11-16
+
+Keep the default core-15 datasets, 5% noise seeds 0/1/2, existing finite
+candidate panel, registered alternatives, modulo-3 raw time splits, raw dyad
+axis and previous bootstrap budgets. All tuning uses the training group only.
+No candidate equation integration or new evolutionary search occurs.
+
+Quadrature change:
+Use the physical supports selected in the previous train-only PCR experiment.
+Map them onto the independently reconstructed full time grid. Interpolate
+each pointwise weak monomial locally, piecewise, with degree 3 in time and
+degree 5 in space (the shared maximum derivative order plus one). Integrate
+that interpolant against the analytically differentiated weak test by Gauss
+quadrature. DC tests integrate the represented polynomial exactly; modulated
+tests increase Gauss order until relative weight change is <=1e-11. The
+accuracy bound and maximum refinement are numerical guards, not statistical
+or structural thresholds. Boundary stencils use valid interior nodes only.
+This controls quadrature error of the interpolant; it does not guarantee the
+interpolant equals the unknown physical field. Remaining data derivatives
+use the same fourth-order finite differences as the production weak form.
+
+Fit both ordinary and bias/covariance-corrected least squares on these local
+integrals. Reconstruct each bootstrap draw before rebuilding nonlinear weak
+terms. Retain signed Gram eigenvalues and the existing numerical rank cutoff.
+Compare on the previous frozen spectral score to isolate the fitting change.
+
+Evaluation change:
+Use continuous quadrature for the full spectral test bank. Its maximum
+frequencies remain the previous training-only LOO field-bandwidth family.
+For training weak matrix M, compute bootstrap mean bias, corrected value Z,
+and entrywise variance V (including the finite bootstrap-mean variance).
+The estimated squared-error difference between retaining and discarding a
+moment is 2V-|Z|^2. Normalize each library column by its training mean energy,
+sum across the library and both frequency signs, and minimize cumulative risk
+over all rectangular frequency prefixes. Every candidate shares the chosen
+bank. No residuals, known coefficients, clean fields or held-out groups enter
+selection. Cross-row correlation does not change this trace risk, but the
+plug-in bias/variance estimates are approximate for nonlinear reconstruction.
+
+Ablations:
+1. Old fit with old frozen score (baseline).
+2. New continuous local fit with old frozen score (fit-only change).
+3. Old/new fits with full continuous spectral bank (quadrature-only score change).
+4. Old/new fits with risk-selected continuous bank (operator-uncertainty change).
+Compare ordinary energy and signed cross-product in each bank. The denominator
+is training target energy within that common bank, never measurement-noise
+variance. Negative cross-products remain signed. Exact coefficients and clean
+fields are evaluated only after fitting and bank selection as diagnostics.
+
+Report all equation slots separately. Aggregate counts are descriptive;
+rotations reuse records and are not independent trials. Preserve coefficient
+accuracy measured on the OLD common clean bank so selecting easier evaluation
+moments cannot be mistaken for improving coefficients. The new selected-bank
+clean residual is reported separately. This remains a finite-panel study.
+
+Computation: one BLAS thread/process, below-normal priority. The user authorized
+parallel independent tests. Reuse fixed evaluation artifacts when appropriate.
+
+Normalization ablation, frozen before the full battery:
+The first four seed-0 probes used the observed-energy normalization above.
+It can normalize away the very derivative noise amplification being targeted.
+The full battery compares that arm to natural operator units: each field is
+scaled by its training standard deviation, each coordinate by its observed
+domain extent, and derivatives by the inverse extent to their order. Products
+and coordinate factors combine those units algebraically. Known opaque
+forcing tokens use their RMS amplitude. These are common nondimensionalization
+rules, not fitted coefficient magnitudes, clean-field scales or noise variance.
+The frequency-prefix risk uses squared units as column scales. Retain both
+normalizations as ablations and report all outcomes, including over-smoothing.
+results/ contains the initial four probes; unit_results/ is the full battery.

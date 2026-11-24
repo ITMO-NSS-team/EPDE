@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "noise_variance_mean": 0.9993958326821513,
+  "scalar_amplitude_replay": true,
+  "units_invariant": true,
+  "studentized_linear_gaussian_coverage": 0.947296142578125,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_checks.py": "6ae9d1a7815c4ca9ef68901895ce0a1d12da4b6069c33e93d390a21d6dbf721a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356"
+  }
+}

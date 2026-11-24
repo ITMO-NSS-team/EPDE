@@ -1,0 +1,264 @@
+{
+  "status": "COMPLETE",
+  "cohort": "correlated",
+  "records": 72,
+  "summary": [
+    {
+      "profile": "negative",
+      "model_kind": "ar",
+      "bank": "local",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.9410807291666666,
+      "reference_pointwise_coverage": 0.9456380208333334,
+      "reference_uniform_coverage": 1.0,
+      "reference_regions": {
+        "ellipsoid": 6,
+        "unbounded": 6
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 10.75,
+      "registered_at_minimum": 6,
+      "compatible_drops": 9,
+      "excluded_drops": 21,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "negative",
+      "model_kind": "ar",
+      "bank": "broad",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.9560546875,
+      "reference_pointwise_coverage": 0.9358723958333334,
+      "reference_uniform_coverage": 0.9996744791666666,
+      "reference_regions": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 11.75,
+      "registered_at_minimum": 3,
+      "compatible_drops": 12,
+      "excluded_drops": 18,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "negative",
+      "model_kind": "iid",
+      "bank": "local",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.75,
+      "reference_pointwise_coverage": 1.0,
+      "reference_uniform_coverage": 1.0,
+      "reference_regions": {
+        "ellipsoid": 6,
+        "unbounded": 6
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 12.0,
+      "registered_at_minimum": 0,
+      "compatible_drops": 18,
+      "excluded_drops": 12,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "negative",
+      "model_kind": "iid",
+      "bank": "broad",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.75,
+      "reference_pointwise_coverage": 1.0,
+      "reference_uniform_coverage": 1.0,
+      "reference_regions": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 12.25,
+      "registered_at_minimum": 0,
+      "compatible_drops": 15,
+      "excluded_drops": 15,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "negative",
+      "model_kind": "known_rho",
+      "bank": "local",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.9309895833333334,
+      "reference_pointwise_coverage": 0.9453125,
+      "reference_uniform_coverage": 1.0,
+      "reference_regions": {
+        "ellipsoid": 6,
+        "unbounded": 6
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 10.75,
+      "registered_at_minimum": 6,
+      "compatible_drops": 9,
+      "excluded_drops": 21,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "negative",
+      "model_kind": "known_rho",
+      "bank": "broad",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.9404296875,
+      "reference_pointwise_coverage": 0.9290364583333334,
+      "reference_uniform_coverage": 0.998046875,
+      "reference_regions": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 11.75,
+      "registered_at_minimum": 3,
+      "compatible_drops": 12,
+      "excluded_drops": 18,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "ar",
+      "bank": "local",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.3024088541666667,
+      "reference_pointwise_coverage": 0.2906901041666667,
+      "reference_uniform_coverage": 0.5045572916666666,
+      "reference_regions": {
+        "empty": 6,
+        "unbounded": 5,
+        "ellipsoid": 1
+      },
+      "exact_reference_accepted": 6,
+      "mean_compatible_candidates": 6.083333333333333,
+      "registered_at_minimum": 3,
+      "compatible_drops": 10,
+      "excluded_drops": 20,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "ar",
+      "bank": "broad",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.3671875,
+      "reference_pointwise_coverage": 0.5045572916666666,
+      "reference_uniform_coverage": 0.7428385416666666,
+      "reference_regions": {
+        "ellipsoid": 8,
+        "empty": 2,
+        "unbounded": 2
+      },
+      "exact_reference_accepted": 10,
+      "mean_compatible_candidates": 10.416666666666666,
+      "registered_at_minimum": 2,
+      "compatible_drops": 10,
+      "excluded_drops": 20,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "iid",
+      "bank": "local",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.0,
+      "reference_pointwise_coverage": 0.0,
+      "reference_uniform_coverage": 0.0,
+      "reference_regions": {
+        "empty": 12
+      },
+      "exact_reference_accepted": 0,
+      "mean_compatible_candidates": 0.5,
+      "registered_at_minimum": 3,
+      "compatible_drops": 0,
+      "excluded_drops": 30,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "iid",
+      "bank": "broad",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.0,
+      "reference_pointwise_coverage": 0.0126953125,
+      "reference_uniform_coverage": 0.16178385416666666,
+      "reference_regions": {
+        "empty": 9,
+        "ellipsoid": 3
+      },
+      "exact_reference_accepted": 3,
+      "mean_compatible_candidates": 4.333333333333333,
+      "registered_at_minimum": 3,
+      "compatible_drops": 2,
+      "excluded_drops": 28,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "known_rho",
+      "bank": "local",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.9466145833333334,
+      "reference_pointwise_coverage": 0.9436848958333334,
+      "reference_uniform_coverage": 1.0,
+      "reference_regions": {
+        "ellipsoid": 6,
+        "unbounded": 6
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 12.0,
+      "registered_at_minimum": 0,
+      "compatible_drops": 18,
+      "excluded_drops": 12,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "known_rho",
+      "bank": "broad",
+      "records": 12,
+      "incomplete": 0,
+      "equation_cases": 12,
+      "operator_coverage": 0.953125,
+      "reference_pointwise_coverage": 0.9466145833333334,
+      "reference_uniform_coverage": 0.9990234375,
+      "reference_regions": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_reference_accepted": 12,
+      "mean_compatible_candidates": 12.25,
+      "registered_at_minimum": 0,
+      "compatible_drops": 15,
+      "excluded_drops": 15,
+      "unresolved_candidates": 0
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\analyze.py": "ebff5766ab9a78e0c5b6969830d55fab681e6bc55c6838b1881e63b2e35f0e3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\directional_diagnostic_protocol.txt": "ac0c90bc888ef5d61ab1af0b06d863eb81e11fac3205fd74c14521255f4eb12f"
+  }
+}

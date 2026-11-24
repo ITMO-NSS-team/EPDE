@@ -1,0 +1,456 @@
+{
+  "cases": 60,
+  "accuracy_changes": {
+    "worsened": 16,
+    "unchanged": 18,
+    "improved": 26
+  },
+  "retention_changes": [],
+  "failures": [
+    {
+      "system": "ac",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 0.000270298129030592,
+      "joint_energy": 0.000270298129030592,
+      "ratio": 1.0,
+      "change": 0.0,
+      "status": "unchanged",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "ac",
+      "seed": 2,
+      "slot": 0,
+      "baseline_energy": 0.00013676281071394608,
+      "joint_energy": 0.00014292299168427875,
+      "ratio": 1.045042807603723,
+      "change": 6.160180970332668e-06,
+      "status": "worsened",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 0.1469299133280697,
+      "joint_energy": 0.0911119305765431,
+      "ratio": 0.62010470511274,
+      "change": -0.05581798275152661,
+      "status": "improved",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 1,
+      "slot": 0,
+      "baseline_energy": 0.1642068714021843,
+      "joint_energy": 0.1655428991887944,
+      "ratio": 1.008136247741654,
+      "change": 0.0013360277866101,
+      "status": "worsened",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 2,
+      "slot": 0,
+      "baseline_energy": 0.14227728098500428,
+      "joint_energy": 0.0769317446982014,
+      "ratio": 0.5407170010952757,
+      "change": -0.06534553628680288,
+      "status": "improved",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "ks",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 0.00010651492104679092,
+      "joint_energy": 0.00010651492104679092,
+      "ratio": 1.0,
+      "change": 0.0,
+      "status": "unchanged",
+      "baseline_retained": false,
+      "joint_retained": false
+    }
+  ],
+  "reference_fold_choices": {
+    "local_clsm": 111,
+    "broad0_clsm": 24,
+    "broad1_clsm": 14,
+    "broad0_ols": 15,
+    "broad1_ols": 11,
+    "local_ols": 5
+  },
+  "reference_half_full_changes": 8,
+  "worst_ratio_regressions": [
+    {
+      "system": "duffing",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 1.538941241029229e-05,
+      "joint_energy": 8.156977349716772e-05,
+      "ratio": 5.3003825826783775,
+      "change": 6.618036108687543e-05,
+      "status": "worsened",
+      "baseline_retained": true,
+      "joint_retained": true
+    },
+    {
+      "system": "pde_divide",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 7.640611085382537e-06,
+      "joint_energy": 2.854935546018832e-05,
+      "ratio": 3.736527764749979,
+      "change": 2.0908744374805783e-05,
+      "status": "worsened",
+      "baseline_retained": true,
+      "joint_retained": true
+    },
+    {
+      "system": "ns",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 0.0001533443519071533,
+      "joint_energy": 0.0002601789096087179,
+      "ratio": 1.6966970506109715,
+      "change": 0.0001068345577015646,
+      "status": "worsened",
+      "baseline_retained": true,
+      "joint_retained": true
+    },
+    {
+      "system": "lorenz",
+      "seed": 1,
+      "slot": 1,
+      "baseline_energy": 5.632238693496732e-05,
+      "joint_energy": 9.259937300296414e-05,
+      "ratio": 1.6440953241183487,
+      "change": 3.6276986067996824e-05,
+      "status": "worsened",
+      "baseline_retained": true,
+      "joint_retained": true
+    },
+    {
+      "system": "lorenz",
+      "seed": 0,
+      "slot": 1,
+      "baseline_energy": 3.6346894462790104e-05,
+      "joint_energy": 5.405627438615555e-05,
+      "ratio": 1.4872322707376089,
+      "change": 1.770937992336545e-05,
+      "status": "worsened",
+      "baseline_retained": true,
+      "joint_retained": true
+    }
+  ],
+  "best_absolute_improvements": [
+    {
+      "system": "kdv_cossin",
+      "seed": 2,
+      "slot": 0,
+      "baseline_energy": 0.14227728098500428,
+      "joint_energy": 0.0769317446982014,
+      "ratio": 0.5407170010952757,
+      "change": -0.06534553628680288,
+      "status": "improved",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 0.1469299133280697,
+      "joint_energy": 0.0911119305765431,
+      "ratio": 0.62010470511274,
+      "change": -0.05581798275152661,
+      "status": "improved",
+      "baseline_retained": false,
+      "joint_retained": false
+    },
+    {
+      "system": "pde_compound",
+      "seed": 0,
+      "slot": 0,
+      "baseline_energy": 0.001655047366186715,
+      "joint_energy": 0.00046124957911052137,
+      "ratio": 0.2786926758315419,
+      "change": -0.0011937977870761936,
+      "status": "improved",
+      "baseline_retained": true,
+      "joint_retained": true
+    },
+    {
+      "system": "vdp",
+      "seed": 1,
+      "slot": 0,
+      "baseline_energy": 0.0020918770737080442,
+      "joint_energy": 0.0014192340234388515,
+      "ratio": 0.6784500108905199,
+      "change": -0.0006726430502691928,
+      "status": "improved",
+      "baseline_retained": true,
+      "joint_retained": true
+    },
+    {
+      "system": "pde_compound",
+      "seed": 2,
+      "slot": 0,
+      "baseline_energy": 0.0008090102720724056,
+      "joint_energy": 0.0005975858012406172,
+      "ratio": 0.7386628104360261,
+      "change": -0.00021142447083178837,
+      "status": "improved",
+      "baseline_retained": true,
+      "joint_retained": true
+    }
+  ],
+  "per_slot": [
+    {
+      "system": "ac",
+      "slot": 0,
+      "baseline_median": 0.00013676281071394608,
+      "joint_median": 0.00014292299168427875,
+      "baseline_retained": 1,
+      "joint_retained": 1,
+      "changes": {
+        "unchanged": 2,
+        "worsened": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "slot": 0,
+      "baseline_median": 1.510859380209447e-05,
+      "joint_median": 9.631764478304765e-06,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "unchanged": 1,
+        "improved": 2
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "slot": 0,
+      "baseline_median": 1.8082181671183513e-05,
+      "joint_median": 2.580104132090397e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 2,
+        "improved": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "slot": 0,
+      "baseline_median": 0.00012373955354148347,
+      "joint_median": 8.725420538326942e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 1,
+        "improved": 2
+      }
+    },
+    {
+      "system": "kdv",
+      "slot": 0,
+      "baseline_median": 1.3912014148208697e-05,
+      "joint_median": 1.395286833269439e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "improved": 1,
+        "unchanged": 1,
+        "worsened": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "slot": 0,
+      "baseline_median": 0.1469299133280697,
+      "joint_median": 0.0911119305765431,
+      "baseline_retained": 0,
+      "joint_retained": 0,
+      "changes": {
+        "improved": 2,
+        "worsened": 1
+      }
+    },
+    {
+      "system": "ks",
+      "slot": 0,
+      "baseline_median": 4.951901273407384e-05,
+      "joint_median": 4.951901273407384e-05,
+      "baseline_retained": 2,
+      "joint_retained": 2,
+      "changes": {
+        "unchanged": 3
+      }
+    },
+    {
+      "system": "lorenz",
+      "slot": 0,
+      "baseline_median": 0.00017295081427899607,
+      "joint_median": 0.00017404401062263067,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "improved": 2,
+        "worsened": 1
+      }
+    },
+    {
+      "system": "lorenz",
+      "slot": 1,
+      "baseline_median": 5.632238693496732e-05,
+      "joint_median": 9.259937300296414e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 2,
+        "unchanged": 1
+      }
+    },
+    {
+      "system": "lorenz",
+      "slot": 2,
+      "baseline_median": 3.158153163747908e-05,
+      "joint_median": 3.158153163747908e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "unchanged": 3
+      }
+    },
+    {
+      "system": "lv",
+      "slot": 0,
+      "baseline_median": 0.0004702962938336359,
+      "joint_median": 0.0004702962938336359,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "unchanged": 2,
+        "improved": 1
+      }
+    },
+    {
+      "system": "lv",
+      "slot": 1,
+      "baseline_median": 0.0004995794208787381,
+      "joint_median": 0.0004867941948987735,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "improved": 2,
+        "unchanged": 1
+      }
+    },
+    {
+      "system": "ns",
+      "slot": 0,
+      "baseline_median": 0.00015372591872560003,
+      "joint_median": 0.00021165193853743644,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 1,
+        "improved": 2
+      }
+    },
+    {
+      "system": "ns",
+      "slot": 1,
+      "baseline_median": 5.760612339146817e-05,
+      "joint_median": 4.586174135037778e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 1,
+        "improved": 2
+      }
+    },
+    {
+      "system": "ns",
+      "slot": 2,
+      "baseline_median": 1.3147846855946638e-05,
+      "joint_median": 1.2659062143940073e-05,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 1,
+        "improved": 2
+      }
+    },
+    {
+      "system": "ode",
+      "slot": 0,
+      "baseline_median": 0.0007959080417058933,
+      "joint_median": 0.0008999396526551537,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 2,
+        "unchanged": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "slot": 0,
+      "baseline_median": 0.0008090102720724056,
+      "joint_median": 0.00046124957911052137,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "improved": 3
+      }
+    },
+    {
+      "system": "pde_divide",
+      "slot": 0,
+      "baseline_median": 7.640611085382537e-06,
+      "joint_median": 7.910495517842772e-06,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "worsened": 1,
+        "improved": 1,
+        "unchanged": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "slot": 0,
+      "baseline_median": 0.0020918770737080442,
+      "joint_median": 0.0014192340234388515,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "improved": 3
+      }
+    },
+    {
+      "system": "wave",
+      "slot": 0,
+      "baseline_median": 0.0776346386530012,
+      "joint_median": 0.0776346386530012,
+      "baseline_retained": 3,
+      "joint_retained": 3,
+      "changes": {
+        "unchanged": 2,
+        "worsened": 1
+      }
+    }
+  ]
+}

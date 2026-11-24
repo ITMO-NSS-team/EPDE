@@ -1,0 +1,164 @@
+{
+  "status": "PASS",
+  "gaussian_operator_coverage": 0.951812744140625,
+  "units_invariant": true,
+  "simultaneous_rayleigh_bound": true,
+  "bounded_empty_unbounded_controls": true,
+  "constant_preserved": true,
+  "correlated_amplitude": [
+    {
+      "rho": 0.0,
+      "estimate": 0.1999362563696596
+    },
+    {
+      "rho": 0.4,
+      "estimate": 0.2002061397514562
+    },
+    {
+      "rho": -0.4,
+      "estimate": 0.199633159818264
+    }
+  ],
+  "geometry": {
+    "ac": {
+      "columns": 10,
+      "stochastic": 5,
+      "rows": {
+        "local": 354,
+        "broad": 25
+      }
+    },
+    "burgers": {
+      "columns": 11,
+      "stochastic": 6,
+      "rows": {
+        "local": 450,
+        "broad": 25
+      }
+    },
+    "burgers_inviscid": {
+      "columns": 13,
+      "stochastic": 7,
+      "rows": {
+        "local": 210,
+        "broad": 25
+      }
+    },
+    "duffing": {
+      "columns": 11,
+      "stochastic": 5,
+      "rows": {
+        "local": 96,
+        "broad": 5
+      }
+    },
+    "kdv": {
+      "columns": 17,
+      "stochastic": 12,
+      "rows": {
+        "local": 900,
+        "broad": 25
+      }
+    },
+    "kdv_cossin": {
+      "columns": 12,
+      "stochastic": 6,
+      "rows": {
+        "local": 216,
+        "broad": 25
+      }
+    },
+    "ks": {
+      "columns": 12,
+      "stochastic": 7,
+      "rows": {
+        "local": 5376,
+        "broad": 25
+      }
+    },
+    "lorenz": {
+      "columns": 19,
+      "stochastic": 14,
+      "rows": {
+        "local": 73,
+        "broad": 5
+      }
+    },
+    "lv": {
+      "columns": 16,
+      "stochastic": 11,
+      "rows": {
+        "local": 144,
+        "broad": 5
+      }
+    },
+    "ns": {
+      "columns": 28,
+      "stochastic": 23,
+      "rows": {
+        "local": 594,
+        "broad": 125
+      }
+    },
+    "ode": {
+      "columns": 11,
+      "stochastic": 6,
+      "rows": {
+        "local": 96,
+        "broad": 5
+      }
+    },
+    "pde_compound": {
+      "columns": 11,
+      "stochastic": 6,
+      "rows": {
+        "local": 468,
+        "broad": 25
+      }
+    },
+    "pde_divide": {
+      "columns": 12,
+      "stochastic": 7,
+      "rows": {
+        "local": 315,
+        "broad": 25
+      }
+    },
+    "vdp": {
+      "columns": 11,
+      "stochastic": 6,
+      "rows": {
+        "local": 147,
+        "broad": 5
+      }
+    },
+    "wave": {
+      "columns": 20,
+      "stochastic": 15,
+      "rows": {
+        "local": 105,
+        "broad": 25
+      }
+    }
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\checks.py": "04b2a9c4e5ec21867c499f36b448dccf8708da3d45cce761660039088a973ae0"
+  }
+}

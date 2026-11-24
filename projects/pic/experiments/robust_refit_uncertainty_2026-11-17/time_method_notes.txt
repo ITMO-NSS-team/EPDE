@@ -1,0 +1,66 @@
+Temporal information and correlation-aware reconstruction
+=========================================================
+
+The local quintic contrasts remove localized signal effectively, but they also
+remove low frequencies needed to identify positive AR1 correlation. Neither a
+small optimizer score nor a near-correct median sigma rules out an unidentified
+upper tail. Studentization is particularly sensitive: if bootstrap sigma/rho
+drift toward high-amplitude, near-unit-root noise, their covariance metrics can
+grow enough to make the calibrated normalized statistic misleadingly small.
+
+The temporal method uses the known time axis0 globally. It fits the already
+verified AR2-curvature/AR1-observation-noise likelihood to temporal second
+differences only, pooling spatial lines. Four fixed starts and a verified state
+score replace numerical gradients. Statistical dependence between lines means
+the pooled likelihood is composite for parameter uncertainty; no likelihood
+Hessian confidence claim is made.
+
+For spatial rho, fourth temporal differences suppress smooth signal while
+preserving the spatial covariance factor of separable Gaussian noise. If
+Cov(e)=sigma^2 Rt tensor Rs, then a temporal filter D gives
+Cov(De)=sigma^2 (D Rt D') tensor Rs. Thus the spatial correlation is unchanged
+at a fixed time. After pooled median centering, estimate adjacent sign agreement
+tau and use rho=sin(pi*tau/2), the Gaussian sign-correlation identity. The sign
+score has bounded influence, but remaining temporal signal can still bias it.
+No arbitrary signals or nonseparable noise identification theorem is asserted.
+No estimate uses injected sigma/rho or clean signal. Noise-only fits and sigma
+ratios are evaluation diagnostics after raw fits are frozen.
+
+The AC bootstrap diagnostic identifies another model mismatch: the nuisance
+signal is reconstructed by ordinary pooled GCV, which treats errors along each
+axis as independent. Positive correlation can therefore be retained as signal.
+Generating fresh noise around this contaminated pilot adds noise twice in some
+directions. Improving the subsequent noise fit cannot alone remove this source
+of bootstrap mismatch.
+
+For an axis with estimated covariance R=L L' and existing roughness penalty K,
+write y=L z and mu=L f. The penalized problem becomes
+  min_f ||z-f||^2 + lambda f' L' K L f.
+Diagonalize L' K L=U diag(d) U'; use the same pooled GCV shrinkage on U' L^-1 y,
+then map back with L U. The amplitude sigma cancels from the smoothing choice.
+For time, K is the original natural-cubic-spline penalty with a two-dimensional
+affine nullspace. For spatial axes it is the original DCT fourth-power penalty
+with a constant nullspace. Reconstruction still proceeds axis by axis.
+
+At rho0 the implementation agrees with the existing method. Added affine time
+trends, constants and changes of units are preserved in the checks. Additional
+checks compare with the direct normal equations (I+lambda R K) mu=y at several
+positive/negative correlations and finite lambda values. This algebra is signal
+smoothing, not integration of a discovered dynamical equation.
+
+Coverage studies have distinct scopes. The69-anchor local6 study and its
+studentized follow-up use the original nuisance pilot. The69 fresh temporal
+parameter cases plus192 bootstrap fields assess noise estimation, not coverage.
+The paired AC pilot screen changes only reconstruction on already seen anchors.
+Only the targeted AC-positive coverage study on fresh seeds48..50 tests the
+combined temporal estimator/correlation-aware pilot with fixed, correction-refit
+and studentized uncertainty. Its result cannot establish universal15-system
+validity. No per-system estimator switching or tuned coverage thresholds occur.
+
+All actual-field replicates retain the anchor's nuisance pilot and weak design.
+Noise estimation is repeated, and studentization repeats the noise-dependent
+metric, but reconstruction itself is not repeated for every actual dataset.
+The reported operator coverage therefore evaluates conditional calibration
+given that pilot/design. It is not unconditional confidence coverage of a full
+pipeline that reconstructs a new pilot on every dataset. That additional layer
+of nuisance-estimation uncertainty remains a separate validation requirement.

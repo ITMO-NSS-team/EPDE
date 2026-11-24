@@ -1,0 +1,207 @@
+Completed 2026-11-17: solver-free uncertainty from raw weak residual moments
+
+Direct weak moments with an estimated iid noise model give near95% average
+coverage on the default benchmark, including an independent fresh-seed
+confirmation. This is a useful improvement over coefficient-contrast
+bootstrap uncertainty. A single-coefficient confidence-set inversion also
+works for wave. It does not establish confidence after equation search,
+generic colored-noise calibration, or a replacement for dyad in ranking.
+
+What was tested
+
+The primary study covers all15 default systems at fresh anchors24/25/26:
+45 records,60 reference equation/anchor cases and93 registered cases with
+equivalents. It uses256 calibration,256 independent bootstrap-check and256
+actual benchmark measurements per record:34,560 field evaluations.
+Both local and broad native-grid moment banks are fixed before outcomes.
+Local geometry comes from historical seed0 base_plan; broad geometry uses
+the common interior and frequencies0,+/-1,+/-2 per axis. Remaining factor
+derivatives use existing fourth-order central differences; native integration
+uses degree3 time/degree5 spatial interpolation and analytic test derivatives.
+
+Ordinary raw and Gaussian-contraction corrected moments are compared. At a
+fixed coefficient vector v, the residual is M*v. The statistic averages
+squared residual errors divided by estimated marginal noise variance.
+Its cutoff comes from shared-field bootstrap draws, preserving dependence
+between overlapping windows. No independent-row or chi-square approximation,
+no coefficient-level denominator, no covariance ridge and no noisy Gram
+inverse enter this uncertainty test. Coefficients are not fitted inside it.
+
+The primary noise model is the previous estimated separable AR model.
+Its GCV reconstructed field supplies simulated noise covariance, not an
+empirical fitted-coefficient bias correction. All method inputs freeze
+before clean residuals/exact coefficient queries are evaluated.
+Known supports are used to evaluate calibration. There is no new structural
+search or claim about confidence after data-dependent support selection.
+
+Primary results and paired attribution
+
+Nominal95% mean reference coverage, seeds24-26:
+  Local corrected moments: 75.44%; broad corrected moments: 91.96%.
+  Local raw moments:       75.44%; broad raw moments:       92.01%.
+Thus merely applying polynomial mean correction is not the dominant fix.
+For several derivative weak terms, a spatially constant quadratic-noise
+correction integrates to zero. The old noise model remains a bottleneck.
+
+Noise-region coverage about the clean discrete moments and zero-residual
+acceptance at exact coefficients are evaluated separately. They are close
+here: local corrected zero acceptance75.35%, broad91.86%. The maximum
+clean-residual standardized score is0.0335 local/0.1297 broad, versus noise
+cutoffs generally above1. Large quadrature bias does not explain the main
+reference undercoverage in this particular full-grid experiment.
+
+An exploratory paired control applies the prior slab-coefficient contrast
+extractor to EXACTLY the same native local matrices and noise fields:
+                         Direct moments       Coefficient contrasts
+AC                           97.92%                  73.31%
+Forced KdV                   74.74%                   0.00%
+KS                           86.20%                   0.00%
+Wave                         82.16%                  94.27%
+Means are over three anchors, corrected moments. None of these reference
+contrast fits is rank deficient. This controls sampling/quadrature changes
+and supports sensitivity of the nonlinear coefficient-fit transformation
+as a major source of failure for forced KdV/KS. Wave is a counterexample to
+a universal superiority claim. The two regions cover different transformed
+quantities; coverage comparison does not compare their informativeness.
+
+Noise-model repair and fresh confirmation
+
+The benchmark injects iid Gaussian noise at a common relative amplitude
+across variables. The flexible AR estimator sometimes infers strong
+negative correlations on these iid data. Example ODE24: estimated rho=-0.336,
+sigma0.0893 versus actual0.1030; the bootstrap/actual weak-residual SD ratio
+is about0.623. Small systematic scale errors also matter when many local
+moments make the score distribution narrow.
+
+The follow-up explicitly uses the known iid noise FAMILY, but estimates
+the amplitude from noisy observations, without using the true5% value.
+Observed-anchor standard deviations define variable units. High-order
+differences, with frozen previously selected orders, estimate a pooled
+relative variance after division by binomial(2k,k). Both the noise family
+and amplitude estimator change relative to the AR study; the experiment
+does not attribute the entire improvement to correlation restriction alone.
+
+Two versions use identical geometry and fields:
+  iid_fixed: retain the anchor's estimated amplitude in every draw.
+  iid_studentized: re-estimate amplitude and polynomial correction in each
+  measurement/draw, then divide each error by its own amplitude estimate.
+  Calibration variance and check quantiles use those same transformed errors.
+No arbitrary inflation factor is fitted. The estimated correction with a
+random amplitude is not claimed exactly unbiased; mean shifts are measured.
+
+All45 paired records are rerun. The identical methods are then confirmed
+on ALL15 systems at fresh anchors27/28/29, another45 records, with disjoint
+actual-measurement and bootstrap seeds. Each again has256/256/256 draws.
+The paired follow-up reuses original actual measurements; it is not a new
+independent replication. The fresh cohort was specified before its outcomes.
+
+Mean reference coverage (target95%):
+                              Paired24-26        Fresh27-29
+Local iid_fixed                  96.18%             95.05%
+Local iid_studentized            94.71%             94.28%
+Broad iid_fixed                  95.60%             95.14%
+Broad iid_studentized            95.12%             94.84%
+
+The iid noise specification and amplitude estimator are the main supported
+repair. Re-estimating amplitude is not a universal winner. On confirmation,
+mean absolute per-case coverage error is1.86/1.99 percentage points for
+local fixed/studentized and1.33/1.28 for broad fixed/studentized. These
+descriptive differences do not establish population-level superiority.
+The simpler fixed iid version remains a serious control.
+
+Average calibration must not hide remaining failures. Fresh local
+studentized reference coverage averages85.29% on compound PDE and90.36%
+on AC. The worst individual local cases cover83.59%; the fixed version's
+worst is82.81%. Fresh broad studentized system means range92.84-96.22%,
+but its worst individual equation/anchor is Duffing29 at88.67%.
+Three anchors and256 check draws per anchor leave Monte Carlo uncertainty;
+regions across candidates and systems are not independent observations.
+
+For the previously severe systems, fresh studentized coverage is:
+  Forced KdV: local94.14%, broad95.31%.
+  KS:         local94.92%, broad95.18%.
+These are direct-moment regions, not repaired coefficient-contrast regions.
+
+An additional exploratory clean-center control examines remaining local
+failures while keeping the estimated iid model and actual measurements:
+  AC28:       89.84 ->92.19%.
+  Compound28: 83.59 ->90.63%.
+  Compound29: 83.59 ->91.80%.
+Reconstruction affects covariance estimation, but replacing the center
+does not fully restore95%. The remaining error is not completely diagnosed.
+These oracle centers are unavailable in practice and select no method.
+
+Actual coefficient-region inversion: wave
+
+For wave's fixed reference support u_tt = beta*u_xx, invert the
+iid-studentized residual test over beta, with no sign restriction or
+clean-coefficient centering. Both banks and all six anchors are reported.
+Parameterization beta=tan(theta) examines the whole real line, including
+the infinite-coefficient limit. Two grid resolutions8193/16385 plus
+data-derived OLS angles give agreeing roots; scalar boundary refinement
+uses tolerance1e-12. This is numerical one-parameter inversion, not a proof
+against arbitrarily narrow missed components or a multicoefficient projection.
+It does not integrate an ODE/PDE.
+
+All12 regions are single finite intervals and contain the exact beta0.04.
+This inclusion rate on six anchors is not itself a95% calibration estimate.
+Example fresh seed27:
+  Local: [0.02682156, 0.05409908]
+  Broad: [0.03719576, 0.04465890]
+Across all six anchors, mean widths are0.028672 local and0.008354 broad.
+On the256 actual repeated measurements per anchor, exact-coefficient
+acceptance is94.92% local and95.96% broad. Those fields were already used
+in the moment study; this checks inversion consistency, not new replication.
+The narrower broad interval gives a concrete precision comparison for
+this support. It does not imply broad moments universally identify models.
+
+Constants, numerical repair and verification
+
+Explicit constants are retained in all operators and registered supports.
+ODE_simple energy and first-derivative phase identities pass native weak
+checks, maximum residual2.71e-9; the phase identities need no derivative
+power or second-derivative candidate. No identity or constant ban is added.
+Gaussian polynomial expectation error2.22e-16 and operator replay error0.
+Independent correlated-linear Gaussian toy coverage95.047%; the separate
+studentized Gaussian control gives94.730% with32768 check/actual draws.
+Units invariance and explicit zero-variance handling pass.
+
+A numerical shortcut rescaling corrections at matrix level failed a strict
+wave replay by4.95e-11 in one moment. All initial iid attempts are archived
+in iid_initial. Every paired case was rerun with direct field-level
+correction; deterministic covariance maps alone are cached. All90 final iid
+records have exact direct correction replay. Statistical choices and
+tolerances were not relaxed to accept that shortcut.
+
+Main audit PASS:45 records,1116 query rows,859320 scalar scores,1260 fresh
+matrix replays and372 fit replays, all source/input/array hashes.
+Follow-up audit PASS:90 iid records,744 query rows,572136 scalar scores,
+2520 fresh matrix replays,12 paired contrast records/24576 scores, hashes
+and independent data/innovation replay. Inversion passes score arithmetic,
+grid refinement, boundary checks and stored repeated-measurement acceptance.
+Remaining oracle arrays pass their saved-array arithmetic checks.
+No incomplete query rows or nonfinite scores were dropped. All final
+processes finished. Production files were not changed; no commits or
+candidate ODE/PDE solves or PINNs were used.
+
+Decision
+
+Keep dyad's current structural role. Use these direct weak-moment tests as
+an experimental uncertainty layer under an explicitly specified noise
+family. A small uncertainty-normalized residual must not become a new
+ranking preference for weakly identified or overparameterized equations.
+
+This round supplies tested code for moment regions and a one-parameter
+coefficient inversion. It does not yet supply honest uncertainty after
+evolutionary search, general colored-noise handling, or joint coefficient
+regions for forced KdV/KS. The next useful tests are multicoefficient set
+inversion/false-model exclusion and correlated-noise calibration, retaining
+the simpler iid-fixed control. Do not promote a generic production default
+or per-system bank selector from these results.
+
+Artifacts: protocol.txt, iid_protocol.txt, paired_contrast_protocol.txt,
+inversion_protocol.txt, summary.csv/json, iid_summary.csv, followup_summary.json,
+per_query.csv, iid_per_query.csv, paired_contrast_summary.csv,
+wave_inversion.json, remaining_oracle.json, audit.json, followup_audit.json,
+checks.json, iid_checks.json, all frozen inputs/replicate arrays and PNG/SVG
+figures. render_figures.py produces the final plots from audited tables.

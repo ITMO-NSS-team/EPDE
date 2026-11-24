@@ -1,0 +1,126 @@
+Noise-region calibration and solver-free sensitivity
+===================================================
+
+1. Controlled likelihood calibration versus the ODE benchmark
+384 controlled calibration fields(128 per profile),192 independent
+controlled validation fields(64 per profile),192 fresh ODE fields
+(seeds200..263,64 per profile). All selected original and restricted
+fits were replayed with the original Python likelihood. Numerical
+convergence does not imply statistical confidence validity.
+The controlled signal has stationary Gaussian AR2 curvature independent
+of AR1 measurement noise. It matches the assumed contrast likelihood.
+The ODE has a fixed deterministic signal. Controlled curvature parameters
+were fixed from prior fits; no new validation outcome tunes them.
+Target nuisance coverage97.5%. Nominal chi-square2 threshold7.37776.
+Controlled calibration uses rank126/128, frozen before validation.
+Model-calibrated profile-LR coverage:
+model_validation/iid: {'n': 64, 'covered': 63, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.984375, 'coverage_upper': 0.984375, 'binomial95_interval': [0.9159896735656463, 0.9996044874859493]}
+model_validation/positive: {'n': 64, 'covered': 64, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.9439909106133634, 1.0]}
+model_validation/negative: {'n': 64, 'covered': 64, 'missed': 0, 'unresolved': 0, 'coverage_lower': 1.0, 'coverage_upper': 1.0, 'binomial95_interval': [0.9439909106133634, 1.0]}
+ode/iid: {'n': 64, 'covered': 59, 'missed': 5, 'unresolved': 0, 'coverage_lower': 0.921875, 'coverage_upper': 0.921875, 'binomial95_interval': [0.8270216709957924, 0.9741461598320319]}
+ode/positive: {'n': 64, 'covered': 7, 'missed': 57, 'unresolved': 0, 'coverage_lower': 0.109375, 'coverage_upper': 0.109375, 'binomial95_interval': [0.045121020187114856, 0.2124572259554024]}
+ode/negative: {'n': 64, 'covered': 63, 'missed': 1, 'unresolved': 0, 'coverage_lower': 0.984375, 'coverage_upper': 0.984375, 'binomial95_interval': [0.9159896735656463, 0.9996044874859493]}
+Wald coverage and nominal-cutoff comparisons are in summary.json/CSV.
+For positive correlation: controlled64/64 versus ODE7/64 covered.
+The ODE coverage95% binomial interval is approximately4.5%..21.2%,
+far below the97.5% target. Slight cutoff adjustment does not fix this.
+Median positive noise amplitude/truth: controlled0.9998, ODE1.4242.
+Median positive rho error: controlled-0.0038, ODE+0.2810.
+This is strong evidence that the assumed signal/noise model does not
+provide reliable nuisance uncertainty for this ODE. It is not a proof
+that all Gaussian curvature models or all solver-free estimators fail.
+Controlled calibration at one fixed nuisance configuration is not a
+uniform or deployable calibration for arbitrary signals/parameters.
+
+A posthoc80-start restricted-likelihood search on all64 positive ODE
+fields and all24 paired fields found better nuisance optima in some
+cases(maximum LR reduction6.0042), but changed ZERO nominal or calibrated
+membership decisions. Original results are preserved. This is a finite
+optimizer stress test, not a proof of global optimality.
+
+One already-covered field,positive/234, exposed a new unrestricted basin:
+the better restricted solution had lower objective than the stored full
+fit, producing a negative retrospective LR. Releasing that solution
+improved-2loglik by25.4127: sigma0.10054,rho0.33935 became
+sigma0.13023,rho0.60022(true sigma0.10301,rho0.4). Better optimization
+therefore increased the noise bias. The repaired diagnostic LR20.0859
+rejects truth; the original frozen positive count is7/64, while replacing
+this one result posthoc would give6/64. No replacement was made because
+the starting point came from truth-based validation. This neither explains
+away the57 original misses nor establishes a deployable optimizer repair.
+
+2. Continuous basic-bootstrap regions: independent follow-up
+The previous12-case ellipsoid comparison was archival, not validation.
+All12 empirical basic ellipsoids contained truth, motivating this frozen
+24-field follow-up(seeds264..271,8 per profile).128 refits each; all retained.
+Coordinates theta=(log sigma,atanh rho). Center2theta_hat-mean(theta_star),
+sample covariance V, and either chi-square2(.975) or empirical rank126 of
+centered bootstrap Mahalanobis radii. The uncorrected comparator uses
+theta_hat and the same bootstrap covariance. Constants are retained.
+Fresh noise-pair coverage:
+iid: uncorrected 7/8, basic_nominal 7/8, basic_empirical 7/8, finite_hull 7/8
+positive: uncorrected 0/8, basic_nominal 7/8, basic_empirical 7/8, finite_hull 4/8
+negative: uncorrected 8/8, basic_nominal 8/8, basic_empirical 8/8, finite_hull 8/8
+Already-frozen model-calibrated likelihood methods on those SAME24 fields:
+iid: lr 7/8, wald 6/8
+positive: lr 0/8, wald 0/8
+negative: lr 8/8, wald 8/8
+Observed estimate versus basic-center bias:
+{'iid': {'original_sigma_ratio': {'min': 0.9016725175566591, 'median': 0.9541307508821063, 'max': 1.3755535179860172, 'q05': 0.9081840818118021, 'q95': 1.2461005103952743}, 'basic_center_sigma_ratio': {'min': 0.8882271728590556, 'median': 0.9157581564213627, 'max': 1.1911403081319472, 'q05': 0.8890941405758034, 'q95': 1.1216301306710934}, 'original_rho_error': {'min': -0.0718291120435311, 'median': 0.01933868196144068, 'max': 0.4551616008343677, 'q05': -0.06140758141657912, 'q95': 0.31930692533092364}, 'basic_center_rho_error': {'min': -0.11183734896946498, 'median': -0.04333123977471649, 'max': 0.30254416800211825, 'q05': -0.10701823615642111, 'q95': 0.21037386009668288}}, 'positive': {'original_sigma_ratio': {'min': 1.2289707996091304, 'median': 1.4816346067649961, 'max': 1.5890173645203323, 'q05': 1.2987273376879331, 'q95': 1.5698912213401186}, 'basic_center_sigma_ratio': {'min': 1.0353329524957748, 'median': 1.2581138552943476, 'max': 1.2948872538999767, 'q05': 1.0916070028405718, 'q95': 1.2877335600247903}, 'original_rho_error': {'min': 0.23196437733500308, 'median': 0.3226216521719961, 'max': 0.3530989333194381, 'q05': 0.2512748919018066, 'q95': 0.34747023370514923}, 'basic_center_rho_error': {'min': 0.10534333372486615, 'median': 0.22608650580400963, 'max': 0.25681879637858684, 'q05': 0.1300561494421487, 'q95': 0.2499848765237692}}, 'negative': {'original_sigma_ratio': {'min': 0.9425706740998793, 'median': 0.9935108996046002, 'max': 1.0350483108479112, 'q05': 0.9524418160797538, 'q95': 1.0249486435888764}, 'basic_center_sigma_ratio': {'min': 0.9387391292641516, 'median': 0.9960290581104738, 'max': 1.0382605127464173, 'q05': 0.9479612329397569, 'q95': 1.0273416580073564}, 'original_rho_error': {'min': -0.09885323752709785, 'median': 0.0185414151136917, 'max': 0.06010935397280859, 'q05': -0.07565008994748301, 'q95': 0.05424445144674337}, 'basic_center_rho_error': {'min': -0.10807897764401841, 'median': 0.008914635469809223, 'max': 0.0461269216898878, 'q05': -0.08701711767195042, 'q95': 0.03838696209671086}}}
+These ellipsoids are continuous regions. Their empirical calibration
+must still be checked:8 outer fields per profile cannot prove97.5%
+coverage. The finite reflected-point hull remains a descriptive comparator.
+
+3. Propagating uncertainty while preserving scenario geometry
+Frozen probe: ellipse center, observed estimate,32 angles on each of
+half and full radius(66 points). Each has128 conditional known-noise
+fields, MC16 normalization and97.5% joint rank126 cutoff. Both original
+95% primary regions are included in the finite union. The scalar
+triangle/Loewner compression is a paired comparator. No point is dropped.
+The66-point scan does NOT certify the continuum of the ellipse. A noise
+ellipse containing truth does not by itself validate downstream equation
+confidence coverage. This remains a finite sensitivity experiment.
+Full-library weak-error coverage:
+iid: studentized 7/8, fixed_metric 8/8, scalar 8/8, finite_union 8/8
+positive: studentized 8/8, fixed_metric 8/8, scalar 8/8, finite_union 8/8
+negative: studentized 8/8, fixed_metric 8/8, scalar 8/8, finite_union 8/8
+The fixed-metric primary already covered24/24 in this cohort. No extra
+coverage gain over it is demonstrated here; the test measures precision
+when explicitly retaining additional noise scenarios.
+Reference geometry:
+iid: studentized bounded 8/8, fixed_metric bounded 8/8, finite_union bounded 8/8, scalar bounded 8/8
+positive: studentized bounded 8/8, fixed_metric bounded 8/8, finite_union bounded 8/8, scalar bounded 1/8
+negative: studentized bounded 8/8, fixed_metric bounded 8/8, finite_union bounded 8/8, scalar bounded 8/8
+Reference equation accepted in 24/24 finite unions.
+Outer-width ratios versus primary studentized enclosure, bounded only:
+{'union': {'min': 1.1193768575366172, 'median': 1.7113885384047196, 'max': 5.360726240239652, 'q05': 1.1360531503995406, 'q95': 2.909235184665419}, 'scalar': {'min': 1.1352197955838765, 'median': 1.7311439689866637, 'max': 3.9041108257536368, 'q05': 1.1540004236684134, 'q95': 2.8894950703352342}}
+Coordinates contributing to those ratios:
+{'union': 72, 'scalar': 51}
+These are outer enclosure widths, not exact joint coefficient intervals.
+Boundedness alone also does not establish correct structure or exclude
+zero coefficients. All cutoffs were frozen before clean-moment scoring.
+
+4. Implementation and audit
+The original validated guarded fitter is used throughout. Substituting
+the exact native likelihood at initialization missed a better archived
+basin(1/54); adding3 starts still missed2/144. Those attempts were rejected
+and their failed records retained. The native final likelihood arithmetic
+remains independently checked against original Python. No ODE/PDE solver.
+Likelihood, gradient, Hessian, bootstrap draws, noise-region membership,
+generalized scores, scalar bounds and coefficient certificates audited.
+All prior experiment manifests remain unchanged; complete.py checks this.
+Selected-fit warnings in the24-case bootstrap:
+[]
+
+5. Interpretation and next step
+Do not promote the AR2 model-based likelihood regions: the positive-noise
+ODE coverage failure is substantial. The basic bootstrap tests whether
+reproducing the deterministic pilot can compensate for this bias.
+Keep any improved coverage separate from coefficient precision and from
+a formal confidence guarantee. The next methodological comparison should
+change the signal representation in noise estimation and validate on more
+independent signals, rather than trusting convergence or one likelihood
+model. To obtain continuous robust equation regions, finite nuisance scans
+must also be replaced by bounds over the full noise region.
+This round concerns ODE noise identification; the prior KdV weak-direction
+failure is unresolved. Dyad remains provisional. No production edit.

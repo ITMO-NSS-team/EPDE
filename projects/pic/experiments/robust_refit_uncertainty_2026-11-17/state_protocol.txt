@@ -1,0 +1,10 @@
+Numerical follow-up to11 unresolved Fisher-coordinate fits. Evaluate the SAME
+AR2-curvature / AR1-noise contrast likelihood via a five-dimensional stationary
+Kalman innovations recursion, with exact initial stationary covariance and
+analytic sensitivity recursions. Use Joseph covariance updates for conditioning.
+This integrates no candidate differential equation; it is covariance algebra.
+Verify against dense contrast covariance and finite-difference gradients first.
+Reevaluate all84 fitted variable solutions; optimize any projected score>2e-5
+or previously unresolved fit from its saved best solution. Keep bounds, family
+and status threshold unchanged. Preserve prior banded results. No coverage
+outcomes or clean fields enter the numerical selection or refinement.

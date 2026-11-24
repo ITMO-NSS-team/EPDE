@@ -1,0 +1,345 @@
+{
+  "status": "COMPLETE",
+  "records": 138,
+  "summary": [
+    {
+      "profile": "iid",
+      "model_kind": "curvature",
+      "bank": "local",
+      "completed_records": 44,
+      "incomplete_records": 1,
+      "reference_cases": 57,
+      "geometry": {
+        "ellipsoid": 48,
+        "unbounded": 6,
+        "empty": 3
+      },
+      "exact_anchor_accepted": 54,
+      "operator_coverage": 0.7895951704545454,
+      "directional_coverage": 0.723913944128788,
+      "directional_zero_acceptance": 0.7225822679924243,
+      "uniform_coverage": 0.9317885890151515,
+      "uniform_zero_acceptance": 0.9317885890151515
+    },
+    {
+      "profile": "iid",
+      "model_kind": "curvature",
+      "bank": "broad",
+      "completed_records": 44,
+      "incomplete_records": 1,
+      "reference_cases": 57,
+      "geometry": {
+        "ellipsoid": 42,
+        "unbounded": 15
+      },
+      "exact_anchor_accepted": 57,
+      "operator_coverage": 0.8331853693181818,
+      "directional_coverage": 0.9194631865530304,
+      "directional_zero_acceptance": 0.9189009232954546,
+      "uniform_coverage": 0.9980024857954546,
+      "uniform_zero_acceptance": 0.9977361505681818
+    },
+    {
+      "profile": "iid",
+      "model_kind": "curvature",
+      "bank": "both",
+      "completed_records": 44,
+      "incomplete_records": 1,
+      "reference_cases": 57,
+      "geometry": {
+        "bounded_outer": 54,
+        "unbounded_certified": 3
+      },
+      "exact_anchor_accepted": 57,
+      "operator_coverage": 0.8329190340909091,
+      "directional_coverage": null,
+      "directional_zero_acceptance": null,
+      "uniform_coverage": null,
+      "uniform_zero_acceptance": 0.9977361505681818
+    },
+    {
+      "profile": "iid",
+      "model_kind": "iid",
+      "bank": "local",
+      "completed_records": 45,
+      "incomplete_records": 0,
+      "reference_cases": 60,
+      "geometry": {
+        "ellipsoid": 51,
+        "unbounded": 9
+      },
+      "exact_anchor_accepted": 60,
+      "operator_coverage": 0.9418402777777778,
+      "directional_coverage": 0.9284722222222223,
+      "directional_zero_acceptance": 0.9279224537037036,
+      "uniform_coverage": 1.0,
+      "uniform_zero_acceptance": 1.0
+    },
+    {
+      "profile": "iid",
+      "model_kind": "iid",
+      "bank": "broad",
+      "completed_records": 45,
+      "incomplete_records": 0,
+      "reference_cases": 60,
+      "geometry": {
+        "ellipsoid": 45,
+        "unbounded": 15
+      },
+      "exact_anchor_accepted": 60,
+      "operator_coverage": 0.9434895833333333,
+      "directional_coverage": 0.9414207175925927,
+      "directional_zero_acceptance": 0.9401475694444444,
+      "uniform_coverage": 0.9982638888888888,
+      "uniform_zero_acceptance": 0.9981770833333333
+    },
+    {
+      "profile": "iid",
+      "model_kind": "iid",
+      "bank": "both",
+      "completed_records": 45,
+      "incomplete_records": 0,
+      "reference_cases": 60,
+      "geometry": {
+        "bounded_outer": 57,
+        "unbounded_certified": 3
+      },
+      "exact_anchor_accepted": 60,
+      "operator_coverage": 0.9434027777777778,
+      "directional_coverage": null,
+      "directional_zero_acceptance": null,
+      "uniform_coverage": null,
+      "uniform_zero_acceptance": 0.9981770833333333
+    },
+    {
+      "profile": "negative",
+      "model_kind": "curvature",
+      "bank": "local",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 6,
+        "unbounded": 3,
+        "empty": 3
+      },
+      "exact_anchor_accepted": 9,
+      "operator_coverage": 0.7080078125,
+      "directional_coverage": 0.69921875,
+      "directional_zero_acceptance": 0.6988932291666666,
+      "uniform_coverage": 0.7548828125,
+      "uniform_zero_acceptance": 0.7548828125
+    },
+    {
+      "profile": "negative",
+      "model_kind": "curvature",
+      "bank": "broad",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9391276041666666,
+      "directional_coverage": 0.9443359375,
+      "directional_zero_acceptance": 0.9443359375,
+      "uniform_coverage": 0.9996744791666666,
+      "uniform_zero_acceptance": 0.9996744791666666
+    },
+    {
+      "profile": "negative",
+      "model_kind": "curvature",
+      "bank": "both",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9391276041666666,
+      "directional_coverage": null,
+      "directional_zero_acceptance": null,
+      "uniform_coverage": null,
+      "uniform_zero_acceptance": 0.9996744791666666
+    },
+    {
+      "profile": "negative",
+      "model_kind": "known_rho",
+      "bank": "local",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 6,
+        "unbounded": 6
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9449869791666666,
+      "directional_coverage": 0.9612630208333334,
+      "directional_zero_acceptance": 0.9612630208333334,
+      "uniform_coverage": 1.0,
+      "uniform_zero_acceptance": 1.0
+    },
+    {
+      "profile": "negative",
+      "model_kind": "known_rho",
+      "bank": "broad",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9498697916666666,
+      "directional_coverage": 0.9527994791666666,
+      "directional_zero_acceptance": 0.9527994791666666,
+      "uniform_coverage": 0.9990234375,
+      "uniform_zero_acceptance": 0.9990234375
+    },
+    {
+      "profile": "negative",
+      "model_kind": "known_rho",
+      "bank": "both",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9498697916666666,
+      "directional_coverage": null,
+      "directional_zero_acceptance": null,
+      "uniform_coverage": null,
+      "uniform_zero_acceptance": 0.9990234375
+    },
+    {
+      "profile": "positive",
+      "model_kind": "curvature",
+      "bank": "local",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 6,
+        "unbounded": 3,
+        "empty": 3
+      },
+      "exact_anchor_accepted": 9,
+      "operator_coverage": 0.7171223958333334,
+      "directional_coverage": 0.7067057291666666,
+      "directional_zero_acceptance": 0.7067057291666666,
+      "uniform_coverage": 0.75,
+      "uniform_zero_acceptance": 0.75
+    },
+    {
+      "profile": "positive",
+      "model_kind": "curvature",
+      "bank": "broad",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.8896484375,
+      "directional_coverage": 0.9166666666666666,
+      "directional_zero_acceptance": 0.9166666666666666,
+      "uniform_coverage": 0.998046875,
+      "uniform_zero_acceptance": 0.998046875
+    },
+    {
+      "profile": "positive",
+      "model_kind": "curvature",
+      "bank": "both",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.8896484375,
+      "directional_coverage": null,
+      "directional_zero_acceptance": null,
+      "uniform_coverage": null,
+      "uniform_zero_acceptance": 0.998046875
+    },
+    {
+      "profile": "positive",
+      "model_kind": "known_rho",
+      "bank": "local",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 6,
+        "unbounded": 6
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9612630208333334,
+      "directional_coverage": 0.962890625,
+      "directional_zero_acceptance": 0.9625651041666666,
+      "uniform_coverage": 1.0,
+      "uniform_zero_acceptance": 1.0
+    },
+    {
+      "profile": "positive",
+      "model_kind": "known_rho",
+      "bank": "broad",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "ellipsoid": 9,
+        "unbounded": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9664713541666666,
+      "directional_coverage": 0.9596354166666666,
+      "directional_zero_acceptance": 0.9596354166666666,
+      "uniform_coverage": 0.9996744791666666,
+      "uniform_zero_acceptance": 0.9996744791666666
+    },
+    {
+      "profile": "positive",
+      "model_kind": "known_rho",
+      "bank": "both",
+      "completed_records": 12,
+      "incomplete_records": 0,
+      "reference_cases": 12,
+      "geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "exact_anchor_accepted": 12,
+      "operator_coverage": 0.9664713541666666,
+      "directional_coverage": null,
+      "directional_zero_acceptance": null,
+      "uniform_coverage": null,
+      "uniform_zero_acceptance": 0.9996744791666666
+    }
+  ],
+  "incomplete": [
+    {
+      "system": "ns",
+      "seed": 37,
+      "profile": "iid",
+      "model_kind": "curvature",
+      "status": "incomplete_noise_model"
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze.py": "c80db47d068db47cd353cd63df79853b41a60ddb08501388be89b9610ae7f134"
+  }
+}

@@ -1,0 +1,45 @@
+Frozen solver-free nuisance and weak-direction comparison
+========================================================
+Preserve previous experiment directories, production code, constants and valid
+identities. No dynamics solver. Use the all-original-start exact-state noise
+repair without changing its objective, bounds, starts or tolerances.
+
+A. Compare bootstrap normalizations on identical fields and corrected moments:
+studentized = each replicate's refitted noise covariance;
+fixed_metric = the observed noise covariance for every replicate.
+Both refit noise in all128 replicates and center fields on the observed pilot.
+The observed covariance/pilot is the same for both methods. MC16, rank123/128
+per bank and joint maximum. This isolates random-normalization effects; it is
+NOT full propagation over a confidence set of noise parameters and does not
+establish uniform nuisance-parameter coverage. Avoid calling it such a method.
+Report a retrospective comparison on the previous69 default/core datasets and
+3 repaired ODE datasets, then fresh ODE seeds57..59 under iid,+.4,-.4 (9 cases).
+No method selection or tuning based on these fresh outcomes. Retain all failures.
+
+B. Screen the same12 KdV banks using the archived iid seed51 pilot/noise model.
+For every fixed candidate feature support, project its stochastic feature
+columns off its deterministic FEATURE columns; target columns are not used.
+Compute the smallest eigenvalue of that residual signal Gram relative to the
+stochastic feature noise Gram. Ignore purely deterministic supports only in
+this design proxy (retain their equations). Negative roundoff eigenvalues are
+zeroed only for log1p evaluation. No ridge or truth-based support filtering.
+Rank by the25th percentile of log1p(minimum eigenvalues); tie-break by their
+mean, then original menu order. Select the best bank except local, which stays
+in both compared pairs. Candidate labels/exact coefficients/clean data cannot
+enter the ranking. The supplied benchmark panel is fixed and itself contains
+reference-derived supports, so this is not unrestricted adaptive discovery.
+Freeze selection, then fresh KdV seeds57..59 under iid,+.4,-.4 (9 cases).
+Compare original(local,broad) and replacement(local,selected), independently
+calibrated joint maxima, under both normalizations from A. Refit repaired noise
+in every draw; no changes after fresh outcomes. Evaluate all candidate regions.
+
+C. Independent noise-identification diagnostic:96 fresh ODE observations,
+seeds100..131 under iid,+.4,-.4; fit repaired noise once and reconstruct pilot.
+Save fitted quantities before evaluating truth. Report sigma/rho errors and
+weak-error scores with fitted vs known noise, for attribution only. Do not
+interpret these uncalibrated scores as coverage rates or use truth for fitting.
+No test of a nuisance confidence-envelope method is claimed in this round.
+
+All fresh fields use existing RNG domains984101/984102/984105 and unused seeds.
+Freeze cutoffs before clean-field coverage queries. Three fully bootstrapped
+observations per profile remain a screen, not precise95% coverage certification.

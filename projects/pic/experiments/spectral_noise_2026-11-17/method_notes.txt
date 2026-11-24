@@ -1,0 +1,56 @@
+Exact covariance calculation used in this experiment
+---------------------------------------------------
+For an n-sample stationary AR(1) correlation matrix R(rho), orthonormal
+DCT-II coordinates turn R^-1 into diagonal D plus a rank-two endpoint term:
+  D[k] = (1 + rho^2 - 2*rho*cos(pi*k/n)) / (1-rho^2),
+  Q = D + [rho/(1+rho)] * U*U^T,
+where U contains the DCT transforms of the first and last unit vectors.
+The stable implementation uses squared sine/cosine forms of the numerator.
+This is an exact finite-domain identity, checked against dense matrices.
+
+For a separable tensor covariance, full precision is the Kronecker product
+of the per-axis precisions. Let L be the tensor of low DCT frequencies and
+O its complement. The marginal precision on O is
+  P_O = Q_OO - Q_OL * Q_LL^-1 * Q_LO.
+Since L is a tensor block, Q_LL is also a Kronecker product. Set discarded
+coefficients tozero in z. The retained quadratic is
+  z^T Q z - (Qz)_L^T Q_LL^-1 (Qz)_L.
+The retained covariance determinant follows
+  logdet(C_O) = logdet(C_full) + logdet(Q_LL).
+All per-axis actions/inverses use a diagonal plus rank-two matrix, avoiding
+dense matrices at the largest KS field sizes. No diagonal-frequency noise
+approximation is made.
+
+For the corner control H (high on every axis), each marginal high block has
+precision D_H+U_H*K*U_H^T with
+  K = alpha*(I + alpha*U_L^T*D_L^-1*U_L)^-1,
+  alpha = rho/(1+rho).
+The tensor corner covariance remains separable. This makes the same exact
+quadratic/logdet calculation inexpensive, but discards informative strips.
+
+With nO retained coefficients, sigma^2 is profiled as q/nO and the objective
+is log(q/nO)+logdet(C_O)/nO. The three-start optimizer estimates all axis rhos
+jointly. The method assumes that retained signal coefficients are negligible.
+Failure of that assumption is a modeling error even when covariance algebra
+and optimization are exact. The compound-system attribution demonstrates
+one consequence: a wrong covariance contraction changes the mean weak matrix.
+
+The approximate rho standard deviations saved with fits are local curvature
+diagnostics of this Gaussian profile likelihood. They are not calibrated
+confidence intervals and are not used to select a noise model or test cutoff.
+
+Follow-up priorities after this frozen comparison
+------------------------------------------------
+Keep the known-iid estimator when that family is specified by the benchmark.
+Do not automatically switch noise models by achieved reference coverage.
+For unknown correlation, improve nuisance signal treatment while retaining
+frequencies that identify correlation. A joint signal/covariance restricted
+likelihood is a more targeted next hypothesis than another instability score.
+Boundary trends and signal leakage into frequency strips need explicit tests.
+The corner-only control is not a general fix: it loses correlation information.
+
+Then propagate noise-parameter uncertainty, currently held fixed during
+weak-moment calibration. Test on fresh raw fields and on pure-noise controls,
+with both correlation signs and short ODE records. Any covariance union or
+likelihood confidence region should remain an uncertainty calculation, not
+a structural ranking reward for larger or less identifiable equations.

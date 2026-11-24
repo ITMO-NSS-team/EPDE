@@ -1,0 +1,50 @@
+Localized weak discrepancy and continuous raw fitting, 2026-11-16
+Frozen before execution.
+
+Same core-15 saved systems, 5% noise seeds 0/1/2, finite candidate panel,
+registered equivalents, dyad, modulo-3 time groups and original 32/128
+fitting/bias-correction budgets. No equation integration or generated data.
+
+Fix A: evaluate the residual using the compact LOCAL weak test bank whose
+physical supports were selected from the training group in the earlier PCR
+experiment. Map that bank to the independently reconstructed full time grid
+with the existing continuous Gauss quadrature. All candidates use the same
+bank. Fit on group g, cross-score on independently reconstructed other groups.
+Correct complete operator means, keep cross-products signed, normalize by
+training target energy in this bank. No spectral modes, covariance weighting,
+structural threshold or new hyperparameter selection is introduced.
+
+Compare both old and current continuous-fitted coefficients on the new bank,
+while retaining the exact previous frozen spectral score as control.
+
+Fix B: apply the same continuous quadrature directly on the raw training
+group's time grid and observations. Use the EXISTING raw-grid physical
+supports, test smoothness, crops and window lattice. Local polynomial
+interpolation supplies integration, not field smoothing. Fit OLS and the
+existing mean/covariance-corrected signed least-squares rule. Bootstrap raw
+observations around the reconstructed pilot; do not reconstruct the bootstrap
+fields before building these RAW fitting operators. This isolates a fitting
+alternative to applying continuous quadrature on reconstructed fields.
+
+For fitting bias, compare the observed raw weak matrix to the bootstrap mean
+relative to the pilot raw-grid weak matrix. Use the same fixed noise model
+and RNG as previous experiments. No clean fields enter fits, window choices,
+or scores. Clean data and exact coefficients are post-selection diagnostics.
+Half/full fitting budgets are retained as a numerical sensitivity check.
+
+Evaluate every fit on both legacy spectral and new local banks. Keep the
+previous frozen clean bank as the fitted-coefficient accuracy diagnostic.
+Changing the evaluation bank must not be mistaken for improving coefficients.
+
+For current continuous and new raw-continuous CLSM fits, repeat the conditional
+paired uncertainty calculation on the local bank: 128 operator covariance
+draws/group, 512 shared group index/sign perturbations, finite-bias-mean
+variance factor, and exact bilinear scores. Reuse the paired_uncertainty
+method and its limitations. Coefficients and denominators remain fixed.
+Compare its score uncertainty with the old spectral bank on identical draws.
+No uncertainty interval changes dominance; no confidence threshold is tuned.
+
+Report all 45 system-seed runs, 60 equation-seed cases, all fitting/scoring
+arms, exact-law diagnostics and regressions. This remains a fixed-panel,
+single-noise-level experiment, not full discovery validation. Parallel
+processes use one BLAS thread each and below-normal priority.

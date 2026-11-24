@@ -1,0 +1,372 @@
+{
+  "status": "COMPLETE",
+  "summary": [
+    {
+      "n": 301,
+      "rho": 0.0,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.060329839901925024,
+      "sigma_median": 0.99276602007172
+    },
+    {
+      "n": 301,
+      "rho": 0.0,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.060663885549503756,
+      "sigma_median": 0.9928015183329224
+    },
+    {
+      "n": 301,
+      "rho": 0.0,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 2,
+      "available": 64,
+      "rho_rmse": 0.2875309044570385,
+      "sigma_median": 1.0301332584294967
+    },
+    {
+      "n": 301,
+      "rho": 0.0,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.05781698665988384,
+      "sigma_median": 0.990837939244388
+    },
+    {
+      "n": 301,
+      "rho": 0.4,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.050206173039860025,
+      "sigma_median": 0.9943027406959901
+    },
+    {
+      "n": 301,
+      "rho": 0.4,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.04997846919887502,
+      "sigma_median": 0.9915155232447429
+    },
+    {
+      "n": 301,
+      "rho": 0.4,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 7,
+      "available": 64,
+      "rho_rmse": 0.3885876138471747,
+      "sigma_median": 0.9152371976449787
+    },
+    {
+      "n": 301,
+      "rho": 0.4,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.04931747574174795,
+      "sigma_median": 0.9936240760140695
+    },
+    {
+      "n": 301,
+      "rho": -0.4,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.04989455726527429,
+      "sigma_median": 0.9904975954981909
+    },
+    {
+      "n": 301,
+      "rho": -0.4,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.049742735839815574,
+      "sigma_median": 0.9904576525006579
+    },
+    {
+      "n": 301,
+      "rho": -0.4,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.09691632949224407,
+      "sigma_median": 1.009024918380609
+    },
+    {
+      "n": 301,
+      "rho": -0.4,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.050140028619589584,
+      "sigma_median": 0.9896397236471179
+    },
+    {
+      "n": 320,
+      "rho": 0.0,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.05060789033823928,
+      "sigma_median": 1.0018173402368393
+    },
+    {
+      "n": 320,
+      "rho": 0.0,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.05059616231845133,
+      "sigma_median": 1.0019732076614893
+    },
+    {
+      "n": 320,
+      "rho": 0.0,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.3068595945100072,
+      "sigma_median": 1.0146201369532908
+    },
+    {
+      "n": 320,
+      "rho": 0.0,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.0493557493314987,
+      "sigma_median": 1.0029810177570702
+    },
+    {
+      "n": 320,
+      "rho": 0.4,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.04820763270232052,
+      "sigma_median": 0.9896798654218062
+    },
+    {
+      "n": 320,
+      "rho": 0.4,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.048775622556231905,
+      "sigma_median": 0.9888900612928869
+    },
+    {
+      "n": 320,
+      "rho": 0.4,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 10,
+      "available": 64,
+      "rho_rmse": 0.38853137205527477,
+      "sigma_median": 0.9287129259125111
+    },
+    {
+      "n": 320,
+      "rho": 0.4,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.0487547946952521,
+      "sigma_median": 0.9924299170259518
+    },
+    {
+      "n": 320,
+      "rho": -0.4,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.05428944478342508,
+      "sigma_median": 0.9867610795392172
+    },
+    {
+      "n": 320,
+      "rho": -0.4,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.054288531700087024,
+      "sigma_median": 0.9866285227893453
+    },
+    {
+      "n": 320,
+      "rho": -0.4,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.0947225357793847,
+      "sigma_median": 1.005027596098592
+    },
+    {
+      "n": 320,
+      "rho": -0.4,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.05391733015970876,
+      "sigma_median": 0.9874009265036838
+    },
+    {
+      "n": 1001,
+      "rho": 0.0,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.03270643975762399,
+      "sigma_median": 1.00211880477406
+    },
+    {
+      "n": 1001,
+      "rho": 0.0,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.03327286375852669,
+      "sigma_median": 1.0023533857851579
+    },
+    {
+      "n": 1001,
+      "rho": 0.0,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.15493896422150066,
+      "sigma_median": 1.0085826667734503
+    },
+    {
+      "n": 1001,
+      "rho": 0.0,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.032702301390679867,
+      "sigma_median": 1.0033964952182757
+    },
+    {
+      "n": 1001,
+      "rho": 0.4,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.031314713787604864,
+      "sigma_median": 0.9997904426339894
+    },
+    {
+      "n": 1001,
+      "rho": 0.4,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.0280051574968667,
+      "sigma_median": 0.9993564329305576
+    },
+    {
+      "n": 1001,
+      "rho": 0.4,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 6,
+      "available": 64,
+      "rho_rmse": 0.31936522599511613,
+      "sigma_median": 1.0331294633240646
+    },
+    {
+      "n": 1001,
+      "rho": 0.4,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.02799777677705608,
+      "sigma_median": 1.0004931874914456
+    },
+    {
+      "n": 1001,
+      "rho": -0.4,
+      "method": "White curvature",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.03060480458445879,
+      "sigma_median": 0.9976217412497347
+    },
+    {
+      "n": 1001,
+      "rho": -0.4,
+      "method": "Correlated curvature",
+      "draws": 64,
+      "incomplete": 1,
+      "available": 63,
+      "rho_rmse": 0.028772215606694056,
+      "sigma_median": 0.9968716021714192
+    },
+    {
+      "n": 1001,
+      "rho": -0.4,
+      "method": "Spectral strips",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.0445532533134305,
+      "sigma_median": 1.0008168727381657
+    },
+    {
+      "n": 1001,
+      "rho": -0.4,
+      "method": "Known zero signal",
+      "draws": 64,
+      "incomplete": 0,
+      "available": 64,
+      "rho_rmse": 0.028717722691869407,
+      "sigma_median": 0.9972439617850419
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze_noise.py": "a4897b8c2014f79fa593168fa0b2de752630ec6cd19512d1622570905136ee51"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\noise_trials.json": "ba13351075c1a4bc97e84386c20f57f8538346a303c6e8f6b30ed0c7dbeaaf67",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\noise_trials_correlated.json": "2ed1cb25eaef0240b97100494bcb6449ee448206e66a6052c9b69dfd7749164b"
+  }
+}

@@ -1,0 +1,65 @@
+Broad raw validation and training-only common covariance weighting
+Frozen before outcomes, 2026-11-16.
+
+Primary question: can a broader validation representation resolve accurate
+wave fits while retaining sensitivity to inaccurate KS coefficients? This
+changes validation only. All candidate coefficients, candidate panels,
+registered equivalents and original dyad are frozen from the previous study.
+Start wave/KS x seeds 0/1/2, 5% noise. Also test AC and forced KdV for failure
+diagnostics. Expand unchanged only if the targeted result justifies it.
+
+The time domain is the intersection of the three raw sample domains, chosen
+from indices alone. No extrapolation. Build one full-support compact weak
+window per axis, with the previous minimum-q and q+1 bank rules. Add signed
+Fourier modes until the TRAINING reconstruction's candidate feature matrices
+pass the existing 1e-12 numerical-rank criterion, capped by its previously
+selected field bandwidth. This rank rule is not a statistical guarantee.
+Both q arms are reported; do not choose between them with clean outcomes.
+
+Map each raw group by the existing fixed natural cubic interpolant, without
+smoothing. Use the prior analytic Gaussian contractions for polynomial weak
+monomials. Evaluate signed cross residual products from the two held-out raw
+groups. Constants use their actual modulated weak column; non-DC entries are
+not replaced by ones. No centering or unscored intercept is introduced.
+
+Compare unweighted moments with common noise-covariance weighting. Convert
+the conjugate-symmetric complex moments to an equivalent real basis: the DC
+row, then sqrt(2)*real and sqrt(2)*imaginary for one representative of each
+nonzero mode pair. This preserves squared norms and real cross products.
+
+For each fitting fold/bank, simulate 128 corrected operator draws from the
+TRAINING reconstruction sampled on its raw grid and its old estimated noise
+model. The pilot is used only for the conditional noise model, not to replace
+held-out raw observations. Center each operator column's draws and divide
+by that column's observed reconstructed moment norm. Pool their row
+covariances with equal column weights, obtaining a single C for all models.
+The deterministic constant and known external columns contribute zero noise.
+Use W=C^(-1/2) and score <W r_left,W r_right>/||W pilot_target||^2.
+This is an experimental common metric, not a calibrated goodness-of-fit test.
+It includes target and predictor operator noise; it is not each candidate's
+own residual covariance, which would change the metric with coefficients.
+
+Whitening is evaluated only when C is positive full rank at the existing
+1e-12 relative numerical cutoff. Do not delete null directions, use a clean
+field to repair C, or introduce a tuned ridge. Report infeasibility explicitly.
+The unweighted arm remains available. A 64-draw whitening arm measures
+covariance-estimation sensitivity; all choices are frozen before scoring.
+
+Paired uncertainty uses 128 operator draws per raw group and 512 shared
+empirical perturbations across candidates, banks and rotations. Repeat
+averaging with 64 draws. Treat coefficients, weighting and noise estimates
+as fixed for these conditional SDs. No confidence gates or tuned penalties.
+
+Clean controls after scores freeze: same broad bank on saved full clean
+fields and on interpolated clean subsamples, and frozen old clean-bank fit
+accuracy. A quiet score that cannot distinguish bad coefficients is a failure,
+not successful variance reduction. Held-out option rankings are diagnostics;
+selecting a fit with them would require a separate final evaluation split.
+
+Check real-basis equivalence, constant preservation, feature-unit invariance
+of common weighting, whitened empirical covariance, geometry/no extrapolation,
+finite outputs and source/input hashes. Preserve valid ODE_simple phase and
+energy identities as controls; a squared first derivative is distinct from
+a second derivative. No candidate ODE/PDE solves, PINNs, clean benchmark
+regeneration, production edits or commits. Parallel tests, one BLAS thread
+per worker, below-normal priority.

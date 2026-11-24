@@ -1,0 +1,26 @@
+Temporal estimator follow-up, frozen before fresh evaluation
+==========================================================
+The old seed36 screen motivates further assessment. Keep time_fit.py fixed.
+Evaluate all 23 system/profile combinations on fresh anchors45,46,47 using
+RNG domain982101 and the existing 5%-of-clean-SD benchmark noise convention.
+This amplitude convention is evaluation design, never an estimator input.
+Freeze raw fitted models before examining clean signal or isolated noise.
+Fit both the temporal estimator and the existing local6 estimator on identical
+raw fields; no per-system method selection. Then fit temporal noise-only fields
+for attribution. This is noise-estimation validation, NOT coverage validation.
+
+For four deliberately difficult cases (AC positive, compound iid, NS iid,
+KS positive), reconstruct the same observed-data pilot, then generate16 paired
+bootstrap fields per fresh anchor using the temporal anchor noise model and
+RNG982102. Fit both estimators on each identical bootstrap field. Record sigma
+ratios relative to the generating anchor sigma, rho errors and all warning
+statuses. Raw and bootstrap estimation remains clean-data-free. Sixteen draws
+are an instability screen, not tail calibration or a confidence interval.
+
+Separately repeat all576 paired pure-noise draws from the earlier AR2 study:
+n301/320/1001, rho0/+0.4/-0.4,64 draws per cell. Verify input hashes. Compare
+with both earlier AR2 and local6. Preserve numerical warnings and finite outputs.
+No candidate dynamics integration, production changes, fallback to truth,
+rejection/resampling, or truth-selected axis. Constants/identities remain intact.
+This follow-up may support a next coverage study; it cannot retroactively
+validate studentization results obtained with the different local6 estimator.

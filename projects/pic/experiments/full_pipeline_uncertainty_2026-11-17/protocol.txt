@@ -1,0 +1,26 @@
+Full-pipeline uncertainty follow-up: decision before new results
+==============================================================
+Preserve all completed prior experiments. No production edits, candidate ODE/PDE
+integration, dyad replacement, removal of constants or rejection of valid identities.
+
+First isolate the KS-positive failure on the existing anchors45..47. Reuse the
+exact raw fields, temporal anchor noise model and16 bootstrap noise realizations
+from the prior time_validation_frozen records. Factorial comparison:
+  pilot: ordinary pooled GCV / correlation-aware GCV;
+  refitted noise estimator: local quintic contrasts / temporal AR2 likelihood.
+The generating noise model is the same temporal anchor estimate in all arms.
+Across pilot choices, noise increments are identical but means differ. Within
+one pilot, both estimators see identical fields. Old-pilot results are immutable
+paired controls, not new runs. Freeze new-pilot fits before clean diagnostics.
+This is exploratory causal attribution of numerical-procedure behavior on known
+anchors, not a new confidence coverage claim.
+
+Then implement noise estimation, correlation-aware reconstruction and covariance
+normalization anew for each bootstrap and actual field. The weak banks/candidate
+library remain fixed to the default observed grid; only nuisance estimation is
+repeated. Evaluate whether fixed-pilot conclusions survive that full procedure.
+Freeze the exact algorithm/streams/sample sizes in a separate decision file
+before new coverage. Include independent new outer anchors for unconditional
+checks; many draws around one fitted anchor are not independent fitted anchors.
+Preserve numerical warnings, finite fits and all failures. No oracle corrections
+or dataset-specific cutoff changes enter the procedure.

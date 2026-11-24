@@ -1,0 +1,28 @@
+Domain-refactor U, live first-objective comparison
+Four scalar systems, three paired seeds, 5% Gaussian field noise and 50 NSGA-II epochs per search.
+Every pair used identical observations, native weak rows, WLS, dyad, and intercept handling.
+The VWSR selector guard recorded zero calls in all 24 searches.
+Exact recovery credits registered alternatives and counts an intercept as part of the support.
+
+System            WAPE hits   Weak hits   WAPE min distances   Weak min distances
+ode               1/3         3/3         [0, 3, 5]            [0, 0, 0]
+vdp               0/3         0/3         [1, 1, 2]            [2, 2, 1]
+wave              0/3         1/3         [2, 2, 3]            [0, 2, 2]
+ac                0/3         0/3         [1, 1, 1]            [1, 1, 1]
+
+WAPE retained a law in 1/12 searches and evaluated one in 12/12.
+The normalized compromise picked one in 0/12. Ignoring intercept presence gave 1/12 front hits.
+Median final front size 14.5.
+
+WEAK retained a law in 4/12 searches and evaluated one in 12/12.
+The normalized compromise picked one in 0/12. Ignoring intercept presence gave 4/12 front hits.
+Median final front size 19.
+
+Closest structure under the weak score improved / tied / worsened in 5 / 5 / 2 paired cases.
+Median paired total-time ratio (weak / WAPE) 1.13. Wall time includes shared-machine contention.
+Unweighted zero-estimated-noise folds 3/36.
+
+The minimum-discrepancy support was outside the registered laws in 12/12 searches and had a negative signed score in 12/12.
+The score of the same fixed relation took both signs over eight fresh noise realizations in 11/12 cases.
+Each recheck keeps its learned frequencies, coefficients, scales, noise correction and whitening fixed.
+These are repeat observations of each benchmark trajectory. Extrapolation to other trajectories and systems remains open.

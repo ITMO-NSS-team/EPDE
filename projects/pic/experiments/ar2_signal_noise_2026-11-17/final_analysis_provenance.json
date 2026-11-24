@@ -1,0 +1,12 @@
+{
+  "reason": "Reporting-only schema repair: fit_info.ar2 holds coefficient lists. Optional rho SD is absent; no parameter confidence was calculated.",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\prepare_final_analysis.py": "118e1e7b11bcd981ce727dd62b2ee02520179683a3666167ee5b5383b66fadc5"
+  },
+  "prior_source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\analyze.py": "8730936d95ee39d39e5ba9b776230b6b7b52c2fc921aa2f773741b5e495068d3"
+  },
+  "generated_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\analyze_final.py": "2a0072da31fd0c410e64115122c6c3a86bf38535de47593151d3e83412b69a84"
+  }
+}

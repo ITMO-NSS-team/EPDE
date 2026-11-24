@@ -1,0 +1,4 @@
+{
+  "independent_linear_operator_cross_gram_unbiased": true,
+  "within_replica_gram_noise_bias_verified": true
+}

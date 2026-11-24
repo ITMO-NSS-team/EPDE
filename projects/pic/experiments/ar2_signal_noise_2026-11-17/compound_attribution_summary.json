@@ -1,0 +1,93 @@
+{
+  "status": "COMPLETE",
+  "workers": 1,
+  "rows": [
+    {
+      "system": "pde_compound",
+      "seed": 39,
+      "bank": "local",
+      "cutoff": 1.495982636340663,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.3709925179542405,
+      "analytic_bias_cutoff_ratio": 0.24799252941981248,
+      "empirical_mean_score": 0.37805048724687007,
+      "oracle_mean_score": 0.0036967373859267748,
+      "mean_minus_bias_norm": 2.6028619687586345,
+      "oracle_mean_norm": 2.6028619687853043
+    },
+    {
+      "system": "pde_compound",
+      "seed": 39,
+      "bank": "broad",
+      "cutoff": 4.381985757048402,
+      "original_coverage_count": 3,
+      "oracle_correction_coverage_count": 252,
+      "analytic_bias_score": 7.5182320252432815,
+      "analytic_bias_cutoff_ratio": 1.7157134783357622,
+      "empirical_mean_score": 7.624846762619228,
+      "oracle_mean_score": 0.008381347410046189,
+      "mean_minus_bias_norm": 0.004898201639241781,
+      "oracle_mean_norm": 0.004898201645212782
+    },
+    {
+      "system": "pde_compound",
+      "seed": 40,
+      "bank": "local",
+      "cutoff": 1.5175527746065716,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.3811660513348196,
+      "analytic_bias_cutoff_ratio": 0.25117152939451326,
+      "empirical_mean_score": 0.3824805073434174,
+      "oracle_mean_score": 0.0034734214879513807,
+      "mean_minus_bias_norm": 2.462450484952601,
+      "oracle_mean_norm": 2.462450484975513
+    },
+    {
+      "system": "pde_compound",
+      "seed": 40,
+      "bank": "broad",
+      "cutoff": 3.9378050962285833,
+      "original_coverage_count": 0,
+      "oracle_correction_coverage_count": 254,
+      "analytic_bias_score": 7.749622959998693,
+      "analytic_bias_cutoff_ratio": 1.9680057216190976,
+      "empirical_mean_score": 7.717856148915523,
+      "oracle_mean_score": 0.0038560697501730016,
+      "mean_minus_bias_norm": 0.005359807272401265,
+      "oracle_mean_norm": 0.005359807275612723
+    },
+    {
+      "system": "pde_compound",
+      "seed": 41,
+      "bank": "local",
+      "cutoff": 1.4927010738969906,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.2631007464306624,
+      "analytic_bias_cutoff_ratio": 0.17625816114929563,
+      "empirical_mean_score": 0.26583902326151737,
+      "oracle_mean_score": 0.0032938723745513836,
+      "mean_minus_bias_norm": 2.6781591711507757,
+      "oracle_mean_norm": 2.6781591711726054
+    },
+    {
+      "system": "pde_compound",
+      "seed": 41,
+      "bank": "broad",
+      "cutoff": 4.462147332185531,
+      "original_coverage_count": 25,
+      "oracle_correction_coverage_count": 252,
+      "analytic_bias_score": 5.644016484007641,
+      "analytic_bias_cutoff_ratio": 1.2648655599731704,
+      "empirical_mean_score": 5.752660756999432,
+      "oracle_mean_score": 0.007251934386647663,
+      "mean_minus_bias_norm": 0.006158201829314875,
+      "oracle_mean_norm": 0.0061582018352808665
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\compound_attribution.py": "e2059be3eac90bf3006b7863b5b2fd95bbb5e856001708375dfab2832c95a69c"
+  }
+}

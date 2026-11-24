@@ -1,0 +1,157 @@
+{
+  "status": "COMPLETE",
+  "records": 45,
+  "equation_seed_cases": 60,
+  "measurements": 17280,
+  "pairs": 957,
+  "score_nonfinite": 0,
+  "calibration": [
+    {
+      "system": "ALL",
+      "axis": "fixed_D",
+      "pilot": "standard",
+      "pairs": 957,
+      "cases": 60,
+      "mean_coverage": 0.9394265935214211,
+      "equal_case_coverage": 0.9391446046384615,
+      "median_coverage": 0.9453125,
+      "median_sd_ratio": 1.022042030631911
+    },
+    {
+      "system": "ALL",
+      "axis": "fixed_D",
+      "pilot": "twice",
+      "pairs": 957,
+      "cases": 60,
+      "mean_coverage": 0.9396388453500523,
+      "equal_case_coverage": 0.939289900426713,
+      "median_coverage": 0.9453125,
+      "median_sd_ratio": 1.0221731057533676
+    },
+    {
+      "system": "ALL",
+      "axis": "refit_D",
+      "pilot": "standard",
+      "pairs": 957,
+      "cases": 60,
+      "mean_coverage": 0.9313691875653083,
+      "equal_case_coverage": 0.929047314248437,
+      "median_coverage": 0.9609375,
+      "median_sd_ratio": 1.128452113363482
+    },
+    {
+      "system": "ALL",
+      "axis": "refit_D",
+      "pilot": "twice",
+      "pairs": 957,
+      "cases": 60,
+      "mean_coverage": 0.9363979231974922,
+      "equal_case_coverage": 0.9345009945564934,
+      "median_coverage": 0.9609375,
+      "median_sd_ratio": 1.117330408381554
+    },
+    {
+      "system": "ALL",
+      "axis": "dyad",
+      "pilot": "standard",
+      "pairs": 957,
+      "cases": 60,
+      "mean_coverage": 0.6975901253918495,
+      "equal_case_coverage": 0.698900561373298,
+      "median_coverage": 0.90625,
+      "median_sd_ratio": 1.0393664975841956
+    },
+    {
+      "system": "ALL",
+      "axis": "dyad",
+      "pilot": "twice",
+      "pairs": 957,
+      "cases": 60,
+      "mean_coverage": 0.7018841431556949,
+      "equal_case_coverage": 0.6987453773882459,
+      "median_coverage": 0.9140625,
+      "median_sd_ratio": 1.0210084240419917
+    }
+  ],
+  "coefficient_calibration": [
+    {
+      "pilot": "standard",
+      "coefficients": 459,
+      "mean_coverage": 0.8852294389978214,
+      "median_sd_ratio": 1.0155405148281047
+    },
+    {
+      "pilot": "twice",
+      "coefficients": 459,
+      "mean_coverage": 0.8875782952069716,
+      "median_sd_ratio": 1.022654972998729
+    }
+  ],
+  "fronts": [
+    {
+      "mode": "fixed",
+      "criterion": "dyad",
+      "cases": 60,
+      "anchor_retained": 54,
+      "standard_mean_retention": 0.880078125,
+      "twice_mean_retention": 0.8958333333333334,
+      "benchmark_mean_retention": 0.900390625,
+      "benchmark_mean_size": 3.0966145833333334
+    },
+    {
+      "mode": "fixed",
+      "criterion": "complexity",
+      "cases": 60,
+      "anchor_retained": 54,
+      "standard_mean_retention": 0.9016927083333334,
+      "twice_mean_retention": 0.9069010416666666,
+      "benchmark_mean_retention": 0.9048177083333333,
+      "benchmark_mean_size": 2.7427083333333333
+    },
+    {
+      "mode": "refit",
+      "criterion": "dyad",
+      "cases": 60,
+      "anchor_retained": 54,
+      "standard_mean_retention": 0.9180989583333333,
+      "twice_mean_retention": 0.918359375,
+      "benchmark_mean_retention": 0.9252604166666667,
+      "benchmark_mean_size": 3.23984375
+    },
+    {
+      "mode": "refit",
+      "criterion": "complexity",
+      "cases": 60,
+      "anchor_retained": 54,
+      "standard_mean_retention": 0.9272135416666667,
+      "twice_mean_retention": 0.9264322916666666,
+      "benchmark_mean_retention": 0.9282552083333333,
+      "benchmark_mean_size": 2.8190104166666665
+    }
+  ],
+  "empirical_refit_over_fixed_sd_quantiles": [
+    0.9894166166940913,
+    1.7535684697959824,
+    15.361698645539061,
+    9752.792054848886
+  ],
+  "pilot_field_error_improved": 27,
+  "pilot_field_error_total": 60,
+  "numerical": {
+    "standard": {
+      "main_refits": 403200,
+      "indefinite": 3645,
+      "rank_deficient": 12288
+    },
+    "twice": {
+      "main_refits": 403200,
+      "indefinite": 3263,
+      "rank_deficient": 12288
+    },
+    "benchmark": {
+      "main_refits": 403200,
+      "indefinite": 6000,
+      "rank_deficient": 12288
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "prior_source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\coverage.py": "a7ce2412db3d853a66635292abf2ca5a036f82e590b5ec184e2bdc1a551dd84e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\run_case.py": "98c947aeeda58324323e80b360434be1799b135980cfc986a1d7f1ecceb386e2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\run_suite.py": "bfb5ef20198c327e32d3dbfa337c18fcca0d90f23f3e7a8791d33f348f2b7aff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\audit.py": "1e107dd122b16c94fcb0c3dc8ef88fbf904849d98cbcc150b9a56ed8e3c2821f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\analyze.py": "8d0140ff1c05b190d3890ec3d93113b14f48089b721e7b5f17273071a37bc1d4"
+  },
+  "generated_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\coverage.py": "cfa35e5bcc39350d05977c66f412dda9954de23a4341917cebe26d295628ad3c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\run_case.py": "fa6f992382b36a810c3669cbe6d9aeaf587b7431fe5bd40861a6119bd81c4835",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\run_suite.py": "13c3c95fbfe6f43b3a21b3540810affe492a6ae491098531c67f9a0fff981514",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit.py": "55f4980794ad9141a1c52544af9bbe955f4d4a82e28c0bd7aebca44276514e3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze.py": "c80db47d068db47cd353cd63df79853b41a60ddb08501388be89b9610ae7f134"
+  }
+}

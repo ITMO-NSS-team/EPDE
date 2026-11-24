@@ -1,0 +1,5 @@
+The initial suite stopped during imports on all69 jobs: local study.py collided
+with the inherited harness module of the same name. No anchor or coverage data
+were generated. Startup logs/processes and run_case_initial.py are preserved.
+Copy the local module to paired_study.py and import that unique name. Only module
+resolution and source-hash naming change; no statistical or evaluation setting.

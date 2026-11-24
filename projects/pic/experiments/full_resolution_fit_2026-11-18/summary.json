@@ -1,0 +1,198 @@
+{
+ "screen": {
+  "blocked_energy": {
+   "wls": {
+    "unresolved": 18,
+    "registered_lower": 91,
+    "registered_upper": 91,
+    "exact_lower": 79,
+    "exact_upper": 79,
+    "additions_lower": 119,
+    "additions_upper": 119,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.2724062648739655,
+    "retains_diffusion": {
+     "ac": 1,
+     "ac_zero": 0
+    }
+   },
+   "tls": {
+    "unresolved": 12,
+    "registered_lower": 95,
+    "registered_upper": 95,
+    "exact_lower": 83,
+    "exact_upper": 83,
+    "additions_lower": 135,
+    "additions_upper": 135,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.3390523490592213,
+    "retains_diffusion": {
+     "ac": 0,
+     "ac_zero": 0
+    }
+   }
+  },
+  "record_cross": {
+   "wls": {
+    "unresolved": 0,
+    "registered_lower": 96,
+    "registered_upper": 96,
+    "exact_lower": 86,
+    "exact_upper": 86,
+    "additions_lower": 157,
+    "additions_upper": 157,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.2724062648739655,
+    "retains_diffusion": {
+     "ac": 5,
+     "ac_zero": 1
+    }
+   },
+   "tls": {
+    "unresolved": 0,
+    "registered_lower": 98,
+    "registered_upper": 98,
+    "exact_lower": 85,
+    "exact_upper": 85,
+    "additions_lower": 142,
+    "additions_upper": 142,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.3390523490592213,
+    "retains_diffusion": {
+     "ac": 3,
+     "ac_zero": 2
+    }
+   }
+  },
+  "blocked_cross": {
+   "wls": {
+    "unresolved": 18,
+    "registered_lower": 91,
+    "registered_upper": 91,
+    "exact_lower": 79,
+    "exact_upper": 79,
+    "additions_lower": 112,
+    "additions_upper": 113,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.2724062648739655,
+    "retains_diffusion": {
+     "ac": 1,
+     "ac_zero": 0
+    }
+   },
+   "tls": {
+    "unresolved": 12,
+    "registered_lower": 90,
+    "registered_upper": 90,
+    "exact_lower": 78,
+    "exact_upper": 78,
+    "additions_lower": 119,
+    "additions_upper": 119,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.3390523490592213,
+    "retains_diffusion": {
+     "ac": 0,
+     "ac_zero": 0
+    }
+   }
+  }
+ },
+ "confirmation": {
+  "blocked_energy": {
+   "wls": {
+    "unresolved": 18,
+    "registered_lower": 93,
+    "registered_upper": 93,
+    "exact_lower": 81,
+    "exact_upper": 81,
+    "additions_lower": 112,
+    "additions_upper": 112,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.32320180513648444,
+    "retains_diffusion": {
+     "ac": 1,
+     "ac_zero": 1
+    }
+   },
+   "tls": {
+    "unresolved": 12,
+    "registered_lower": 96,
+    "registered_upper": 96,
+    "exact_lower": 84,
+    "exact_upper": 84,
+    "additions_lower": 137,
+    "additions_upper": 137,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.3679320767208738,
+    "retains_diffusion": {
+     "ac": 0,
+     "ac_zero": 0
+    }
+   }
+  },
+  "record_cross": {
+   "wls": {
+    "unresolved": 0,
+    "registered_lower": 97,
+    "registered_upper": 97,
+    "exact_lower": 85,
+    "exact_upper": 85,
+    "additions_lower": 151,
+    "additions_upper": 151,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.32320180513648444,
+    "retains_diffusion": {
+     "ac": 5,
+     "ac_zero": 4
+    }
+   },
+   "tls": {
+    "unresolved": 0,
+    "registered_lower": 103,
+    "registered_upper": 103,
+    "exact_lower": 88,
+    "exact_upper": 88,
+    "additions_lower": 143,
+    "additions_upper": 143,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.3679320767208738,
+    "retains_diffusion": {
+     "ac": 5,
+     "ac_zero": 3
+    }
+   }
+  },
+  "blocked_cross": {
+   "wls": {
+    "unresolved": 18,
+    "registered_lower": 91,
+    "registered_upper": 91,
+    "exact_lower": 80,
+    "exact_upper": 80,
+    "additions_lower": 109,
+    "additions_upper": 109,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.32320180513648444,
+    "retains_diffusion": {
+     "ac": 0,
+     "ac_zero": 1
+    }
+   },
+   "tls": {
+    "unresolved": 12,
+    "registered_lower": 92,
+    "registered_upper": 92,
+    "exact_lower": 77,
+    "exact_upper": 77,
+    "additions_lower": 112,
+    "additions_upper": 112,
+    "slots": 120,
+    "median_fullfit_angle_degrees": 0.3679320767208738,
+    "retains_diffusion": {
+     "ac": 0,
+     "ac_zero": 0
+    }
+   }
+  }
+ }
+}

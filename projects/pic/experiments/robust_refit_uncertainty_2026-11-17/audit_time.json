@@ -1,0 +1,1026 @@
+{
+  "status": "PASS",
+  "records": 101,
+  "totals": {
+    "hash_links": 1622,
+    "field_hashes": 976,
+    "score_replays": 1460
+  },
+  "rows": [
+    {
+      "status": "PASS",
+      "record": "time_screen\\ac_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ac_iid_seed36.json": "3bc1ff67a50a942afa7026d96181104dc663818bbfde2abcd4c8fbd226c800da"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ac_negative_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ac_negative_seed36.json": "9c31d721d08588ef4fac3eb031c0e3809c0a6a74674f949fa7cc62a456db9dbe"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ac_positive_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ac_positive_seed36.json": "eba5ae5e588998227840f0bfc22f661fe0a4664de93f1c3e2b7bbe255f836f7c"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\burgers_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\burgers_iid_seed36.json": "ca020b9e1e67f8fd85c0babc42463ea11d473b7fd155b0946bd0c34509e881f5"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\burgers_inviscid_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\burgers_inviscid_iid_seed36.json": "95374a0d156a15e5f5af85100e3b1658dc0ab2100ebc1fab1fe8a086e7c12ffa"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\duffing_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\duffing_iid_seed36.json": "6eb19bbb084609a6864c6cd1749433890a3c9daaa42bf4bd260711ded50a6576"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\kdv_cossin_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\kdv_cossin_iid_seed36.json": "25574ee998807f3da4579a73e4d9b91d1f955362a04473059d819f6f19c9bb10"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\kdv_cossin_negative_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\kdv_cossin_negative_seed36.json": "146b4aa830de48230bf985fe9f9b426a9280f286a9eba506b7647a751021bc68"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\kdv_cossin_positive_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\kdv_cossin_positive_seed36.json": "24487184a11db9eae4d7482e960587ed590f86214b78b1a3ce4d3317f2faf582"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\kdv_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\kdv_iid_seed36.json": "c9c6c88c1f0885e751649dd8f751bf17d398deff6324305b812c1b96cb3d6766"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ks_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ks_iid_seed36.json": "9d6c76368ecf5ae2eb75f874ac2343e229c3521f0b471a4eb90fb98204ca7037"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ks_negative_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ks_negative_seed36.json": "dd2cba01ed2eaec583e8d2928878b0e49798b6166caca22eb5c4c97604c9176b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ks_positive_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ks_positive_seed36.json": "35e74b166bb85753457ac1b8480dcdc7366b0e66c83e9dbfa7f8f9939bd921b6"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\lorenz_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 3,
+      "score_replays": 6,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\lorenz_iid_seed36.json": "cb90ce941e1b585418f4206986669d34905bdd9962c365e5fcdd65024f7eabda"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\lv_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 2,
+      "score_replays": 4,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\lv_iid_seed36.json": "19cc43df09695623fdd7d02d4ed499522eb86b758673350f60931a5abc8467c5"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ns_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 3,
+      "score_replays": 6,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ns_iid_seed36.json": "22aa00c7c822b19599eb4288de6d134982141713921838de1435d0ff31a522b8"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\ode_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\ode_iid_seed36.json": "033f7873d4a2dbeedec316f5ec1b3b9ca7aeddc814108df9c5059600462aef5d"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\pde_compound_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\pde_compound_iid_seed36.json": "6aa845e949bd304eb3db113b00ee8e831df006f3a2df5de47071519d5ed8d9b5"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\pde_divide_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\pde_divide_iid_seed36.json": "584f732f5effa4511a63b3101d5f3f39900dd3630defb344beab40e8d25acd36"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\vdp_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\vdp_iid_seed36.json": "6943fa44c5860319d513c42bb425b615c99edc3b414cede6e56c87f4b9e340f4"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\wave_iid_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\wave_iid_seed36.json": "4405d026fff7a7da8a25bcc4df1b6c3f13f1b2233231167c3b84886a384dcc7d"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\wave_negative_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\wave_negative_seed36.json": "138c4d33cc8dd5be00f055cae99a9aeabb7f39cc036275db84b05a0ae2ab199f"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_screen\\wave_positive_seed36.json",
+      "hash_links": 16,
+      "field_hashes": 1,
+      "score_replays": 2,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_screen\\wave_positive_seed36.json": "fc612e2e4b7ad6e2e5f0c9da8060cb4612a8699cfa55f44ced25ceccea752172"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_iid_seed45.json": "52930277c7b25c7b8ad3ab364d6af2d39b2375357468e42835f21ac63daa6ba8"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_iid_seed46.json": "f698097e26cc01df27c0cc89e6300fde8b34bd0d867214ce4904932771fad8c3"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_iid_seed47.json": "e2ff9d6761d096afcb2e89b6289a859cc3135f3e3a653225dff9bce6e09c252b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_negative_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_negative_seed45.json": "ef9702b3dfed519319e18131b3d9a79bc895ab4b93d3839af2063fc37db49212"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_negative_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_negative_seed46.json": "4914197a955d9315dc2e9819830fb1ab9647edc67ad810d18cdcd7dc31310bf2"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_negative_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_negative_seed47.json": "6857f1cf5391d2a3fe999b92297894a7d6d230ce9126e8e322b951b9da859ff1"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_positive_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_positive_seed45.json": "e2d8b76e8d33f831d1524b30d59fa216cb9309ac8150df377da013059c687113"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_positive_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_positive_seed46.json": "c09b2adeda4e401fa131a9a35942852134438287a992dc1744feb3eecb5ce84a"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ac_positive_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_positive_seed47.json": "0a57f2c21a4c7925ed525ff3caeadda52382d736243370f83c55bb960c56cde3"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\burgers_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_iid_seed45.json": "985df18a37172c15462495d2f18e9ac21ea633142a374c3202af107d3c65d8eb"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\burgers_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_iid_seed46.json": "2b9b8d938aa48591c9b9fddfb03aa9c2a4238b69705ea3dad91929d9036f0cd8"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\burgers_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_iid_seed47.json": "a10ae967a4d68c0712af35fbeb7f4791449b43f3f88994ed8e52579cc73f0b39"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\burgers_inviscid_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_inviscid_iid_seed45.json": "3a54adca35ecb15659e7feab06b88196fda75fe2760e1c77e831027fe896638e"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\burgers_inviscid_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_inviscid_iid_seed46.json": "0a871fc8fd2aeddb6710e1074f78819036702c368b96d47b02b951e20aa8ac2f"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\burgers_inviscid_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_inviscid_iid_seed47.json": "206dbbc136aa95f6fdafaeb804039118202c1931f6a787a32a66c00097e9cbdb"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\duffing_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\duffing_iid_seed45.json": "9719eb0181e9cb9a28e7b32fe4372f8daab568d6388d2acfecbe0da26509014a"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\duffing_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\duffing_iid_seed46.json": "0429c9316b5bda9b5b041c52f8d9631f98cb582b7cbc88732daf32fced8a72ff"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\duffing_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\duffing_iid_seed47.json": "801762d66be0e791c235478d8869ca747eecb1b743d56c76becf05a5da796ac5"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_iid_seed45.json": "74832237ab1c7be7a4ad7d4a4baafe66516ce408cc9742317d17fe0181fbf5e0"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_iid_seed46.json": "777ea6fa337c3ab5d395ce40cc76d2e518782bb73a7b0cfbb3e699f36e926bc4"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_iid_seed47.json": "ce0418eda8881122d731c784f197f47c9ff267547c10afc0c0cc3c86c5931be6"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_negative_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_negative_seed45.json": "814cfcdb9b0e30720740ece720efaedc7247c5fb9dc252faa3ab9a70b972ac73"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_negative_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_negative_seed46.json": "baf1a6e7cb39c3a0f288fe06aba8a7065752a7c1f5aade4eebad9da371a16672"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_negative_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_negative_seed47.json": "b24f2d501ec7dd4b5b6eb73047381ecec3d1241ce2948b7b9bd9c94268548781"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_positive_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_positive_seed45.json": "8ccb15a79443334d1301d0a95dd73f3e6b5ab307831faee0ad46070341da78ee"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_positive_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_positive_seed46.json": "487fbd6a2c86d3efead7de5cd476d128b80d5d0a6b7191e672b70ed100ee98b0"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_cossin_positive_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_positive_seed47.json": "e68081b4844b37fb1a7e73f68424bf48a869ff34b329a97dd928872d17e576ce"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_iid_seed45.json": "98e52b1910d22d6b8bda1f28d6e66d0c627ed76c08c198da8341a0814c9a27c4"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_iid_seed46.json": "45bccf1b8acf39be61e4c15a561ca0da9f3b32ac703125bd757976337bb0b619"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\kdv_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_iid_seed47.json": "0b0b804cc714dbd91b185ae57d56234adcd1a8c433df230b0d69da3314623d79"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_iid_seed45.json": "3149f2b7cca9e387bb6cc3b9f8bfb3909df6fa3049df3581dd78499d80a53747"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_iid_seed46.json": "8da6cde197249966a4b3dd6cf62d85b13d46793eb077e05325bb028b7ff4e57d"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_iid_seed47.json": "98cd858b13dab8cc6bfcf81ca7f538f32ac343ad32b94d4db9bd3ef96ccf35b7"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_negative_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_negative_seed45.json": "db392e747ede26554fdc10d0ae8b816a2898047bdb13f6331dd303ee1935e226"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_negative_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_negative_seed46.json": "691c4467b76499d5c6ba108783ff67ef9ad7c978118f0ec0c2ec7ed29f8f147b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_negative_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_negative_seed47.json": "9023753bcb41dc2d43c3de4cd9feb25793f8409460d03d3e8ff4bc73f3cc6622"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_positive_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_positive_seed45.json": "20a980e381d1ab90d42b4278d3970b98117e2f585ec76423dd09609482ff3847"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_positive_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_positive_seed46.json": "ce8411b269f0fd0b5326c4d50e53dd450c1e2d6a85e97321acddb37fcc823b7f"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ks_positive_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_positive_seed47.json": "27aff54167451f7b2f1928b80afdbb4dc50b078fa83422ede0c1317472ed1702"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\lorenz_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 3,
+      "score_replays": 9,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lorenz_iid_seed45.json": "f86cbb2e051eda30b830445dff5330c68ef86bb8c08ec01f4af70d48e0299af7"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\lorenz_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 3,
+      "score_replays": 9,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lorenz_iid_seed46.json": "0f419ecee3ae1ff262b5b4ff65c603d71bc8b04a6a52965b1a137cc3fb7114f8"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\lorenz_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 3,
+      "score_replays": 9,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lorenz_iid_seed47.json": "63c9d5102b46e9328c40c063c6a0456db3459e65ad3656e34a6ec5d58354dde1"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\lv_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 2,
+      "score_replays": 6,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lv_iid_seed45.json": "13fe3e232f96cda88c72c5178f88e03bffbf0a85e032cac7b12f8c861d4f55d2"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\lv_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 2,
+      "score_replays": 6,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lv_iid_seed46.json": "ca51790e77abebd7c3987037cf65616ba3219974e9a7199645afc3a9f43a8e7f"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\lv_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 2,
+      "score_replays": 6,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lv_iid_seed47.json": "d416fd15b972be91e16a3a6576c891a4e393bcd0e70ceffc4268d27173390af4"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ns_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 51,
+      "score_replays": 105,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ns_iid_seed45.json": "a8dacd8b38c86f2846986e924e0897d83f892b7253fdebb101ba0f5172f10075"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ns_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 51,
+      "score_replays": 105,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ns_iid_seed46.json": "c9d291ea0be2e0bd24a8d983d0f19e389947885d238b246db6c8d58536a86285"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ns_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 51,
+      "score_replays": 105,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ns_iid_seed47.json": "243a5965d19ffcaa94f092bc546cdd5efe62f94b27b5077bc18261ab9f531e77"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ode_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ode_iid_seed45.json": "eab422909ebe79703ee2d7c6a53e0484004d03b8ba0c96708c286c102334e43c"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ode_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ode_iid_seed46.json": "3d66add811a839723e023dc54fc6f5707349579fc39f26437da4229b0d558d8e"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\ode_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ode_iid_seed47.json": "daf9498415c5de05b58520fa9a33acc3c8777415263be886cdbf989fc49adc7b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\pde_compound_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_compound_iid_seed45.json": "aa23642d186369eb8775945eaf9144f181560f5472fe4a74d994922c9f56d7f2"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\pde_compound_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_compound_iid_seed46.json": "ebbef8b82f187d3af3352a9da8d9290b68545980aa99d300b03d1de11e09b6b2"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\pde_compound_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 17,
+      "score_replays": 35,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_compound_iid_seed47.json": "ca62d84b748bab045ee6253c034d97a3da158bdc5b75fbd5994aa809b82fa37f"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\pde_divide_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_divide_iid_seed45.json": "4142490c2c7399e627163f18fc0a4c320c555c1f4620dd4a9e20700f4d3e7875"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\pde_divide_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_divide_iid_seed46.json": "457067fe890774781f4baee019c25057cf664e5a2c42189d9fcac29632454a68"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\pde_divide_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_divide_iid_seed47.json": "6ba7b26b5559d8be6082920276065af3ff2ebe333e98e3dd95b62bd237f6537b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\vdp_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\vdp_iid_seed45.json": "ba86455850d3372ffd8661906bed69f06d436494e1fcf92a6b43216b2f716a04"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\vdp_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\vdp_iid_seed46.json": "e3c471f482bda4c51261a6303d8dbdc1f0d39bc19d33a4e83d20580e7628856e"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\vdp_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\vdp_iid_seed47.json": "90188fa2d076671dc05c5b5ce6315068059730f98a0c9e5caaeb49bc99874ef0"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_iid_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_iid_seed45.json": "ecc465d28ac754768d97d7d14226afb202c6244fc35803d3bd830c9b1640463f"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_iid_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_iid_seed46.json": "9bb58f131a1467ce0371334a43134ac52ed2d60a4682461dd49c1293c4e5ed87"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_iid_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_iid_seed47.json": "6c1fb7ce83753920b33ce9914ee9fba82ba80d37939f1f075b4969f45c10e03a"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_negative_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_negative_seed45.json": "047a53c5e080cb4c6802ce929e2343cee84b3347a3256b91c9a9d9627083b51b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_negative_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_negative_seed46.json": "401a3744554a598c323734c3ada5ae74e067eef70cdd694c5e4f8bca70c3c53c"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_negative_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_negative_seed47.json": "f05b6424c54d715564f68d7b1ede69ee87a133b16077a9be61ecdcbdc2dd743e"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_positive_seed45.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_positive_seed45.json": "b651fc6ad57ef9b777a70befb707ab1d084e9741a6f34f05214a80db849f8b42"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_positive_seed46.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_positive_seed46.json": "8f6802d40df38f941856f02bb7b3b9e36160ba3de4fdc597e86e94dabe077bd2"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_validation\\wave_positive_seed47.json",
+      "hash_links": 17,
+      "field_hashes": 1,
+      "score_replays": 3,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_positive_seed47.json": "dbbfd09ee00b13b95f319e6b58f7db547eaec40239323fb4362a9044832abe34"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n1001_profile0.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n1001_profile0.json": "e301654b349f458d6d6e97e74aef3f6108c94857c9052d6c4c37cff316b216fe"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n1001_profile1.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n1001_profile1.json": "2e65efe0b532a84bbd623781b484f7631165ee9f748b635d9545eef7a6d64f7d"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n301_profile0.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n301_profile0.json": "6ddff8d53e45b2f02bc8387f6f84fa22a3174b9749e637cc30b260113624576a"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n301_profile1.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n301_profile1.json": "4a37173fa5e4d02e6f61a6adf2c558abce5d2ee9490de8054741b0ca8899dfbe"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n301_profile2.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n301_profile2.json": "cdf6808138f57f0bb8faff2bb82b0c846e4f822c93d8aa9541337bf4c468d2df"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n320_profile0.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n320_profile0.json": "44b73a1282a96c0e80173a5b424a8d832cdf50a5f10342bb868883c96aead379"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n320_profile1.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n320_profile1.json": "36b519e160245887667be6c0f499913b1c0b5272e8bb63c8eee25661cf37d096"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n320_profile2.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n320_profile2.json": "94e1265e78017031c63ae1c84973404f7fd0e01514ba024b53b2f4d97ef0bf7b"
+      }
+    },
+    {
+      "status": "PASS",
+      "record": "time_noise\\n1001_profile2.json",
+      "hash_links": 9,
+      "field_hashes": 64,
+      "score_replays": 64,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n1001_profile2.json": "006c4bc4b588398257c8eafc126ebb2306886eb1d85d86b567ba917c361a7924"
+      }
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time.py": "d6998b0da32afeee433d4371622e279f9eb09907855b0b7e6ab4059f44e543dc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time_available.py": "cf73b25565235e94506baee070b82fce97b1d1072016db92786291198613e576",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_followups.py": "c1be9f7f2658534a86296e3318f909e4bef5de60a2fbc9e5d92e458d5cad1259"
+  }
+}

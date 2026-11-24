@@ -1,0 +1,20 @@
+Implementation clarification after inspecting bootstrap warnings
+==============================================================
+The frozen protocol already says selected-fit warnings invalidate nominal
+numerical status and that draws must never be removed. Two spline refits in
+positive/402 (draws46 and76) selected p16 and hit rho=0.999999, the declared
+search endpoint. These are retained as boundary warnings, not clipped away,
+replaced, or re-estimated under a changed selection rule.
+
+Continue every predeclared calculation using ALL128 refits, including the
+continuous basic ellipse and all66 finite scenarios when mathematically
+defined. Those algebraic quantities and geometry remain useful diagnostics.
+For a case with any selected-fit warning, report nominal noise/weak-error
+coverage as unresolved (null), preserve the computed membership separately
+as diagnostic_coverage, and exclude its width from valid paired-width
+comparisons while counting it in the full12-case denominator. Do not claim
+that its computed bounded enclosure is a validated uncertainty result.
+No fitting, selection, cutoff, draw or noise-scenario rule is changed.
+
+This clarification is recorded before any downstream weak-error scoring.
+It implements the original warning rule; it is not a repaired estimator.

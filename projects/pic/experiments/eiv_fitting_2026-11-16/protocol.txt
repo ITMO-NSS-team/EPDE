@@ -1,0 +1,77 @@
+Fresh-seed raw weak errors-in-variables coefficient test
+Frozen before outcomes, 2026-11-16.
+
+Question: does iterative residual-covariance weighting improve coefficient
+estimation on AC and forced KdV while preserving wave and KS accuracy?
+This is a known-support coefficient experiment, not an evolutionary search
+or a new structural-retention benchmark. Fit all registered reference and
+equivalent equations in the existing candidate panel. Keep constants.
+
+Use the saved fields, 5% independent additive Gaussian noise, fresh seeds
+3, 4, 5. These seeds were not used in the preceding fitting/validation study.
+They are new noise records on the same trajectories, not new physical systems.
+Use the same three interleaved raw time groups and rotate the training group.
+The other two groups are used only for final signed cross validation. No fit
+selection is performed with validation or clean data.
+
+Freeze geometries from seed 0 of the earlier study, independent of these new
+records: local continuous windows from weak_fitting; minimum-q broad windows
+from joint_prediction_risk; common-interior minimum-q broad validation bank
+from variance_reduction. No noise-adaptive geometry is reselected here.
+For local fitting report both the existing dense windows and a natural-stride
+subset: retain every ceil(radius/stride)-th center along each axis. This
+removes heavily overlapping rows by geometry alone, without inspecting data,
+covariance eigenvalues or outcomes. Both ordinary and iterative fits use the
+same rows within each arm. Broad fits use every conjugate-paired real moment.
+
+Estimate each group's noise model and reconstruction from that group alone.
+Raw fitting uses the fixed natural-cubic map on the training group's own
+domain, with no extrapolation. Use the existing degree<=3 Gaussian contraction
+correction for nonlinear weak terms. A deterministic constant uses its actual
+weak column. Reconstructed fields serve as covariance pilots and separate
+baseline fits, not as observations in the proposed raw fit.
+
+Generate 512 joint operator draws around each training pilot with its estimated
+separable Gaussian noise model. Keep target/predictor and row correlations.
+Center the draws. For residual r(c)=b-Ac, compute C(c) as the empirical row
+covariance of delta_b-delta_A*c. Start at corrected-raw OLS and alternate:
+  c_next = argmin || C(c_previous)^(-1/2) (b-Ac) ||^2.
+Use column scaling, full-rank least squares, and the existing 1e-12 relative
+Gram-eigenvalue tolerance. C must be positive FULL rank at the same tolerance;
+do not remove null directions or add a tuned ridge. Report failures explicitly.
+Convergence: prediction change / (norm(b)+norm(A*c)) <= 1e-8, at most 100
+iterations. Save the trace. A nonconverged iterate is diagnostic only and is
+not counted as a successful fit. No damping or outcome-dependent restarts.
+
+This is a conditional covariance IRLS experiment inspired by weak-form
+errors-in-variables inference. It is not a faithful WENDy implementation,
+not an exact likelihood optimizer, and not a proven unbiased estimator.
+The pilot and noise parameters remain fixed through iteration.
+
+Controls on each bank/row set: uncorrected raw OLS, corrected raw OLS,
+reconstructed OLS, and reconstructed CLSM. Reconstructed CLSM uses the old
+system's 32/128 correction budget on fresh draws; it is recomputed, not copied
+from seed 0. Dense-local reconstructed CLSM is the baseline. Use common draws
+across banks. Do not choose whichever arm looks best for each system.
+
+Final validation uses the unchanged common broad raw score construction:
+128 TRAINING-group operator draws define one pooled row covariance shared by
+all fitted equations, normalized as in variance_reduction. This covariance
+is distinct from the candidate-dependent covariance used DURING fitting.
+Held-out groups supply the two corrected raw residuals. Keep signed products.
+Report ordinary and unweighted scores as diagnostics.
+
+After all fits and weights freeze, use saved clean fields to report:
+- residual energy on the SAME old seed-0 spectral clean bank for every method;
+- clean residuals on the new validation bank;
+- coefficient estimates and errors relative to registered coefficients;
+- clean-training and interpolated-clean-training fit floors.
+Clean fields are evaluation controls only (apart from generating benchmark
+noise); never use their coefficients, residuals or noise truth in fitting.
+
+Check residual-covariance algebra, known-covariance GLS, feature-unit
+invariance, constant preservation, explicit singular-covariance failure,
+no-extrapolation geometry, finite outputs, stored fits/source/input hashes,
+and the user's ODE_simple phase/energy identities. No equation solves, PINNs,
+clean benchmark regeneration, production edits, or commits. Parallel tests
+with one BLAS thread/process and below-normal Windows priority.

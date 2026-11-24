@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "gradient_checks": 13,
+  "max_robust_gradient_error": 3.5838554346412366e-11,
+  "synthetic_model": [
+    0.207674781344449,
+    [
+      0.4627513007525239
+    ],
+    [
+      3
+    ]
+  ],
+  "unit_polynomial_invariance": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\checks6.py": "b7e50d2bdf57e8dc62f111175db4b652fb0d27cf90d839541ad83abbbd2f447d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\protocol.txt": "7ebd247bbf0a9d88d0eee542cbfb4da625211a6decd142ef0baae463e71c8aa0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_protocol.txt": "aadeacf2a33dc4c68dd9a5d3b0a8e994129fb4f8f91d6b770a609104cb64198c"
+  }
+}

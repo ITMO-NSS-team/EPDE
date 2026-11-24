@@ -1,0 +1,1323 @@
+{
+  "primary_arm": "q0_white128",
+  "fitting": "joint",
+  "structural_changes": {
+    "q0_plain/baseline": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [],
+      "losses": [
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q0_plain/joint": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "gains": [],
+      "losses": [
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q0_white128/baseline": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": [
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q0_white128/joint": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": []
+    },
+    "q0_white64/baseline": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": [
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q0_white64/joint": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": []
+    },
+    "q1_plain/baseline": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 1
+        }
+      ],
+      "gains": [],
+      "losses": [
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 1
+        }
+      ]
+    },
+    "q1_plain/joint": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 1
+        }
+      ],
+      "gains": [],
+      "losses": [
+        {
+          "system": "ac",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 1
+        }
+      ]
+    },
+    "q1_white128/baseline": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": [
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q1_white128/joint": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": [
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q1_white64/baseline": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": [
+        {
+          "system": "ns",
+          "seed": 1,
+          "slot": 0
+        }
+      ]
+    },
+    "q1_white64/joint": {
+      "failures": [
+        {
+          "system": "ac",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "ac",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 0,
+          "slot": 0
+        },
+        {
+          "system": "kdv_cossin",
+          "seed": 1,
+          "slot": 0
+        }
+      ],
+      "gains": [
+        {
+          "system": "kdv_cossin",
+          "seed": 2,
+          "slot": 0
+        },
+        {
+          "system": "ks",
+          "seed": 0,
+          "slot": 0
+        }
+      ],
+      "losses": []
+    }
+  },
+  "diagnostic_option_accuracy_vs_baseline": {
+    "improved": 21,
+    "worsened": 7,
+    "unchanged": 32
+  },
+  "targeted_coefficients": [
+    {
+      "system": "ac",
+      "seed": 0,
+      "slot": 0,
+      "exact": [
+        0.0001,
+        -5.0,
+        5.0
+      ],
+      "terms": [
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "u",
+            [
+              [
+                "power",
+                3.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          0.0001481084004782951,
+          -5.07697102423799,
+          5.047596605010483
+        ],
+        [
+          0.00042642255408910617,
+          -5.184903506693806,
+          5.156288409968433
+        ],
+        [
+          -4.670789815856651e-06,
+          -4.988027816054365,
+          4.984662556364122
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "seed": 1,
+      "slot": 0,
+      "exact": [
+        0.0001,
+        -5.0,
+        5.0
+      ],
+      "terms": [
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "u",
+            [
+              [
+                "power",
+                3.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          3.680659944190137e-05,
+          -4.957695832527027,
+          4.981291828314201
+        ],
+        [
+          0.00020688223389622138,
+          -4.979834814618024,
+          4.974656307725878
+        ],
+        [
+          0.00022473677019418608,
+          -5.0517987585959245,
+          5.039412937279276
+        ]
+      ]
+    },
+    {
+      "system": "ac",
+      "seed": 2,
+      "slot": 0,
+      "exact": [
+        0.0001,
+        -5.0,
+        5.0
+      ],
+      "terms": [
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "u",
+            [
+              [
+                "power",
+                3.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          0.00020532613921060347,
+          -5.015962975375242,
+          5.012777439950962
+        ],
+        [
+          0.0002151166482356834,
+          -5.030161517404638,
+          5.003737107885327
+        ],
+        [
+          -4.242158736505938e-05,
+          -5.183089666253365,
+          5.114260746597539
+        ]
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 0,
+      "slot": 0,
+      "exact": [
+        -6.0,
+        -1.0,
+        1.0
+      ],
+      "terms": [
+        [
+          [
+            "du/dx1",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ],
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^3u/dx1^3",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "cos(t)sin(x)",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          4.0809914984867826,
+          -0.004562842792418792,
+          -0.16830166728292026
+        ],
+        [
+          -2.6239639246187383,
+          0.056663069432873595,
+          -0.3160889665895219
+        ],
+        [
+          -1.6983284467467918,
+          -0.14679118973641145,
+          -0.03230500406641228
+        ]
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 1,
+      "slot": 0,
+      "exact": [
+        -6.0,
+        -1.0,
+        1.0
+      ],
+      "terms": [
+        [
+          [
+            "du/dx1",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ],
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^3u/dx1^3",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "cos(t)sin(x)",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          4.3969355387075675,
+          0.0002169391882034136,
+          -0.16730922369760093
+        ],
+        [
+          3.576398658017109,
+          -0.06564494072541749,
+          -0.05853044280188909
+        ],
+        [
+          3.131669540148162,
+          -0.02673718238674509,
+          -0.14844358082316428
+        ]
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 2,
+      "slot": 0,
+      "exact": [
+        -6.0,
+        -1.0,
+        1.0
+      ],
+      "terms": [
+        [
+          [
+            "du/dx1",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ],
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^3u/dx1^3",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "cos(t)sin(x)",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          10.311539726070048,
+          -0.3033955849551008,
+          0.18363630306663817
+        ],
+        [
+          2.493766138485361,
+          -0.10640220266860771,
+          -0.06411944462035968
+        ],
+        [
+          -1.4778210239872174,
+          -0.334857715984995,
+          0.2005903762641767
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "seed": 0,
+      "slot": 0,
+      "exact": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "terms": [
+        [
+          [
+            "du/dx1",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ],
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^4u/dx1^4",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          -1.0000603735558744,
+          -1.0021948017292885,
+          -1.003828070305223
+        ],
+        [
+          -1.0005686728201206,
+          -1.0021328836525458,
+          -1.0009804623923046
+        ],
+        [
+          -1.0029541771439356,
+          -1.0005517857736967,
+          -0.9994586294641724
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "seed": 1,
+      "slot": 0,
+      "exact": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "terms": [
+        [
+          [
+            "du/dx1",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ],
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^4u/dx1^4",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          -1.000447027133187,
+          -1.0015408614749353,
+          -1.0032543474875704
+        ],
+        [
+          -1.0011184587333286,
+          -1.0016436451253572,
+          -1.0006523771530913
+        ],
+        [
+          -0.9992520603675618,
+          -0.999460967436079,
+          -0.9985664108803295
+        ]
+      ]
+    },
+    {
+      "system": "ks",
+      "seed": 2,
+      "slot": 0,
+      "exact": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "terms": [
+        [
+          [
+            "du/dx1",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ],
+          [
+            "u",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            "d^4u/dx1^4",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          -0.9979435441724255,
+          -0.999529042788516,
+          -1.0003783084354982
+        ],
+        [
+          -1.0017372398915563,
+          -0.9992135357430683,
+          -1.0011872682945904
+        ],
+        [
+          -0.9997062306440795,
+          -1.0022337602488172,
+          -1.0022760539810973
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "seed": 0,
+      "slot": 0,
+      "exact": [
+        0.04
+      ],
+      "terms": [
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          0.04817381921628753
+        ],
+        [
+          0.04366374106565009
+        ],
+        [
+          0.022899578486754116
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "seed": 1,
+      "slot": 0,
+      "exact": [
+        0.04
+      ],
+      "terms": [
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          0.016120822868603394
+        ],
+        [
+          0.02915936112281899
+        ],
+        [
+          0.048101887371644676
+        ]
+      ]
+    },
+    {
+      "system": "wave",
+      "seed": 2,
+      "slot": 0,
+      "exact": [
+        0.04
+      ],
+      "terms": [
+        [
+          [
+            "d^2u/dx1^2",
+            [
+              [
+                "power",
+                1.0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "coefficients": [
+        [
+          0.03737426049413656
+        ],
+        [
+          0.04364705341060321
+        ],
+        [
+          0.04650727707850496
+        ]
+      ]
+    }
+  ],
+  "margin_definition": "Competitor minus reference score; positive favors reference. Dyad-eligible unregistered candidates only for closest comparisons. These reference-pair margins do not replace equivalent-aware retention.",
+  "uncertainty_limit": "Conditional paired SD with fixed coefficients, weights, geometry and noise estimates; not calibrated confidence, a significance test, or fresh-seed replication.",
+  "ranking_limit": "Lowest validation score among saved reference fits is a ranking diagnostic. Using it for selection requires a separate final evaluation split."
+}

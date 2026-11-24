@@ -1,0 +1,18 @@
+Post-result attribution,2026-11-17. Fresh iid compound spectral models show
+zero broad operator coverage while the paired iid-family models do not.
+On its three fresh anchors33/34/35, retain ALL saved spectral calibration,
+whitening, pilot, cutoff and actual fields. Change only the actual-field
+Gaussian contraction correction to the injected covariance (oracle control).
+This is not a deployable repair and not an independent coverage replication.
+
+Replay both corrections for all256 actual fields; save operator scores and
+mean error matrices. For degree<=3 polynomial weak columns, the exact mean
+error under covariance misspecification is the assumed-corrected clean matrix
+minus the true-covariance-corrected clean matrix. Verify against Monte Carlo
+means diagnostically, with their sampling variability explicitly retained.
+Report its whitened operator score relative to the saved cutoff and coverage
+after oracle correction. A failure that remains is not assigned to mean bias.
+
+Also estimate the same spectral noise model on the exact injected anchor noise
+without the clean signal. This is an attribution estimate only; do not replace
+the saved raw model or calibrations. Record all source/input/field hashes.

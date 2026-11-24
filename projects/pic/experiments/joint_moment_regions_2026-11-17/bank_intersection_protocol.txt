@@ -1,0 +1,35 @@
+Exploratory follow-up after inspecting single-bank regions; no new fields.
+Use the same saved local/broad error Gram matrices and shared check draws.
+Set c_joint=95th percentile of max(local_operator_score,broad_operator_score)
+over the independent check draws. This calibrates both constraints together;
+do not intersect two unadjusted marginal95% regions.
+
+The exact joint region satisfies v^T A_local v<=0 AND v^T A_broad v<=0,
+where A_bank=G_observed-c_joint*S_bank. Every nonnegative mixture is a
+necessary condition. A positive-definite feature block in a mixture gives
+a bounded ellipsoid OUTER region, not the exact intersection. An empty
+mixture region certifies the intersection empty. Mixture parameters are
+computed from the observed matrices, never truth/clean fields.
+
+For each candidate, divide each bank's matrices by its positive
+G_yy+c_joint*S_yy target scale. Normalize feature units using the summed
+diagonals of those positive matrices. Choose lambda in[0,1] to maximize
+the smallest eigenvalue of the normalized mixture feature block, a concave
+one-dimensional objective. Use bounded scalar optimization and endpoints;
+verify against a101-point grid. Lambda is a mathematical boundedness
+certificate, not a tuned search penalty or assumed optimum for interval width.
+All resulting coordinate projections are conservative outer bounds.
+
+If no bounded certificate is found, inspect each single-bank negative
+eigenvector and1024 fixed-seed unit feature directions. A direction with
+strictly negative quadratic curvature in BOTH banks certifies an unbounded
+joint region; construct and verify a finite feasible witness on that ray.
+Absence of a witness remains unresolved. Do not claim rejection from an
+optimization failure. Constants and all full-panel candidates remain.
+
+Report joint operator-noise coverage, true-coefficient acceptance of the
+actual two constraints, bounded/empty/unbounded/unresolved geometry, explicit
+witnesses and projections. Adaptive mixture weights need not be resampled
+for the deterministic implication from the simultaneous two-bank event;
+do not call a fixed-mixture repeated-measurement calculation an adaptive
+pipeline coverage result. No clean-driven bank or noise-model selection.

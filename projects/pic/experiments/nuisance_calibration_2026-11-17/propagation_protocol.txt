@@ -1,0 +1,26 @@
+Frozen finite sensitivity probe of the continuous basic-bootstrap ellipse
+=======================================================================
+Apply to all24 new bootstrap fields, seeds264..271 x3 profiles. Frozen before
+their truth membership is evaluated. Use the basic empirical ellipse only as
+a prechosen sensitivity domain, not because of observed validation performance.
+Retain center, observed estimate and32 equally spaced angles on each of the
+half-radius and full-radius ellipse:66 points. The covariance square root is
+the symmetric eigenvalue square root. No clipping, removed points or tuning.
+This finite scan DOES NOT cover the continuum or certify robust coverage over
+the entire ellipse. It tests practical precision and exposes bad geometries.
+At each point, reuse the previous known-noise conditional128-field procedure,
+MC16 covariance, joint97.5% rank126 cutoff and RNG domain985802. Include both
+original guarded128-refit primary regions(studentized and fixed metric95%)
+in the finite union, so the actual primary feasible sets cannot shrink.
+Save corrected observed matrices, covariances, conditional Grams/scores and
+independent certificates. Preserve the full fixed library, constants and valid
+identities. Reference-support geometry is the reported diagnostic; it is not
+an adaptive selection criterion. Also retain the scalar Loewner compression
+as a paired precision comparator. No clean moments or exact coefficients enter
+construction or selection. Freeze all regions/cutoffs before clean scoring.
+Evaluate full-library error coverage separately for original methods, scalar
+envelope, and existence of a covering conditional point. The finite union
+includes original methods. Record reference-equation acceptance separately.
+Report all24 outcomes, unresolved cases, boundedness and outer enclosure
+widths. Neither finite scans nor this small outer cohort prove95% equation
+confidence coverage. No solver, production promotion or omitted failures.

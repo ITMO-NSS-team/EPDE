@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "records": 3,
+  "totals": {
+    "hash_links": 276,
+    "operator_scores": 6144,
+    "regions": 168,
+    "certificates": 84,
+    "matrix_replays": 90,
+    "refit_replays": 18
+  },
+  "rows": [
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed50",
+      "warnings": 0,
+      "result_sha256": "09967c75363177ebfcd720c46f6afa5383c092db443d2c11b4031b0a63b56736",
+      "hash_links": 92,
+      "operator_scores": 2048,
+      "regions": 56,
+      "certificates": 28,
+      "matrix_replays": 30,
+      "refit_replays": 6
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed48",
+      "warnings": 0,
+      "result_sha256": "e36399097a55c0621a852116604e69ffaa72eea7a2d644389114de0c76bf1ea0",
+      "hash_links": 92,
+      "operator_scores": 2048,
+      "regions": 56,
+      "certificates": 28,
+      "matrix_replays": 30,
+      "refit_replays": 6
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed49",
+      "warnings": 0,
+      "result_sha256": "b58b8a619ebaf9f68debb87b047905a050347c246ea14fe022a125c94224ecec",
+      "hash_links": 92,
+      "operator_scores": 2048,
+      "regions": 56,
+      "certificates": 28,
+      "matrix_replays": 30,
+      "refit_replays": 6
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time_pilot.py": "d3b55bc8220cabaeb737e6bb0cced25efe8003e99886a96542075738142a8fa0"
+  }
+}

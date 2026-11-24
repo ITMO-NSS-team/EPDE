@@ -1,0 +1,22 @@
+{
+  "system_runs": 12,
+  "equation_seed_cases": 12,
+  "old_local_retained": 6,
+  "infeasible_fold_arms": 0,
+  "hashes_verified": true,
+  "result_sha256": {
+    "wave_seed0.json": "aeffdd5679857ebc29129785ff95fd98526dc8b32f0df174b001e0308dc2fb4c",
+    "wave_seed1.json": "22359fbc966c4ab0919b669f056737c3d2864f14768e9a4ae6a295ea260802e3",
+    "wave_seed2.json": "66c8fddabdb69314ef9c420238c6caf310601f56020de7dd60cc3f00c07e1b52",
+    "ks_seed0.json": "b6fb2f5668f84729165cf74273512362234fe96b68651834863f166fdf118f42",
+    "ks_seed1.json": "9f9a44eb424efb459fc1a275711157c328098b958eb184c8dff74d9a35f0db38",
+    "ks_seed2.json": "bda1ec70b394b9b7296cec31957db2ae30edd8f828dbffa0636f72d5c8509f54",
+    "ac_seed0.json": "6d00c5d6b096c146163b83dfedc0619a91a415900b2d04e55f542e2032519bf6",
+    "ac_seed1.json": "5183a33f665a39d8ca886dd6416b0636784bfb7646244821e54e781e9456476f",
+    "ac_seed2.json": "8dc26e6c8d31866683524e075f75d3aa94c863ef9cf2705d964b47353e4e1ceb",
+    "kdv_cossin_seed0.json": "30c6bf4a7e5f5d913266197867f07b8a237491a1b22697e1db0075ca1ee126d8",
+    "kdv_cossin_seed1.json": "e316af436cd0e8b01227d36d2c6f442b5548c4b3a9d25f48eb7f77c21ab306aa",
+    "kdv_cossin_seed2.json": "8c4baa147b6a555140ae9e208a9b53ebf2650c7d8d3ab3a01413e217143309b0"
+  },
+  "max_whitening_identity_error": 6.123879181529901e-12
+}

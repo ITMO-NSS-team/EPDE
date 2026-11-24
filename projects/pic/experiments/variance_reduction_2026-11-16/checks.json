@@ -1,0 +1,14 @@
+{
+  "real_basis_isometry": true,
+  "feature_units_invariant": true,
+  "whitening_identity_max_error": 2.3314683517128287e-15,
+  "zero_covariance_explicitly_infeasible": true,
+  "constant_dc": 1.0000000000000002,
+  "constant_real_moments": [
+    1.0000000000000002,
+    0.792420888340043,
+    -4.066252215052446e-17,
+    0.05907563878736932,
+    -4.103117140754345e-17
+  ]
+}

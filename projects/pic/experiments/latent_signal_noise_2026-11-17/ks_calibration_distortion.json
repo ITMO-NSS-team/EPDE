@@ -1,0 +1,206 @@
+{
+  "status": "COMPLETE",
+  "independent_eigenvalue_check": "PASS",
+  "rows": [
+    {
+      "profile": "iid",
+      "bank": "local",
+      "cutoff": 1.13484274289612,
+      "min_actual_to_calibration_second_moment": 1.2553510909649954,
+      "max_actual_to_calibration_second_moment": 1.3035856943012138,
+      "original_score_quantiles": [
+        1.3242027756402166,
+        1.3763028830777266,
+        1.4548167084599506
+      ],
+      "oracle_score_quantiles": [
+        1.3248199030139933,
+        1.376076669094377,
+        1.4551408667438241
+      ],
+      "model": {
+        "u": [
+          0.0517014341113419,
+          [
+            -0.06467648043188559,
+            -0.0348506172772954
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "profile": "iid",
+      "bank": "broad",
+      "cutoff": 4.615436143685784,
+      "min_actual_to_calibration_second_moment": 1.046578404588167,
+      "max_actual_to_calibration_second_moment": 1.4723369575344902,
+      "original_score_quantiles": [
+        2.086539169933617,
+        3.6316251054120894,
+        6.3801430949439
+      ],
+      "oracle_score_quantiles": [
+        2.1256122791523873,
+        3.55518858501212,
+        6.474031401505373
+      ],
+      "model": {
+        "u": [
+          0.0517014341113419,
+          [
+            -0.06467648043188559,
+            -0.0348506172772954
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "profile": "positive",
+      "bank": "local",
+      "cutoff": 1.1212492931105342,
+      "min_actual_to_calibration_second_moment": 1.3525604812460275,
+      "max_actual_to_calibration_second_moment": 1.5785045500096353,
+      "original_score_quantiles": [
+        1.5720632285505147,
+        1.6371737463522809,
+        1.747520503851616
+      ],
+      "oracle_score_quantiles": [
+        1.5710777833202438,
+        1.637125621561701,
+        1.746820106386239
+      ],
+      "model": {
+        "u": [
+          0.049449604200816066,
+          [
+            0.3295608836319114,
+            0.319213497050208
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "profile": "positive",
+      "bank": "broad",
+      "cutoff": 5.303816283171718,
+      "min_actual_to_calibration_second_moment": 1.4587379423483022,
+      "max_actual_to_calibration_second_moment": 1.8402162967231221,
+      "original_score_quantiles": [
+        2.6159822184370403,
+        4.6202447088601595,
+        8.61596069598832
+      ],
+      "oracle_score_quantiles": [
+        2.6100201921529544,
+        4.545029951304253,
+        8.679443065481632
+      ],
+      "model": {
+        "u": [
+          0.049449604200816066,
+          [
+            0.3295608836319114,
+            0.319213497050208
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "profile": "negative",
+      "bank": "local",
+      "cutoff": 1.1179414571668087,
+      "min_actual_to_calibration_second_moment": 1.1856770750981536,
+      "max_actual_to_calibration_second_moment": 1.207660745814341,
+      "original_score_quantiles": [
+        1.2377180108730106,
+        1.2774178408358394,
+        1.3491052109785933
+      ],
+      "oracle_score_quantiles": [
+        1.2375643255339979,
+        1.2775567265937413,
+        1.3500059525588073
+      ],
+      "model": {
+        "u": [
+          0.052871306529812326,
+          [
+            -0.4450335823819089,
+            -0.42226611296273847
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "profile": "negative",
+      "bank": "broad",
+      "cutoff": 5.00769248866303,
+      "min_actual_to_calibration_second_moment": 1.0632017470129518,
+      "max_actual_to_calibration_second_moment": 1.431336267178894,
+      "original_score_quantiles": [
+        1.9477209757407115,
+        3.307812312157372,
+        6.129208024769279
+      ],
+      "oracle_score_quantiles": [
+        1.9538459881132781,
+        3.3391539241806587,
+        6.0967501009170535
+      ],
+      "model": {
+        "u": [
+          0.052871306529812326,
+          [
+            -0.4450335823819089,
+            -0.42226611296273847
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze_ks.py": "c0fe78d2180529255a4efdb5f3e3bf5e265ae4cc9c12d22ff1b2ad3fa1bf75c1"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_iid_attribution_seed36.json": "b96736f279cb42a1c2b0f3fccebeb7b3d1af36e04448a748390c43674a1608ab",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_iid_attribution_seed36.npz": "66d21de586d92654706f4d8a4eb8d89a0c230b39a177c091edf1470bcfcac3e2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_curvature_seed36.npz": "6dfaaabefaea7e7560bacaa0e8aa00e0bf1e576042d0aecbaa8f79fd4f00d576",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_curvature_seed36.json": "6b7aa03bfd4f3337a142800f8f5c9640cb85d3f93da638676d886f65ae52804b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\frozen\\ks_iid_curvature_seed36.json": "18fbc0a91f914c01f9f8b20eec5f71bea8f3e853c4cc5a2f8128b1566bd7fdbd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_positive_attribution_seed36.json": "7ab5c7fdae822d763466eff798150b150826cce88df4b98bdde27390ac55a81e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_positive_attribution_seed36.npz": "353df6726f34357603414733682a3c493a6a3d1e70b6d2be7a0e9ef3725dee67",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_curvature_seed36.npz": "f101986d862c7d1d5d55176e4f3dd1425581e4fa4b838339e7c74b02a7eaef08",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_curvature_seed36.json": "ece33efdf0749bf1ff01c58024c05e5f580c0f67dad69912b83f1e3b16c2d02e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\frozen\\ks_positive_curvature_seed36.json": "daef2bdc22e79df912a2dc0ab42d3e86f0c16023aa681ce6d020690a98a6ed0f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_negative_attribution_seed36.json": "1e952ede5259c76510dce5ba385b3c37155fd5d0579ded71423a05b87d16af2a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_negative_attribution_seed36.npz": "800252e2c6a9d3ec23afbf43ec64ab69956dfb312cde47b2f478bafc698e7da5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_curvature_seed36.npz": "dbfabc50e0e1e259ee6ad21c76fd9ae190507240a3275c90d51482270e60b462",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_curvature_seed36.json": "4652d737bf7f6bb54291d5bcb59ef6586bd4d299e24a69c57efa5556afc6092a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\frozen\\ks_negative_curvature_seed36.json": "be722e13a30f2b4ff689daf6626d10b376927f08965532cbb76624e32e1ba602"
+  }
+}

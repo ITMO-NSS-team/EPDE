@@ -1,0 +1,21 @@
+{
+  "cases": 45,
+  "equation_seed_trials": 60,
+  "unchanged_valid_retention": 53,
+  "primary_comparisons": 990,
+  "registered_comparisons": 1539,
+  "primary_point_dominators": 21,
+  "primary_point_dominators_95_below_zero": 0,
+  "primary_point_dominators_worse_on_clean": 10,
+  "unregistered_primary_point_dominators": 16,
+  "unregistered_dominators_worse_on_clean": 7,
+  "wrong_dominators_95_below_zero": 0,
+  "dyad_eligible_primary_comparisons": 116,
+  "eligible_intervals95_exclude_zero": 67,
+  "eligible_definite_sign_opposite_clean": 0,
+  "primary_oracle_gap_coverage95": 865,
+  "exact_controls": 60,
+  "exact_control_coverage95": 59,
+  "max_frozen_score_scaled_error": 9.470468929472647e-10,
+  "calculation_seconds": 1065.7859999001375
+}

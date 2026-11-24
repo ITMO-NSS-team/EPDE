@@ -1,0 +1,9 @@
+{
+  "cases": 12,
+  "hashes_verified": true,
+  "finite_scores": true,
+  "source_sha256": {
+    "run_replica.py": "562653ef1e2dbd544a6cb73f829a4fcabdf3e41234443d8b68cf8f65f227c984",
+    "summarize.py": "e692d7249e6de5758aacb7618608117237046ad3b39abc4f2ad5b0ae9f674a9e"
+  }
+}

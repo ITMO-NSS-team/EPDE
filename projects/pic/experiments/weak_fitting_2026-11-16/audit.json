@@ -1,0 +1,17 @@
+{
+  "cases": 45,
+  "equation_seed_cases": 60,
+  "max_frozen_score_scaled_difference": 6.720798900045066e-10,
+  "same_panel_and_scoring": true,
+  "source_hashes_match": true,
+  "source_sha256": {
+    "complete_quadrature.py": "7ed5a367e67dea5dd72a2db83ccd7a98621228fcad4fe9ebe5c1453d56f70155",
+    "diagnose.py": "bf0967224e8c34c381fa1e26e02f0a04f8fc98bc3257ef72efc4bae5769a70f7",
+    "numerical_checks.py": "7a3f3257e4acae29a17f50adee689a17a19e99977008374706349e26a0836631",
+    "probe.py": "3b66e9791a6178554415dcf12f06adc08b89a6dc78fc607a6aaca1af38c444f9",
+    "run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "run_fitting_raw_probe.py": "3c4f06c3f3445f4857908ccf2192e1b7933c94cc38b392e9453088d56c8bad0c",
+    "summarize.py": "2ce30622f9a429c153e1c23ee61dd53c822afdb0869c4f9f3a6a491eebb08bf3"
+  },
+  "calculation_seconds": 385.45689250016585
+}

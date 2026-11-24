@@ -1,0 +1,59 @@
+Exploratory noise-model repair, frozen after the primary45-record results.
+Reuse all15 anchors24/25/26 and actual measurement seeds; paired follow-up,
+not independent replication. The benchmark's known noise FAMILY is iid
+Gaussian with a common relative amplitude across variables. Do not use
+the true 5% amplitude or clean field to estimate it. This assumption is
+explicitly narrower than generic colored/heteroscedastic measurement noise.
+
+Freeze each variable's observed-anchor standard deviation as its unit scale.
+Reuse the primary anchor's selected differencing orders, ignoring its AR
+correlations. Estimate one common relative variance by pooling sums of
+squared order-k differences divided by binomial(2k,k) and the squared
+variable scale; divide by total number of differenced entries. This is a
+specified noise-amplitude estimator, not an uncertainty calibration factor.
+Omit axes with selected order0 and fail explicitly if none are usable.
+
+Use the same native banks, pilot and registered exact coefficient queries.
+Generate256 calibration and256 independent check fields with iid noise
+at the estimated amplitude; RNG domains830140/830141 and the same raw
+standard-normal innovations as the original study. Reuse256 actual fields.
+
+Compare two iid controls per bank:
+1. iid_fixed: Gaussian correction and noise variance use the fixed anchor
+   amplitude, as in the primary conditional region.
+2. iid_studentized: re-estimate amplitude on EVERY simulated/actual field,
+   apply Gaussian polynomial correction with that estimate, and divide
+   each residual error by its own estimated relative amplitude. Calibration
+   variance is computed from those studentized errors; check quantiles
+   and actual errors use the same transformation. No independent-row or
+   chi-square approximation, no assumption that nonlinear variance scales
+   exactly with amplitude. Empirical shared-field calibration is retained.
+
+For all banks, report noise coverage, zero-residual acceptance, coordinate
+coverage, standardized error shifts, fitted amplitude and sampling spread.
+The studentized point uses the observed residual divided by the observed
+amplitude. For diagnostic noise errors subtract clean/pilot moments before
+dividing by the respective draw's amplitude. Constant terms are kept.
+
+Freeze amplitude/unit scales/orders, correction model and calibration
+hashes before reading clean diagnostic moments. Estimated correction with
+a random amplitude is not claimed exactly unbiased; its residual mean
+shift is part of the measured bootstrap distribution. Existing identities
+and degree<=3 corrections are unchanged. There is no coefficient-map
+bootstrap or candidate integration. No production promotion from these
+paired results; correlated-noise and independent replication remain separate.
+
+Numerical preflight addendum: a matrix-space correction-rescaling shortcut
+failed strict direct-operator replay for wave seed24 by4.95e-11 in one
+moment (relative6.17e-12). Archive all initial attempts in iid_initial and
+rerun ALL45 paired cases with direct field-level correction for every
+draw. Share only deterministic covariance maps, and require exact replay.
+Do not relax tolerance or alter statistical choices.
+
+Independent confirmation, fixed before the corrected final runs: apply
+the identical iid_fixed and iid_studentized procedures to ALL15 systems
+at fresh anchors27/28/29, with the same256/256/256 draw counts and seed
+domains. Actual seeds1200000+1000*anchor+b are disjoint from the first
+cohort. These45 records require no prior AR study arrays; freeze estimates
+and calibration before evaluating clean diagnostics. No per-system method
+choice or change of amplitude estimator is allowed from confirmation data.

@@ -1,0 +1,28 @@
+Navier–Stokes viscosity deletion on held-out weak measurements
+18 November 2026
+
+The training noise correction restored the reference equation on the three known failures. With the original local-plus-time training windows, it increased the discrepancy margin in favor of the full equation on every fresh seed, and the full equation won on 11 of 12. The historical broad space–time training windows with the same correction gave 12 wins. These comparisons use the target-invariant coefficient fit and discrepancy throughout.
+
+The benchmark contains the viscous term 0.01 times the second derivative of u along x2. The competitor drops that term and refits every remaining coefficient, including the viscosity in the other direction. Each seed supplies three training rotations. Within a rotation all methods use identical held-out measurements, whitening, and normalization. Positive D(drop) minus D(full) favors retaining the term. Each new seed adds 5% iid noise to the same stored trajectory.
+
+Training windows        Noise correction   Known wins   Fresh wins   Fresh median margin   Fitted viscosity
+Local plus time         off                  0/3          8/12           1.24e-5               0.01895
+Local plus time         on                   3/3         11/12           8.06e-5               0.01109
+Broad space–time        off                  3/3         10/12           4.37e-5               0.02002
+Broad space–time        on                   3/3         12/12           8.69e-5               0.01036
+
+The viscosity column gives the median across fresh seeds of their three-fold median, re-expressed with the time derivative coefficient set to one for reporting. The true benchmark value is 0.01. In the corrected local-plus-time arm, seed 72019 still preferred the reduced equation (margin -2.76e-5). Corrected broad windows reversed that comparison (+4.35e-5). The smallest fresh margin for corrected broad windows was +3.95e-5.
+
+Controls
+
+Adding x1, x2, or both spatial modulations to the existing local-plus-time block without the training correction retained the term on 8, 8, and 7 of the 12 fresh seeds respectively. With correction all three retained it on 11/12. The historical broad windows differ in footprint, time-frequency range, and block weighting, so their additional gain cannot be assigned to spatial modulation alone. The directed historical coefficient fit on the same corrected broad windows also won 12/12 with a median viscosity of 0.01041.
+
+The correction estimates reconstruction bias and subtracts the estimated moment-error covariance using 128 perturbations of the training group's fitted noise model. Across all six geometries it increased the held-out margin on every fresh seed. Subtraction can produce an indefinite training Gram. For example, 37 of 72 corrected broad candidate-fold fits had a negative minimum eigenvalue on the fresh seeds. This experiment used the smallest algebraic eigenvalue and checked every fit for a unique numerical direction. Performance under noise models other than the tested 5% iid model remains open.
+
+The uncorrected local-plus-time scores matched the prior experiment to 4.0e-17. The directed corrected broad coefficients matched the existing fits to 3.0e-14. Reversing term order and rescaling their signed units changed the implicit projective directions by at most 7.8e-15 radians. Independent evaluation from the cross-product matrices and stored coefficients verified 1,170 fold scores, 195 per-seed contrasts, and 26 aggregate rows, with maximum score difference 6.7e-16.
+
+This is a fixed pair on one trajectory. It establishes sensitivity to this deletion for these noise draws. Full-panel Pareto survival, false retention of extra terms, and uncertainty in choosing among competing laws require a separate experiment. A cross-system comparison can keep the training correction fixed and use a measurement design chosen without access to validation outcomes or a preferred equation target.
+
+Reproduction
+
+Run holdouts.py, training.py, compare.py and verify.py in order with the EPDE environment. The file protocol.txt records the predefined arms and seeds. Every contrast is in paired.csv, every fold coefficient and score in fits.json, and the aggregates and checks in summary.json. The two archive directories preserve the training and held-out measurements and their hashes.

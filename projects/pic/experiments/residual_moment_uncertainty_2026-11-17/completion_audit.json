@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "hash_links_verified": 4416,
+  "main_records": 45,
+  "paired_iid_records": 45,
+  "independent_confirmation_records": 45,
+  "paired_contrast_records": 12,
+  "wave_regions": 12,
+  "remaining_oracle_cases": 3,
+  "all_final_processes_successful": true,
+  "final_initial_attempts_excluded": true
+}

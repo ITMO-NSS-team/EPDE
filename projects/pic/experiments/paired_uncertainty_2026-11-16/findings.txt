@@ -1,0 +1,102 @@
+Paired discrepancy uncertainty: all 15 systems, 3 seeds, 5% noise
+Completed 2026-11-16. Solver-free; coefficients, dyad and test banks fixed.
+
+The remaining failed comparisons are small relative to modeled evaluation
+noise. This supports testing a lower-variance discrepancy representation;
+it does not establish a new recovery result or validate a confidence rule.
+
+All 45 system runs completed, covering 60 equation-seed cases. Replayed score
+values reproduce the previous full continuous-bank calculation to a maximum
+scaled error of 9.48e-10. Retention is unchanged at 53/60. No interval or
+standardized margin was used to change the Pareto front.
+
+Across the seven previously failed equation-seed cases there are 16
+unregistered candidates dominating the primary reference. Every one has
+a conditional 95% paired model interval crossing zero. Their absolute
+standardized advantages range from 0.024 to 1.407. Seven of these 16
+competitors actually have worse fixed-fit clean residual scores.
+
+There are five additional primary-reference dominance comparisons involving
+registered equivalent laws. Those are not discovery failures. In total all
+21 primary-reference dominators have intervals crossing zero; do not count
+the five registered alternatives as false laws.
+
+Examples (competitor minus reference score; negative favors competitor):
+
+  Trial / competitor             Observed gap      Paired SD       |gap|/SD
+  KS seed 0, add u^2              -4.5403e-6        1.4893e-5          0.305
+  AC seed 0, drop diffusion       -1.3748e-4        9.7740e-5          1.407
+  compound seed 1, drop (u_x)^2    -2.6651           7.3040             0.365
+  compound seed 1, drop u*u_xx    -3.3558          11.0910             0.303
+  compound seed 2, drop (u_x)^2    -0.2055           8.7022             0.024
+  forced KdV seed 2, drop u_xxx   -13.1394         119.0515             0.110
+
+The compound seed 2 dropped-term candidate is worse on clean data by 0.1344.
+The KS added-u^2 candidate is worse on clean data by 1.570e-6. Their noisy
+advantages are not precise enough to establish that ranking under this model.
+
+Pairing is essential. For KS seed 0, treating candidate scores independently
+would give SD 0.2163 instead of 1.489e-5: the large common residual noise
+cancels in the candidate difference. For AC seed 0, independent SD is 0.001017
+versus paired 0.00009774, a factor of 10.4. Independent rotation errors also
+omit covariance because each raw group appears in two held-out products.
+
+This is not merely a model that makes all comparisons ambiguous. Of 116
+primary comparisons whose competitor has no larger dyad, 67 have model
+95% intervals excluding zero. All 67 favor the reference, and all have the
+same sign on the fixed-fit clean control. The other 49 remain unresolved by
+that descriptive interval. These are correlated, reused comparisons, not
+116 independent trials or a validated multiple-testing procedure.
+
+Calibration remains incomplete. Only 865/990 primary comparison intervals
+contain their clean-oracle gap (87.4%, below the nominal 95% label). Exact-law
+control intervals contain the clean score in 59/60 equation-seed cases.
+Wave seed 2 misses: noisy exact-law score 0.02126; interval [0.001064,0.03920];
+clean score 2.45e-8. These outcomes warn against treating the local model
+intervals as calibrated discovery confidence.
+
+Forced KdV exact-law scores +1996.4, +1458.8, -1337.7 have conditional model
+SDs about 2428.8, 3803.9, 2084.3. Their intervals contain the near-zero clean
+score, but are far too broad to deliver useful precision. Adding error bars
+has diagnosed the problem; it has not repaired the discrepancy estimator.
+
+Covariance-draw sensitivity on the 16 failed-case dominators: using 64
+instead of 128 bootstrap covariance draws changes SD ratios to 0.943-1.105.
+All 16 intervals still cross zero. The finite Monte Carlo and noise-model
+assumptions remain; this check only addresses one numerical sensitivity.
+
+Method and limitations:
+- 128 reconstructed bootstrap operator draws per raw group; 512 joint
+  symmetrized empirical perturbations, sharing group indices/signs across
+  candidates and rotations. All cross-operator/moment correlations retained.
+- Cross-products include linear and noise-times-noise contributions.
+- Coefficients, training denominator, chosen supports and bands are fixed.
+  Refitting/selection variability and common reconstruction bias are omitted.
+- Group independence and the bootstrap-mean variance factor are model
+  assumptions. The intervals are local conditional sensitivity diagnostics.
+- Clean fields and exact coefficients are diagnostics only; no tuning uses
+  them. No ODE/PDE candidate is integrated or new data generated.
+
+Validation: exact scalar and complex-vector enumeration confirms paired
+variance, quadratic contributions and shared-rotation covariance. Identical
+candidates have zero paired perturbation. Complex covariance max error is
+3.56e-15 across 216 exhaustive joint draws. All result/input/source hashes,
+finite samples, frozen scores and unchanged fronts pass the audit.
+
+One deterministic NS seed 1 case was redundantly executed by overlapping
+workers; only one identical-seed result is counted. This supplies no extra
+statistical replication. Calculation-seconds in summary.json sums unique
+saved cases, not every redundant execution.
+
+Next research branch:
+Test local, compact weak evaluation integrals on the training-selected
+physical supports that improved fitting. Keep candidates, coefficients and
+dyad frozen to isolate evaluation. Compare precision, conditional paired
+uncertainty, clean-oracle rankings and retained structures on all 15 systems.
+Also test continuous quadrature directly on raw training observations as a
+fitting ablation, because wave/AC still have fitting regressions.
+
+Files: protocol.txt; model_notes.txt; run_paired.py; summarize.py;
+validate_model.py; pairs.csv; primary_dominators.csv; exact_controls.csv;
+equations.csv; covariance_sensitivity.csv; paired_gaps.png/.svg;
+summary.json; audit.json; results/*.json and *_samples.npz.

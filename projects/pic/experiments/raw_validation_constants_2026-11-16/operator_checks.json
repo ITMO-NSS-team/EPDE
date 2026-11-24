@@ -1,0 +1,14 @@
+{
+  "gaussian_contractions": [
+    -0.8400000000000001,
+    -0.2519999999999999
+  ],
+  "expected": [
+    -0.84,
+    -0.252
+  ],
+  "covariance_dense_max_error": 4.440892098500626e-16,
+  "constant_column": 1.0000000000000004,
+  "constant_derivative": 2.8907115367361232e-15,
+  "independent_cross_mean": 6.0
+}

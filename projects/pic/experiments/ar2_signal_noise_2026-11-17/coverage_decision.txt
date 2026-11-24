@@ -1,0 +1,23 @@
+Frozen after the full23-anchor screen with analytic gradients, before any
+fresh39..41 data or coverage outcomes. Use score_fit.py globally, with the same
+AR2 curvature/AR1 noise family, four prescribed starts and recorded numerical
+options. The initial finite-difference implementation and its failures remain
+archived. No model variant is selected per system from clean-data outcomes.
+
+Analytic-gradient screen:28 raw-variable and28 noise-only fits, all status ok.
+VDP's numerical noise-boundary failure disappears. KS amplitude/correlation
+estimates are near the generating values in all3 profiles. NS iid amplitudes
+are1.017..1.051 times truth, correlations0.012..0.091, a substantial improvement
+over the previous curvature model. Residual compound amplitude bias remains
+(ratio1.076). The screen supports a fresh global stress test, not promotion.
+576 initial-implementation pure-noise trials have no incomplete fits; the
+same576 draws are being checked with analytic gradients as a numerical audit.
+
+Fresh anchors39,40,41 and domains970101/2/3/4. All15 iid x3x(AR2,iid-family)
+=90 records; core4 x3x2 signs x(AR2,known-rho amplitude)=48 records. Each256
+calibration/check/evaluation fields. Paired raw/evaluation fields, prior pilot,
+banks, candidates, correction algebra and matrix confidence sets unchanged.
+Keep boundary/optimizer failures explicit. No truth covariance fallback.
+Assess correction mean bias and calibration shape separately. Keep parameter
+uncertainty fixed in this primary comparison; any follow-up must be separate
+and must not overwrite these results. No production edits or candidate solvers.

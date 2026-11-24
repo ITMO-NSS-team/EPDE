@@ -1,0 +1,7 @@
+{
+  "aligned_weights_max_error": 7.282283135804709e-13,
+  "off_grid_polynomial_ibp_error": 3.250863876078298e-13,
+  "shifted_grid_polynomial_agreement": true,
+  "constant_preserved": true,
+  "unsafe_support_rejected": true
+}

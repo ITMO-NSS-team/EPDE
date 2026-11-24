@@ -1,0 +1,25 @@
+{
+  "cases": 45,
+  "equation_trials": 60,
+  "baseline_max_scaled_error": 4.785987318262075e-10,
+  "source_hashes_match": true,
+  "finite_scores": true,
+  "calculation_seconds": 370.44085939991055,
+  "source_sha256": {
+    "check_prefix.py": "1e23dfd30fa8f7b11bd8085e7b807d9f5261b013846b655f47fd8df1d301a9c8",
+    "diagnose_controls.py": "1e62377ad2bd1988f477a8873371c1e4626d48bf90996909aad8a2ca9e04a5c4",
+    "probe_continuous.py": "cdb314f3c48e537dbd7346b9371532b6c3d81aa15b5127873207a7ef8a2a8aed",
+    "quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "run_operator.py": "f45248b9d7ccb64323294b6bc7ecbf637d0a1356f05c791fffac1df98245f8b9",
+    "run_operator_energy_probe.py": "9df20ed5609cf6e6d8303902af1c72b58246b4ee363cae0b26f71f7b244129c8",
+    "summarize.py": "2c9abf685e415fde13954b05e54c014f9eada19b51e756f1533ffad55e83dd19"
+  },
+  "half_full_fitting_binary_fronts_match": true,
+  "legacy_full_binary_fronts_match": true,
+  "clean_diagnostic_cases": 15,
+  "clean_diagnostic_inputs_verified": true,
+  "report_sha256": {
+    "findings.txt": "615ba04de89b1a30120406295ac6b6f7d6269efb636d179ccc6023fc50736594",
+    "failure_analysis.txt": "9f79353f4e8fdd83d8827d0754f4592169284ef8bff3097113cccf4830bdaf83"
+  }
+}

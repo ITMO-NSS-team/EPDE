@@ -1,0 +1,5 @@
+system,anchors,direct_mean_coverage,contrast_mean_coverage,nonfinite,actual_deficient_count
+ac,3,0.9791666666666666,0.7330729166666666,0,0
+kdv_cossin,3,0.7473958333333334,0.0,0,0
+ks,3,0.8619791666666666,0.0,0,0
+wave,3,0.8216145833333334,0.9427083333333334,0,0

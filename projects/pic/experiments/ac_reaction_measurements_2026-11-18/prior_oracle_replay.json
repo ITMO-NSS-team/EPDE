@@ -1,0 +1,30 @@
+{
+  "local": {
+    "original": {
+      "front": 8,
+      "diffusion": 8
+    },
+    "reference_only": {
+      "front": 22,
+      "diffusion": 22
+    },
+    "matched": {
+      "front": 11,
+      "diffusion": 11
+    }
+  },
+  "middle": {
+    "original": {
+      "front": 6,
+      "diffusion": 6
+    },
+    "reference_only": {
+      "front": 23,
+      "diffusion": 23
+    },
+    "matched": {
+      "front": 6,
+      "diffusion": 6
+    }
+  }
+}

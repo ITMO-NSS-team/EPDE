@@ -1,0 +1,10 @@
+Exploratory attribution after the iid confirmation results, not a new fix.
+Local iid-studentized coverage remains low for compound PDE (fresh-seed
+mean85.29%) and AC (90.36%). Examine AC28 and compound28/29, with the same
+estimated iid model, unit scales, frozen differencing orders,256 calibration
+and256 check innovations. Change only the simulation center from reconstructed
+to known clean field. Re-estimate amplitude/corrections in every simulated
+field, as before. Reuse the SAME256 actual studentized residual errors.
+Reference support only, local bank only. Save arrays, reproduce coverage
+arithmetic and source/input hashes. Clean-center results are attribution
+controls and must not be used as an available estimator or bank selector.

@@ -1,0 +1,11 @@
+After the complete primary comparison revealed zero KS local coverage on all
+three anchors in every noise regime, test oracle correction on seed36 for each
+of iid/positive/negative profiles. This supplements the previously selected NS
+and compound attribution cases; primary outcomes and fitted models stay frozen.
+Same pilot, metric, calibration cutoff and all256 actual fields. Replace only
+the actual-field Gaussian correction by the known generating covariance.
+Build banks/pilot from the same raw data using the cheap specified-family
+constructor, then install the saved latent covariance. Full main audit separately
+refits that covariance; this mechanism experiment does not repeat optimization.
+Save complete Grams/means/scores and replay native matrices/field hashes.
+No deployable oracle correction, model selection or dynamics integration.

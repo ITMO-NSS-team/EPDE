@@ -1,0 +1,72 @@
+{
+  "by_system": {
+    "ac": {
+      "scores": 960,
+      "max_scaled_error": 9.663311590054944e-15
+    },
+    "burgers": {
+      "scores": 1080,
+      "max_scaled_error": 8.160701758798014e-15
+    },
+    "burgers_inviscid": {
+      "scores": 1128,
+      "max_scaled_error": 4.6629367034256575e-15,
+      "negligible_written_target_in_short_training_fold": 24
+    },
+    "duffing": {
+      "scores": 1080,
+      "max_scaled_error": 2.9260394523440483e-15
+    },
+    "kdv": {
+      "scores": 1296,
+      "max_scaled_error": 5.168787637363621e-15
+    },
+    "kdv_cossin": {
+      "scores": 1152,
+      "max_scaled_error": 7.216449660063518e-15
+    },
+    "ks": {
+      "scores": 1152,
+      "max_scaled_error": 2.0945397761814517e-15
+    },
+    "lorenz": {
+      "scores": 4248,
+      "max_scaled_error": 1.9855778296011833e-15
+    },
+    "lv": {
+      "scores": 2592,
+      "max_scaled_error": 2.283200637840159e-15
+    },
+    "ns": {
+      "scores": 4896,
+      "max_scaled_error": 7.216449660063518e-15
+    },
+    "ode": {
+      "scores": 1008,
+      "max_scaled_error": 1.4130719124612255e-15
+    },
+    "pde_compound": {
+      "scores": 1080,
+      "max_scaled_error": 6.832367169516446e-15
+    },
+    "pde_divide": {
+      "scores": 1080,
+      "max_scaled_error": 4.884981308350689e-15
+    },
+    "vdp": {
+      "scores": 1080,
+      "max_scaled_error": 1.3802220741790236e-15
+    },
+    "wave": {
+      "scores": 1248,
+      "max_scaled_error": 8.376079179998697e-15
+    },
+    "ac_zero": {
+      "scores": 960,
+      "max_scaled_error": 9.365277986060257e-15
+    }
+  },
+  "identity_checks": 36,
+  "pareto_slot_method_splits": 1440,
+  "score_checks": 26040
+}

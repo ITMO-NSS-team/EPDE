@@ -1,0 +1,43 @@
+Full guard bootstrap and finite nuisance sensitivity envelope
+===========================================================
+Preserve every prior artifact and production source. Solver-free throughout.
+Use the existing conditional profile-start guard, same likelihood, starts,
+bounds and tolerances. A native stationary-innovations arithmetic backend may
+be used only after independent objective/gradient checks and complete-fit
+comparisons. The earlier rejected banded inverse accelerator is not used.
+Final selected fits must pass the original Python innovations score check.
+Record any numerical discrepancies or fallback polishing explicitly.
+
+Primary cases: ODE positive seeds57..59 (paired observed-data reruns of the
+prior uninformative cases); fresh seeds60..62 under iid,+.4,-.4 (9 cases).
+MC16 covariance;128 parametric bootstrap fields; guard applied to observed
+noise fit and every bootstrap fit. Reconstruct observed pilot with guarded
+noise. Hold observed pilot fixed for covariance normalization. Compare
+studentized and fixed observed-covariance bootstraps; rank123 of128. Shared
+Gaussian RNG domains984101/984102/984105. Reconstruct/bootstrap the entire
+guarded procedure; do not splice corrected fits into older cutoffs. Save
+canonical observed pilot arrays. Parallelize bootstrap chunks, keeping draws
+and seeds unchanged. Preserve all fit warnings and unsuccessful cases.
+
+Secondary sensitivity method, not a calibrated noise confidence set:
+Take all128 basic-bootstrap reflected noise parameter pairs in coordinates
+(log sigma,atanh rho): theta_j=2*theta_hat-theta_star_j; add theta_hat. Do not
+remove extreme points. Nonfinite/nonstationary arithmetic is an unresolved
+envelope, not an excuse to clip/discard a point. The finite129-point set need
+not contain the true noise model and is NOT a95% confidence region.
+For each point, simulate128 fields with that noise around the observed pilot,
+using independent domain985802 and common Gaussian draws across points.
+Correct moments with the point's known noise model (no refit within this
+conditional diagnostic). MC16 normalization, joint rank126/128 (97.5%).
+Let D_j=M_observed(theta_hat)-M_observed(theta_j). For each bank, bound the
+original-center error Gram by H_j(t)=(1+t) D_j'D_j+(1+1/t)c_j C_j, t>0.
+Choose t in exp([-10,10]) to minimize the largest generalized eigenvalue
+relative to observed C_hat; retain endpoints. This is a valid deterministic
+triangle/Loewner bound for each considered point, given that point's bound.
+The envelope cutoff is the maximum over points/banks and the original two
+joint cutoffs. Therefore it cannot shrink either original coefficient region.
+This is a finite sensitivity envelope, not uniform nuisance-parameter coverage
+and not a formal95% confidence guarantee. Report coverage and precision costs
+on all fresh fields; do not choose points or tuning using clean data.
+Freeze all primary and envelope cutoffs before clean-field scoring. Keep the
+candidate library, constants and valid identities. No adaptive-search claim.

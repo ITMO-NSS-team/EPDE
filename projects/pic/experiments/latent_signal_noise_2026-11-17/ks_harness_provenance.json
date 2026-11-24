@@ -1,0 +1,8 @@
+{
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\failure_attribution.py": "390c9958e882a27bb1fc2ad842ed25a706b78e75e37f1745923b830b795c452f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_attribution.py": "95cf3c45326742f6cf84afd0b5d58b3fa5e448b155f623eb2227eaf72907ac12",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ks_attribution.py": "4a57dab5148847d06d047b2181cdaecfe2587f6ad9a73d3737efa8c4336f34df",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_ks_attribution.py": "c377549ad506570e82f5bbbf665256ef3df8317bdc84a9185b359e758d7b5bc7"
+  }
+}

@@ -1,0 +1,21 @@
+Oracle Monte Carlo check, fixed after the original four-system diagnostic.
+The original true-field/true-noise control had reference coverage 82.8%
+on wave and 89.1% on KS using only 128 check and 128 benchmark draws.
+Before interpreting this as a methodological defect, test sampling error.
+
+Use the same four systems ac/kdv_cossin/ks/wave, anchor21, reference only,
+same common candidate-width floor, unchanged 256 calibration contrasts.
+Draw 1024 new known-clean/known-iid-noise check fields, RNG SeedSequence
+[720132,21], and 1024 independent actual fields, dataset seeds950000+b.
+Extract reference contrasts only, verifying replay against the full panel.
+Reuse each original model (pilot/estimated noise, clean/estimated noise,
+clean/actual noise), bias and variance and its original 128-draw radius.
+Report coverage of these fixed radii on the new 1024 actual fields.
+Separately compute a 95% radius from the 1024 new true-model check fields
+and evaluate it on the independent 1024 actual fields. No promotion,
+threshold tuning, new coefficient fit or candidate-law integration.
+
+The extension tests only whether the true-model control's short-run
+calibration discrepancy persists. Clean data remains an oracle attribution
+tool. Cases were chosen in the earlier diagnostic, not chosen for favorable
+coverage. Report all four cases, source/input/array hashes and replay checks.

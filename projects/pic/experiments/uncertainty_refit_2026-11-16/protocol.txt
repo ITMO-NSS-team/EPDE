@@ -1,0 +1,67 @@
+Pilot bias correction and main-coefficient refit uncertainty
+Frozen before outcomes, 2026-11-16.
+
+Use all 15 default systems with new anchor noise seeds18/19/20 (45 records,
+60 equation/seed cases), 5% Gaussian observation noise, full saved candidate
+panels. Historical seed0 supplies geometry and each candidate's selected
+joint-risk fitting bank/estimator. Freeze those choices; do not select a
+different method based on new or clean outcomes. Rebuild anchor noise models,
+reconstruction, coefficient corrections and validation weights from each
+new noisy record. Keep current dyad and all constants/equivalent identities.
+This is a frozen-design replication, not an evolutionary search.
+
+Before fresh runs, reproduce historical seed0 joint coefficients, broad
+q0_white128 discrepancy and dyad for AC, forced KdV, KS and wave. Follow
+the original fitted correction prefix (32 or128) and 128 weighting draws.
+
+For each anchor use two full-record pilots:
+standard: existing GCV time spline and spatial shrinkage reconstruction.
+twice: 2*S(y)-S(S(y)), with the SAME linear smoother S fitted to the anchor.
+This algebraic bias correction introduces no selected smoothing parameter.
+Verify the frozen S reproduces the standard pilot and preserves constants.
+The correction is used only for the bootstrap pilot, not to alter main fits.
+
+For each pilot draw128 shared-field parametric bootstrap measurements using
+the same estimated full-record AR noise and the same random innovations.
+Compare with128 fresh actual iid5% measurements, seeds620000+1000*anchor+b.
+All pilot, noise, weight and correction choices freeze before clean controls
+or benchmark generation. No tuning against the clean field.
+
+For each measurement compute full-record dyad and two discrepancy versions:
+fixed: freeze the anchor's main candidate coefficient vectors.
+refit: reconstruct the three training groups again, INCLUDING GCV reselection,
+and refit each main vector on its historically selected bank/OLS-or-CLSM
+estimator. Apply the anchor's fixed mean/Gram correction maps. Held-out
+observations and training groups share the same full noise field, preserving
+the dependence across rotations, candidates and objectives. Geometry,
+bank/estimator choice, corrections, noise models and validation weights
+remain fixed. This still is not full discovery-pipeline uncertainty.
+
+Noise-free centers use the same fixed coefficients or refit procedure,
+respectively, with observation-noise mean/Gram/contraction corrections off
+for the refit functional and validation. This defines the conditional
+noise-free functional being estimated; it is not a claim that it equals
+the physical reference equation. Store clean residual energies for fitted
+vectors separately, including each refitted replicate's clean risk.
+
+Assess pairwise (competitor-minus-reference) errors by subtracting each
+pilot's own noise-free center, versus actual errors around the clean center.
+Report central95% empirical bootstrap error-range coverage, SD ratios,
+bias, marginal/joint sign frequencies, repeated-measurement Pareto retention,
+and the change in spread when main fits vary. Preserve all candidates;
+unregistered does not automatically mean invalid. Do not translate these
+diagnostics into a confidence penalty or arbitrary pruning gate.
+
+Primary pilot comparison is standard versus twice under the refit version;
+fixed-fit ablation isolates what was omitted previously. Show failure and
+regression cases as well as aggregates. No incomplete-case averaging or
+clipping of extreme scores; record nonfinite/numerical failures explicitly.
+No universal promotion based on these data alone. Further experiments, if
+motivated, require a separately frozen follow-up protocol and fresh seeds.
+
+Save score/vector/energy arrays, anchor and center metadata, provenance
+hashes, pilot errors for diagnostic use only, and complete process status.
+Audit source/input consistency, historical replay, all45 fresh anchors,
+shared innovations, finite counts, pairwise coverage and Pareto arithmetic.
+Seven independent workers, one BLAS thread each. Solver-free throughout:
+no candidate differential equation integration, PINNs, production edits or commits.

@@ -1,0 +1,34 @@
+Independent training replicas for weak fitting, 2026-11-16
+Targeted mechanism test: ac, wave, kdv_cossin, ks; seeds0/1/2; saved 5% noise.
+No ODE/PDE equation integration, new clean data, structural threshold, or
+window tuning from ground truth. Preserve every previous experiment.
+
+For each outer modulo-3 training group, split its raw time planes into even
+and odd subsequences. Reconstruct these two training replicas separately on
+the original grid. Use the SAME previously selected physical weak supports
+and continuous local quadrature as local_discrepancy_2026-11-16.
+
+Fit each candidate by a symmetric cross Gram of the two weak operator
+matrices. Compare raw reconstructed operators and operators corrected for
+bootstrap mean bias. The cross Gram uses no within-replica covariance
+subtraction. Keep signed eigenvalues and the existing numerical rank cutoff.
+Also fit ordinary pooled least squares on both replicas as a control for
+the loss of sampling density. Use the original 32/128 correction budget.
+
+Each replica bootstrap uses a noise model estimated from its own raw data
+and reconstructs every draw before weak operators are formed. RNGs differ
+across replicas and outer groups. Group independence is a working assumption;
+supports were selected from the complete outer training record and are held
+fixed for this comparison, so no exact finite-sample unbiasedness is claimed.
+Nonlinear reconstruction and shared selection can leave common bias.
+
+The outer two held-out groups remain unchanged and supply the same local
+cross score as before; also use the frozen old spectral score. Neither enters
+fitting. Coefficient accuracy is diagnosed on the old frozen clean bank.
+After all noisy fits are frozen, reconstruct clean training subsequences and
+repeat the cross-Gram fit as an interpolation/density diagnostic only.
+
+Report all 12 targeted cases, numerical ranks/negative eigenvalues, retained
+registered structures, fitted coefficient accuracy, clean-replica controls,
+and regressions. This is not a complete core-15 validation. Expand only if
+the mechanism test justifies it; retain negative results.

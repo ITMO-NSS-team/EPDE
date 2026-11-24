@@ -1,0 +1,656 @@
+Spline signal means for solver-free noise estimation
+===================================================
+
+A change in the signal representation greatly reduces the positive-noise
+bias on the forced ODE benchmark, but is not ready to replace the fitter:
+one of12 bootstrap cases is unresolved and another noise region misses
+truth after bias correction. It does not establish uniform confidence
+coverage or settle the dyad objective. This is the dataset named ode,
+not ode_simple. No equation solver or clean/reference-based fitting is used.
+
+1. Frozen method and independent data
+Raw data = deterministic cubic spline mean + Gaussian AR1 measurement
+noise. Candidate dimensions:8,16,24,32,48,64. Choose dimension by four
+held-out predictive scores, refitting noise in each fold. Fit each fixed
+dimension by full-covariance restricted likelihood. Retain all grid minima
+and endpoints; verify selected arithmetic with whitened QR. The finite
+search is not a proof of global optimality. Held-out Student-t densities
+plug in rho and are selection scores, not coverage claims. Constants and
+linear terms are present in the spline; the equation library is unchanged.
+264 fresh paired fields: ODE192, VDP48, Duffing24, 5% noise; iid,+.4,-.4.
+All estimates were frozen before scoring against clean data.
+
+Median noise amplitude / truth and correlation error (guarded -> spline):
+ode/iid: n=64, sigma 1.00296 -> 1.00798; rho error -0.00339 -> +0.00744; dimensions {32: 63, 48: 1}
+ode/positive: n=64, sigma 1.43544 -> 0.99870; rho error +0.29476 -> -0.00859; dimensions {32: 58, 24: 5, 48: 1}
+ode/negative: n=64, sigma 0.99947 -> 0.99893; rho error -0.00831 -> +0.00398; dimensions {32: 64}
+vdp/iid: n=16, sigma 1.03683 -> 0.99676; rho error +0.09749 -> +0.00017; dimensions {24: 13, 16: 3}
+vdp/positive: n=16, sigma 1.05510 -> 1.02699; rho error +0.03507 -> -0.00541; dimensions {24: 8, 16: 8}
+vdp/negative: n=16, sigma 0.98375 -> 0.98157; rho error +0.01419 -> -0.00498; dimensions {24: 16}
+duffing/iid: n=8, sigma 1.01625 -> 1.01513; rho error +0.00968 -> +0.00812; dimensions {32: 8}
+duffing/positive: n=8, sigma 1.05837 -> 1.01493; rho error +0.06206 -> +0.00873; dimensions {32: 5, 24: 2, 48: 1}
+duffing/negative: n=8, sigma 0.99344 -> 0.99402; rho error +0.00918 -> +0.00891; dimensions {32: 8}
+
+2. Remaining point-estimation failures
+Positive ODE data selected p24 in5/64 cases. The largest amplitude error
+was +27.8%(seed354); small splines can still assign signal residuals to
+noise. Cross-validation optimizes prediction, not true-noise recovery.
+The fixed-p32 results below are posthoc diagnostics, not a retuned method.
+[
+  {
+    "key": "ode_positive_seed354",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 1.278130782045965,
+      "rho_error": 0.21529470768282377,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.0878509796295797,
+      "rho_error": 0.0732200192757212,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 1.5625477209371184,
+    "mean_rmse_over_noise": 0.651935607327226
+  },
+  {
+    "key": "ode_positive_seed334",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 1.239916436098387,
+      "rho_error": 0.20721139890242846,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.1024097517583027,
+      "rho_error": 0.10629524293137582,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 0.4712103365508824,
+    "mean_rmse_over_noise": 0.7378130640659627
+  },
+  {
+    "key": "ode_positive_seed342",
+    "selected_p": 32,
+    "spline": {
+      "sigma_ratio": 0.815048293975109,
+      "rho_error": -0.07605225838568219,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 0.815048293975109,
+      "rho_error": -0.07605225838568219,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 0.0,
+    "mean_rmse_over_noise": 0.515611659134093
+  },
+  {
+    "key": "ode_positive_seed316",
+    "selected_p": 48,
+    "spline": {
+      "sigma_ratio": 0.8339799641744242,
+      "rho_error": -0.15048747398484508,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 0.9369046493847702,
+      "rho_error": -0.005154941358523624,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 8.068043186446516,
+    "mean_rmse_over_noise": 0.5796524064157372
+  },
+  {
+    "key": "ode_positive_seed302",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 1.1878562609281123,
+      "rho_error": 0.18302752604221373,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.041021405583164,
+      "rho_error": 0.06057921840001573,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 1.4050245821181306,
+    "mean_rmse_over_noise": 0.6669739484535572
+  },
+  {
+    "key": "ode_positive_seed347",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 1.1813045600353296,
+      "rho_error": 0.14560901429718376,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.048884438394261,
+      "rho_error": 0.027378600023805766,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 0.448242378068187,
+    "mean_rmse_over_noise": 0.7160628500863729
+  },
+  {
+    "key": "vdp_iid_seed303",
+    "selected_p": 16,
+    "spline": {
+      "sigma_ratio": 1.149098389946907,
+      "rho_error": 0.0038771021497476113,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.128720099177388,
+      "rho_error": -0.029606420136462145,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 7.654174872933481,
+    "mean_rmse_over_noise": 0.3589053103375696
+  },
+  {
+    "key": "ode_positive_seed340",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 1.146129575778152,
+      "rho_error": 0.13077816056768665,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.022871143816323,
+      "rho_error": 0.013953417169520865,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 0.9878780940881597,
+    "mean_rmse_over_noise": 0.6259979311121333
+  },
+  {
+    "key": "vdp_positive_seed310",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 1.139730023001089,
+      "rho_error": 0.15856010447874236,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.1262738893869852,
+      "rho_error": 0.14768848652066524,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 6.684519500272245,
+    "mean_rmse_over_noise": 0.473850439561547
+  },
+  {
+    "key": "vdp_positive_seed311",
+    "selected_p": 16,
+    "spline": {
+      "sigma_ratio": 1.1354677373017492,
+      "rho_error": 0.10051040925877686,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 1.1297045619849337,
+      "rho_error": 0.09479431711075376,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 8.236476499444507,
+    "mean_rmse_over_noise": 0.4379805474245377
+  },
+  {
+    "key": "ode_negative_seed341",
+    "selected_p": 32,
+    "spline": {
+      "sigma_ratio": 0.882645350158478,
+      "rho_error": 0.05851823581592519,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 0.882645350158478,
+      "rho_error": 0.05851823581592519,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 0.0,
+    "mean_rmse_over_noise": 0.22008397261124157
+  },
+  {
+    "key": "vdp_positive_seed307",
+    "selected_p": 24,
+    "spline": {
+      "sigma_ratio": 0.8831242201747538,
+      "rho_error": -0.1214481607166834,
+      "near_unit": false
+    },
+    "fixed_p32": {
+      "sigma_ratio": 0.8922259989820803,
+      "rho_error": -0.10762011464097537,
+      "near_unit": false
+    },
+    "cv_p32_minus_selected": 4.195494957125106,
+    "mean_rmse_over_noise": 0.3514095692741898
+  }
+]
+
+Independent posthoc approximation diagnostic (not used for any choice):
+Hold rho and spline dimension fixed. The expected restricted variance is
+sigma_true^2 + signal_residual_quadratic/(n-p). These are square roots
+of expected estimated variance divided by true sigma, not expected sigma:
+ode/iid/p16: 2.17054
+ode/positive/p16: 1.62507
+ode/negative/p16: 3.09949
+ode/iid/p24: 1.14674
+ode/positive/p24: 1.06892
+ode/negative/p24: 1.31407
+ode/iid/p32: 1.00359
+ode/positive/p32: 1.00179
+ode/negative/p32: 1.00807
+vdp/iid/p16: 1.04390
+vdp/positive/p16: 1.01954
+vdp/negative/p16: 1.09924
+vdp/iid/p24: 1.00073
+vdp/positive/p24: 1.00034
+vdp/negative/p24: 1.00167
+vdp/iid/p32: 1.00002
+vdp/positive/p32: 1.00001
+vdp/negative/p32: 1.00005
+duffing/iid/p16: 1.17213
+duffing/positive/p16: 1.07748
+duffing/negative/p16: 1.36808
+duffing/iid/p24: 1.01797
+duffing/positive/p24: 1.00778
+duffing/negative/p24: 1.04140
+duffing/iid/p32: 1.00049
+duffing/positive/p32: 1.00021
+duffing/negative/p32: 1.00113
+
+3. Independent bootstrap and weak-error regions
+Fresh ODE seeds400..403:12 paired raw observations,128 refits per method
+(3072 total). Spline selection is repeated in every draw. Both procedures
+use the same correlated-GCV pilot rule; pilots depend on estimated noise.
+Bootstrap fields share normals but differ because estimated noise/pilots
+differ. No bootstrap replicate is removed. Noise coordinates are log sigma
+and atanh rho; basic center2theta_hat-mean(theta_star), covariance from128
+draws and empirical rank126 Mahalanobis radius. Two-bank primary weak-error
+cutoffs use rank123 and MC16 covariance with the observed pilot held fixed.
+Both studentized and fixed-metric cutoffs are tested.
+
+Noise-pair coverage (basic empirical):
+guarded: iid 4/4, unresolved 0, positive 4/4, unresolved 0, negative 4/4, unresolved 0
+spline: iid 4/4, unresolved 0, positive 2/4, unresolved 1, negative 4/4, unresolved 0
+
+Full-library weak-error coverage:
+guarded/iid: studentized 4/4, unresolved 0, fixed_metric 4/4, unresolved 0, scalar 4/4, unresolved 0, finite_union 4/4, unresolved 0
+guarded/positive: studentized 4/4, unresolved 0, fixed_metric 4/4, unresolved 0, scalar 4/4, unresolved 0, finite_union 4/4, unresolved 0
+guarded/negative: studentized 4/4, unresolved 0, fixed_metric 4/4, unresolved 0, scalar 4/4, unresolved 0, finite_union 4/4, unresolved 0
+spline/iid: studentized 4/4, unresolved 0, fixed_metric 4/4, unresolved 0, scalar 4/4, unresolved 0, finite_union 4/4, unresolved 0
+spline/positive: studentized 3/4, unresolved 1, fixed_metric 3/4, unresolved 1, scalar 3/4, unresolved 1, finite_union 3/4, unresolved 1
+spline/negative: studentized 4/4, unresolved 0, fixed_metric 4/4, unresolved 0, scalar 4/4, unresolved 0, finite_union 4/4, unresolved 0
+
+Reference coefficient-region geometry:
+{
+  "guarded": {
+    "iid": {
+      "studentized": {
+        "bounded_outer": 4
+      },
+      "fixed_metric": {
+        "bounded_outer": 4
+      },
+      "finite_union": {
+        "bounded_outer": 4
+      },
+      "scalar": {
+        "bounded_outer": 4
+      }
+    },
+    "positive": {
+      "studentized": {
+        "bounded_outer": 4
+      },
+      "fixed_metric": {
+        "bounded_outer": 4
+      },
+      "finite_union": {
+        "bounded_outer": 4
+      },
+      "scalar": {
+        "unbounded_certified": 2,
+        "bounded_outer": 2
+      }
+    },
+    "negative": {
+      "studentized": {
+        "bounded_outer": 4
+      },
+      "fixed_metric": {
+        "bounded_outer": 4
+      },
+      "finite_union": {
+        "bounded_outer": 4
+      },
+      "scalar": {
+        "bounded_outer": 4
+      }
+    }
+  },
+  "spline": {
+    "iid": {
+      "studentized": {
+        "bounded_outer": 4
+      },
+      "fixed_metric": {
+        "bounded_outer": 4
+      },
+      "finite_union": {
+        "bounded_outer": 4
+      },
+      "scalar": {
+        "bounded_outer": 4
+      }
+    },
+    "positive": {
+      "studentized": {
+        "bounded_outer": 3,
+        "unresolved_selected_fit": 1
+      },
+      "fixed_metric": {
+        "bounded_outer": 3,
+        "unresolved_selected_fit": 1
+      },
+      "finite_union": {
+        "bounded_outer": 3,
+        "unresolved_selected_fit": 1
+      },
+      "scalar": {
+        "bounded_outer": 3,
+        "unresolved_selected_fit": 1
+      }
+    },
+    "negative": {
+      "studentized": {
+        "bounded_outer": 4
+      },
+      "fixed_metric": {
+        "bounded_outer": 4
+      },
+      "finite_union": {
+        "bounded_outer": 4
+      },
+      "scalar": {
+        "bounded_outer": 4
+      }
+    }
+  }
+}
+
+4. Finite nuisance propagation and precision
+66 points per noise ellipse: center, estimate,32 half-radius angles and32
+full-radius angles.128 known-noise conditional fields per point; rank126
+joint cutoff, MC16 covariance. The union also retains both primary regions.
+This finite probe DOES NOT certify the continuous ellipse or adaptive
+equation search. Scalar triangle/Loewner compression is a comparator.
+Paired outer-width ratios, spline / guarded (bounded pairs only):
+{
+  "studentized": {
+    "n": 33,
+    "median": 0.9874648685443126,
+    "mean": 0.9275984777068675,
+    "min": 0.5632047619356512,
+    "max": 1.0210905610010288,
+    "q05": 0.6470312019753105,
+    "q95": 1.0165716735994654,
+    "bounded_pairs": 11,
+    "total_pairs": 12,
+    "profiles": {
+      "iid": {
+        "n": 12,
+        "median": 0.9920344713338063,
+        "mean": 0.9878989272094224,
+        "min": 0.9394734286062348,
+        "max": 1.0206410699088535,
+        "q05": 0.9517249948532212,
+        "q95": 1.0169107899585812,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      },
+      "positive": {
+        "n": 9,
+        "median": 0.7080727079205698,
+        "mean": 0.7524967802461663,
+        "min": 0.5632047619356512,
+        "max": 0.9430684648470659,
+        "q05": 0.5882878813216558,
+        "q95": 0.9412063808242942,
+        "bounded_pairs": 3,
+        "total_pairs": 4
+      },
+      "negative": {
+        "n": 12,
+        "median": 0.996209616082437,
+        "mean": 0.998624301299838,
+        "min": 0.9843290813768024,
+        "max": 1.0210905610010288,
+        "q05": 0.986053764318933,
+        "q95": 1.0169767326544372,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      }
+    }
+  },
+  "fixed_metric": {
+    "n": 33,
+    "median": 1.0071229276269236,
+    "mean": 0.9124363898326978,
+    "min": 0.4326715637852505,
+    "max": 1.032328728054886,
+    "q05": 0.5028971553995695,
+    "q95": 1.0239739684165374,
+    "bounded_pairs": 11,
+    "total_pairs": 12,
+    "profiles": {
+      "iid": {
+        "n": 12,
+        "median": 0.9975502249408176,
+        "mean": 0.9896781801938525,
+        "min": 0.9372274695500248,
+        "max": 1.0138658065857968,
+        "q05": 0.9500874489847692,
+        "q95": 1.0122312865624856,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      },
+      "positive": {
+        "n": 9,
+        "median": 0.5571015969596133,
+        "mean": 0.6679763599499084,
+        "min": 0.4326715637852505,
+        "max": 0.9757059397478416,
+        "q05": 0.44352427524720084,
+        "q95": 0.9749712074928417,
+        "bounded_pairs": 3,
+        "total_pairs": 4
+      },
+      "negative": {
+        "n": 12,
+        "median": 1.0183487057110105,
+        "mean": 1.0185396218836351,
+        "min": 1.0109274195688867,
+        "max": 1.032328728054886,
+        "q05": 1.0114974632902838,
+        "q95": 1.0303532257912706,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      }
+    }
+  },
+  "finite_union": {
+    "n": 33,
+    "median": 0.6640930520147773,
+    "mean": 0.7278442543439134,
+    "min": 0.33937318487199214,
+    "max": 1.0447319317122128,
+    "q05": 0.39618033156618276,
+    "q95": 1.02998538203382,
+    "bounded_pairs": 11,
+    "total_pairs": 12,
+    "profiles": {
+      "iid": {
+        "n": 12,
+        "median": 0.619977262917959,
+        "mean": 0.6004355860275067,
+        "min": 0.38596728325647184,
+        "max": 0.7742625636359544,
+        "q05": 0.3953292442070402,
+        "q95": 0.7623215358609243,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      },
+      "positive": {
+        "n": 9,
+        "median": 0.5059402042533071,
+        "mean": 0.5087404621386136,
+        "min": 0.33937318487199214,
+        "max": 0.6462050112590247,
+        "q05": 0.3760668049260098,
+        "q95": 0.6393988334751248,
+        "bounded_pairs": 3,
+        "total_pairs": 4
+      },
+      "negative": {
+        "n": 12,
+        "median": 1.0188472864545157,
+        "mean": 1.0195807668142953,
+        "min": 1.001163117696598,
+        "max": 1.0447319317122128,
+        "q05": 1.0012304840989503,
+        "q95": 1.0378405466258653,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      }
+    }
+  },
+  "scalar": {
+    "n": 30,
+    "median": 0.664218793016984,
+    "mean": 0.7151640386670224,
+    "min": 0.23807556518242662,
+    "max": 1.0450468510990714,
+    "q05": 0.3188111342212948,
+    "q95": 1.0300653408892761,
+    "bounded_pairs": 10,
+    "total_pairs": 12,
+    "profiles": {
+      "iid": {
+        "n": 12,
+        "median": 0.5510896377685601,
+        "mean": 0.5698296032564512,
+        "min": 0.38791079472162665,
+        "max": 0.7239282946644594,
+        "q05": 0.39243011553648255,
+        "q95": 0.7119313330780697,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      },
+      "positive": {
+        "n": 6,
+        "median": 0.4364698146766911,
+        "mean": 0.3984761878641343,
+        "min": 0.23807556518242662,
+        "max": 0.551247802415847,
+        "q05": 0.24412543597616668,
+        "q95": 0.530015622280826,
+        "bounded_pairs": 2,
+        "total_pairs": 4
+      },
+      "negative": {
+        "n": 12,
+        "median": 1.018223939240576,
+        "mean": 1.018842399479037,
+        "min": 0.9998379019430922,
+        "max": 1.0450468510990714,
+        "q05": 0.9998408845132373,
+        "q95": 1.0373758563079274,
+        "bounded_pairs": 4,
+        "total_pairs": 4
+      }
+    }
+  }
+}
+Within-method finite/scalar outer width divided by studentized primary:
+{
+  "guarded": {
+    "finite_union": {
+      "n": 36,
+      "median": 1.7926708235150806,
+      "mean": 1.96293203654822,
+      "min": 1.0631997444738492,
+      "max": 4.328195152580835,
+      "q05": 1.1050822316790274,
+      "q95": 3.2808149641582394
+    },
+    "scalar": {
+      "n": 30,
+      "median": 1.9898643918053223,
+      "mean": 2.1317561420569615,
+      "min": 1.0850290559379752,
+      "max": 5.753125640980479,
+      "q05": 1.1234756565906174,
+      "q95": 4.167594268986481
+    }
+  },
+  "spline": {
+    "finite_union": {
+      "n": 33,
+      "median": 1.258450357053002,
+      "mean": 1.3325453762544597,
+      "min": 1.0897845968770106,
+      "max": 2.072327956139529,
+      "q05": 1.125151625830046,
+      "q95": 1.6735533385684527
+    },
+    "scalar": {
+      "n": 33,
+      "median": 1.2906056974315965,
+      "mean": 1.4218964233961455,
+      "min": 1.111494027169609,
+      "max": 2.67913449543361,
+      "q05": 1.1467181646752886,
+      "q95": 2.0388257882764873
+    }
+  }
+}
+Widths describe outer enclosures of the reference-support intersection,
+not exact confidence intervals. The guarded positive400 union originally
+had an unresolved bookkeeping status:58 bounded and10 certified empty
+components. The independently verified empty components contribute
+nothing, so the union is bounded. A separate review records this logical
+correction without overwriting the frozen output. No unresolved set or
+bootstrap draw is discarded. Denominators and unbounded cases must be
+reported; successful widths alone must not hide lost boundedness.
+Reference acceptance: {'guarded': 12, 'spline': 11}/12 per method.
+
+5. Verification and scope
+Independent dense error-contrast checks for264 selected spline fits;
+replayed every spline selection, every original guarded selected fit,
+all generalized eigenvalue scores and coefficient/Loewner certificates.
+Representative covariance and raw bootstrap fields are independently
+reconstructed. All source/data hash links and prior manifests are checked.
+Selected-fit warnings: [{'key': 'ode_positive_seed402_spline', 'draw': 46, 'status': 'boundary'}, {'key': 'ode_positive_seed402_spline', 'draw': 76, 'status': 'boundary'}]
+The positive402 spline case hit the rho search endpoint in bootstrap
+draws46 and76, selecting p16. All draws and downstream calculations are
+retained, but coverage is unresolved and this case is excluded from valid
+width pairs while remaining in the12-case denominator. Conditional
+prediction can reward a near-random-walk noise model for omitted signal;
+good prediction therefore does not ensure accurate noise separation.
+Only4 outer fields per noise profile in the uncertainty comparison:
+even4/4 gives a wide binomial interval. This does not validate a95%
+or97.5% guarantee. The bootstrap was repeated after selection, but that
+alone cannot guarantee that it reproduces signal-model selection bias.
+No production method is replaced. No KdV repair or full15-system rerun
+is claimed here. Dyad remains provisional; constants and valid identities
+remain admissible. Next: test noise-identification criteria and stability
+across competing spline dimensions, rather than relying on conditional
+prediction alone or clipping rho. Calibrate uncertainty separately for
+the new estimator: compare uncorrected and basic centers on larger fresh
+cohorts, because inherited bias correction can worsen an accurate fit.
+Only then extend the comparison to the full default system set.

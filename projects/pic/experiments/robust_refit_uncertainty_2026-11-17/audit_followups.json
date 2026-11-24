@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "screen_records": 46,
+  "repair_variable_fits": 84,
+  "repair_statuses": {
+    "ok": 73,
+    "unresolved_optimization": 11
+  },
+  "pure_noise_draws": 576,
+  "likelihood_score_replays": 772,
+  "hash_links": 809,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_followups.py": "c1be9f7f2658534a86296e3318f909e4bef5de60a2fbc9e5d92e458d5cad1259"
+  }
+}

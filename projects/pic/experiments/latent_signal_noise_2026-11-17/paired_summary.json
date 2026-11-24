@@ -1,0 +1,331 @@
+{
+  "status": "COMPLETE",
+  "summary": [
+    {
+      "profile": "iid",
+      "bank": "local",
+      "planned_pairs": 45,
+      "complete_pairs": 44,
+      "missing": [
+        {
+          "system": "ns",
+          "seed": 37,
+          "candidate_status": "incomplete_noise_model",
+          "control_status": "COMPLETE"
+        }
+      ],
+      "candidate_coverage": 0.7895951704545454,
+      "control_coverage": 0.9422940340909091,
+      "paired_difference": -0.15269886363636365,
+      "candidate_anchor_range": [
+        0.0,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.83203125,
+        0.984375
+      ]
+    },
+    {
+      "profile": "iid",
+      "bank": "broad",
+      "planned_pairs": 45,
+      "complete_pairs": 44,
+      "missing": [
+        {
+          "system": "ns",
+          "seed": 37,
+          "candidate_status": "incomplete_noise_model",
+          "control_status": "COMPLETE"
+        }
+      ],
+      "candidate_coverage": 0.8331853693181818,
+      "control_coverage": 0.9434481534090909,
+      "paired_difference": -0.11026278409090909,
+      "candidate_anchor_range": [
+        0.046875,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.8984375,
+        0.984375
+      ]
+    },
+    {
+      "profile": "iid",
+      "bank": "both",
+      "planned_pairs": 45,
+      "complete_pairs": 44,
+      "missing": [
+        {
+          "system": "ns",
+          "seed": 37,
+          "candidate_status": "incomplete_noise_model",
+          "control_status": "COMPLETE"
+        }
+      ],
+      "candidate_coverage": 0.8329190340909091,
+      "control_coverage": 0.943359375,
+      "paired_difference": -0.11044034090909091,
+      "candidate_anchor_range": [
+        0.046875,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.8984375,
+        0.984375
+      ]
+    },
+    {
+      "profile": "positive",
+      "bank": "local",
+      "planned_pairs": 12,
+      "complete_pairs": 12,
+      "missing": [],
+      "candidate_coverage": 0.7171223958333334,
+      "control_coverage": 0.9612630208333334,
+      "paired_difference": -0.244140625,
+      "candidate_anchor_range": [
+        0.0,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.90625,
+        0.984375
+      ]
+    },
+    {
+      "profile": "positive",
+      "bank": "broad",
+      "planned_pairs": 12,
+      "complete_pairs": 12,
+      "missing": [],
+      "candidate_coverage": 0.8896484375,
+      "control_coverage": 0.9664713541666666,
+      "paired_difference": -0.07682291666666667,
+      "candidate_anchor_range": [
+        0.6484375,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.94921875,
+        0.9921875
+      ]
+    },
+    {
+      "profile": "positive",
+      "bank": "both",
+      "planned_pairs": 12,
+      "complete_pairs": 12,
+      "missing": [],
+      "candidate_coverage": 0.8896484375,
+      "control_coverage": 0.9664713541666666,
+      "paired_difference": -0.07682291666666667,
+      "candidate_anchor_range": [
+        0.6484375,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.94921875,
+        0.9921875
+      ]
+    },
+    {
+      "profile": "negative",
+      "bank": "local",
+      "planned_pairs": 12,
+      "complete_pairs": 12,
+      "missing": [],
+      "candidate_coverage": 0.7080078125,
+      "control_coverage": 0.9449869791666666,
+      "paired_difference": -0.23697916666666666,
+      "candidate_anchor_range": [
+        0.0,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.87890625,
+        0.9921875
+      ]
+    },
+    {
+      "profile": "negative",
+      "bank": "broad",
+      "planned_pairs": 12,
+      "complete_pairs": 12,
+      "missing": [],
+      "candidate_coverage": 0.9391276041666666,
+      "control_coverage": 0.9498697916666666,
+      "paired_difference": -0.0107421875,
+      "candidate_anchor_range": [
+        0.8359375,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.90625,
+        0.9765625
+      ]
+    },
+    {
+      "profile": "negative",
+      "bank": "both",
+      "planned_pairs": 12,
+      "complete_pairs": 12,
+      "missing": [],
+      "candidate_coverage": 0.9391276041666666,
+      "control_coverage": 0.9498697916666666,
+      "paired_difference": -0.0107421875,
+      "candidate_anchor_range": [
+        0.8359375,
+        1.0
+      ],
+      "control_anchor_range": [
+        0.90625,
+        0.9765625
+      ]
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze_pairs.py": "2bce9b991c53526d89488f7cd79554d4378ead730f24a7960fccbbd975296486"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_iid_curvature_seed36.json": "0f9a237b4a0c4d5d100ee951dad149806de698459c05da50d6df54d6f2cd4a49",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_iid_curvature_seed37.json": "1a38822488e3953de24bcb78d117e7863b641f2ff18853681e66b9e055f0469a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_iid_curvature_seed38.json": "fbc04fd94072b56debc8bd1db3058b326ed498ead0fb370a2cae4ec3a10a2945",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_iid_iid_seed36.json": "8f2e9d9c80f802b62fcc089b4f8ebaaed79aee1fef79ee63fdd1a3f3b2b475bf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_iid_iid_seed37.json": "08cecdbbc98753a4d028bf53ff6ed7ff58f99c02f49c7458a48889f2d2cd4e16",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_iid_iid_seed38.json": "18ce88e4c187aea26c1a8ddbf554cffe512bd5b4bc6e665e9ace209b26a26bdc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_negative_curvature_seed36.json": "5db7fcdb2b3b8d1692cd2fe61b6bd8c2acf6464c11a09de6c46d619e05a61533",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_negative_curvature_seed37.json": "057cc2be26dc20ee3ee0d976517b3892efee84e00a637000c1e25339c969be43",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_negative_curvature_seed38.json": "7889109c66f0460a48f37633aa87232c61e809cc86a8b19a732ce760066b1dd9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_negative_known_rho_seed36.json": "7ffdcac1908f60cdd8b3fc7ee83cb36ee23d19ba3c8330b0ca24037b213e0b56",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_negative_known_rho_seed37.json": "03de6e9b75df1f2536d2395b8ed2fe5cabffc72d1d493959f6d0193505f2a5ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_negative_known_rho_seed38.json": "d853b87544128fa67ee1a736850d01ddb789ff4568807faaa8f122cf506a5a1f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_positive_curvature_seed36.json": "627326a04da5cd928e279578b8f13d4a75f941c13e687d7e717a3f264013c211",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_positive_curvature_seed37.json": "a6d15587d0570e108ab5bc42df1a6fd9fbee224f72b58d4b091c80aede40c399",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_positive_curvature_seed38.json": "feb08044c8ac934f62b2b82291bed1b2a76c335451f534f8e79b37132e81dbf1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_positive_known_rho_seed36.json": "a3e5fffb8dd966169f095d8c91a8bf7cd2d96b0c8014a327f00d72d52a77690c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_positive_known_rho_seed37.json": "2afeb7a3e2b538b4c4820e9aa79e16fae5f8da251033458b10b79c1220f7c865",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ac_positive_known_rho_seed38.json": "cfc1c36d371720f3c8bd05baf5b67a114333d42de22e64c5d7a072e2e757e25b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_iid_curvature_seed36.json": "4e524b041ccd9cec534c6295ee43a8e65c64fa9d6febc5f9f50c4364233dc71b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_iid_curvature_seed37.json": "23904cb4ea8f898f4d07fc221eca292088ecb3589e8e1bfaf0d7496834917eef",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_iid_curvature_seed38.json": "0c14b91a84036830ec05f11262aa61f258b701a22555c4f580985bb043e92c82",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_iid_iid_seed36.json": "6b81d836c36723893feafdbe02e451f02ee1af9302f4571673d7ba2c35cccc8c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_iid_iid_seed37.json": "e1ba99f7b6eefc7f7a5772cf60c857c157fd3f827d1d9e4a8fa492c7ba698b82",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_iid_iid_seed38.json": "cf7a6f51da6a77b7a2a08e9a384fec1e0853026a730d3b167e4bd0aba5710b01",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_curvature_seed36.json": "d964373bbb4860d4a436a404c9d0441c9339e1e251ce574abb720dab352e3b53",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_curvature_seed37.json": "f45ac1ed907fa6f88832a31374a9749e4f18e3f46d1517f9834cdf31befcde6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_curvature_seed38.json": "f19d60cf37f9e6b41e650b4b369663fb7fca0f7ad27fdb462f4fbb5f93781d5e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_iid_seed36.json": "a738c5bf1c3324d1d5ad1eacd313989c52a92dadc017cec56fd41ab86f3806af",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_iid_seed37.json": "b11b85c0e0cc9109411d832f15c86818ee30df0851d06c8ecf0a404585d12165",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_iid_seed38.json": "231bb5a9c0b3bde69088b371910f8f9050a77e8b1b73781b5984a158793c0dc1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\duffing_iid_curvature_seed36.json": "9e034b3a7f2d7415bcfd27621cf364a4a790bbfdfa7c770aef427bf7f3f64480",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\duffing_iid_curvature_seed37.json": "839292fe891c01e6d649c12298d7ca8ee402dc70c1cac5e185f608c41927598c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\duffing_iid_curvature_seed38.json": "0f2efc6223d90d330d2c024a5708d813f52dd8416a8eeb86fffaeeb9aa35f76e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\duffing_iid_iid_seed36.json": "af3ca66c783f4f804f3d6db578bd5632c18cd420e862ecd669bf50e358206977",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\duffing_iid_iid_seed37.json": "6dadf22692bdec564faf019560a832721f1c0874a981d9fb6cf76164b2c2b930",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\duffing_iid_iid_seed38.json": "4e8c8b371142a7abbaa398e7414b64c64fc568cfbb6b09a033791bea94d5b2f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_iid_curvature_seed36.json": "9653b55cc9a57b0e5996f23a997775c03db06d633689480578b2ffbfe7c6eba0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_iid_curvature_seed37.json": "9bd446a5effcb127cbf0972d4ac728895fb5b573e1a1405bf9262884dea24b80",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_iid_curvature_seed38.json": "45cccbc45937337040c5385bae4317f2897d194f02368cad36a7d99c2e0f089f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_iid_iid_seed36.json": "a068e08a746733b1c13599e62077178ae38559a004414f1a2d4795d8d2b6a596",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_iid_iid_seed37.json": "6e1dfd738ca8bff889411226a5759f99df23b9a0a536ead4b46f6390ae74142c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_iid_iid_seed38.json": "59ba8e23a3af4c3303d94690d312bd3a2d395a4be81b40d5b45f0422d0ab3f60",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_negative_curvature_seed36.json": "068efcf4fd41cdc8f5ec1bfded84b4f9a05b41d5dca04e84b87f852c128f07e5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_negative_curvature_seed37.json": "50d3f3ddfe11c228f9261f1de4291af69e79933d7ef519623c86fc6f05fc2c24",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_negative_curvature_seed38.json": "333a6439b82091a2960f0c0d82c051cdd1266f778b050a886155ca2c68314604",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_negative_known_rho_seed36.json": "d28136dd0750316aa9046034af578626b88cc1c511d6c2da8cd6c29a7a3cd183",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_negative_known_rho_seed37.json": "ed7333e3805d6800c5314fbb61810ac87865eaa2ee61c970dc19a10c3e05dbd3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_negative_known_rho_seed38.json": "b8691f338d84b769529b694db035888fc10a69171ec96db443c6566ee6ca7d70",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_positive_curvature_seed36.json": "c7fb803b476bc0c0d21819af10f717fccdb8e4ea2444e00efb2973adfba44518",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_positive_curvature_seed37.json": "afb7459c85d2e4f8c3d3d644cbb63c54202a14fe117d0b99d073c1f75121b834",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_positive_curvature_seed38.json": "a749821b715bd63f80c37940189c0bf84657cf856ee917a5e972e616163350eb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_positive_known_rho_seed36.json": "170eaba4ee4663d5b8e6b97684478ed068aeec7c2ba025a2d38b5a8fc5fb4ed5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_positive_known_rho_seed37.json": "212d616fc812854735d65d0569544e11966f1321297cf5b8fdfe4ad4d3d77e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_cossin_positive_known_rho_seed38.json": "cf9b3a4f3557f7d45328e6085d512d86eb3bcf0d44d8fd99564907a0b43a2117",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_iid_curvature_seed36.json": "1888b83f4e24951ce50cc27e919ea7964cf5feb55af09307a93de7b93aa46007",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_iid_curvature_seed37.json": "92fe4ee1e98dc1c1893eaa85ee133b5bcae6c123ac7b680f0b96197f1fd1f762",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_iid_curvature_seed38.json": "1325eee3417e541c1543f77db8d26d02a39a6a16ef09f95f9886a8715a7c0d89",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_iid_iid_seed36.json": "e364d24557f0436b1ae4433d100c6cad76b5750c0601bc6c648eb1c6316c789e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_iid_iid_seed37.json": "1c3a94ffa992cd21bac3c35dcba0308f0bd609ad79975266b1f8b432c7c055c2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\kdv_iid_iid_seed38.json": "bca9d2a9977b4e1cf80bd4d7028de4ad495a23ed92cdff09d6d159fa883d0145",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_curvature_seed36.json": "6b7aa03bfd4f3337a142800f8f5c9640cb85d3f93da638676d886f65ae52804b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_curvature_seed37.json": "3fe40ca05d84b0f3b9c85a781c667a2802a710985e8aa9bd7f027753a9c0a88d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_curvature_seed38.json": "6c74d8a11e7668f0097f2b8a16edd86cb694fea5d9ce7309ca470fcdd877203b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_iid_seed36.json": "3096bcff25f3094a8f54915bc81a11463a3efd26ad897fa31de540726a591547",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_iid_seed37.json": "f24322547609d2d65f7faa6b96d49589ab8431f770b7dba5bb199a4f820f47ca",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_iid_iid_seed38.json": "68f05a7a2b907db11187c554210c9ec577525d6ab7ef2cbd3aef3b612068039b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_curvature_seed36.json": "4652d737bf7f6bb54291d5bcb59ef6586bd4d299e24a69c57efa5556afc6092a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_curvature_seed37.json": "255d0e401ec947e9b1d7d06c1b22dfe04237b4f13a333657f8c3cdaa60dbbaf1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_curvature_seed38.json": "0c15bd8fedd2aecd70ca36374495ae864c944d2cf29e90b7c1635d83097ee92c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_known_rho_seed36.json": "83b2665efb626165cd5a8c8919e157d88b02a0cd51a7acf8b776fa095c278897",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_known_rho_seed37.json": "1b0e581d0fd5e860cf71ebdd8658294f56beb0bc8f6696e87063f998e430e767",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_negative_known_rho_seed38.json": "dddaa9eb28c92828aaad73ae6c831bafac6c009eda820d37e5fd413f5f4a0238",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_curvature_seed36.json": "ece33efdf0749bf1ff01c58024c05e5f580c0f67dad69912b83f1e3b16c2d02e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_curvature_seed37.json": "87f5a1809050c56706e3fbfc5f682e859198fd39f9fd162e15855f01d6c94330",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_curvature_seed38.json": "e4cab5c9c4de4bb03b83f58030203a8afe56b6afa7ffbd56cb0f4a13478bbcb5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_known_rho_seed36.json": "c660d71a40353556309e9109d053f47c299250a80422a6010355073777a26561",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_known_rho_seed37.json": "9526527ac4ed8b9619599443ef25e1b12bd102bbf488458fc218e9cacd37f8ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ks_positive_known_rho_seed38.json": "4c298aedb1296be6cf38c1d525e74e8c1e2cd652e0fae387f199aed13938bfef",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lorenz_iid_curvature_seed36.json": "541d9f5a32410a5087422390a5322e1860499424676d118ea987b75e4d92744a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lorenz_iid_curvature_seed37.json": "0eec4253319ac8fe5d5d236c6ee07399a66458c79b9d2e72d10a54b6d281e7e6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lorenz_iid_curvature_seed38.json": "760888c45fa4f762e6a67c00906c826a07e3af0346c92c857d09382bb700fded",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lorenz_iid_iid_seed36.json": "274f4615e72bf982437a7fb69763935d5544ded4e1b6b6fdbe32043a646230dc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lorenz_iid_iid_seed37.json": "5782c7408d1b322965f79e9bf67191aae691b4508585323ee255f1292ca3cf5b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lorenz_iid_iid_seed38.json": "25eb5578e9d12a8843a0e0f04c0b2fd2ae0e42d1d7f871a398b9e8aa90244800",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lv_iid_curvature_seed36.json": "a3f843d3263aad200ade85edb99265738b93cbafcc2ad53ec80e13c928e22d40",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lv_iid_curvature_seed37.json": "a63c1a5697b81d5e44b61498d511adcdad242d9575cce404098cff79ea0719aa",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lv_iid_curvature_seed38.json": "299fe94177c1f7fd116f083b59992fad6e4beef43ed64ead2c049f7434ec7519",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lv_iid_iid_seed36.json": "c5a0e741a93ae48bc77a440cf993d047d4aa392ed512fb313fdec3dfcb1a4478",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lv_iid_iid_seed37.json": "ccc552a3e2920af9d184a8b38a875dd3de3d68dc061979b193b33ee6b05a25ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\lv_iid_iid_seed38.json": "6b8344864074a02b431f9206e21f39ff4c5648b48edb7ba3e02f507eb3fe7410",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_curvature_seed36.json": "6a7e865cf80ab7f27d0787e12daa3b28dae1bd38978bdd54422f8d43747e2c71",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_curvature_seed37.json": "8a346e0f4ad37c62dbbe4113f727cb31b2eedae9b0a5921f9b7b6c90855d64e1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_curvature_seed38.json": "b6d7ff39c8760ca6c3cce4c16ab4ccd35549e1f47162b05658438680d7987319",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_iid_seed36.json": "678709c9f08e379b7c7cc74dd1fa14991598b94e2fd16c022290394f2b22ad0a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_iid_seed37.json": "49f66e5d1ed80e1e905959719a491f7dfd1f429b986e1ffb7c74b9368e1b9c64",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_iid_seed38.json": "146f34adf253374be38b3324085f224ec24b5f48178d11ac4e64a2caea1e93b2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ode_iid_curvature_seed36.json": "f46a55840fd1ef79f00441ebdf065f819093e0addbe1325a164a9ac119f57728",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ode_iid_curvature_seed37.json": "e615882e48cc9a7bc82c7431cca384246814e3b0aa876c81ef20584b8d2d7af5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ode_iid_curvature_seed38.json": "5fbffb9b12922e1bda21043548f7880e12217f7a8fb0a378727b7998a88ff803",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ode_iid_iid_seed36.json": "0c74602cba93b12388a9ec4b340781b1c4e781562fcb5bb885f6ec4446336337",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ode_iid_iid_seed37.json": "457fbdf49ac48b1dae6115030aaec59532c9511bac40ddc53d93e3047343c902",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ode_iid_iid_seed38.json": "88cfcd118e9550c70d279b07c517f3d41fb2f35d09a4e2a1c3ddc5c02eb58b6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_curvature_seed36.json": "6e884bbbf05e8a73ed623f85129180fe5fa41b69dbfad971a3d844d5400a57d6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_curvature_seed37.json": "8a3d3daf3d7097fa9129d75e4bffc3cce9b10fedcb794f1e8e83159474ccb1dd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_curvature_seed38.json": "85e8bae18d8aca4e5d841ad789c10a227304e0b91388d3d1387e401dd6833c87",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_iid_seed36.json": "ecdae21e8fb6d1bee8d2a62021f05a474acd1422abb3f3439bfd32434623d5a8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_iid_seed37.json": "8634e15b653d9a56c7697ee0a4916c98880773a9087eeacad24d92b8983bd564",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_iid_seed38.json": "52da37aeb818de76262138deb822c2a399cfc8f58ac3389625efc9479dfb478e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_divide_iid_curvature_seed36.json": "0e551dacdb2c207733468e8fc589b851997bc0ee8e64863c1636f564f5942b97",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_divide_iid_curvature_seed37.json": "4d1f87182e07ab2c5c352c59ad6efde683cef55a8037a98d227ac53254ba659e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_divide_iid_curvature_seed38.json": "531c839a1a096b8a254400443fe6fae9db7d609e11d764dbce1d3b7b97d773ea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_divide_iid_iid_seed36.json": "74817b97114b990df97c8b96609c6b2d71034fa30c664ae5876790a9199eb48f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_divide_iid_iid_seed37.json": "ddab33577e78f4cd1f05fb41b7fa77344b891daa3a998123d74984b890588f61",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_divide_iid_iid_seed38.json": "e86304d5d24dade19da7242c84b6654d45ab1cbb5444fba7290499a0bbfbf936",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\vdp_iid_curvature_seed36.json": "1512b5332e68d99ca6a9f68bf9b23cdb60d9f2f62e0ca1ed6c0a644b32e0272d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\vdp_iid_curvature_seed37.json": "30982edc05bbaaa82d5f42d0c26f33da5d9a279d347995a79227c7e44a6d100b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\vdp_iid_curvature_seed38.json": "cbaa7c519bc5dc49653865179e9070e2c870460cf49932f2f4fe9a7a9d8c49b5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\vdp_iid_iid_seed36.json": "72f8b818d87397e3b1a7b5640033d5f586f6912f2c41faa3957685cbccc985ea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\vdp_iid_iid_seed37.json": "b8f2eecc3aec792436afb7fc96f94512898616e53608af6b7370a2ade619191a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\vdp_iid_iid_seed38.json": "688f861781449eb14c6eae48d89fec1ec1fcab8e57df85cf6110d85248337c4e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_iid_curvature_seed36.json": "e1c35f3e729cd5db6dcb4c8543d3342d2df34cbeaa0c3497f4c1fe6a3cfe319a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_iid_curvature_seed37.json": "c0060542b21d8af65f3b8d70709a4c647186cb5e0f83cdbe030e561a34e2a9f4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_iid_curvature_seed38.json": "be3772b4294a75cf201f8d443c89a720c5b426f15e59598f26eca12572abb66b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_iid_iid_seed36.json": "ccae95594b56a5015990e72e06234cd8d36927610c5e4d4a82a1bd6269cbe44a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_iid_iid_seed37.json": "6975057bf6271a4af26a2d277aa96a2f052a9501364a22301d69e3030cccb5b8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_iid_iid_seed38.json": "7a494825ed3f696386aaf4ac9acdf2972d04e6a8aefb3d8d2d10b86f8270f7c3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_negative_curvature_seed36.json": "8dce6842363bb2e372b49a4e5d8e079b9b2e0e511e22e94e55d1bb86e8c7001b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_negative_curvature_seed37.json": "2e2928cec220fcdba08949fccbec4973f857ae983e62d5554a45f5397e986f83",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_negative_curvature_seed38.json": "ea930f5fed31515c8779099fbb7fd39af369be76c56e4ef9319751cd05ca758e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_negative_known_rho_seed36.json": "ad3f4370414051f3aef0d9e479d85364f3e8b47d8fa400763b2a858b41a8713d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_negative_known_rho_seed37.json": "a5e0d12505eca127a98de70d204e97b500ace61240d8c667fadafe447ada419b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_negative_known_rho_seed38.json": "a8a96c0fae5aa2c45c6326c09e28e356812d752430094bfae212825213cfa082",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_positive_curvature_seed36.json": "dcca247a3c3134d82828a74982d984133639a6193e935cc9b9bf5e7796c8a108",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_positive_curvature_seed37.json": "4b52e2c972c681f55139fbe05f211dbe089c4e2d7ba2bf09a86e368f9eb6be76",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_positive_curvature_seed38.json": "c29c91b98aa783bc7b3cabf1f696642f3ec34f612f5508a0b0dbae890be490b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_positive_known_rho_seed36.json": "ca035a0c6b410e71c2b3e5cac4b3c9b246ce10121771e81c3b0aebe5ee1f68d7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_positive_known_rho_seed37.json": "c21411610954057c737d65c3903c3e1dc05284ee0c21db066c872520a94a19fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\wave_positive_known_rho_seed38.json": "d1e865eaa7099036463d28df6408082426b928929d48fde0a047b0af259bc7de"
+  }
+}

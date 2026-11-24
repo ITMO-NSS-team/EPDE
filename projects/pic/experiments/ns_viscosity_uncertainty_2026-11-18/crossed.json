@@ -1,0 +1,48 @@
+{
+  "allen_cahn": {
+    "even_coefficients": {
+      "n_coefficients": 64,
+      "n_heldouts": 64,
+      "mean": -7.474774908917291e-07,
+      "positive": 0.46240234375,
+      "variance": 5.1292305619172545e-11,
+      "coefficient_share": 0.5010673910879262,
+      "heldout_share": 0.16359652440181874,
+      "interaction_share": 0.335336084510255
+    },
+    "odd_coefficients": {
+      "n_coefficients": 64,
+      "n_heldouts": 64,
+      "mean": -4.452993884176401e-06,
+      "positive": 0.24609375,
+      "variance": 5.0432234458702667e-11,
+      "coefficient_share": 0.40129456512143186,
+      "heldout_share": 0.13022984187276404,
+      "interaction_share": 0.4684755930058041
+    },
+    "maximum_diagonal_error": 1.548579515488202e-16
+  },
+  "navier_stokes": {
+    "even_coefficients": {
+      "n_coefficients": 64,
+      "n_heldouts": 64,
+      "mean": 6.495601379550237e-05,
+      "positive": 0.993896484375,
+      "variance": 5.527169902518839e-10,
+      "coefficient_share": 0.5643819872464895,
+      "heldout_share": 0.37787326540431293,
+      "interaction_share": 0.05774474734919746
+    },
+    "odd_coefficients": {
+      "n_coefficients": 64,
+      "n_heldouts": 64,
+      "mean": 6.784734515517137e-05,
+      "positive": 0.995361328125,
+      "variance": 4.841467546018313e-10,
+      "coefficient_share": 0.4292988226802719,
+      "heldout_share": 0.5038900084453843,
+      "interaction_share": 0.06681116887434377
+    },
+    "maximum_diagonal_error": 1.290336110529311e-16
+  }
+}

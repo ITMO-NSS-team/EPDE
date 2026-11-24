@@ -1,0 +1,48 @@
+2026-11-17, frozen before new estimator outcomes.
+Goal: solver-free joint correlation/amplitude estimation, then weak-moment
+uncertainty coverage on fresh anchors. No production changes or dynamics solves.
+
+Primary estimator: exact Gaussian profile likelihood for orthonormal DCT-II
+coefficients outside the tensor product of the lower half of frequencies
+on every axis. Low-mode coefficients are unrestricted nuisance means and
+are removed, not fitted to equations. Use ceil(n/2) low modes per axis.
+Control: retain only the high-frequency tensor corner (high on every axis).
+No cutoff selection by truth/coverage and no minimum across axis amplitudes.
+Each variable has its own stationary separable AR(1) covariance and amplitude.
+No true correlation or5% amplitude is passed to these estimators.
+
+Exact finite-domain covariance, not a diagonal periodogram approximation.
+In DCT coordinates the AR precision is diagonal plus a rank-two endpoint
+correction. Marginalizing discarded coefficients is a Schur complement.
+For strips (complement of the low tensor block), compute quadratic and
+log-determinant by the full precision and its low-block Schur complement.
+For the high corner, use each marginal high-frequency precision. Profile
+sigma^2=quadratic/retained_count and optimize correlations simultaneously.
+Stationary range(-1,1);1e-6 excluded at each endpoint solely for numerical
+evaluation. Three starts (0,+0.5,-0.5 on all axes); record optimizer outcomes,
+boundary fits and disagreement. Boundary/incomplete fits are NOT substituted
+with another estimator and remain explicit failures. No ridge or fitted
+signal-variance cap. Correlation rank/curvature is recorded diagnostically.
+
+Checks before field experiments: dense Toeplitz/cosine covariance agreement
+for quadratic forms/logdet, dimensions1..3 and rho0,+/-0.4,mixed axes;
+unit/constant invariance; synthetic separable noise recovery with fixed
+random seeds. Replicated raw/noise-only exploratory fits use anchors30..32
+from the previous study, including all15 iid systems and the core4 colored
+systems. Both fixed frequency designs remain separate; no per-system choice.
+
+After exploratory estimation and a recorded decision, freeze the primary
+method before new coverage anchors33/34/35. Default target: all15 iid systems
+versus estimated iid-family amplitude control; core4 rho+/-0.4 versus existing
+AR and known-rho/estimated-amplitude attribution controls. Use the previous
+native weak banks, Gaussian corrections and full finite candidate library.
+256 calibration+256 check+256 actual fields per record, including simultaneous
+operator and directional reference residual coverage, joint region geometry.
+No blanket post-search or general colored-noise claim. Audit all coefficients,
+source/field/array hashes, seed independence and representative fresh matrices.
+
+RNG namespaces: synthetic950100; exploratory uses prior anchors exactly;
+coverage anchor950101, calibration950102, check950103, actual950104. Keys
+include profile id and anchor; same fields/standard innovations across models.
+Seven worker processes, one BLAS thread each. Every rejected method/failed
+numerical attempt remains recorded; no silent fallbacks or omitted systems.

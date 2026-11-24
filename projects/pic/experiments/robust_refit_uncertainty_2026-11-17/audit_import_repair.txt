@@ -1,0 +1,6 @@
+Initial pilot-screen audit stopped at import before evaluating any records:
+ImportError: cannot import name checkfit from audit_followups, because an older
+experiment had already loaded a module with the same basename. Initial audit
+sources retained as *_initial.py. The repaired audit imports this folder's
+audit_followups.py by explicit path under a unique module name; pilot audit
+reuses that helper. No estimator, pilot, simulation, tolerance or result changed.

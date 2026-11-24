@@ -1,0 +1,11 @@
+{
+  "cases": 12,
+  "source_hashes_verified": true,
+  "finite_scores": true,
+  "feasible_fold_arms": 72,
+  "fold_arms": 72,
+  "source_sha256": {
+    "run_broad.py": "c2d98f8d7be5d75ec353301083c76f7b5109753ec88374acf18ecd6b09d2de02",
+    "summarize.py": "961f43a58a5ccde05d3dbc5c2ff7040de77544c2a77b04c0848bd5c225a29846"
+  }
+}

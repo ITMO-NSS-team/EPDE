@@ -1,0 +1,22 @@
+Independent test of continuous basic-bootstrap noise regions
+===========================================================
+Motivation: the archival12-case descriptive ellipsoids all contain the true
+noise, whereas the finite scenario hull omitted two cases. The current
+controlled-model profile calibration is fixed and will remain unchanged.
+This experiment is frozen before generating any of its new validation fields.
+Use24 previously unused ODE fields: seeds264..271 under iid,+.4,-.4 (8 each).
+Same validated guarded fitter,128 conditional parametric noise bootstrap fits
+around the correlated-GCV pilot, original RNG domains984101/984102. No candidate
+equation is solved; no clean signal enters fitting, pilot or region construction.
+For theta=(log sigma,atanh rho), compute bootstrap mean mu and sample covariance
+V from ALL128 refits. Compare: uncorrected ellipse centered at theta_hat with
+chi-square2(.975) cutoff; basic ellipse centered at2theta_hat-mu with the same
+cutoff; basic ellipse with rank126/128 of centered bootstrap Mahalanobis radii.
+Also retain the hull of all128 reflected points plus theta_hat, as descriptive
+comparator only. A singular covariance or non-ok selected fit makes numerical
+validity unresolved; never remove draws or silently regularize covariance.
+Freeze every region before scoring truth. Report coverage, bias, ellipsoid
+area, exact marginal bounds in sigma/rho, and validation counts. These are
+continuous noise regions, unlike the previous finite point list, but their
+coverage is still an empirical hypothesis.24 outer cases cannot prove97.5%
+coverage or downstream95% equation-set coverage. No production promotion.

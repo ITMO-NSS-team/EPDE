@@ -1,0 +1,170 @@
+Native-sample quadrature and combined local/broad moments, 2026-11-16
+
+Direct native sampling removes most of the deterministic KS error caused by
+dense field resampling. It does not fix broad fitting under noise. Combining
+local and broad constraints prevents the large noisy KS regression, but the
+local KS fit remains more accurate. Mixed fitting improves the median clean
+residual energy on AC, forced KdV and wave relative to the old local baseline;
+it is not a universal replacement. Validation-score misranking and inaccurate
+forced-KdV coefficients remain unresolved.
+
+Scope and controls
+
+Twelve runs: AC, forced KdV (kdv_cossin), wave and KS, each at 5% independent
+Gaussian observation noise with seeds 3/4/5. These are the SAME records as
+the preceding EIV experiment, used for paired comparisons, not another
+independent replication. Known supports only: 12 reference/seed cases and
+24 registered-equation/seed cases including four wave equivalents. Each
+case rotates three interleaved groups through training and validation.
+This is not a repeat of the 15-system structural screen or a new search.
+
+Frozen protocol.txt specifies native versus interpolated input; local,
+broad and combined moment banks; corrected OLS and unchanged 512-draw
+residual-covariance IRLS. Combined fitting stacks constraints and retains
+their joint covariance from shared draws. No coefficient averaging or
+manually tuned bank weight is used. No clean or held-out values select a
+bank, fit, geometry, convergence threshold or regularizer. IRLS starts
+from corrected OLS, requires full covariance rank, and uses relative
+prediction-change tolerance 1e-8 with a 100-iteration limit. Failures are
+retained explicitly without a fallback or averaging incomplete cases.
+
+Native quadrature integrates monomials on the original sample grid. It
+still uses within-cell polynomial interpolation (degree 3 in time, 5 in
+space); it removes dense field resampling, not all interpolation. Remaining
+derivative factors use the existing fourth-order central differences, with
+support halos. Weak test derivatives are evaluated analytically.
+
+Broad supports were aligned to the native grid, changing physical geometry
+for wave and slightly for KS relative to the preceding study. The NEW
+interpolated controls have exactly the same physical windows, centers and
+frequencies as the native controls. Use those matched controls to attribute
+effects to native sampling, rather than comparing directly with old broad
+results. Local fitting uses the frozen historical natural-stride subset.
+
+Accuracy results
+
+Metric: median over three seeds of the three-fold mean residual energy on
+the same frozen clean spectral evaluation bank. Lower is better. This is
+neither a relative coefficient error nor a trajectory prediction error.
+Clean data are used only after fitting for diagnostic evaluation.
+
+System       Old local CLSM   Interp broad IRLS  Native broad IRLS
+AC           1.591756e-4      1.119977e-4        1.141355e-4
+Forced KdV   1.701656e-1      4.853441e-2        4.914740e-2
+Wave         6.108926e-2      1.322916e-3        2.480758e-3
+KS           5.987805e-5      1.580211           1.938218
+
+System       Native local IRLS  Interp mixed IRLS  Native mixed IRLS
+AC           1.608398e-4        1.176828e-4        1.141519e-4
+Forced KdV   incomplete (7/9)   8.429899e-2        8.469692e-2
+Wave         2.983963e-1        3.236549e-3        4.795330e-3
+KS           5.133720e-5        8.036860e-5        8.090566e-5
+
+Native mixed IRLS improves 9/12 reference/seed cases versus old local CLSM:
+AC 2/3, forced KdV 3/3, wave 3/3, KS 1/3. Median changes are approximately
+28%, 50%, and 92% lower energy for the first three systems, but 35% higher
+for KS. Combining banks sacrifices some broad-fit accuracy for forced KdV
+and wave while preventing the broad-only KS collapse. Interpolated mixed
+fitting performs similarly, showing that the main noisy-data benefit here
+comes from combining constraints, rather than from native sampling alone.
+These small paired samples do not establish population-level superiority.
+
+Clean controls isolate the resampling problem
+
+On matched broad KS geometry, corrected OLS on clean observations gives:
+  Full clean sampling:                     1.042770e-10
+  Subsampled clean, then dense resampling:  2.069206e-1
+  Subsampled clean, native quadrature:      9.943466e-5
+
+Native quadrature reduces this error about 2,081-fold, yet remains far above
+the full-sampling floor. Local native clean energy is 2.394381e-8; mixed
+native clean energy is 2.394442e-8. This isolates a substantial deterministic
+representation effect, but the noisy native broad energy of 1.938218 shows
+that eliminating most of that effect is insufficient. The remaining noisy
+failure cannot be assigned uniquely to variance, identifiability or noise-
+model error by this experiment. The clean controls repeat identical clean
+data across seeds and are not independent replicates.
+
+Coefficient accuracy remains a separate issue
+
+Coordinate-wise medians over the nine reference folds are listed here as
+diagnostics, not as a new fitted or averaged coefficient vector:
+  Forced KdV, native mixed: (-1.76109, -0.335968, 0.235193)
+  Forced KdV, native broad: (-4.09913, -0.517239, 0.436169)
+  Forced KdV, exact:        (-6, -1, 1)
+  KS, native mixed:        (-0.998537, -0.999275, -1.000123)
+  KS, native broad:        (-0.999354, -1.002988, -1.186162)
+  KS, exact:               (-1, -1, -1)
+
+AC's small coefficient also remains poorly resolved: native mixed median
+2.434593e-4 versus exact 1e-4. Wave's native mixed median is 0.0368125 versus
+exact 0.04; broad native is 0.0394600. A reduced residual alone does not
+justify claiming all coefficients have been recovered.
+
+Validation does not yet supply a reliable automatic bank selector
+
+The old common broad validation score was reproduced with maximum error
+0.0 for saved baseline fits. New direct-native validation uses common
+physical supports inside all groups' usable domains, including partial
+native cells at off-grid endpoints. Its 512-draw pooled covariance metric
+is learned only from training and is shared across all candidates and fits.
+All validation covariance matrices pass the full-rank feasibility check.
+
+Descriptive pairwise ranking agreement with frozen clean energy, across
+771 dependent pairs of complete new fits on reference cases:
+  Old broad score:          579/771 = 75.1%
+  Native broad, whitened:   601/771 = 78.0%
+  Native local, whitened:   435/771 = 56.4%
+  Native mixed, whitened:   565/771 = 73.3%
+
+Pairs share records and coefficients; these are not 771 independent tests.
+Native broad has modestly higher descriptive agreement. Adding local
+validation does not improve agreement here. For example, on wave seed 3,
+mixed native validation chooses native local IRLS with clean energy
+0.298396, whereas the old broad score chooses interpolated broad IRLS with
+0.000552725. Thus combined fitting and combined validation must be assessed
+separately. All fit-selection summaries in ranking_diagnostic.csv are
+post-hoc diagnostics; no selector is promoted, and an outer validation split
+would be required to evaluate a selection pipeline.
+
+Failures and numerical checks
+
+426/432 new IRLS fits converge. Six reach the 100-iteration limit:
+  Forced KdV seed 3, folds 0 and 1: native and interpolated local (4 fits).
+  Wave seed 3, fold 2: native mixed, equivalent_3.
+  Wave seed 4, fold 1: interpolated local, equivalent_3.
+All reference mixed fits converge; the equivalent-support failure remains
+reported. No failure is replaced with a successful subset average. All
+432 new corrected-OLS fits succeed. See failed_fits.csv for diagnostics.
+
+Quadrature checks pass: aligned-weight maximum difference 7.28e-13;
+off-grid polynomial integration-by-parts error 3.25e-13; agreement between
+shifted sampling grids; constant preservation; rejection of unsafe supports.
+Three ODE_simple identity controls preserve their additive constants:
+  u' cos(t) + u sin(t) = 1
+  u cos(t) - u' sin(t) = 1.3
+  (u')^2 + u^2 = 2.69
+The last identity uses a derivative power; both phase identities do not.
+These are clean identity-preservation controls, not a noisy search result.
+Completion audit details, source/input/result hashes and replay checks are
+recorded in completion_audit.json after running audit_native.py.
+
+Implication for the next experiment
+
+Retain local and broad fits as separate candidates and assess how a
+solver-free validation score can distinguish their accuracy on an outer
+split. Do not automatically replace the local objective with the mixed
+one, or treat the modest ranking-agreement gain as validation of a selector.
+For forced KdV, inspect training-side sensitivity and uncertainty of the
+coefficient directions: residual reduction has not resolved the coefficient
+error. These are proposed follow-ups, not completed experiments here.
+
+Artifacts: protocol.txt; per_case.csv; per_fold.csv; coefficient_errors.csv;
+clean_controls.csv; paired_input_comparison.csv; validation_weighting.csv;
+ranking_diagnostic.csv; ranking_agreement.csv; failed_fits.csv; summary.json;
+diagnosis.json; comparison.png/svg; checks.json; invariant_checks.json;
+completion_audit.json; and the 12 full result JSON files.
+
+No candidate ODE/PDE solves, PINNs, clean benchmark regeneration, production
+edits or commits were made. Existing unrelated workspace changes were left
+intact.

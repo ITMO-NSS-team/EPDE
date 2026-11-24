@@ -1,0 +1,46 @@
+Allen–Cahn reaction coefficients and identification of weak diffusion
+18 November 2026
+
+At 5% iid noise on the registered trajectory, keep both the diffusion-bearing and reaction-only supports eligible. The spatial mean supplies an equation for the two reaction coefficients because the spatial integral of the periodic Laplacian vanishes. Estimating the reaction coefficients this way made the full law more competitive, even when the data were generated with exactly zero diffusion. The matched negative control is decisive for interpreting the ranking gain.
+
+Revisiting the previous 22/24
+
+On the same 24 fields used in the earlier coefficient diagnostic, supplying the physical cubic and linear coefficients to the full law and refitting diffusion put it on the original local-window Pareto front 22 times. Giving the identical coefficients to the reaction-only competitor reduced that count to 11. Freely fitting both candidates gave 8. At the middle width the corresponding counts were 23, 6 and 6. The original comparison measured the benefit of improving only the reference fit and overstates the gain available for identifying diffusion when the rival receives the same information.
+
+Primary experiment
+
+On 64 new noise realizations, the spatial-mean first stage followed by local diffusion fitting raised reference front survival from 21/64 to 53/64. In the direct comparison with reaction only, keeping diffusion won 58/64 instead of 21/64, with 37 paired gains and no losses (two-sided exact sign test p = 1.46e−11). Front survival gained on 33 fields and fell on one (p = 4.07e−9). Both tests concern repeated measurements on the diffusion-bearing trajectory.
+
+Coefficient accuracy moved in the opposite direction. Median absolute errors for the linear and cubic coefficients increased from 0.024 and 0.034 to 0.078 and 0.066. For the diffusion coefficient, whose physical value is 0.0001, error increased from 0.000097 to 0.000333. The estimated diffusion coefficient was positive on 37/64 fields with the mean fit. The full law's median held-out discrepancy increased from 1.44e−5 to 9.72e−5. Added terms beat the reference in 30/384 comparisons versus 48/384 for the original fit, while more added supports survived the full Pareto front (24 versus 16). These are different comparisons within the same panel.
+
+Disjoint observations and the exact zero control
+
+The follow-up paired 64 additional positive fields with 64 reaction-only fields generated from the same initial profile and matched standardized noise draws. The reaction-only field was evaluated from its closed-form time dependence. The direct comparison below counts a field when the signed outer discrepancy of the full candidate is smaller than the reaction-only candidate's. The null column measures false preferences for including diffusion.
+
+Fit                                  Diffusion present    Diffusion absent
+Original local                             23/64                19/64
+Spatial mean, then local diffusion         60/64                60/64
+Mean and local on disjoint grid points     61/64                60/64
+Modes 0–3, then local diffusion            28/64                29/64
+Direct fit using modes 0–12                24/64                18/64
+Physical reactions supplied to both        18/64                 9/64
+
+The signed margin of the mean-based fit had empirical AUC 0.484. Splitting the reaction measurement onto even spatial columns and fitting diffusion on odd columns gave 0.486. The diffusion-bearing law survived the mean-based Pareto front on 57/64 positive fields and 56/64 null fields. The true reaction-only law remained eligible on all 64 null fields. The results support an interpretation in which a free diffusion coefficient can compensate for error in the fixed reaction ratios. They do not identify a unique source of that error.
+
+Held-out spatial harmonics
+
+A separate experiment fitted both candidate equations on training modes 0–12 and evaluated their difference on identical physical-time windows in two disjoint held-out time groups. The diffusion multiplier grows with the squared spatial wavenumber. New readouts used raw periodic moments and training-only column normalization. For each readout, the 62nd ordered margin of 64 previously generated null fields supplied a benchmark-specific threshold. None of the subsequent 128 positive or 128 negative fields contributed to calibration.
+
+Readout                    Positive calls       False calls       Empirical AUC
+Modes 0–3                      12/128                3/128              0.551
+Modes 4–12 (primary)           10/128                1/128              0.565
+Modes 0–12                     16/128                2/128              0.599
+Absolute fitted coefficient    13/128                8/128              0.704
+
+The higher-frequency check reduced false calls but detected few true fields. Even the combined frequency bank detected only 12.5% of positive fields at the fixed threshold. Sensitivity and thresholds on other trajectories remain untested.
+
+Checks and scope
+
+The 51-by-128 benchmark equals every fourth time and space sample of the documented periodic AC.mat array. Each fit used only the outer training group. Polynomial noise correction, temporal integration by parts and independent spatial channels supplied the new training measurements. Each of the 14 fixed candidate supports, including constants and extensions, received the same fitting rule. Only the benchmark controls used known coefficients for fitting. No candidate PDE was integrated.
+
+The periodic-mean clean fit recovered the cubic and linear coefficients as −4.99996 and 4.99995. On clean controls the 0–12-mode fit returned diffusion 0.0000996 on the registered field and −3.9e−9 on the zero field. Independent FFT calculations replayed sampled weak matrices to 2.7e−14 relative to the matrix scale. Signed unit and permutation checks covered the fitted score, and 2,368 Pareto fronts were reconstructed independently. The independent readout code also reproduced the 0–12-mode training coefficients on all 64 calibration fields. Field hashes, protocol files, per-field tables and scripts are stored alongside this report. The conclusions apply to these two periodic trajectories, the fixed candidate panel and the stated measurement noise.

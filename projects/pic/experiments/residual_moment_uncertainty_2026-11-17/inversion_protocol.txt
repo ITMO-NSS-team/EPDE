@@ -1,0 +1,28 @@
+Exploratory confidence-set inversion, frozen before fresh confirmation outcomes.
+Wave reference support has one fitted coefficient. For BOTH local and broad
+native banks and ALL six anchors24-29, invert the iid_studentized residual
+test without introducing a coefficient-fit bootstrap. Inputs are only the
+saved observed moments, pilot-error calibration/check moments and re-estimated
+amplitudes. The exact coefficient is queried only after the region is built.
+
+For beta in R, use target-feature residual M_y-beta*M_x. Its row variance is
+the sample variance of studentized calibration errors at that same beta.
+The cutoff is the95th percentile of the same fixed256 studentized check
+error scores at beta. Accept when the observed statistic is below cutoff.
+No sign restriction, Gaussian coefficient approximation, chosen radius or
+clean-coefficient centering is allowed. The single support is registered and
+fixed; this is not post-search confidence or a multicoefficient projection.
+
+Parameterize projectively as v=(cos(theta),-sin(theta)), beta=tan(theta),
+theta in[-pi/2,pi/2]. Score scale invariance allows examination of infinite
+beta through v=(0,1). Search8193 and16385 uniform angles, adding the observed
+ordinary least-squares angle. Refine every sign-changing boundary with
+Brent's scalar root routine, tolerance1e-12. Require agreement between both
+resolutions; label results numerical inversion, not proof against arbitrarily
+narrow components. Retain empty, disconnected or unbounded regions.
+
+Audit the batched quadratic-form score against direct residual arithmetic,
+both-resolution roots, boundary equality and stored exact-coefficient
+acceptance on256 independent actual measurements. Plot all12 intervals and
+report exact-coefficient inclusion only after freezing numerical regions.
+No differential-equation solve or new data generation is needed.

@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "synthetic_model": [
+    0.1999737715828197,
+    [
+      0.2998450802982072,
+      0.4014916118672478,
+      -0.4027415432032108
+    ],
+    [
+      2,
+      4,
+      4
+    ]
+  ],
+  "true_model": [
+    0.2,
+    [
+      0.3,
+      0.4,
+      -0.4
+    ]
+  ],
+  "unit_linear_trend_invariance": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_checks.py": "1ef0b10eb6d8b5600144f57fdada8f13247540b7848715aeba9c0067131c5ac9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_protocol.txt": "53e2e80c63b576e248c5d96a0265b4a164135df29aa142317fdf490e40d4342c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d"
+  }
+}

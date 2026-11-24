@@ -1,0 +1,193 @@
+{
+  "status": "PASS",
+  "gradient_checks": 32,
+  "max_inverse_error": 3.5393586585996673e-06,
+  "max_gradient_error": 4.1229399902475983e-07,
+  "synthetic": {
+    "model": [
+      0.20137621153865748,
+      [
+        0.3765115629785518
+      ],
+      [
+        2
+      ]
+    ],
+    "info": {
+      "status": "ok",
+      "sigma": 0.20137621153865748,
+      "rhos": [
+        0.3765115629785518
+      ],
+      "kappas": [
+        0.08071493874732794
+      ],
+      "p1s": [
+        -0.985831179551422
+      ],
+      "p2s": [
+        -0.15403466004695915
+      ],
+      "ar1": [
+        -1.137683350157318
+      ],
+      "ar2": [
+        -0.15403466004695915
+      ],
+      "signal_boundary": false,
+      "contrast_count": 999,
+      "shape": [
+        1001
+      ],
+      "objective": -1.157317411216463,
+      "fits": [
+        {
+          "start": "nested_ar1",
+          "success": true,
+          "value": -1.157317411216463,
+          "theta": [
+            0.3765115629785518,
+            -2.5168316062488794,
+            -0.985831179551422,
+            -0.15403466004695915
+          ],
+          "iterations": 21,
+          "gradient": [
+            4.8439074973316565e-09,
+            8.919705946075496e-10,
+            3.5973465983829556e-08,
+            2.1080478473933795e-09
+          ],
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "start": "fixed_0",
+          "success": true,
+          "value": -1.1553320861064227,
+          "theta": [
+            0.36917691080798876,
+            -8.784618429943878,
+            0.5332830040534637,
+            -0.08313588045717835
+          ],
+          "iterations": 131,
+          "gradient": [
+            4.371934037017411e-09,
+            -9.014576669852392e-08,
+            -1.238121368374312e-06,
+            1.1193457727376455e-07
+          ],
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "start": "fixed_1",
+          "success": true,
+          "value": -1.1242757223695254,
+          "theta": [
+            0.41567572010081033,
+            -2.9923013774875793,
+            0.9999981943365812,
+            -0.5059007548607872
+          ],
+          "iterations": 25,
+          "gradient": [
+            -0.0007243641986136584,
+            0.0010060931513553202,
+            -0.019057837344007567,
+            -0.0005873405185341241
+          ],
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "start": "fixed_2",
+          "success": true,
+          "value": -1.1554287226641566,
+          "theta": [
+            0.36930647595955546,
+            -9.75701932927831,
+            0.9448544220009056,
+            -0.6481267311648193
+          ],
+          "iterations": 28,
+          "gradient": [
+            0.0030378100246192252,
+            0.001009024398107683,
+            0.014513537024053003,
+            0.0033717511583809118
+          ],
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        }
+      ],
+      "warm": {
+        "status": "ok",
+        "sigma": 0.2014116287330579,
+        "rhos": [
+          0.37488168529687815
+        ],
+        "kappas": [
+          0.06175218982669037
+        ],
+        "phis": [
+          -0.9862666141863908
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 999,
+        "shape": [
+          1001
+        ],
+        "objective": -1.1572316230946205,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.1572316230946205,
+            "theta": [
+              0.37488168529687815,
+              -2.784625841322429,
+              -0.9862666141863908
+            ],
+            "iterations": 35,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -1.1220493533820672,
+            "theta": [
+              0.38999644340952216,
+              -3.005119955599507,
+              0.9999962822520295
+            ],
+            "iterations": 25,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.155332019892506,
+            "theta": [
+              0.3691305561103031,
+              -8.589573941447377,
+              0.3916125152389101
+            ],
+            "iterations": 32,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.03518226971255323,
+        "likelihood": "exact"
+      },
+      "failed_evaluations": 1,
+      "successful_objective_spread": 0.03304168884693759,
+      "likelihood": "exact"
+    }
+  },
+  "trend_units_invariant": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\checks_score.py": "f02cc222b4de2796efb8364b456544a52166312f6912aa9dfab4832d4609588c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_fit.py": "1bda821f1f18b901819f855c0fd2b08e2ed106684eda2fafeb20ae25df7d6572",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_core.py": "6cdfd9faedcca6f8dd06dfbf4e8e195fbeb953fcddd46a5dca070a796210c001",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\fit.py": "f40ec40d042db19311acb0cb86142da2966c9f5589181b0e12e5b5b2cc382023",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_protocol.txt": "f2ab671b499742a8aba77924c02997d5958accb4dd512fe1c41e824cf5be89bb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_fit.py": "485b11c45108b921fc5a46dda07997a45c4ad788ef24de1852d84c33cb9e3b14",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\latent_fit.py": "84e33329e5f57c3b73f2151154e0341ad9071ea145696ccf2bb58b5a48a7fe9a"
+  }
+}

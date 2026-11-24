@@ -1,0 +1,20 @@
+Targeted fresh coverage decision, before seeds48..50
+===================================================
+The exploratory paired AC-positive pilot screen on anchors45..47 reduces mean
+bootstrap sigma ratios from1.239/1.241/1.296 to1.004/1.014/1.009 by changing
+only nuisance reconstruction to correlation-aware GCV. Freeze this combination:
+time_fit.py noise estimation + correlated_pilot.py observed-data reconstruction.
+
+Run AC positive rho0.4 only, fresh seeds48,49,50, RNG domains983101..983104.
+Same256 calibration/check/actual draws, both fixed and correction-refit branches,
+same native weak banks, candidate panel, constant columns, and joint regions as
+the full69-anchor study. Freeze before clean truth/actual evaluation. Preserve
+all finite flagged fits. No per-system constants, tuned cutoffs or true noise
+parameters enter the procedure; choosing AC targets the observed failure.
+
+Then apply the previously fixed32-common-field studentizer and validated local
+responses to these same three cases. Its algorithm is specified before any
+new coverage outcomes. This checks a targeted repair, not universal promotion:
+three anchors in one positive-noise PDE do not certify all15 systems or95%
+unconditional coverage. Compare earlier studies descriptively, not as paired
+new/old coverage, since the seeds and pilot/noise models differ.

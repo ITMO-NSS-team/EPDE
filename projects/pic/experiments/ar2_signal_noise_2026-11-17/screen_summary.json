@@ -1,0 +1,330 @@
+{
+  "status": "COMPLETE",
+  "records": 23,
+  "summary": [
+    {
+      "profile": "iid",
+      "mode": "raw",
+      "variables": 20,
+      "incomplete": 1,
+      "sigma_ratio_quantiles": [
+        0.9143909478301241,
+        0.9316491648925925,
+        0.9917530002700952,
+        1.0534012202430014,
+        835.7331635566231
+      ],
+      "rho_error_quantiles": [
+        -0.999999,
+        -0.04563845776195974,
+        0.008481730840091963,
+        0.03292680865925991,
+        0.09148606202201655
+      ]
+    },
+    {
+      "profile": "iid",
+      "mode": "noise_only",
+      "variables": 20,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.8938838941683345,
+        0.908173123277997,
+        0.9857871565261909,
+        0.9988552966935825,
+        1.0080694735218836
+      ],
+      "rho_error_quantiles": [
+        -0.07163947807293931,
+        -0.043631335293943474,
+        0.002478351953436914,
+        0.011757619949677257,
+        0.031959077691207274
+      ]
+    },
+    {
+      "profile": "positive",
+      "mode": "raw",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9935410125569893,
+        0.9948028667320652,
+        1.0026781421785669,
+        1.0326706676570858,
+        1.0434113432744547
+      ],
+      "rho_error_quantiles": [
+        -0.06071694117091336,
+        -0.04877311666990597,
+        -0.00408237119472013,
+        0.018220477640298036,
+        0.04221599429476014
+      ]
+    },
+    {
+      "profile": "positive",
+      "mode": "noise_only",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9846875275283207,
+        0.9882902916201375,
+        0.9966980742559317,
+        0.9992509565839695,
+        1.0003444776867478
+      ],
+      "rho_error_quantiles": [
+        -0.04054808988763969,
+        -0.026635377075469244,
+        -0.01085967084335085,
+        -0.000744575066237696,
+        -0.0004973848852836693
+      ]
+    },
+    {
+      "profile": "negative",
+      "mode": "raw",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        1.0033807755134247,
+        1.0055687335324446,
+        1.012412483370472,
+        1.0193062525683358,
+        1.021515647455857
+      ],
+      "rho_error_quantiles": [
+        -0.027492481402099866,
+        -0.024179023376293313,
+        -0.014186579045769254,
+        0.01897070264688582,
+        0.05473951869635829
+      ]
+    },
+    {
+      "profile": "negative",
+      "mode": "noise_only",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9964829047938181,
+        0.9989303537701694,
+        1.0087835225622799,
+        1.0142651517320387,
+        1.014839083727382
+      ],
+      "rho_error_quantiles": [
+        -0.03291555790783629,
+        -0.028049226855183296,
+        -0.006967180343687512,
+        0.000602303081536091,
+        0.008186523208938423
+      ]
+    }
+  ],
+  "processes": [
+    {
+      "record": "ac_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 8.9
+    },
+    {
+      "record": "ac_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 12.5
+    },
+    {
+      "record": "ac_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 13.8
+    },
+    {
+      "record": "burgers_inviscid_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 7.9
+    },
+    {
+      "record": "duffing_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 2.8
+    },
+    {
+      "record": "pde_compound_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 36.3
+    },
+    {
+      "record": "burgers_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 30.9
+    },
+    {
+      "record": "kdv_cossin_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 10.1
+    },
+    {
+      "record": "kdv_cossin_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 10.1
+    },
+    {
+      "record": "kdv_cossin_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 14.1
+    },
+    {
+      "record": "lorenz_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "seconds": 9.4
+    },
+    {
+      "record": "lv_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "seconds": 3.0
+    },
+    {
+      "record": "ode_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 2.3
+    },
+    {
+      "record": "vdp_iid_seed36",
+      "statuses": [
+        "boundary",
+        "ok"
+      ],
+      "seconds": 3.3
+    },
+    {
+      "record": "wave_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 14.9
+    },
+    {
+      "record": "pde_divide_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 29.7
+    },
+    {
+      "record": "wave_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 15.6
+    },
+    {
+      "record": "wave_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 13.8
+    },
+    {
+      "record": "kdv_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 167.6
+    },
+    {
+      "record": "ns_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "seconds": 273.6
+    },
+    {
+      "record": "ks_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 471.9
+    },
+    {
+      "record": "ks_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 552.9
+    },
+    {
+      "record": "ks_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 591.5
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen.py": "d67e0dabb42746fd10abf9c5584b42760bd0bdc812cf438ce30c7d973a3eca00",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\fit.py": "f40ec40d042db19311acb0cb86142da2966c9f5589181b0e12e5b5b2cc382023",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\protocol.txt": "c1fc5f7673022b57672802a276d331c9153ac89c672c65952d2000c1349526e5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_fit.py": "485b11c45108b921fc5a46dda07997a45c4ad788ef24de1852d84c33cb9e3b14",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\latent_fit.py": "84e33329e5f57c3b73f2151154e0341ad9071ea145696ccf2bb58b5a48a7fe9a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\coverage.py": "cfa35e5bcc39350d05977c66f412dda9954de23a4341917cebe26d295628ad3c"
+  }
+}

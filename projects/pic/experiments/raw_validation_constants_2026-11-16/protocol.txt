@@ -1,0 +1,92 @@
+Frozen protocol: raw weak validation and explicit constant/intercept audit
+2026-11-16
+
+Primary test: evaluate EXISTING fixed coefficients, not refit or select them.
+Start wave/KS x three seeds, also AC/forced KdV to diagnose previous failures.
+If raw ranking separates accurate wave and KS options without an obvious
+quadrature failure, expand unchanged to the core 15. Noise 5%, seeds 0/1/2.
+Retain original candidate panel, registered equivalents, dyad, physical local
+weak supports, training target-energy normalization and 3 raw time groups.
+No candidate equation solves, PINNs, production changes or new search.
+
+Each raw group is mapped to the original fine grid by a FIXED natural cubic
+interpolant in time. There is no time smoothing or spatial filtering. The
+existing weak bank's interior support excludes out-of-domain extrapolation;
+assert this explicitly. Interpolation is not assumed exact: saved clean
+subsamples undergo the identical map as a quadrature/discretization control,
+compared against the original full clean weak bank after coefficients freeze.
+
+The finite panel has polynomial degree <=3 in observed fields and their
+linear derivatives. For fixed zero-mean joint Gaussian measurement noise:
+  corrected(a b) = a b - C_ab
+  corrected(a b c) = a b c - C_ab c - C_ac b - C_bc a.
+Covariances propagate the existing per-group separable AR noise model through
+the fixed time interpolant and the exact finite-difference operators used by
+weak monomials. Different variables have independent errors in this model.
+Coordinate and opaque known factors are deterministic. Constants and linear
+monomials receive zero correction. These identities are exact under the
+assumed known covariance; estimated covariance and real bias remain limits.
+
+Primary discrepancy is the signed cross-product of corrected residual moments
+from the OTHER TWO raw groups. Independent groups remove the squared-noise
+floor; do not additionally subtract a within-group variance from that cross
+product. Also save uncorrected raw cross-products and ordinary residual energy.
+All six existing fitting options are ranked only as a validation diagnostic;
+using these held-out scores to choose a fit would require another evaluation
+split and is NOT reported as validated discovery.
+
+Uncertainty: 128 Gaussian operator draws per raw group, centered around the
+existing noisy-data reconstruction solely as a signal proxy for variance.
+Apply the same analytical correction to every draw. 512 paired empirical
+perturbations reuse group draw indices across candidates/options/rotations,
+preserving correlation. No 1+1/B mean-correction factor: point correction is
+analytic, not a bootstrap estimate. Report conditional dispersion and 64/128
+covariance sensitivity; neither is calibrated physical-model confidence.
+
+Constants/intercepts:
+- Inventory physical constants in all registered structures; do not assume
+  zero forcing as a general law, or ban offsets based on this catalog.
+- Current panel fits only explicit terms and calls dyad with fit_intercept=False.
+  Audit constant-column normalization; no hidden fitted intercept is added.
+- Compare each reference with its existing reference-plus-constant candidate:
+  changes in local discrepancy, dyad, all physical coefficients and clean fit.
+- Decompose dyad into the explicit constant contribution and other terms.
+  Re-rank a diagnostic counterfactual omitting ONLY the constant's dyad score;
+  this models an unpenalized fitted intercept, not the primary objective.
+- For fixed coefficients, set only the constant coefficient to zero and
+  decompose raw cross discrepancy into its direct offset contribution and
+  remaining contribution. Report residual-mean versus centered components.
+  Centering is a diagnostic, not an authorized free offset in the objective.
+
+Checks before outcomes: Gaussian polynomial identities by exact low-order
+quadrature, covariance propagation against explicit dense small-grid maps,
+constant weak column equals one, derivative of a constant vanishes, analytic
+cross-noise cancellation, baseline coefficients/dyad/scores reproduce saved
+values, common supports avoid extrapolation, clean coarse/full mismatch is
+reported rather than hidden. Save hashes and all negative results.
+
+Context source: Messenger and Bortz, Asymptotic consistency of the WSINDy
+algorithm in the limit of continuum data, https://arxiv.org/abs/2211.16000 .
+Its noise-induced spurious polynomial terms motivate checking lower-order
+terms; our finite-sample correction/test is specified above, not established
+as successful by that paper. No external claim replaces local validation.
+
+Implementation adjustment before completed targeted comparison:
+Some original local plans have zero temporal cut (KS and AC), so their edge
+windows require extrapolation from another raw group. The support assertion
+stopped those runs. Exclude precisely the weak rows whose interpolation or
+remaining derivative stencil leaves the common raw-group domain, without
+tuning from outcomes. Apply the same fixed mask to smooth/raw/clean controls;
+keep the old full-bank training normalization. Save original smooth scores
+and verify them before masking, then report the restricted smooth comparison
+separately. Three initial wave cases and the original source are preserved
+in initial_boundary_results/ and run_validation_initial.py and are rerun.
+
+User clarification: the additional ODE is ODE_simple_discovery in
+projects/pic/data/ode/ode.py, NOT the core registry's forced oscillator 'ode'.
+It has u=sin(t)+1.3 cos(t), 200 points over [0,4*pi], max derivative order 1.
+Its exact invariant u^2+(u')^2=2.69 contains an additive constant. The separate
+ode_simple diagnostic must credit this identity, distinguish it from a
+universal evolution equation, and must not use an unavailable second
+derivative as a competing search candidate. Evaluate the existing closed-form
+sample definition directly; no numerical ODE integration is involved.

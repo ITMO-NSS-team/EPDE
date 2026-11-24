@@ -1,0 +1,94 @@
+Solver-free nuisance normalization and weak-direction research
+=============================================================
+
+Frozen primary comparison:18 fresh datasets,128 refits each, MC16.
+Both methods correct moments using refitted noise. Studentized normalization
+uses each replicate covariance; fixed_metric uses observed covariance.
+This isolates normalization randomness; it is NOT confidence-set propagation
+over noise parameters. All cutoffs were frozen before clean-data evaluation.
+
+1. Coverage and precision (counts out of3 for every system/profile)
+ode/iid: {'studentized': {'local': 3, 'broad': 3, 'original': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'original': 3}}
+ode/positive: {'studentized': {'local': 3, 'broad': 3, 'original': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'original': 3}}
+ode/negative: {'studentized': {'local': 3, 'broad': 3, 'original': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'original': 3}}
+kdv_cossin/iid: {'studentized': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}}
+kdv_cossin/positive: {'studentized': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}}
+kdv_cossin/negative: {'studentized': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'selected': 3, 'original': 3, 'replacement': 3}}
+Paired normalization coverage disagreements: 0.
+Reference coefficient geometry:
+ode/iid: {'studentized': {'original': {'bounded_outer': 3}}, 'fixed_metric': {'original': {'bounded_outer': 3}}}
+ode/positive: {'studentized': {'original': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}}}
+ode/negative: {'studentized': {'original': {'bounded_outer': 3}}, 'fixed_metric': {'original': {'bounded_outer': 3}}}
+kdv_cossin/iid: {'studentized': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}}
+kdv_cossin/positive: {'studentized': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}}
+kdv_cossin/negative: {'studentized': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}, 'fixed_metric': {'original': {'unbounded_certified': 3}, 'replacement': {'unbounded_certified': 3}}}
+Coverage is full-library weak-error containment, not exact-equation recovery.
+No bootstrap draw was removed. All warnings are retained in result files.
+Retrospective72-data comparison is exploratory and has different estimator
+versions in its69 historical and3 repaired-ODE cohorts; do not pool them.
+{'historical_default': {'studentized': {'local': 67, 'broad': 68, 'joint': 68}, 'fixed_metric': {'local': 68, 'broad': 68, 'joint': 68}}, 'repaired_ode': {'studentized': {'local': 2, 'broad': 3, 'joint': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'joint': 3}}}
+
+2. Noise identification and optimizer safeguards
+In96 independent ODE fields, the repaired temporal fitter still produced
+near-unit estimates: [('iid', 0, 32), ('positive', 19, 32), ('negative', 0, 32)].
+Profile checks recovered better moderate-rho optima in the three extreme
+positive-correlation cases inspected. Polishing the original starts was not
+sufficient: new basins must also be searched. The IID112 moderate-rho case
+was different: its old fit had slightly BETTER likelihood than the lower-rho
+profile solution (difference0.475 in -2loglik). Not every biased estimate is
+an optimizer failure.
+The new guard triggers extra fixed-rho starts at[-.8,-.4,0,.4,.8] only if
+|rho|>.95 or fit status is non-ok, then releases rho. It retains the old fit
+as a candidate and selects the best exact objective. The trigger is not a cap.
+Fixed-rho intermediate records store the full gradient; their unconstrained
+status may be nonstationary by construction. Only released fits compete.
+Independent48-field guard evaluation (32 positive,8 IID,8 negative):
+iid: n=8, near-unit 0 -> 0, sigma/truth {'min': 0.9289392540483326, 'median': 1.0076442546978388, 'max': 1.0362242871903078}, rho error {'min': -0.060908895120763626, 'median': 0.0022337117615568343, 'max': 0.07775577531884985}, statuses {'ok': 8}
+positive: n=32, near-unit 17 -> 0, sigma/truth {'min': 0.8591582739201138, 'median': 1.4228469215062933, 'max': 1.6312920641706685}, rho error {'min': -0.13511426099016716, 'median': 0.3099301359075028, 'max': 0.3766364618457614}, statuses {'ok': 32}
+negative: n=8, near-unit 0 -> 0, sigma/truth {'min': 0.930269649588277, 'median': 0.9906494239923443, 'max': 1.0333536209123386}, rho error {'min': -0.1172069258171543, 'median': -0.024449322462818168, 'max': 0.03471980895806931}, statuses {'ok': 8}
+The guard does not remove moderate amplitude/correlation bias. It has been
+tested for noise fitting here; full bootstrap uncertainty WITH this new guard
+is not validated. The original18-case run was preserved rather than replaced.
+
+3. Existing local-polynomial alternative (exploratory96-field comparison)
+iid: n=32, near-unit=0, sigma/truth {'min': 0.8474037916631927, 'median': 1.0076663972645736, 'max': 1.3770513984519936}, rho error {'min': -0.313572837080569, 'median': 0.007203968285199806, 'max': 0.4253088147431337}, statuses {'ok': 32}
+positive: n=32, near-unit=10, sigma/truth {'min': 0.7008221931476374, 'median': 1.0502671532653298, 'max': 116.95269476245741}, rho error {'min': -0.4873912801124946, 'median': 0.03562008239144682, 'max': 0.5999476502291514}, statuses {'ok': 32}
+negative: n=32, near-unit=0, sigma/truth {'min': 0.8670284658147676, 'median': 1.0012649708703976, 'max': 1.138231421240682}, rho error {'min': -0.10603009596715096, 'median': 0.04648064177779476, 'max': 0.20518295013894378}, statuses {'ok': 32}
+Local6 is the unchanged Gaussian-consistent robust estimator after removing
+quintic polynomials in short blocks. This compares signal/noise assumptions.
+It is not newly tuned, not a validated global replacement, and not calibrated
+as part of the present fresh bootstrap procedure.
+Gaussian information diagnostic: with320 points and true rho=.4, the local
+Cramer-Rao scale for rho rises0.05128->0.31399 after removing local quintic
+polynomials. The inferred log-sigma/rho parameter correlation becomes0.9841.
+For rho=-.4 the same contrast scale is0.08362. This asymmetry is consistent
+with losing the slow noise components when removing a smooth signal.
+The calculation retains cross-block covariance and assumes the signal lies
+exactly in the removed polynomial space. These are local information bounds,
+not confidence intervals or predictions for biased/boundary estimators.
+Independent Gaussian score simulations verified the Fisher matrices within
+1.5% relative error. This diagnostic explains a limitation of detrending;
+it does not prove the cause of every temporal AR2-model bias.
+
+4. Weak-direction design
+The fixed12-bank menu was ranked by weak coefficient directions across every
+eligible fixed candidate support, projecting only its deterministic feature
+columns. Purely deterministic candidates were retained in equation inference.
+The selected bank was full_k4. Its proxy score1.05783 exceeds broad0.90009.
+The reference support minimum pilot signal/noise eigenvalue improves only
+1.82278->1.89319; the main proxy gain comes from other, more weakly identified
+supports. This helps explain why a better aggregate criterion can leave the
+main coefficient ambiguity unresolved. Reference labels/exact coefficients
+did not enter selection; the benchmark candidate panel itself is fixed and
+reference-derived, so these tests do not establish adaptive EPDE-search validity.
+
+5. Limits and decision
+Keep dyad provisional and retain separate weak accuracy and precision checks.
+Numerical optimizer repair and statistical noise identification are distinct.
+Do not interpret apparent coverage with unstable nuisance fits as a solution:
+very large uncertainty regions can cover well while conveying little precision.
+Conditional profile starts deserve broader end-to-end tests; moderate bias
+requires comparing the signal/noise model assumptions and nuisance uncertainty.
+Three fully bootstrapped datasets per case cannot certify95% coverage.
+Constants/valid identities are retained. No solver or production change.
+All raw records, frozen outcomes, numerical audits and manifests are saved.

@@ -1,0 +1,53 @@
+Automatic mean adequacy and noise-information screening
+=====================================================
+Preserve all previous results and production files. No ODE/PDE solver, removed
+constants/identities, clipped noise parameters, or discarded observations.
+Development used only prior stress seeds1283,1334,1456,1016; both older boundary
+failures were repaired, but this is not validation. Original fixed candidate
+splines p8,16,24,32,48,64, rho grid and CV score remain unchanged.
+
+For each p compare its mean space with span(Xp,Xq), where q is the next grid
+dimension; q96 is the diagnostic extension at p64. These uniform cubic spaces
+share the four global cubics, so union rank is p+q-4 (verified numerically).
+At a fixed estimated rho compute generalized-least-squares residual sums of
+squares Q0,Q1 and F=((Q0-Q1)/(r-p))/(Q1/(n-r)). The main adjacent-noise version
+uses rho from the q fit (p64 supplies rho for its q96 extension). The own-noise
+version uses rho from p. Rho is estimated, so the nominal F p-value is an
+adequacy diagnostic, not an exact calibrated test. Retain source-fit warnings.
+
+For each candidate use its own restricted likelihood and analytic positive-
+boundary limit rho->1, sigma^2(1-rho)->eta. Require limiting LR > chi-square2
+(.975)+1e-6. This excludes the known escaping sequence, but does not by itself
+certify compactness of the whole noise region. Do not shrink the parameter
+domain. Require the selected fit and screening-noise fit to have status ok.
+Eligible candidates also need adequacy p-value >= alpha. Select either best
+original CV score (ties smaller p) or smallest eligible p. If none qualifies,
+abstain with unresolved_no_candidate; keep the observation in the denominator.
+Compare alpha .01 and .05, own and adjacent rho, CV and smallest orderings:
+eight frozen alternatives. Primary candidate: adjacent rho, CV order, alpha.01.
+Unchanged CV and fixed-p32 are comparators. No method is chosen after validation.
+
+Fresh benchmark cohort264: ODE seeds1800..1863, VDP1800..1815, Duffing1800..1807,
+all iid,+.4,-.4. Existing raw RNG domain984101 and5% signal-standard-deviation
+noise. Fresh ODE positive stress1024: seeds2000..3023, same domain.
+Analytic signals288: n320, mean sin(2*pi*f*x)+.3*cos(4*pi*f*x)+.2*x, x in[0,1],
+f=1,2,4,6,8,12; each profile iid,+.4,-.4,16 realizations. Noise5% signal std;
+RNG SeedSequence[991101,frequency,profile_id,replicate]. No system integration.
+Exact-model controls256: zero mean, sigma1, n320/1001, rho=-.4,0,.4,.8,32 fields
+each; RNG[991102,n,rho_index,replicate]. Total1832 independent noisy fields.
+Fit/selection records for ALL fields frozen before truth-based scoring.
+
+Noise-region diagnostic: for each chosen p, restricted likelihood-ratio region
+with nominal chi-square2(.975) cutoff; evaluate membership at true sigma,rho.
+Model selection is not accounted for by that cutoff. Report empirical coverage,
+abstentions, boundary warnings and analytic unboundedness separately, with full
+denominators. Do not claim calibrated97.5% confidence or boundedness merely
+because the screening rule was satisfied. No new coefficient propagation yet.
+
+Arithmetic checks: direct dense GLS F calculations, independent contrast
+likelihoods and boundary covariance limits. Audit every field/hash, all fitted
+selection decisions and selected likelihood membership. Audit richer-noise
+screening against dense GLS on representative fields and every abstention;
+repeat129-point rho searches for all selected dimensions, retaining any newly
+found basin as a warning rather than silently replacing frozen results.
+All prior manifests must remain unchanged. No promotion from this experiment.

@@ -1,0 +1,109 @@
+system,seed,fit,metric,retained,unregistered_dominators
+wave,0,baseline,raw_cross,True,[]
+wave,0,baseline,smooth_cross,True,[]
+wave,0,baseline,original_smooth_cross,True,[]
+wave,0,baseline,uncorrected_cross,True,[]
+wave,0,baseline,clean_subsample_cross,True,[]
+wave,0,baseline,clean_full,True,[]
+wave,0,joint,raw_cross,True,[]
+wave,0,joint,smooth_cross,True,[]
+wave,0,joint,original_smooth_cross,True,[]
+wave,0,joint,uncorrected_cross,True,[]
+wave,0,joint,clean_subsample_cross,True,[]
+wave,0,joint,clean_full,True,[]
+wave,1,baseline,raw_cross,True,['e0:drop_0']
+wave,1,baseline,smooth_cross,True,[]
+wave,1,baseline,original_smooth_cross,True,[]
+wave,1,baseline,uncorrected_cross,True,['e0:drop_0']
+wave,1,baseline,clean_subsample_cross,True,[]
+wave,1,baseline,clean_full,True,[]
+wave,1,joint,raw_cross,True,['e0:drop_0']
+wave,1,joint,smooth_cross,True,[]
+wave,1,joint,original_smooth_cross,True,[]
+wave,1,joint,uncorrected_cross,True,['e0:drop_0']
+wave,1,joint,clean_subsample_cross,True,[]
+wave,1,joint,clean_full,True,[]
+wave,2,baseline,raw_cross,True,[]
+wave,2,baseline,smooth_cross,True,[]
+wave,2,baseline,original_smooth_cross,True,[]
+wave,2,baseline,uncorrected_cross,True,[]
+wave,2,baseline,clean_subsample_cross,True,[]
+wave,2,baseline,clean_full,True,[]
+wave,2,joint,raw_cross,True,[]
+wave,2,joint,smooth_cross,True,[]
+wave,2,joint,original_smooth_cross,True,[]
+wave,2,joint,uncorrected_cross,True,[]
+wave,2,joint,clean_subsample_cross,True,[]
+wave,2,joint,clean_full,True,[]
+ks,0,baseline,raw_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,baseline,smooth_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,baseline,original_smooth_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,baseline,uncorrected_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,baseline,clean_subsample_cross,True,[]
+ks,0,baseline,clean_full,True,[]
+ks,0,joint,raw_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,joint,smooth_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,joint,original_smooth_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,joint,uncorrected_cross,False,"['e0:add_6', 'e0:add_7']"
+ks,0,joint,clean_subsample_cross,True,[]
+ks,0,joint,clean_full,True,[]
+ks,1,baseline,raw_cross,True,[]
+ks,1,baseline,smooth_cross,True,[]
+ks,1,baseline,original_smooth_cross,True,[]
+ks,1,baseline,uncorrected_cross,True,[]
+ks,1,baseline,clean_subsample_cross,True,[]
+ks,1,baseline,clean_full,True,[]
+ks,1,joint,raw_cross,True,[]
+ks,1,joint,smooth_cross,True,[]
+ks,1,joint,original_smooth_cross,True,[]
+ks,1,joint,uncorrected_cross,True,[]
+ks,1,joint,clean_subsample_cross,True,[]
+ks,1,joint,clean_full,True,[]
+ks,2,baseline,raw_cross,True,[]
+ks,2,baseline,smooth_cross,True,[]
+ks,2,baseline,original_smooth_cross,True,[]
+ks,2,baseline,uncorrected_cross,True,[]
+ks,2,baseline,clean_subsample_cross,True,[]
+ks,2,baseline,clean_full,True,[]
+ks,2,joint,raw_cross,True,[]
+ks,2,joint,smooth_cross,True,[]
+ks,2,joint,original_smooth_cross,True,[]
+ks,2,joint,uncorrected_cross,True,[]
+ks,2,joint,clean_subsample_cross,True,[]
+ks,2,joint,clean_full,True,[]
+kdv_cossin,0,baseline,raw_cross,False,"['e0:drop_1', 'e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,baseline,smooth_cross,False,"['e0:drop_0', 'e0:drop_1', 'e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,baseline,original_smooth_cross,False,"['e0:drop_1', 'e0:add_0', 'e0:add_3', 'e0:add_4', 'e0:add_5', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,baseline,uncorrected_cross,False,"['e0:drop_1', 'e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,baseline,clean_subsample_cross,False,"['e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,baseline,clean_full,False,"['e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,joint,raw_cross,False,"['e0:drop_0', 'e0:drop_1', 'e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,joint,smooth_cross,False,"['e0:drop_0', 'e0:add_0', 'e0:add_4', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,joint,original_smooth_cross,False,"['e0:drop_0', 'e0:add_0', 'e0:add_4', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,joint,uncorrected_cross,False,"['e0:drop_0', 'e0:drop_1', 'e0:add_0', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,joint,clean_subsample_cross,False,"['e0:drop_1', 'e0:add_0', 'e0:add_3', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,0,joint,clean_full,False,"['e0:drop_1', 'e0:add_0', 'e0:add_3', 'e0:add_4', 'e0:add_6', 'e0:time_harmonic', 'e0:field_harmonic', 'e0:first_order_fit']"
+kdv_cossin,1,baseline,raw_cross,False,"['e0:drop_2', 'e0:time_harmonic']"
+kdv_cossin,1,baseline,smooth_cross,False,"['e0:drop_0', 'e0:drop_2', 'e0:time_harmonic']"
+kdv_cossin,1,baseline,original_smooth_cross,False,"['e0:drop_0', 'e0:drop_2', 'e0:time_harmonic']"
+kdv_cossin,1,baseline,uncorrected_cross,False,"['e0:drop_2', 'e0:time_harmonic']"
+kdv_cossin,1,baseline,clean_subsample_cross,False,['e0:time_harmonic']
+kdv_cossin,1,baseline,clean_full,False,['e0:time_harmonic']
+kdv_cossin,1,joint,raw_cross,False,"['e0:drop_0', 'e0:drop_1', 'e0:time_harmonic']"
+kdv_cossin,1,joint,smooth_cross,False,"['e0:drop_0', 'e0:drop_2', 'e0:time_harmonic']"
+kdv_cossin,1,joint,original_smooth_cross,False,"['e0:drop_0', 'e0:drop_2', 'e0:time_harmonic']"
+kdv_cossin,1,joint,uncorrected_cross,False,"['e0:drop_0', 'e0:drop_1', 'e0:time_harmonic']"
+kdv_cossin,1,joint,clean_subsample_cross,False,['e0:time_harmonic']
+kdv_cossin,1,joint,clean_full,False,['e0:time_harmonic']
+kdv_cossin,2,baseline,raw_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,baseline,smooth_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,baseline,original_smooth_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,baseline,uncorrected_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,baseline,clean_subsample_cross,True,[]
+kdv_cossin,2,baseline,clean_full,True,[]
+kdv_cossin,2,joint,raw_cross,True,[]
+kdv_cossin,2,joint,smooth_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,joint,original_smooth_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,joint,uncorrected_cross,True,[]
+kdv_cossin,2,joint,clean_subsample_cross,False,"['e0:drop_0', 'e0:drop_1']"
+kdv_cossin,2,joint,clean_full,False,"['e0:drop_0', 'e0:drop_1']"

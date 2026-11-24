@@ -1,0 +1,718 @@
+{
+  "status": "PASS",
+  "systems": 15,
+  "matrix_pairs": 180,
+  "max_covariance_relative_error": 6.082405102648798e-13,
+  "rows": [
+    {
+      "system": "ac",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 2.852307043802621e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.0441131999832578,
+          "new": 0.018926699995063245
+        },
+        {
+          "rho": 0.4,
+          "old": 0.03774409997276962,
+          "new": 0.030417800007853657
+        },
+        {
+          "rho": -0.4,
+          "old": 0.029699099948629737,
+          "new": 0.01931420003529638
+        }
+      ],
+      "profile_checks": [
+        {
+          "objective_error": 1.1102230246251565e-15,
+          "gradient_error": 1.6444262618264816e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 6.32549568280183e-14
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 2.4424906541753444e-15
+        },
+        {
+          "objective_error": 1.5543122344752192e-15,
+          "gradient_error": 2.46374032286667e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 4.769101780155438e-14
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 1.6375789613221059e-15
+        },
+        {
+          "objective_error": 8.881784197001252e-16,
+          "gradient_error": 7.869926932357885e-12
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 2.842170943040401e-14
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.3877787807814457e-15
+        }
+      ],
+      "fit_deltas": [
+        {
+          "variable": "u",
+          "sigma_relative_difference": 5.417274806518435e-08,
+          "max_rho_difference": 7.167929833018505e-07,
+          "new_seconds": 0.7746915000025183
+        }
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 6.529526480914416e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.08284809999167919,
+          "new": 0.07973709999350831
+        },
+        {
+          "rho": 0.4,
+          "old": 0.06956969999009743,
+          "new": 0.023509900027420372
+        },
+        {
+          "rho": -0.4,
+          "old": 0.07257580000441521,
+          "new": 0.02542590000666678
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "burgers",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 6.082405102648798e-13,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.1737062999745831,
+          "new": 0.15334919997258112
+        },
+        {
+          "rho": 0.4,
+          "old": 0.19879860000219196,
+          "new": 0.10907679999945685
+        },
+        {
+          "rho": -0.4,
+          "old": 0.18798210000386462,
+          "new": 0.1516565000056289
+        }
+      ],
+      "profile_checks": [
+        {
+          "objective_error": 6.661338147750939e-16,
+          "gradient_error": 8.91786644530157e-11
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 2.2815083156046967e-14
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 4.191091917959966e-15
+        },
+        {
+          "objective_error": 1.3322676295501878e-15,
+          "gradient_error": 3.296657391516078e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 8.168465903679589e-14
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 6.661338147750939e-16
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 1.4515499913159147e-11
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.3877787807814457e-14
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 2.581268532253489e-15
+        }
+      ],
+      "fit_deltas": [
+        {
+          "variable": "u",
+          "sigma_relative_difference": 3.072472305465368e-07,
+          "max_rho_difference": 1.3859540744232124e-07,
+          "new_seconds": 1.261493700032588
+        }
+      ]
+    },
+    {
+      "system": "kdv",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 9.966218674018008e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 1.0385853999760002,
+          "new": 0.7480290000094101
+        },
+        {
+          "rho": 0.4,
+          "old": 1.0283354999846779,
+          "new": 0.7388446999830194
+        },
+        {
+          "rho": -0.4,
+          "old": 0.933328699960839,
+          "new": 0.7301479000016116
+        }
+      ],
+      "profile_checks": [
+        {
+          "objective_error": 0.0,
+          "gradient_error": 4.2300385416638164e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 3.3639757646142243e-14
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 7.216449660063518e-16
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 8.787104377461219e-11
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 2.842170943040401e-14
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.1102230246251565e-15
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.5174861367484027e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 2.2426505097428162e-14
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 5.551115123125783e-16
+        }
+      ],
+      "fit_deltas": [
+        {
+          "variable": "u",
+          "sigma_relative_difference": 2.4095407891167042e-09,
+          "max_rho_difference": 1.2908445504340726e-08,
+          "new_seconds": 1.6712949999491684
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 3.5969110427512054e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.03211510000983253,
+          "new": 0.020846800005529076
+        },
+        {
+          "rho": 0.4,
+          "old": 0.026640399999450892,
+          "new": 0.01672149996738881
+        },
+        {
+          "rho": -0.4,
+          "old": 0.030854999960865825,
+          "new": 0.01849480002420023
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "duffing",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 7.012894690167857e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.045810800045728683,
+          "new": 0.011122999945655465
+        },
+        {
+          "rho": 0.4,
+          "old": 0.03674389998195693,
+          "new": 0.012682700005825609
+        },
+        {
+          "rho": -0.4,
+          "old": 0.03823000000556931,
+          "new": 0.016612600011285394
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "lorenz",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 1.7175644531528937e-13,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.04830019996734336,
+          "new": 0.020006600010674447
+        },
+        {
+          "rho": 0.4,
+          "old": 0.03589509997982532,
+          "new": 0.022983400034718215
+        },
+        {
+          "rho": -0.4,
+          "old": 0.03601000003982335,
+          "new": 0.020162299973890185
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "lv",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 7.29352537201725e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.026752200035843998,
+          "new": 0.013120199961122125
+        },
+        {
+          "rho": 0.4,
+          "old": 0.02775489998748526,
+          "new": 0.012874500011093915
+        },
+        {
+          "rho": -0.4,
+          "old": 0.023620099993422627,
+          "new": 0.013001299987081438
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "ks",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 4.873223086340131e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 2.3970316000049934,
+          "new": 1.8978356999577954
+        },
+        {
+          "rho": 0.4,
+          "old": 2.3515316999983042,
+          "new": 1.8434956999844871
+        },
+        {
+          "rho": -0.4,
+          "old": 2.336926899966784,
+          "new": 1.7013215000042692
+        }
+      ],
+      "profile_checks": [
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.4284412541698543e-10
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 6.639133687258436e-14
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 3.0531133177191805e-15
+        },
+        {
+          "objective_error": 3.3306690738754696e-16,
+          "gradient_error": 1.9604406986672984e-10
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 2.8888003100746573e-13
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 1.7763568394002505e-15
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 2.173985991227312e-11
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 4.1522341120980855e-14
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.3322676295501878e-15
+        }
+      ],
+      "fit_deltas": [
+        {
+          "variable": "u",
+          "sigma_relative_difference": 1.3866685577568205e-13,
+          "max_rho_difference": 1.895393564321779e-13,
+          "new_seconds": 3.2656734000192955
+        }
+      ]
+    },
+    {
+      "system": "ode",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 2.3211176451923092e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.019276300037745386,
+          "new": 0.008196700015105307
+        },
+        {
+          "rho": 0.4,
+          "old": 0.016010399966035038,
+          "new": 0.009838500001933426
+        },
+        {
+          "rho": -0.4,
+          "old": 0.016704500012565404,
+          "new": 0.007335699978284538
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "ns",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 5.91343791559147e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.8662859000032768,
+          "new": 0.7997187000000849
+        },
+        {
+          "rho": 0.4,
+          "old": 0.8695047000073828,
+          "new": 0.754281900008209
+        },
+        {
+          "rho": -0.4,
+          "old": 0.8260443999897689,
+          "new": 0.7916903999866918
+        }
+      ],
+      "profile_checks": [
+        {
+          "objective_error": 1.4432899320127035e-15,
+          "gradient_error": 1.1100897978622015e-10
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 1.8041124150158794e-13
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 3.3306690738754696e-16
+        },
+        {
+          "objective_error": 8.049116928532385e-16,
+          "gradient_error": 8.037370768931851e-11
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 2.008185284729791e-13
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 1.7763568394002505e-15
+        },
+        {
+          "objective_error": 7.771561172376096e-16,
+          "gradient_error": 1.2545520178264269e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 1.1138312494551883e-13
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 2.3037127760972e-15
+        },
+        {
+          "objective_error": 6.661338147750939e-16,
+          "gradient_error": 3.369748924342275e-12
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 6.492029136495603e-14
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 1.9984014443252818e-15
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 9.469669493000765e-11
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 1.3589129821411916e-13
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 1.5543122344752192e-15
+        },
+        {
+          "objective_error": 6.661338147750939e-16,
+          "gradient_error": 3.0605740164446615e-11
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 1.743327704417652e-13
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 3.3306690738754696e-15
+        },
+        {
+          "objective_error": 6.661338147750939e-16,
+          "gradient_error": 6.080635994720751e-11
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 2.638167462265528e-13
+        },
+        {
+          "objective_error": 2.220446049250313e-16,
+          "gradient_error": 6.661338147750939e-16
+        },
+        {
+          "objective_error": 1.4432899320127035e-15,
+          "gradient_error": 2.8389290918084953e-11
+        },
+        {
+          "objective_error": 4.440892098500626e-16,
+          "gradient_error": 1.0726142196659794e-13
+        },
+        {
+          "objective_error": 6.661338147750939e-16,
+          "gradient_error": 6.661338147750939e-16
+        },
+        {
+          "objective_error": 3.3306690738754696e-16,
+          "gradient_error": 6.557532294948487e-12
+        },
+        {
+          "objective_error": 6.661338147750939e-16,
+          "gradient_error": 5.828670879282072e-14
+        },
+        {
+          "objective_error": 0.0,
+          "gradient_error": 2.9976021664879227e-15
+        }
+      ],
+      "fit_deltas": [
+        {
+          "variable": "u",
+          "sigma_relative_difference": 3.840974871494041e-09,
+          "max_rho_difference": 3.052862898329095e-08,
+          "new_seconds": 0.5670514000230469
+        },
+        {
+          "variable": "v",
+          "sigma_relative_difference": 3.1308289294429414e-14,
+          "max_rho_difference": 1.9130010076029436e-13,
+          "new_seconds": 0.6737257000058889
+        },
+        {
+          "variable": "p",
+          "sigma_relative_difference": 2.5205016740414976e-08,
+          "max_rho_difference": 4.054938351934212e-08,
+          "new_seconds": 0.8574315999867395
+        }
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 1.7134036200774684e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.14257730002282187,
+          "new": 0.12076060002436861
+        },
+        {
+          "rho": 0.4,
+          "old": 0.13355950004188344,
+          "new": 0.10864150000270456
+        },
+        {
+          "rho": -0.4,
+          "old": 0.180830400029663,
+          "new": 0.1679469999508001
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "pde_divide",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 5.3708224634575796e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.18275370000628754,
+          "new": 0.13638939999509603
+        },
+        {
+          "rho": 0.4,
+          "old": 0.17242680001072586,
+          "new": 0.14067310001701117
+        },
+        {
+          "rho": -0.4,
+          "old": 0.16205990000162274,
+          "new": 0.12116260000038892
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "wave",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 1.4492289973385948e-15,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.1018906999961473,
+          "new": 0.04641970002558082
+        },
+        {
+          "rho": 0.4,
+          "old": 0.07725330005632713,
+          "new": 0.044534800050314516
+        },
+        {
+          "rho": -0.4,
+          "old": 0.06530950003070757,
+          "new": 0.04977549996692687
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    },
+    {
+      "system": "vdp",
+      "status": "PASS",
+      "matrix_pairs": 12,
+      "max_covariance_relative_error": 3.2197138397110594e-14,
+      "timings": [
+        {
+          "rho": null,
+          "old": 0.024508300004526973,
+          "new": 0.00906449998728931
+        },
+        {
+          "rho": 0.4,
+          "old": 0.018549200030975044,
+          "new": 0.011113899992778897
+        },
+        {
+          "rho": -0.4,
+          "old": 0.021814900042954832,
+          "new": 0.010277400026097894
+        }
+      ],
+      "profile_checks": [],
+      "fit_deltas": []
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\acceleration_checks.py": "d73b9c84a2cc3b119cce35031969faa00678ed348263c4ae7d008dc9cf0ecfa3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_acceleration_protocol.txt": "d131da35f983e281ea38906734a369664df000c985366915ac2908ba62a677ea"
+  }
+}

@@ -1,0 +1,61 @@
+Native-sample quadrature and mixed weak moments, 2026-11-16
+Frozen before outcomes.
+
+Test AC, forced KdV, wave, KS on the same 5% noise seeds 3/4/5 as the preceding
+EIV study, for paired comparisons. This is NOT another fresh-seed replication.
+Keep all registered reference/equivalent supports and constants. Known-support
+coefficient experiment only; no structural-retention or search count.
+
+Use the previous seed-0 local geometry on each group's original sampling
+grid, keeping the natural-stride subset (ceil(radius/stride) between centers).
+For broad fitting use the frozen minimum q and maximum Fourier mode k=2,
+but align its full support to the native grid with native derivative halos.
+This makes a changed broad geometry explicit. Compare native and interpolated
+inputs on EXACTLY the same new physical supports, centers and frequencies.
+The interpolated arm uses the previous natural-cubic field map to the dense
+grid and the old continuous quadrature. The native arm forms weak monomials
+on the raw sample grid and integrates them directly. Native quadrature still
+uses local polynomial interpolation WITHIN cells (degree 3 time, 5 space);
+it does not first resample the measured field onto a denser grid.
+
+Compare local, broad, and stacked local+broad constraints. Stacking uses all
+cross-covariances from shared perturbations; no manually weighted sum of
+separately fitted coefficients. Test corrected raw OLS and the unchanged
+512-draw residual-covariance IRLS from eiv_fitting. Same random streams, noise
+estimator and training pilot as that study. Require full positive covariance
+rank; no tuned ridge, null-space deletion, damping, or convergence relaxation.
+Keep incomplete cases explicit. No bank/estimator is chosen with clean data.
+
+Training: one interleaved raw group, rotated through three groups. Evaluation:
+the other two groups. Reproduce the preceding common broad interpolated
+validation score and exact baseline scores as a control.
+
+Additionally evaluate direct-native local, broad and stacked validation
+moments on common PHYSICAL windows across all three sampling grids. Every
+test support lies inside each group's usable derivative-halo domain. The
+common broad window spans that intersection. Common local radii are the
+historical local physical radii, capped by half the available interval;
+centers advance by one radius. The cap uses coordinates only and is needed
+for AC's full-time local support. The new native quadrature handles partial
+native cells at shared window endpoints without extrapolation.
+
+Native validation uses one TRAINING-only pooled covariance metric shared by
+all candidates/fits, with the same column normalization as the previous
+score. Use 512 draws for each native validation bank, including cross-block
+covariances for the combined bank. Report infeasible covariances explicitly
+and preserve unweighted scores as controls. Candidate-dependent IRLS
+covariances are used only during fitting. No test result selects a fit.
+
+Only after fits and weights freeze, compute clean residual energies on the
+same old seed-0 spectral bank; coefficient errors; and native-clean,
+interpolated-clean, full-clean fitting controls on the matched geometries.
+These separate dense resampling artifacts from native quadrature limitations.
+Clean controls are diagnostic, not used to choose geometry or coefficients.
+
+Checks: polynomial IBP including off-grid endpoints, grid-aligned agreement
+with old quadrature, exact constant columns, conjugate real-basis equivalence,
+no extrapolation/unsafe derivative halos, paired raw/draw replay, old-score
+reproduction, complete result coverage, finite scores, source/input hashes,
+and ODE_simple phase/energy identity preservation. No candidate equation
+solves, PINNs, clean benchmark regeneration, production edits or commits.
+Parallel test processes, one BLAS thread each, below-normal priority.

@@ -1,0 +1,53 @@
+{
+  "status": "COMPLETE",
+  "cohort": "iid",
+  "records": 45,
+  "summary": [
+    {
+      "profile": "iid",
+      "model_kind": "iid",
+      "bank": "local",
+      "records": 45,
+      "incomplete": 0,
+      "equation_cases": 60,
+      "operator_coverage": 0.9395833333333333,
+      "reference_pointwise_coverage": 0.9293981481481481,
+      "reference_uniform_coverage": 1.0,
+      "reference_regions": {
+        "ellipsoid": 51,
+        "unbounded": 9
+      },
+      "exact_reference_accepted": 60,
+      "mean_compatible_candidates": 12.05,
+      "registered_at_minimum": 31,
+      "compatible_drops": 49,
+      "excluded_drops": 104,
+      "unresolved_candidates": 0
+    },
+    {
+      "profile": "iid",
+      "model_kind": "iid",
+      "bank": "broad",
+      "records": 45,
+      "incomplete": 0,
+      "equation_cases": 60,
+      "operator_coverage": 0.9448784722222222,
+      "reference_pointwise_coverage": 0.9468315972222222,
+      "reference_uniform_coverage": 0.9993055555555556,
+      "reference_regions": {
+        "ellipsoid": 45,
+        "unbounded": 15
+      },
+      "exact_reference_accepted": 59,
+      "mean_compatible_candidates": 12.85,
+      "registered_at_minimum": 33,
+      "compatible_drops": 54,
+      "excluded_drops": 99,
+      "unresolved_candidates": 0
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\analyze.py": "ebff5766ab9a78e0c5b6969830d55fab681e6bc55c6838b1881e63b2e35f0e3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\directional_diagnostic_protocol.txt": "ac0c90bc888ef5d61ab1af0b06d863eb81e11fac3205fd74c14521255f4eb12f"
+  }
+}

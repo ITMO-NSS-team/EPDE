@@ -1,0 +1,5980 @@
+[
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "burgers_inviscid",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:equivalent_1",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 6111,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 6111,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 6111,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e2:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 6111,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10",
+      "e1:add_9"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "vdp",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "vdp",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:equivalent_1",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 6112,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 6112,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:add_5",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:add_5",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:add_5",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:add_5",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_8"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_8"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "wave",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": [
+      "e0:add_4",
+      "e0:add_5"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "duffing",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:equivalent_1"
+    ],
+    "gained": [
+      "e0:add_4"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:equivalent_1"
+    ],
+    "gained": [
+      "e0:add_4"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e1:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e1:add_0",
+      "e1:add_6"
+    ],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "ode",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_6"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "burgers",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7",
+      "e0:drop_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7",
+      "e0:drop_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:add_13"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:add_13"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6111,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e2:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "vdp",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "vdp",
+    "seed": 6111,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ac",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:first_order_fit"
+    ],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ac",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:first_order_fit"
+    ],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 6112,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e2:add_4",
+      "e2:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lv",
+    "seed": 6112,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_4",
+      "e1:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lv",
+    "seed": 6112,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_4",
+      "e1:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6112,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_1",
+      "e2:add_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "pde_divide",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "pde_divide",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "wave",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_3",
+      "e0:equivalent_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "wave",
+    "seed": 6112,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_1",
+      "e0:add_3",
+      "e0:equivalent_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ac",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_0"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_0"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lv",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_2",
+      "e1:add_5"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "lv",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_2",
+      "e1:add_5"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 6113,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "wave",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:equivalent_0"
+    ],
+    "gained": [
+      "e0:add_4",
+      "e0:equivalent_2"
+    ]
+  },
+  {
+    "cohort": "replay",
+    "bank": "broad",
+    "system": "wave",
+    "seed": 6113,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:equivalent_0"
+    ],
+    "gained": [
+      "e0:add_4",
+      "e0:equivalent_2"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "duffing",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      4,
+      4
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_6"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ks",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73001,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73001,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_10"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73001,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e2:add_12",
+      "e2:add_13",
+      "e2:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e1:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e2:add_11"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e2:add_11"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ode",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ode",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_4",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_divide",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "vdp",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "vdp",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:equivalent_1",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73002,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:add_13",
+      "e0:add_3",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:add_13",
+      "e0:add_3",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:add_13",
+      "e0:add_3",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:add_13",
+      "e0:add_3",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ode",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "duffing",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "duffing",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:add_4",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:add_4",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:add_4",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ks",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73003,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73003,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73003,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_6"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73003,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_4"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "wave",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_0",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_5"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "wave",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      4,
+      4
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_0",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_5"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ks",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73004,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_13"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73004,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_13"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_0",
+      "e1:add_3",
+      "e1:add_9"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      3,
+      3
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_0",
+      "e1:add_3",
+      "e1:add_9"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:field_harmonic"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:field_harmonic"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:field_harmonic"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_3",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:field_harmonic"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers_inviscid",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers_inviscid",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "duffing",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "duffing",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ks",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      3,
+      3
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_10"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73005,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73005,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 73005,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_9"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_12",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e1:add_8"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ac",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:first_order_fit",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "burgers_inviscid",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_2",
+      "e0:add_7"
+    ],
+    "gained": [
+      "e0:add_6"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "kdv",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_6"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lorenz",
+    "seed": 73006,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e2:add_12"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 73006,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_5",
+      "e1:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "lv",
+    "seed": 73006,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e1:add_5",
+      "e1:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_10",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_10",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_10",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_10",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 1,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e2:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e2:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "local_time",
+    "system": "pde_compound",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv_cossin",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv_cossin",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_0"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 73001,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e2:add_3"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "lv",
+    "seed": 73001,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e1:add_10"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_13"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73001,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_13"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_divide",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_2"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "vdp",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "vdp",
+    "seed": 73001,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0",
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0",
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0",
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv_cossin",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv_cossin",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 73002,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e1:add_9"
+    ],
+    "gained": [
+      "e1:add_10",
+      "e1:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e0:add_13"
+    ],
+    "gained": [
+      "e0:add_11",
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2",
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ode",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2",
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73002,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_7"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "burgers",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "burgers",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:drop_2"
+    ],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:drop_2"
+    ],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_divide",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_divide",
+    "seed": 73003,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "duffing",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "duffing",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_4"
+    ],
+    "gained": [
+      "e0:equivalent_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7",
+      "e0:drop_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_7",
+      "e0:drop_2"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 73004,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e2:first_order_fit"
+    ],
+    "gained": [
+      "e2:add_6",
+      "e2:add_8"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 73004,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e2:first_order_fit"
+    ],
+    "gained": [
+      "e2:add_6",
+      "e2:add_8"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_13",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_13",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_13",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_13",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e2:add_12"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73004,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e2:add_12"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": [
+      "e0:add_6",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_2"
+    ],
+    "gained": [
+      "e0:add_6",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "vdp",
+    "seed": 73004,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_0",
+      "e0:add_6"
+    ],
+    "gained": [
+      "e0:add_3"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ac",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "burgers",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "burgers",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "burgers_inviscid",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5"
+    ],
+    "gained": [
+      "e0:equivalent_1",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "burgers_inviscid",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5"
+    ],
+    "gained": [
+      "e0:equivalent_1",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ks",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e0:add_5",
+      "e0:add_7"
+    ],
+    "gained": [
+      "e0:add_0"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "lorenz",
+    "seed": 73005,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e2:first_order_fit"
+    ],
+    "gained": [
+      "e2:add_6"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_13",
+      "e0:add_8"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_13",
+      "e0:add_8"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e1:add_0"
+    ],
+    "gained": [
+      "e1:add_1",
+      "e1:add_11"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_4"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73005,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_4"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ac",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [
+      "e0:first_order_fit"
+    ],
+    "gained": [
+      "e0:add_6"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "duffing",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "duffing",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0",
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0",
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "kdv",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_5",
+      "e0:add_7",
+      "e0:reference"
+    ],
+    "gained": [
+      "e0:equivalent_0",
+      "e0:equivalent_1"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "registered",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "reference",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e0:add_0",
+      "e0:reference"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 1,
+    "outcome": "add_count",
+    "off": [
+      2,
+      2
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [
+      "e1:add_1",
+      "e1:add_2"
+    ],
+    "gained": [
+      "e1:add_9"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 2,
+    "outcome": "add",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      1,
+      1
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_10",
+      "e2:add_8"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "ns",
+    "seed": 73006,
+    "slot": 2,
+    "outcome": "add_count",
+    "off": [
+      0,
+      0
+    ],
+    "on": [
+      2,
+      2
+    ],
+    "removed": [],
+    "gained": [
+      "e2:add_10",
+      "e2:add_8"
+    ]
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  },
+  {
+    "cohort": "fresh",
+    "bank": "broad",
+    "system": "pde_compound",
+    "seed": 73006,
+    "slot": 0,
+    "outcome": "add_count",
+    "off": [
+      1,
+      1
+    ],
+    "on": [
+      0,
+      0
+    ],
+    "removed": [
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "gained": []
+  }
+]

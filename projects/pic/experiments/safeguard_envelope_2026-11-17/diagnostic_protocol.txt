@@ -1,0 +1,21 @@
+Post-evaluation diagnostics, separate from the frozen primary comparison.
+1. For the failed negative/60 field, evaluate the 2x2 combination of estimated
+versus known benchmark noise correction and covariance. Reuse frozen primary
+cutoffs only as a descriptive comparison, not as a newly calibrated procedure.
+Compute a separate known-noise conditional rank126 cutoff with the same pilot
+and conditional RNG streams. Inspect generalized error directions and the
+reference-equation projection. No tuning or production promotion.
+2. For every dataset, inspect the fixed reference support under each of the
+129 already-frozen nuisance scenarios. Use its own corrected moments and
+conditional covariance/cutoff without scalar recentering. Form the UNION of
+the two-bank feasible sets across scenarios, plus both primary feasible sets.
+An intersection over nuisance scenarios would incorrectly require every noise
+model to hold. Retain all points, constants and primary regions. Certify every
+component independently. A union is bounded if every component has a bounded
+outer enclosure; it is unbounded if any component has a certified feasible ray.
+Coordinate extrema of bounded component enclosures give a union outer box,
+not exact coordinate intervals of the joint feasible set. This diagnostic
+tests conservatism of scalar compression only on the fixed reference support.
+It is not a new validated discovery algorithm or a calibrated confidence set.
+Primary coverage/cutoffs and all data are kept unchanged. The nuisance point
+set is finite and may miss truth, even if its convex hull contains truth.

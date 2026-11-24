@@ -1,0 +1,14 @@
+Post-screening mechanism diagnostic, frozen before its optimization results.
+Use old anchors only: AC negative seeds33..35, compound iid seeds33..35,
+NS iid seed33 all three variables. These show raw-field covariance bias.
+Keep primary fresh-coverage protocol/results unchanged.
+
+For each field, fix noise rho to its known generating value and refit curvature
+kappa,phi using the frozen initial nuisance estimate plus two fixed starts.
+Then restart the unrestricted optimizer from the best converged fixed-rho fit.
+Keep the original unrestricted result and every failed attempt. Compare the
+same normalized objective and record count*(fixed-free) only as an objective
+contrast; composite dependence invalidates a naive chi-square interpretation.
+This is an oracle diagnostic to distinguish optimizer/local-minimum problems
+from an objective that itself prefers biased signal/noise allocations. It is
+not a usable estimator or a basis for per-system production selection.

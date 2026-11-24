@@ -1,0 +1,13 @@
+The initial factorial audit stopped at an exact field-hash assertion. No fitting
+or simulation source was changed. The initial audit source is retained. Added
+assertions identify seed/draw/arm and verify reconstructed pilot hashes before
+draw replay. The immediate rerun passed all3 records/192 score replays with exact
+hashes unchanged. A planned three-run cold-process repetition stopped after its
+first run failed; see factorial_replay_logs and factorial_reproducibility.json.
+Twelve dedicated reconstruction replays then quantified two numerically close
+outputs per anchor (maximum relative difference7.43e-11), and recovered arrays
+matching every original hash. The saved-input audit verifies draw hashes exactly
+and checks reconstructed pilots numerically under the separately documented
+bound; see pilot_roundoff_protocol.txt, audit_canonical.json and
+audit_factorial_saved.json. Adding diagnostic assertions alone did not fix the
+replay. The specific low-level source of the floating-point variation is unknown.

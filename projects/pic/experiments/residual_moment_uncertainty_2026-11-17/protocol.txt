@@ -1,0 +1,62 @@
+Frozen before outcomes, 2026-11-17: direct raw weak residual uncertainty.
+
+All15 default systems, fresh anchor seeds24/25/26, 5% independent benchmark
+noise. Known registered supports/equivalents only; this round tests moment
+calibration, not evolutionary structure recovery. Constants are retained.
+No candidate ODE/PDE integration, PINNs, ridge, tuned penalty or clean-data
+choice of geometry/estimator. Seven worker processes, one BLAS thread each.
+
+Use full native measurement grids. Two fixed banks: local physical windows
+from historical seed0 base_plan, and one common-interior broad window with
+frequencies 0,+/-1,+/-2 per axis. Use native_quadrature's degree3 time and
+degree5 spatial interpolation for integration, analytic test derivatives,
+and existing finite differences for factors not moved by integration by
+parts. Keep the historical full-panel q/cut geometry, and compute only
+columns needed by registered laws plus an explicit constant. This is not
+a comparison with differently sampled prior training folds.
+
+For each bank compute ordinary raw weak moments and Gaussian-contraction
+corrected moments, using the full-record estimated separable AR noise model.
+Degree<=3 polynomial contractions are exact in expectation if the noise
+model is correct. They do not invert a noisy coefficient-estimation map.
+Reconstruct a GCV pilot only to simulate error variance and joint shape.
+
+256 pilot-plus-noise draws estimate residual variance at any fixed vector
+v (target coefficient1). Another256 independent pilot draws calibrate the
+95th percentile of mean_r[(weak-error_r @ v)^2 / variance_r(v)]. Errors
+are measured relative to the uncorrupted pilot moments. Do not subtract an
+empirical coefficient bias or invert the weak Gram matrix for this test.
+Marginal standardization is only the statistic; empirical shared-field
+draws preserve joint dependence. No chi-square or row-independence claim.
+Exact zero variance plus nonzero residual is infinite, zero/zero is zero;
+record nonfinite values explicitly, never clip or silently omit.
+
+Compare to256 independent actual benchmark measurements, seeds
+1200000+1000*anchor+b. Freeze bank/noise/pilot/calibration arrays before
+evaluating clean moments or exact coefficient controls. Calibration RNG
+SeedSequence[830140,anchor], check RNG[830141,anchor]. Every bank/method/
+candidate receives the same field in each draw.
+
+Primary diagnostic: coverage of the clean discrete residual vector by the
+noise region at each registered exact coefficient vector. Separate from
+acceptance of a zero residual: the latter includes deterministic data and
+quadrature error and may fail even with good noise coverage. Report clean
+residual/noise scale and standardized mean-noise shift explicitly.
+
+Also freeze unweighted raw and corrected least-squares fits on the anchor
+for each bank/support, using existing unit-scaled rank checks without a
+fallback. Evaluate the same conditional noise coverage and zero-residual
+acceptance for those fixed vectors on independent measurements. Anchor-fit
+acceptance is data-dependent and is not advertised as honest post-selection
+coverage. Report deficient fits rather than averaging successful subsets.
+
+Primary is corrected moments, uncorrected moments a matched control.
+Neither score is a structural objective or pruning gate. Exact constants
+and ODE_simple phase/energy identities receive synthetic controls. Verify
+operator replay, Gaussian polynomial expectation, fixed linear-Gaussian
+coverage, units invariance, shared-draw dependence and separate RNG domains.
+Audit source/input/array hashes and independent saved-array arithmetic.
+
+Only after these checks may confidence-set inversion be explored. A small
+noise-normalized residual alone cannot identify coefficients; sets can be
+broad, disconnected or unbounded. Any follow-up must be recorded separately.

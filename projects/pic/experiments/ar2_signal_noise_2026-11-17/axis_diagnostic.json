@@ -1,0 +1,522 @@
+{
+  "status": "COMPLETE",
+  "records": 13,
+  "workers": 1,
+  "rows": [
+    {
+      "system": "pde_compound",
+      "variable": "u",
+      "axis": 0,
+      "status": "ok",
+      "model": [
+        0.008899601728579747,
+        [
+          0.008312051368162342
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.006608226343989,
+      "global_model": [
+        0.00951546942572062,
+        [
+          0.028796826024082577,
+          0.020503417846409765
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.076267241341334,
+      "clean_curvature_mean_energy_fraction": 0.07312393072754489,
+      "clean_curvature_top1percent_energy": 0.5943624208711934,
+      "clean_curvature_to_expected_noise_energy": 8.004577994607984e-05,
+      "clean_curvature_lag_correlations": [
+        0.9929391391765884,
+        0.9804749454668964,
+        0.9691869184168282,
+        0.9600723209389678
+      ],
+      "frozen_sha256": "3572b545abe6d5183c2f88b996ed710bc9fa19d63812c0bc07fb840905c32ea8"
+    },
+    {
+      "system": "pde_compound",
+      "variable": "u",
+      "axis": 1,
+      "status": "ok",
+      "model": [
+        0.010564442108046915,
+        [
+          0.0925593114586813
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.1949135092803684,
+      "global_model": [
+        0.00951546942572062,
+        [
+          0.028796826024082577,
+          0.020503417846409765
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.076267241341334,
+      "clean_curvature_mean_energy_fraction": 0.06646579667752486,
+      "clean_curvature_top1percent_energy": 0.6713073836343441,
+      "clean_curvature_to_expected_noise_energy": 0.09516897430574585,
+      "clean_curvature_lag_correlations": [
+        0.44378678761906576,
+        0.24890970803440976,
+        0.1669417414295244,
+        0.12355743129292655
+      ],
+      "frozen_sha256": "df1ef2979c3e4fc6243afed9906536939c6e74b7471d8aa184bfae41d32f0822"
+    },
+    {
+      "system": "ks",
+      "variable": "u",
+      "axis": 0,
+      "status": "ok",
+      "model": [
+        0.05357267241069272,
+        [
+          0.006215029607740154
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.0039632371577538,
+      "global_model": [
+        0.0532763119629351,
+        [
+          0.0020744021784407235,
+          -0.007424081663191724
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 0.9984093795451388,
+      "clean_curvature_mean_energy_fraction": 0.0008029315448455024,
+      "clean_curvature_top1percent_energy": 0.3618448230861782,
+      "clean_curvature_to_expected_noise_energy": 0.026601560195273485,
+      "clean_curvature_lag_correlations": [
+        0.9411819483687899,
+        0.7787679200895555,
+        0.5491358387200507,
+        0.2967129783764189
+      ],
+      "frozen_sha256": "e230410492e5f40a336487a96bdbe6396e6e132858a19d294cf2fac592d79706"
+    },
+    {
+      "system": "ks",
+      "variable": "u",
+      "axis": 1,
+      "status": "ok",
+      "model": [
+        0.05307875591283581,
+        [
+          -0.008268497234365768
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 0.9947071372889135,
+      "global_model": [
+        0.0532763119629351,
+        [
+          0.0020744021784407235,
+          -0.007424081663191724
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 0.9984093795451388,
+      "clean_curvature_mean_energy_fraction": 2.7525258039664494e-06,
+      "clean_curvature_top1percent_energy": 0.10495278518519915,
+      "clean_curvature_to_expected_noise_energy": 0.00347976564878067,
+      "clean_curvature_lag_correlations": [
+        0.9929353714621518,
+        0.9718992830734343,
+        0.9373344412931245,
+        0.8899459339832275
+      ],
+      "frozen_sha256": "52fcce26c75fffe7e481b288dfacd9fcdb95333e071d7ec97c5aa0f1f02740d4"
+    },
+    {
+      "system": "ns",
+      "variable": "u",
+      "axis": 0,
+      "status": "ok",
+      "model": [
+        0.016955840189389296,
+        [
+          0.004455847448056516
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.0027477204085673,
+      "global_model": [
+        0.017274532541547306,
+        [
+          0.01752490960008786,
+          0.029041709143299673,
+          0.04107683190968496
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.021594797643824,
+      "clean_curvature_mean_energy_fraction": 0.035577954883682796,
+      "clean_curvature_top1percent_energy": 0.3970103036999168,
+      "clean_curvature_to_expected_noise_energy": 0.013129249119572417,
+      "clean_curvature_lag_correlations": [
+        0.7473218471142583,
+        0.6682912129441314,
+        0.5470785920483556,
+        0.404543935865094
+      ],
+      "frozen_sha256": "a75663833c77b0d16823a9cfb503fa0d5ac8053e8308b098cc38958ef796ad6d"
+    },
+    {
+      "system": "ns",
+      "variable": "u",
+      "axis": 1,
+      "status": "boundary",
+      "model": [
+        14.163078199827646,
+        [
+          0.9999986894203047
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 837.5871805947334,
+      "global_model": [
+        0.017274532541547306,
+        [
+          0.01752490960008786,
+          0.029041709143299673,
+          0.04107683190968496
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.021594797643824,
+      "clean_curvature_mean_energy_fraction": 0.0022686774796573145,
+      "clean_curvature_top1percent_energy": 0.14099404717226405,
+      "clean_curvature_to_expected_noise_energy": 2.111276749235322,
+      "clean_curvature_lag_correlations": [
+        0.6976816292875203,
+        0.19898441671936537,
+        -0.11211098700169007,
+        -0.34116218473304133
+      ],
+      "frozen_sha256": "a39fa546c2b5edc0536243fd6aef65c5fe42bd9d433303eb74f1a47f9ea24141"
+    },
+    {
+      "system": "ns",
+      "variable": "u",
+      "axis": 2,
+      "status": "ok",
+      "model": [
+        0.01708438123190241,
+        [
+          0.028275135662596776
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.0103494809771547,
+      "global_model": [
+        0.017274532541547306,
+        [
+          0.01752490960008786,
+          0.029041709143299673,
+          0.04107683190968496
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.021594797643824,
+      "clean_curvature_mean_energy_fraction": 0.011183590640284532,
+      "clean_curvature_top1percent_energy": 0.11266257706427137,
+      "clean_curvature_to_expected_noise_energy": 0.0867746417631367,
+      "clean_curvature_lag_correlations": [
+        0.8877593779631572,
+        0.6121841369464803,
+        0.29640104616279517,
+        0.02908718528616793
+      ],
+      "frozen_sha256": "33020998e2d9e304a47cce30f58e58fa23daebfb31d68dc11bb232ad6bb50939"
+    },
+    {
+      "system": "ns",
+      "variable": "v",
+      "axis": 0,
+      "status": "ok",
+      "model": [
+        0.014793366119899773,
+        [
+          -0.024793830140875713
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.0039105934293067,
+      "global_model": [
+        0.015485188451378532,
+        [
+          0.011821432147398834,
+          0.0914870800896396,
+          0.069673114364431
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.0508591892872987,
+      "clean_curvature_mean_energy_fraction": 0.035640342726239664,
+      "clean_curvature_top1percent_energy": 0.4107489308469689,
+      "clean_curvature_to_expected_noise_energy": 0.04234451282221225,
+      "clean_curvature_lag_correlations": [
+        0.7575333485381885,
+        0.6678805434021515,
+        0.5323433208192112,
+        0.3745201427764682
+      ],
+      "frozen_sha256": "c3e4cd5bc8cafb759f23209bf5d8455da60058182f3f6712785f77e7ecf1c217"
+    },
+    {
+      "system": "ns",
+      "variable": "v",
+      "axis": 1,
+      "status": "ok",
+      "model": [
+        0.022130672241996163,
+        [
+          0.45607437999328476
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.5018364396163795,
+      "global_model": [
+        0.015485188451378532,
+        [
+          0.011821432147398834,
+          0.0914870800896396,
+          0.069673114364431
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.0508591892872987,
+      "clean_curvature_mean_energy_fraction": 0.017858841721066054,
+      "clean_curvature_top1percent_energy": 0.13537378640868233,
+      "clean_curvature_to_expected_noise_energy": 0.31549362254385305,
+      "clean_curvature_lag_correlations": [
+        0.766468596382981,
+        0.3104419456884194,
+        -0.04787546169035364,
+        -0.2635665976437525
+      ],
+      "frozen_sha256": "a85d6eacfe7515cdb50cf65668055b3d7137418f5de89880a8dd002dac9d8022"
+    },
+    {
+      "system": "ns",
+      "variable": "v",
+      "axis": 2,
+      "status": "ok",
+      "model": [
+        0.014445925995879303,
+        [
+          -0.016463885771594633
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 0.9803325370045863,
+      "global_model": [
+        0.015485188451378532,
+        [
+          0.011821432147398834,
+          0.0914870800896396,
+          0.069673114364431
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.0508591892872987,
+      "clean_curvature_mean_energy_fraction": 0.014864147585109967,
+      "clean_curvature_top1percent_energy": 0.08139300130584973,
+      "clean_curvature_to_expected_noise_energy": 0.32864670318848926,
+      "clean_curvature_lag_correlations": [
+        0.883612395337263,
+        0.5924930722178552,
+        0.2508763559391256,
+        -0.03801154685507
+      ],
+      "frozen_sha256": "d65dc23bfd89ad471e2fe2cc44060db9b0d39bd880963ef5e84f3e5e17b48c27"
+    },
+    {
+      "system": "ns",
+      "variable": "p",
+      "axis": 0,
+      "status": "ok",
+      "model": [
+        0.006018149065854645,
+        [
+          0.018588142175243436
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.0184460898380139,
+      "global_model": [
+        0.006010045626614395,
+        [
+          0.017616559088199417,
+          0.03019273473358901,
+          0.01570176989257577
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.017074751920298,
+      "clean_curvature_mean_energy_fraction": 0.037537938500416736,
+      "clean_curvature_top1percent_energy": 0.4068404604373872,
+      "clean_curvature_to_expected_noise_energy": 0.018072932007185412,
+      "clean_curvature_lag_correlations": [
+        0.763282514240993,
+        0.700093204212775,
+        0.5991778500473007,
+        0.4741782484904742
+      ],
+      "frozen_sha256": "427719924ec8aed4150af7e3896381f7aee0de2a8d16d783fe8eb50ee8aa7344"
+    },
+    {
+      "system": "ns",
+      "variable": "p",
+      "axis": 1,
+      "status": "ok",
+      "model": [
+        0.006156508110964138,
+        [
+          0.06024960542284953
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.0418604697318214,
+      "global_model": [
+        0.006010045626614395,
+        [
+          0.017616559088199417,
+          0.03019273473358901,
+          0.01570176989257577
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.017074751920298,
+      "clean_curvature_mean_energy_fraction": 0.010050417267604,
+      "clean_curvature_top1percent_energy": 0.13795027714681846,
+      "clean_curvature_to_expected_noise_energy": 0.73040817963148,
+      "clean_curvature_lag_correlations": [
+        0.8194520141737089,
+        0.40001838881338203,
+        -0.046242197053983594,
+        -0.3849496647621059
+      ],
+      "frozen_sha256": "7289e0db640440641d78276421df01cf538494f9dc66b850e95218949eb78f3c"
+    },
+    {
+      "system": "ns",
+      "variable": "p",
+      "axis": 2,
+      "status": "ok",
+      "model": [
+        0.005943555038482496,
+        [
+          0.0033341930080194562
+        ],
+        [
+          2
+        ]
+      ],
+      "sigma_ratio": 1.005822607988176,
+      "global_model": [
+        0.006010045626614395,
+        [
+          0.017616559088199417,
+          0.03019273473358901,
+          0.01570176989257577
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "global_sigma_ratio": 1.017074751920298,
+      "clean_curvature_mean_energy_fraction": 0.013257072415872427,
+      "clean_curvature_top1percent_energy": 0.15149080148758529,
+      "clean_curvature_to_expected_noise_energy": 0.23445592354926706,
+      "clean_curvature_lag_correlations": [
+        0.8947685205599126,
+        0.6151394359228654,
+        0.244736562936486,
+        -0.11927530952515812
+      ],
+      "frozen_sha256": "a4032d17b8410e08fecde6786582fe5faf4d682b5a45b40fa928b3de066c8dc2"
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_diagnostic.py": "35fa0923fb0e91a2b5ad690ef052f33aada8a2cd0df5ae20d82f51c039224866"
+  }
+}

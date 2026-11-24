@@ -1,0 +1,490 @@
+{
+  "rows": [
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 771.5431288999971
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 772.1875633999589
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 773.6372750999872
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 797.8276854999713
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 802.7173822000041
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 821.6250640000217
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 834.4376486000256
+    },
+    {
+      "system": "pde_compound",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 106.41081839997787
+    },
+    {
+      "system": "pde_compound",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 113.44749470002716
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 73.22333020000951
+    },
+    {
+      "system": "pde_compound",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 99.82111590000568
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 74.18375990004279
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 86.53431989997625
+    },
+    {
+      "system": "ns",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 375.404139899998
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 62.533048500015866
+    },
+    {
+      "system": "ns",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 371.1363117999863
+    },
+    {
+      "system": "ns",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 368.1265893999953
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 61.28424960002303
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 58.58128099999158
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 64.51665649999632
+    },
+    {
+      "system": "burgers",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 79.9450146999443
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 109.27927689999342
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 110.17218320001848
+    },
+    {
+      "system": "burgers",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 79.25845149997622
+    },
+    {
+      "system": "burgers",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 84.12847970001167
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 69.05263299995568
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 69.47466080001323
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 74.09136030002264
+    },
+    {
+      "system": "duffing",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 67.67076980002457
+    },
+    {
+      "system": "duffing",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 54.872352099977434
+    },
+    {
+      "system": "duffing",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 63.284737600013614
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 624.3082862999872
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 646.1640294999816
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 66.84432809997816
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 77.76217550004367
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 89.66120440000668
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 74.35819599998649
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 88.22207100002561
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 93.65842929994687
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 78.05113720003283
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 77.4441058000084
+    },
+    {
+      "system": "kdv",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 273.0049262000248
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 75.14627409999957
+    },
+    {
+      "system": "kdv",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 248.23528299998725
+    },
+    {
+      "system": "kdv",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 252.1369828999741
+    },
+    {
+      "system": "lorenz",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 80.24942170002032
+    },
+    {
+      "system": "lorenz",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 81.76095380005427
+    },
+    {
+      "system": "lorenz",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 80.49552260001656
+    },
+    {
+      "system": "ode",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 46.393019400013145
+    },
+    {
+      "system": "lv",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 65.01700029999483
+    },
+    {
+      "system": "lv",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 63.835543200024404
+    },
+    {
+      "system": "lv",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 65.13159459998133
+    },
+    {
+      "system": "ode",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 42.70116619998589
+    },
+    {
+      "system": "ode",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 40.01121869997587
+    },
+    {
+      "system": "vdp",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 45.282143699994776
+    },
+    {
+      "system": "vdp",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 44.117227800015826
+    },
+    {
+      "system": "pde_divide",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 87.06058350001695
+    },
+    {
+      "system": "pde_divide",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 78.48214149998967
+    },
+    {
+      "system": "vdp",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 61.523633699980564
+    },
+    {
+      "system": "pde_divide",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 80.86478960001841
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 86.62294149998343
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 83.7462239000015
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 85.50069019995863
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 80.99577949999366
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 82.05152310000267
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 79.31586179998703
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "iid",
+      "exit_code": 0,
+      "seconds": 87.61189020000165
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "negative",
+      "exit_code": 0,
+      "seconds": 87.43364719999954
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "positive",
+      "exit_code": 0,
+      "seconds": 78.83257890003733
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\run_suite_fast.py": "7499ca5321c8e0ddee18b8be40339ba4b7c6576ec23c87bdb8730be73b42861b"
+  }
+}

@@ -1,0 +1,586 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "degree_removed": -1,
+      "contrasts": 320,
+      "rho": -0.8,
+      "fisher": [
+        [
+          640.0,
+          1417.7777777777783
+        ],
+        [
+          1417.7777777777783,
+          4036.728395061733
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.08390372557184309,
+      "local_cramer_rao_rho": 0.03340846081543246,
+      "local_parameter_correlation": -0.882070734401615
+    },
+    {
+      "degree_removed": -1,
+      "contrasts": 320,
+      "rho": -0.4,
+      "fisher": [
+        [
+          640.0,
+          303.80952380952374
+        ],
+        [
+          303.80952380952374,
+          524.4331065759634
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.04642383454426297,
+      "local_cramer_rao_rho": 0.05128447885423013,
+      "local_parameter_correlation": -0.5244044240850758
+    },
+    {
+      "degree_removed": -1,
+      "contrasts": 320,
+      "rho": 0.0,
+      "fisher": [
+        [
+          640.0,
+          0.0
+        ],
+        [
+          0.0,
+          319.0
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.03952847075210474,
+      "local_cramer_rao_rho": 0.055989251095585425,
+      "local_parameter_correlation": 0.0
+    },
+    {
+      "degree_removed": -1,
+      "contrasts": 320,
+      "rho": 0.4,
+      "fisher": [
+        [
+          640.0,
+          -303.80952380952374
+        ],
+        [
+          -303.80952380952374,
+          524.4331065759634
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.04642383454426297,
+      "local_cramer_rao_rho": 0.05128447885423013,
+      "local_parameter_correlation": 0.5244044240850758
+    },
+    {
+      "degree_removed": -1,
+      "contrasts": 320,
+      "rho": 0.8,
+      "fisher": [
+        [
+          640.0,
+          -1417.7777777777783
+        ],
+        [
+          -1417.7777777777783,
+          4036.728395061733
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.08390372557184309,
+      "local_cramer_rao_rho": 0.03340846081543246,
+      "local_parameter_correlation": 0.882070734401615
+    },
+    {
+      "degree_removed": -1,
+      "contrasts": 320,
+      "rho": 0.95,
+      "fisher": [
+        [
+          640.0,
+          -6216.410256410252
+        ],
+        [
+          -6216.410256410252,
+          63841.94608809984
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.16976863873630835,
+      "local_cramer_rao_rho": 0.016997865747971387,
+      "local_parameter_correlation": 0.972515703571161
+    },
+    {
+      "degree_removed": 0,
+      "contrasts": 293,
+      "rho": -0.8,
+      "fisher": [
+        [
+          586.0,
+          1268.0076407066563
+        ],
+        [
+          1268.0076407066563,
+          3620.995754911457
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.08392803297583161,
+      "local_cramer_rao_rho": 0.03376306344339213,
+      "local_parameter_correlation": -0.8704805158619002
+    },
+    {
+      "degree_removed": 0,
+      "contrasts": 293,
+      "rho": -0.4,
+      "fisher": [
+        [
+          586.0,
+          240.64565025199775
+        ],
+        [
+          240.64565025199775,
+          449.0332902567667
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.04677632134801704,
+      "local_cramer_rao_rho": 0.053436204414041164,
+      "local_parameter_correlation": -0.4691264698999383
+    },
+    {
+      "degree_removed": 0,
+      "contrasts": 293,
+      "rho": 0.0,
+      "fisher": [
+        [
+          586.0,
+          -49.41666666666667
+        ],
+        [
+          -49.41666666666667,
+          265.78472222222223
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.04163732533445866,
+      "local_cramer_rao_rho": 0.06182535592166683,
+      "local_parameter_correlation": 0.1252159441909416
+    },
+    {
+      "degree_removed": 0,
+      "contrasts": 293,
+      "rho": 0.4,
+      "fisher": [
+        [
+          586.0,
+          -345.3115876304227
+        ],
+        [
+          -345.3115876304227,
+          440.97848868127403
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.0562899336787475,
+      "local_cramer_rao_rho": 0.0648889643343857,
+      "local_parameter_correlation": 0.6792875295960541
+    },
+    {
+      "degree_removed": 0,
+      "contrasts": 293,
+      "rho": 0.8,
+      "fisher": [
+        [
+          586.0,
+          -1377.11586758644
+        ],
+        [
+          -1377.11586758644,
+          3581.507813850676
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.13305108163861712,
+      "local_cramer_rao_rho": 0.0538188317180673,
+      "local_parameter_correlation": 0.950580110097433
+    },
+    {
+      "degree_removed": 0,
+      "contrasts": 293,
+      "rho": 0.95,
+      "fisher": [
+        [
+          586.0,
+          -5778.4809171473125
+        ],
+        [
+          -5778.4809171473125,
+          58183.720807172365
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.2873174752164235,
+      "local_cramer_rao_rho": 0.028834345909766485,
+      "local_parameter_correlation": 0.9896101250934576
+    },
+    {
+      "degree_removed": 1,
+      "contrasts": 266,
+      "rho": -0.8,
+      "fisher": [
+        [
+          532.0,
+          1118.7865864613548
+        ],
+        [
+          1118.7865864613548,
+          3207.3461055132484
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.0839936393007607,
+      "local_cramer_rao_rho": 0.03420812743572843,
+      "local_parameter_correlation": -0.856482553873787
+    },
+    {
+      "degree_removed": 1,
+      "contrasts": 266,
+      "rho": -0.4,
+      "fisher": [
+        [
+          532.0,
+          180.1555830183528
+        ],
+        [
+          180.1555830183528,
+          376.4939391844393
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.047362311234614984,
+      "local_cramer_rao_rho": 0.05630017034454425,
+      "local_parameter_correlation": -0.40254358926465855
+    },
+    {
+      "degree_removed": 1,
+      "contrasts": 266,
+      "rho": 0.0,
+      "fisher": [
+        [
+          532.0,
+          -89.66666666666669
+        ],
+        [
+          -89.66666666666669,
+          217.52049179453036
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.04494495714237565,
+      "local_cramer_rao_rho": 0.07028889219136124,
+      "local_parameter_correlation": 0.2635876880581222
+    },
+    {
+      "degree_removed": 1,
+      "contrasts": 266,
+      "rho": 0.4,
+      "fisher": [
+        [
+          532.0,
+          -364.24941886342606
+        ],
+        [
+          -364.24941886342606,
+          389.700499443086
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.07225549173060651,
+      "local_cramer_rao_rho": 0.08442308067337433,
+      "local_parameter_correlation": 0.7999771277730864
+    },
+    {
+      "degree_removed": 1,
+      "contrasts": 266,
+      "rho": 0.8,
+      "fisher": [
+        [
+          532.0,
+          -1352.3466159792874
+        ],
+        [
+          -1352.3466159792874,
+          3516.5731556235487
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.2894420567218989,
+      "local_cramer_rao_rho": 0.11257906137835418,
+      "local_parameter_correlation": 0.9887178485558287
+    },
+    {
+      "degree_removed": 1,
+      "contrasts": 266,
+      "rho": 0.95,
+      "fisher": [
+        [
+          532.0,
+          -5416.167837481297
+        ],
+        [
+          -5416.167837481297,
+          55152.53557289316
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 2.964694817909672,
+      "local_cramer_rao_rho": 0.2911743191880797,
+      "local_parameter_correlation": 0.9998930645737512
+    },
+    {
+      "degree_removed": 3,
+      "contrasts": 212,
+      "rho": -0.8,
+      "fisher": [
+        [
+          424.0,
+          823.1771040104086
+        ],
+        [
+          823.1771040104086,
+          2391.245681714059
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.08432756721325406,
+      "local_cramer_rao_rho": 0.03550916012655754,
+      "local_parameter_correlation": -0.8175197525819002
+    },
+    {
+      "degree_removed": 3,
+      "contrasts": 212,
+      "rho": -0.4,
+      "fisher": [
+        [
+          424.0,
+          71.97619837186113
+        ],
+        [
+          71.97619837186113,
+          245.66091489075777
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.04981900679526205,
+      "local_cramer_rao_rho": 0.06545004672292608,
+      "local_parameter_correlation": -0.2230169867667346
+    },
+    {
+      "degree_removed": 3,
+      "contrasts": 212,
+      "rho": 0.0,
+      "fisher": [
+        [
+          424.0,
+          -142.66666666666669
+        ],
+        [
+          -142.66666666666669,
+          153.62282009809485
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.05856992651380063,
+      "local_cramer_rao_rho": 0.09730378648753027,
+      "local_parameter_correlation": 0.5589998860266568
+    },
+    {
+      "degree_removed": 3,
+      "contrasts": 212,
+      "rho": 0.4,
+      "fisher": [
+        [
+          424.0,
+          -366.67540605655006
+        ],
+        [
+          -366.67540605655006,
+          360.13284862798787
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.14049270943004424,
+      "local_cramer_rao_rho": 0.15244224929746247,
+      "local_parameter_correlation": 0.9383556756184815
+    },
+    {
+      "degree_removed": 3,
+      "contrasts": 212,
+      "rho": 0.8,
+      "fisher": [
+        [
+          424.0,
+          -1140.8693670436692
+        ],
+        [
+          -1140.8693670436692,
+          3074.3343862070215
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 1.2605207003223284,
+      "local_cramer_rao_rho": 0.4681201753545665,
+      "local_parameter_correlation": 0.9992575530391473
+    },
+    {
+      "degree_removed": 3,
+      "contrasts": 212,
+      "rho": 0.95,
+      "fisher": [
+        [
+          424.0,
+          -4340.831734964226
+        ],
+        [
+          -4340.831734964226,
+          44440.83711042652
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 21.65332697656637,
+      "local_cramer_rao_rho": 2.115029585907453,
+      "local_parameter_correlation": 0.9999974848990233
+    },
+    {
+      "degree_removed": 5,
+      "contrasts": 158,
+      "rho": -0.8,
+      "fisher": [
+        [
+          316.0,
+          535.2599935032964
+        ],
+        [
+          535.2599935032964,
+          1601.679446411886
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.08539737026300875,
+      "local_cramer_rao_rho": 0.037931519216931484,
+      "local_parameter_correlation": -0.7523734158536534
+    },
+    {
+      "degree_removed": 5,
+      "contrasts": 158,
+      "rho": -0.4,
+      "fisher": [
+        [
+          316.0,
+          -9.936559421710545
+        ],
+        [
+          -9.936559421710545,
+          143.34374372347455
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.056315805655445764,
+      "local_cramer_rao_rho": 0.0836150533952244,
+      "local_parameter_correlation": 0.04668776898630004,
+      "monte_carlo_information_relative_error": 0.013792071871887185
+    },
+    {
+      "degree_removed": 5,
+      "contrasts": 158,
+      "rho": 0.0,
+      "fisher": [
+        [
+          316.0,
+          -159.0000000000001
+        ],
+        [
+          -159.0000000000001,
+          124.66567291173038
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.09398495682539698,
+      "local_cramer_rao_rho": 0.14963336575219977,
+      "local_parameter_correlation": 0.801087841379921
+    },
+    {
+      "degree_removed": 5,
+      "contrasts": 158,
+      "rho": 0.4,
+      "fisher": [
+        [
+          316.0,
+          -313.8231055534627
+        ],
+        [
+          -313.8231055534627,
+          321.80429604310194
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 0.3168598919563901,
+      "local_cramer_rao_rho": 0.31398933159004605,
+      "local_parameter_correlation": 0.9841141033181223,
+      "monte_carlo_information_relative_error": 0.01478058113398209
+    },
+    {
+      "degree_removed": 5,
+      "contrasts": 158,
+      "rho": 0.8,
+      "fisher": [
+        [
+          316.0,
+          -864.9068219114096
+        ],
+        [
+          -864.9068219114096,
+          2367.808824776896
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 3.802292141019697,
+      "local_cramer_rao_rho": 1.3890430498432582,
+      "local_parameter_correlation": 0.9998905500102265
+    },
+    {
+      "degree_removed": 5,
+      "contrasts": 158,
+      "rho": 0.95,
+      "fisher": [
+        [
+          316.0,
+          -3238.425654388094
+        ],
+        [
+          -3238.425654388094,
+          33187.998514947634
+        ]
+      ],
+      "local_cramer_rao_sigma_log": 69.80105611921982,
+      "local_cramer_rao_rho": 6.811064672912688,
+      "local_parameter_correlation": 0.999999675242638
+    }
+  ],
+  "interpretation": "Local information under Gaussian AR1 noise and exactly eliminated polynomial signal. Cross-block covariance retained. Cramer-Rao quantities are local bounds, not confidence intervals or predictions for biased/boundary fits.",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_engine.py": "af312ffe431c428f6dae6f20aebb550aa731b445561281f1004b4d8aa4ad7c8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_metric.py": "a372ae02a7d55602930befa0c1fd02774973850e060e32537540b59d159d0ffd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\run_repair.py": "839f17f417ed29c2e4cb52e6e1470f63dc6cc169e5c9edad6c40a484d4a6d8f4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\context.py": "77f7ef2c9e6e4737475adf4669e868a4edd5b3fbfe3113b61e88e94980146ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\protocol.txt": "5d38aca706ae1716a33308027e8377e34d84434c9c21281fdafbd953b665742c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\contrast_information.py": "f5f268557bbc1769ae592c495a6106d11db60cc4f34f6d1139fabbaf17764d92"
+  }
+}

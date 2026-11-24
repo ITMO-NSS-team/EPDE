@@ -1,0 +1,49 @@
+{
+  "metrics": {
+    "low": {
+      "cutoff": 1.2847880828021484e-06,
+      "detected": 12,
+      "false_calls": 3,
+      "positive_sign": 57,
+      "null_sign": 45,
+      "paired_larger": 83,
+      "auc": 0.55078125,
+      "positive_median": -1.3302069199909588e-07,
+      "zero_median": -2.9330529040174004e-07
+    },
+    "high": {
+      "cutoff": 0.00011934376476199558,
+      "detected": 10,
+      "false_calls": 1,
+      "positive_sign": 49,
+      "null_sign": 33,
+      "paired_larger": 84,
+      "auc": 0.56494140625,
+      "positive_median": -2.2366959055874453e-05,
+      "zero_median": -3.407270703597641e-05
+    },
+    "all": {
+      "cutoff": 1.960394612991613e-06,
+      "detected": 16,
+      "false_calls": 2,
+      "positive_sign": 56,
+      "null_sign": 29,
+      "paired_larger": 94,
+      "auc": 0.5986328125,
+      "positive_median": -3.160890648610119e-07,
+      "zero_median": -1.0531950186860493e-06
+    },
+    "abs_diffusion": {
+      "cutoff": 0.0002149881226327039,
+      "detected": 13,
+      "false_calls": 8,
+      "positive_sign": 128,
+      "null_sign": 128,
+      "paired_larger": 97,
+      "auc": 0.70391845703125,
+      "positive_median": 0.00011849618731689141,
+      "zero_median": 6.48473759988512e-05
+    }
+  },
+  "protocol": "03af75a7d777a0fc9b1c59c103949de816eb3619c80d8076dcd63605e2a8ba59"
+}

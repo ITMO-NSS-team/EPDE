@@ -1,0 +1,4781 @@
+{
+  "status": "COMPLETE",
+  "records": 23,
+  "rows": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.03298298167328522,
+        [
+          0.006091867464025867,
+          0.004521450778370398
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.03298298167328522,
+        "rhos": [
+          0.006091867464025867,
+          0.004521450778370398
+        ],
+        "objective": 1.3915056111600532,
+        "projected_gradient": 9.19202289978438e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.04805329028906838,
+              0.006091942823828808,
+              0.004521481590200504
+            ],
+            "value": 1.3915056111600532,
+            "gradient": [
+              -9.192022899463543e-09,
+              5.328223740598214e-09,
+              8.608926224258373e-10
+            ],
+            "projected_gradient": 9.19202289978438e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.04805322123684942,
+              0.006092128804265762,
+              0.004521663812934373
+            ],
+            "value": 1.3915056111600617,
+            "gradient": [
+              -4.2677935462262384e-08,
+              5.712790901454884e-08,
+              5.140629232133943e-08
+            ],
+            "projected_gradient": 5.712790901446496e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.04805331060048035,
+              0.006091923155703351,
+              0.004521469845605743
+            ],
+            "value": 1.3915056111600532,
+            "gradient": [
+              -2.7380958760849468e-08,
+              4.547757899622118e-09,
+              3.4338153326102322e-09
+            ],
+            "projected_gradient": 2.7380958764200436e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 6618,
+        "shape": [
+          51,
+          128
+        ]
+      },
+      "sigma_ratio": 0.9767399038095539,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.03214767968296605,
+        [
+          -0.015207872686066404,
+          -0.018128357741195637
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.03214767968296605,
+        "rhos": [
+          -0.015207872686066404,
+          -0.018128357741195637
+        ],
+        "objective": 1.4584856102094115,
+        "projected_gradient": 1.4374154184634835e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.013181204415818703,
+              -0.015209045271301886,
+              -0.01813034401804506
+            ],
+            "value": 1.4584856102094115,
+            "gradient": [
+              1.4374154184847154e-08,
+              -3.953400544106908e-09,
+              -5.812731579437326e-12
+            ],
+            "projected_gradient": 1.4374154184634835e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.013181217632662766,
+              -0.015208911482099819,
+              -0.01813019337823938
+            ],
+            "value": 1.4584856102094206,
+            "gradient": [
+              -1.0427015042533186e-07,
+              5.827571674877062e-08,
+              6.499855316856168e-08
+            ],
+            "projected_gradient": 1.0427015042537013e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.013181135258527137,
+              -0.015208979571901485,
+              -0.018130041535170834
+            ],
+            "value": 1.4584856102094261,
+            "gradient": [
+              -1.4594752933007225e-08,
+              9.168942882401447e-10,
+              9.63268450057112e-08
+            ],
+            "projected_gradient": 9.632684500743283e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 6618,
+        "shape": [
+          51,
+          128
+        ]
+      },
+      "sigma_ratio": 0.952003729446728,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.03429076471381888,
+        [
+          -0.3549516525340744,
+          -0.4050672645635287
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.03429076471381888,
+        "rhos": [
+          -0.3549516525340744,
+          -0.4050672645635287
+        ],
+        "objective": 1.3601547605919833,
+        "projected_gradient": 5.108741540915673e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.1682309602075825,
+              -0.37109789507891333,
+              -0.42969605973372554
+            ],
+            "value": 1.3601547605919835,
+            "gradient": [
+              3.1746309309772186e-08,
+              -1.922745929833843e-09,
+              -3.6223629461150805e-09
+            ],
+            "projected_gradient": 3.174630930358191e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.16823089353527937,
+              -0.3710979057175855,
+              -0.4296961207914318
+            ],
+            "value": 1.3601547605919904,
+            "gradient": [
+              1.3217227794746305e-07,
+              -9.900949696988536e-09,
+              -3.440064682977536e-08
+            ],
+            "projected_gradient": 1.3217227795569997e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              -0.16823097808753043,
+              -0.37109789029621987,
+              -0.4296960531438116
+            ],
+            "value": 1.3601547605919833,
+            "gradient": [
+              5.108741548666097e-09,
+              1.1957906714785991e-09,
+              1.0246741489622861e-10
+            ],
+            "projected_gradient": 5.108741540915673e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 6618,
+        "shape": [
+          51,
+          128
+        ]
+      },
+      "sigma_ratio": 1.0154678724895116,
+      "true_rho": -0.4
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.03382295831509495,
+        [
+          -0.35585162185537145,
+          -0.42897168540097697
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.03382295831509495,
+        "rhos": [
+          -0.35585162185537145,
+          -0.42897168540097697
+        ],
+        "objective": 1.3946720382219302,
+        "projected_gradient": 8.143155483253395e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.1417419711601065,
+              -0.3721279589443345,
+              -0.4586357420267288
+            ],
+            "value": 1.3946720382219309,
+            "gradient": [
+              5.755066746117955e-09,
+              1.1766734180349777e-08,
+              1.147113103052097e-08
+            ],
+            "projected_gradient": 1.1766734198115358e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.14174194527431572,
+              -0.3721279729144076,
+              -0.4586357553873221
+            ],
+            "value": 1.3946720382219313,
+            "gradient": [
+              4.4529741508599844e-08,
+              3.483341047726447e-09,
+              4.909810142681882e-09
+            ],
+            "projected_gradient": 4.4529741505261455e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              -0.14174197290270166,
+              -0.3721279693454091,
+              -0.4586357836464275
+            ],
+            "value": 1.3946720382219302,
+            "gradient": [
+              3.994292896973317e-09,
+              6.3846334570939104e-09,
+              -8.143155460035676e-09
+            ],
+            "projected_gradient": 8.143155483253395e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 6618,
+        "shape": [
+          51,
+          128
+        ]
+      },
+      "sigma_ratio": 1.0016145107341312,
+      "true_rho": -0.4
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.03618800872182965,
+        [
+          0.4276990926570801,
+          0.4410815476058042
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.03618800872182965,
+        "rhos": [
+          0.4276990926570801,
+          0.4410815476058042
+        ],
+        "objective": 1.3309197603921483,
+        "projected_gradient": 2.3907104629294906e-09,
+        "fits": [
+          {
+            "theta": [
+              0.23721038498606775,
+              0.4570772358925832,
+              0.4735728769364027
+            ],
+            "value": 1.3309197603921512,
+            "gradient": [
+              7.619878560248856e-08,
+              -5.14246475192289e-08,
+              -8.701645998026435e-09
+            ],
+            "projected_gradient": 7.61987856146007e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.23721030171811106,
+              0.45707721988023975,
+              0.4735728154905099
+            ],
+            "value": 1.3309197603921488,
+            "gradient": [
+              2.409196292179767e-09,
+              -8.337242075523166e-09,
+              7.874768511025363e-09
+            ],
+            "projected_gradient": 8.337242063394257e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              0.23721030517538744,
+              0.4570772432105657,
+              0.47357280204713553
+            ],
+            "value": 1.3309197603921483,
+            "gradient": [
+              1.1966921588855348e-09,
+              2.3907104401311667e-09,
+              -1.8590988554528643e-09
+            ],
+            "projected_gradient": 2.3907104629294906e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 13
+          }
+        ],
+        "contrast_count": 6618,
+        "shape": [
+          51,
+          128
+        ]
+      },
+      "sigma_ratio": 1.0716518145067562,
+      "true_rho": 0.4
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.0340948633002484,
+        [
+          0.3714813578412135,
+          0.41114474610636187
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0340948633002484,
+        "rhos": [
+          0.3714813578412135,
+          0.41114474610636187
+        ],
+        "objective": 1.446882260886356,
+        "projected_gradient": 8.97366531082966e-09,
+        "fits": [
+          {
+            "theta": [
+              0.2701597207425457,
+              0.3901406832440583,
+              0.43698817317341504
+            ],
+            "value": 1.4468822608863576,
+            "gradient": [
+              -4.0676166139850956e-08,
+              3.2050761407165416e-08,
+              1.1033890097359596e-08
+            ],
+            "projected_gradient": 4.067616615754943e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.270159638328734,
+              0.39014051440576636,
+              0.4369880630533302
+            ],
+            "value": 1.446882260886356,
+            "gradient": [
+              5.915407098375596e-09,
+              -8.973665310242507e-09,
+              1.1606532398151496e-09
+            ],
+            "projected_gradient": 8.97366531082966e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              0.27015903211918363,
+              0.3901397705701144,
+              0.43698731604564645
+            ],
+            "value": 1.4468822608863838,
+            "gradient": [
+              1.4243939513257558e-08,
+              -4.545523506245977e-08,
+              -3.673872695537471e-08
+            ],
+            "projected_gradient": 4.5455235075930744e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          }
+        ],
+        "contrast_count": 6618,
+        "shape": [
+          51,
+          128
+        ]
+      },
+      "sigma_ratio": 1.009666555624276,
+      "true_rho": 0.4
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.008916553127525597,
+        [
+          -0.0074305435753741975,
+          -0.010140662893955345
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.008916553127525597,
+        "rhos": [
+          -0.0074305435753741975,
+          -0.010140662893955345
+        ],
+        "objective": 1.4774354127836224,
+        "projected_gradient": 1.0613451983595978e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.004706666485172008,
+              -0.007430825974064281,
+              -0.010141250112265148
+            ],
+            "value": 1.477435412783646,
+            "gradient": [
+              -1.738275871433702e-07,
+              6.060770503060084e-09,
+              -3.3107552245825734e-08
+            ],
+            "projected_gradient": 1.7382758714379332e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.004706452010856504,
+              -0.007430680334050624,
+              -0.010141010513814629
+            ],
+            "value": 1.4774354127836224,
+            "gradient": [
+              3.746093584541491e-09,
+              -2.835741421522783e-09,
+              -1.0613451983849774e-08
+            ],
+            "projected_gradient": 1.0613451983595978e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.004706385952207363,
+              -0.007430635846560114,
+              -0.010140935889452085
+            ],
+            "value": 1.4774354127836242,
+            "gradient": [
+              5.827238979923913e-08,
+              -5.736648020367532e-09,
+              -3.3467457510587744e-09
+            ],
+            "projected_gradient": 5.827238979891347e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 26698,
+        "shape": [
+          101,
+          256
+        ]
+      },
+      "sigma_ratio": 0.9830711994398535,
+      "true_rho": 0.0
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.008916427951860668,
+        [
+          -0.0074523285308871635,
+          -0.010132615494799936
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.008916427951860668,
+        "rhos": [
+          -0.0074523285308871635,
+          -0.010132615494799936
+        ],
+        "objective": 1.4774217691123523,
+        "projected_gradient": 8.633036605032451e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.004725593719577522,
+              -0.007452658562149372,
+              -0.010133312510773271
+            ],
+            "value": 1.4774217691123765,
+            "gradient": [
+              -2.8362301631990737e-08,
+              -3.453720668921539e-08,
+              -9.891767958299499e-08
+            ],
+            "projected_gradient": 9.891767958382369e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.004725443225356031,
+              -0.007452466495972527,
+              -0.01013296228769224
+            ],
+            "value": 1.4774217691123523,
+            "gradient": [
+              1.8746052447247385e-09,
+              -1.7376438350313125e-09,
+              -8.633036604829728e-09
+            ],
+            "projected_gradient": 8.633036605032451e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.004725382198041622,
+              -0.007452424199217466,
+              -0.010132891481192018
+            ],
+            "value": 1.4774217691123535,
+            "gradient": [
+              5.118680240869842e-08,
+              -3.897641042288365e-09,
+              -1.1549918627320303e-09
+            ],
+            "projected_gradient": 5.1186802408655085e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 26698,
+        "shape": [
+          101,
+          256
+        ]
+      },
+      "sigma_ratio": 0.983057398524937,
+      "true_rho": 0.0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        10.796575687277034,
+        [
+          0.02473184910405418,
+          0.01187486159355313
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 10.796575687277034,
+        "rhos": [
+          0.02473184910405418,
+          0.01187486159355313
+        ],
+        "objective": 1.4951232936590813,
+        "projected_gradient": 3.9786567394839434e-08,
+        "fits": [
+          {
+            "theta": [
+              0.006859491304645513,
+              0.024736893485683527,
+              0.01187541980811469
+            ],
+            "value": 1.4951232936590813,
+            "gradient": [
+              -3.978656739517776e-08,
+              2.5093794396545105e-09,
+              6.755273397349848e-09
+            ],
+            "projected_gradient": 3.9786567394839434e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          },
+          {
+            "theta": [
+              0.006859428488739898,
+              0.02473690928513287,
+              0.011875472789747753
+            ],
+            "value": 1.4951232936590892,
+            "gradient": [
+              -1.5330955318143221e-07,
+              3.1643614634293216e-08,
+              5.110288241159944e-08
+            ],
+            "projected_gradient": 1.5330955318183098e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.006859743368611261,
+              0.024737018954454324,
+              0.011875979597049235
+            ],
+            "value": 1.4951232936591294,
+            "gradient": [
+              7.787635671975352e-08,
+              -3.1151641519079606e-08,
+              1.537612024664378e-07
+            ],
+            "projected_gradient": 1.5376120246664293e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 10706,
+        "shape": [
+          101,
+          101
+        ]
+      },
+      "sigma_ratio": 0.9896282081865799,
+      "true_rho": 0.0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        10.796575652938753,
+        [
+          0.024731841685594152,
+          0.011874858909465411
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 10.796575652938753,
+        "rhos": [
+          0.024731841685594152,
+          0.011874858909465411
+        ],
+        "objective": 1.4951232929952045,
+        "projected_gradient": 3.9842108332140136e-08,
+        "fits": [
+          {
+            "theta": [
+              0.006859488212259473,
+              0.02473688606268312,
+              0.01187541712364843
+            ],
+            "value": 1.4951232929952045,
+            "gradient": [
+              -3.984210833199414e-08,
+              2.4569437411787006e-09,
+              6.742648611934912e-09
+            ],
+            "projected_gradient": 3.9842108332140136e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          },
+          {
+            "theta": [
+              0.006859425542301618,
+              0.02473690211429896,
+              0.011875470264770972
+            ],
+            "value": 1.495123292995212,
+            "gradient": [
+              -1.5330251610847162e-07,
+              3.1650814921362573e-08,
+              5.1106110597195064e-08
+            ],
+            "projected_gradient": 1.5330251610864987e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.006859740377133775,
+              0.024737011717876907,
+              0.011875977078644658
+            ],
+            "value": 1.4951232929952525,
+            "gradient": [
+              7.784023212709491e-08,
+              -3.1157521793158253e-08,
+              1.5378301249076008e-07
+            ],
+            "projected_gradient": 1.5378301249091564e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 10706,
+        "shape": [
+          101,
+          101
+        ]
+      },
+      "sigma_ratio": 0.9896282050390882,
+      "true_rho": 0.0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.02338161164513179,
+        [
+          -0.005166632007481026
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.02338161164513179,
+        "rhos": [
+          -0.005166632007481026
+        ],
+        "objective": 1.4366475438544235,
+        "projected_gradient": 1.1680721771767377e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.008276022127259919,
+              -0.0051666779810575925
+            ],
+            "value": 1.4366475438544235,
+            "gradient": [
+              -1.0648349037071725e-09,
+              -1.1680721775285108e-09
+            ],
+            "projected_gradient": 1.1680721771767377e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              -0.008276018839684112,
+              -0.005166673589116245
+            ],
+            "value": 1.4366475438544237,
+            "gradient": [
+              5.568756500770991e-10,
+              8.808068301673881e-11
+            ],
+            "projected_gradient": 5.568756497598137e-10,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.00827602402202577,
+              -0.005166665791210728
+            ],
+            "value": 1.4366475438544237,
+            "gradient": [
+              -1.3030228559493976e-08,
+              1.0575409453827227e-08
+            ],
+            "projected_gradient": 1.3030228559335333e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 503,
+        "shape": [
+          1001
+        ]
+      },
+      "sigma_ratio": 0.9622042680047511,
+      "true_rho": 0.0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.02338161178873319,
+        [
+          -0.005166618965317835
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.02338161178873319,
+        "rhos": [
+          -0.005166618965317835
+        ],
+        "objective": 1.4366475464397028,
+        "projected_gradient": 1.1680256596993677e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.008276009765705885,
+              -0.005166664938546244
+            ],
+            "value": 1.4366475464397028,
+            "gradient": [
+              -1.0647921228189965e-09,
+              -1.168025659404499e-09
+            ],
+            "projected_gradient": 1.1680256596993677e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              -0.008276006478041205,
+              -0.005166660546562495
+            ],
+            "value": 1.4366475464397028,
+            "gradient": [
+              5.570194325668791e-10,
+              8.809618376078918e-11
+            ],
+            "projected_gradient": 5.570194323151201e-10,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.008276011660801942,
+              -0.005166652748171846
+            ],
+            "value": 1.4366475464397028,
+            "gradient": [
+              -1.3031074981167614e-08,
+              1.0576150569853738e-08
+            ],
+            "projected_gradient": 1.3031074981226243e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 503,
+        "shape": [
+          1001
+        ]
+      },
+      "sigma_ratio": 0.9622042739142617,
+      "true_rho": 0.0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.0017352271987788647,
+        [
+          -0.0329134972519804,
+          -0.007901586243880213
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0017352271987788647,
+        "rhos": [
+          -0.0329134972519804,
+          -0.007901586243880213
+        ],
+        "objective": 1.419806152169335,
+        "projected_gradient": 4.3167981727404436e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.00660181776050903,
+              -0.032925453844198226,
+              -0.007902061036047736
+            ],
+            "value": 1.4198061521693401,
+            "gradient": [
+              4.120353812171626e-08,
+              4.600028578232136e-09,
+              -7.678852854620301e-08
+            ],
+            "projected_gradient": 7.678852854617335e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          },
+          {
+            "theta": [
+              -0.006601583704923602,
+              -0.03292500775724924,
+              -0.007901458926039235
+            ],
+            "value": 1.419806152169372,
+            "gradient": [
+              3.451006893005277e-09,
+              9.553861765337854e-08,
+              9.17346982610367e-08
+            ],
+            "projected_gradient": 9.553861765598803e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.006601779287473935,
+              -0.03292539002821412,
+              -0.007901750695391474
+            ],
+            "value": 1.419806152169335,
+            "gradient": [
+              -4.3167981727776754e-08,
+              1.5753343331443462e-08,
+              4.183231029191937e-08
+            ],
+            "projected_gradient": 4.3167981727404436e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 0.9669522130228281,
+      "true_rho": 0.0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.0017346280050166442,
+        [
+          -0.03332931472549549,
+          -0.008211793737529552
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0017346280050166442,
+        "rhos": [
+          -0.03332931472549549,
+          -0.008211793737529552
+        ],
+        "objective": 1.4198141416986287,
+        "projected_gradient": 2.257836356767129e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.006777947156941377,
+              -0.03334166417195116,
+              -0.008211978328483532
+            ],
+            "value": 1.4198141416986287,
+            "gradient": [
+              -1.1188287412639101e-08,
+              -2.2578363570184138e-08,
+              1.4592292035677573e-08
+            ],
+            "projected_gradient": 2.257836356767129e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.006777642289138347,
+              -0.03334113103110651,
+              -0.008211535490027828
+            ],
+            "value": 1.4198141416986778,
+            "gradient": [
+              8.974000477380006e-08,
+              7.673765050965785e-08,
+              8.741850562879322e-08
+            ],
+            "projected_gradient": 8.974000477359606e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.006777864759197884,
+              -0.03334168780820131,
+              -0.008211708261818164
+            ],
+            "value": 1.4198141416986456,
+            "gradient": [
+              2.0346078842607327e-08,
+              -6.262850384054223e-08,
+              9.89917354427664e-08
+            ],
+            "projected_gradient": 9.899173544249129e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 0.966618313384316,
+      "true_rho": 0.0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.0018065171576791981,
+        [
+          -0.4243858239628761,
+          -0.42928217301927746
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0018065171576791981,
+        "rhos": [
+          -0.4243858239628761,
+          -0.42928217301927746
+        ],
+        "objective": 1.3335391645650319,
+        "projected_gradient": 3.4082367483811993e-10,
+        "fits": [
+          {
+            "theta": [
+              -0.16470253020452008,
+              -0.45302919803947966,
+              -0.4590163531067391
+            ],
+            "value": 1.3335391645650319,
+            "gradient": [
+              3.4082368358037944e-10,
+              4.9909808339228673e-11,
+              3.652958629194658e-11
+            ],
+            "projected_gradient": 3.4082367483811993e-10,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.16470254680510205,
+              -0.45302921400506274,
+              -0.45901635094355336
+            ],
+            "value": 1.333539164565032,
+            "gradient": [
+              -2.500960147500285e-08,
+              -7.46144176053313e-09,
+              1.2859152805572324e-09
+            ],
+            "projected_gradient": 2.5009601473113818e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              -0.1647025222934128,
+              -0.45302898398136854,
+              -0.4590164889512864
+            ],
+            "value": 1.3335391645650474,
+            "gradient": [
+              1.1040057941312267e-08,
+              1.0381208758159721e-07,
+              -6.648566295138118e-08
+            ],
+            "projected_gradient": 1.0381208759291383e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.0066784134728297,
+      "true_rho": -0.4
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.0018064394653943877,
+        [
+          -0.42450974757667465,
+          -0.42928299928539915
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0018064394653943877,
+        "rhos": [
+          -0.42450974757667465,
+          -0.42928299928539915
+        ],
+        "objective": 1.333506043225764,
+        "projected_gradient": 2.8886060488009235e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.16469464158140365,
+              -0.45318035392650197,
+              -0.4590173678449272
+            ],
+            "value": 1.3335060432257644,
+            "gradient": [
+              2.6634173745176827e-12,
+              1.2431847960763553e-11,
+              1.3838972808272424e-11
+            ],
+            "projected_gradient": 1.3838985513103808e-11,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.1646946434388803,
+              -0.4531803531403277,
+              -0.4590173660397384
+            ],
+            "value": 1.333506043225764,
+            "gradient": [
+              -2.8886060601966124e-09,
+              4.2014522071402835e-10,
+              9.181375810169882e-10
+            ],
+            "projected_gradient": 2.8886060488009235e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              -0.16469463379477425,
+              -0.45318014274554913,
+              -0.4590175016807014
+            ],
+            "value": 1.3335060432257795,
+            "gradient": [
+              1.0557452222848603e-08,
+              1.0239099727865633e-07,
+              -6.553137798757397e-08
+            ],
+            "projected_gradient": 1.0239099729192347e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.0066351195878647,
+      "true_rho": -0.4
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.001812667592026539,
+        [
+          0.39600485506793964,
+          0.39802112571845905
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.001812667592026539,
+        "rhos": [
+          0.39600485506793964,
+          0.39802112571845905
+        ],
+        "objective": 1.3944623250609198,
+        "projected_gradient": 6.230418958530493e-10,
+        "fits": [
+          {
+            "theta": [
+              0.27920134709788647,
+              0.41890184453374746,
+              0.4212953783174618
+            ],
+            "value": 1.3944623250609203,
+            "gradient": [
+              9.284132289307097e-09,
+              -1.1266296025960662e-09,
+              -4.320523453478524e-09
+            ],
+            "projected_gradient": 9.284132296283332e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              0.2792013521639562,
+              0.41890183518440693,
+              0.42129537459473765
+            ],
+            "value": 1.3944623250609203,
+            "gradient": [
+              2.553917329005465e-08,
+              -9.819337583621098e-09,
+              -9.706867840489624e-09
+            ],
+            "projected_gradient": 2.553917327619004e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              0.2792013071788122,
+              0.41890180072403915,
+              0.42129534096434557
+            ],
+            "value": 1.3944623250609198,
+            "gradient": [
+              1.7353452753774921e-10,
+              -6.230418911612235e-10,
+              -2.2239427562367413e-11
+            ],
+            "projected_gradient": 6.230418958530493e-10,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 13
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.0101057318709035,
+      "true_rho": 0.4
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.0018198989604146403,
+        [
+          0.3997520151036507,
+          0.4017803303132009
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0018198989604146403,
+        "rhos": [
+          0.3997520151036507,
+          0.4017803303132009
+        ],
+        "objective": 1.3942903818614019,
+        "projected_gradient": 5.477409414922363e-09,
+        "fits": [
+          {
+            "theta": [
+              0.2828692557959186,
+              0.42335380816783363,
+              0.42577030580905184
+            ],
+            "value": 1.3942903818614032,
+            "gradient": [
+              3.85510466587054e-08,
+              -3.278951094421382e-08,
+              6.872569836357955e-09
+            ],
+            "projected_gradient": 3.8551046632750996e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.28286914480807596,
+              0.42335374492817684,
+              0.42577017256066646
+            ],
+            "value": 1.3942903818614019,
+            "gradient": [
+              -5.477409393765216e-09,
+              2.5354836128712706e-09,
+              1.9899371602171585e-09
+            ],
+            "projected_gradient": 5.477409414922363e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              0.2828691350334688,
+              0.42335375278745396,
+              0.42577018521581256
+            ],
+            "value": 1.394290381861402,
+            "gradient": [
+              -3.380077818903705e-08,
+              1.3450073001327631e-08,
+              1.5551942785876193e-08
+            ],
+            "projected_gradient": 3.380077817638494e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 13
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.0141353988049964,
+      "true_rho": 0.4
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.005409280360672775,
+        [
+          0.0029603350914580383,
+          -0.005467475564546058
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.005409280360672775,
+        "rhos": [
+          0.0029603350914580383,
+          -0.005467475564546058
+        ],
+        "objective": 1.4300121306707814,
+        "projected_gradient": 4.230248702545569e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.001045673450395551,
+              0.002960371831340199,
+              -0.0054675089534653035
+            ],
+            "value": 1.4300121306707816,
+            "gradient": [
+              -1.2546722916583177e-08,
+              7.321092261458405e-09,
+              4.4986924913288715e-09
+            ],
+            "projected_gradient": 1.2546722916477113e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.0010456718007024897,
+              0.002960338634982258,
+              -0.005467498309870094
+            ],
+            "value": 1.4300121306707816,
+            "gradient": [
+              -1.2228978573535677e-09,
+              -7.2022217159232476e-09,
+              8.260224792966609e-09
+            ],
+            "projected_gradient": 8.260224793228688e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.0010456748008656508,
+              0.002960343739218446,
+              -0.005467530045799042
+            ],
+            "value": 1.4300121306707814,
+            "gradient": [
+              4.230248702441137e-09,
+              -3.9069393945814644e-09,
+              -3.679736442880165e-09
+            ],
+            "projected_gradient": 4.230248702545569e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          }
+        ],
+        "contrast_count": 101742,
+        "shape": [
+          201,
+          512
+        ]
+      },
+      "sigma_ratio": 0.9958603224459517,
+      "true_rho": 0.0
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.0054092754299504085,
+        [
+          0.0029538219730843233,
+          -0.005470497435145365
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0054092754299504085,
+        "rhos": [
+          0.0029538219730843233,
+          -0.005470497435145365
+        ],
+        "objective": 1.4300111401343958,
+        "projected_gradient": 8.231690556623206e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.0010493555116494893,
+              0.0029538650077241537,
+              -0.005470562687477983
+            ],
+            "value": 1.430011140134396,
+            "gradient": [
+              -1.3894240848985339e-08,
+              8.099533821893102e-09,
+              4.6712028899744695e-09
+            ],
+            "projected_gradient": 1.3894240849000872e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.0010493532889268803,
+              0.0029538305638914615,
+              -0.005470552006784641
+            ],
+            "value": 1.4300111401343958,
+            "gradient": [
+              -1.2327774002115065e-09,
+              -7.167275438847582e-09,
+              8.231690556353505e-09
+            ],
+            "projected_gradient": 8.231690556623206e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.001049356276560614,
+              0.002953835588473828,
+              -0.005470583675580227
+            ],
+            "value": 1.4300111401343958,
+            "gradient": [
+              4.244797837570309e-09,
+              -3.910159490706104e-09,
+              -3.6852402644709918e-09
+            ],
+            "projected_gradient": 4.2447978376627254e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          }
+        ],
+        "contrast_count": 101742,
+        "shape": [
+          201,
+          512
+        ]
+      },
+      "sigma_ratio": 0.9958594146892006,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.05323046572452809,
+        [
+          -0.0038114958659337195,
+          -0.006727832762175035
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05323046572452809,
+        "rhos": [
+          -0.0038114958659337195,
+          -0.006727832762175035
+        ],
+        "objective": 1.4358589098888324,
+        "projected_gradient": 8.81350996524699e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.0031902874763972853,
+              -0.0038117166566886402,
+              -0.006728140727734215
+            ],
+            "value": 1.4358589098888461,
+            "gradient": [
+              1.2240614059937798e-07,
+              -8.083629375672204e-08,
+              -7.088749363218426e-08
+            ],
+            "projected_gradient": 1.224061405994195e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.0031902722774783334,
+              -0.003811514323264269,
+              -0.006727934273875383
+            ],
+            "value": 1.4358589098888324,
+            "gradient": [
+              -7.289773713964702e-09,
+              -3.3643172541564016e-09,
+              8.81350996507589e-09
+            ],
+            "projected_gradient": 8.81350996524699e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.003190232433541601,
+              -0.0038115018228509303,
+              -0.006727934023646633
+            ],
+            "value": 1.4358589098888332,
+            "gradient": [
+              4.804764661377778e-08,
+              -1.3183653351631167e-08,
+              -5.8799002348922e-09
+            ],
+            "projected_gradient": 4.804764661397315e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          }
+        ],
+        "contrast_count": 257014,
+        "shape": [
+          251,
+          1024
+        ]
+      },
+      "sigma_ratio": 0.9975502113190373,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.05321981506702848,
+        [
+          -0.004114195911697314,
+          -0.006906566704104036
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05321981506702848,
+        "rhos": [
+          -0.004114195911697314,
+          -0.006906566704104036
+        ],
+        "objective": 1.4358496051445389,
+        "projected_gradient": 9.734574099931614e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.003325264337663484,
+              -0.004114262957971588,
+              -0.00690672932582278
+            ],
+            "value": 1.4358496051445395,
+            "gradient": [
+              3.309328801271888e-08,
+              -2.2634314839696408e-08,
+              -1.3560538610932871e-08
+            ],
+            "projected_gradient": 3.309328801270883e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.0033252682724610695,
+              -0.004114219125060213,
+              -0.0069066765231855344
+            ],
+            "value": 1.4358496051445389,
+            "gradient": [
+              -8.89094420385022e-09,
+              -3.1432877913935608e-09,
+              9.734574099913377e-09
+            ],
+            "projected_gradient": 9.734574099931614e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.0033252253587096083,
+              -0.004114206579131776,
+              -0.006906674397080075
+            ],
+            "value": 1.4358496051445397,
+            "gradient": [
+              5.036621117638463e-08,
+              -1.4089156223943447e-08,
+              -5.315543964542828e-09
+            ],
+            "projected_gradient": 5.036621117653767e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          }
+        ],
+        "contrast_count": 257014,
+        "shape": [
+          251,
+          1024
+        ]
+      },
+      "sigma_ratio": 0.9973506157397988,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.05358703539640321,
+        [
+          -0.3991956801838421,
+          -0.40176691442131535
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05358703539640321,
+        "rhos": [
+          -0.3991956801838421,
+          -0.40176691442131535
+        ],
+        "objective": 1.3630702898046272,
+        "projected_gradient": 3.0158731900709057e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.15293627823446204,
+              -0.42269177291079724,
+              -0.42575417417699324
+            ],
+            "value": 1.3630702898046272,
+            "gradient": [
+              -3.015873195715672e-09,
+              -1.5069458060683791e-09,
+              -1.5627348936212428e-09
+            ],
+            "projected_gradient": 3.0158731900709057e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.15293621178923703,
+              -0.4226918337539888,
+              -0.4257542232981759
+            ],
+            "value": 1.363070289804632,
+            "gradient": [
+              9.955384197249985e-08,
+              -3.1853262837318225e-08,
+              -2.6641695330554853e-08
+            ],
+            "projected_gradient": 9.955384197568584e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              -0.1529363824838679,
+              -0.42269135821828757,
+              -0.4257542864142754
+            ],
+            "value": 1.3630702898046798,
+            "gradient": [
+              -1.6835359692379667e-07,
+              1.967804378108227e-07,
+              -5.424678470312426e-08
+            ],
+            "projected_gradient": 1.9678043783333266e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 257014,
+        "shape": [
+          251,
+          1024
+        ]
+      },
+      "sigma_ratio": 1.0042324025545928,
+      "true_rho": -0.4
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.05357801071022273,
+        [
+          -0.39957562864982155,
+          -0.4017726448352981
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05357801071022273,
+        "rhos": [
+          -0.39957562864982155,
+          -0.4017726448352981
+        ],
+        "objective": 1.362961666884218,
+        "projected_gradient": 4.529229741256913e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.15299694981960318,
+              -0.42314383341072914,
+              -0.4257610119347817
+            ],
+            "value": 1.3629616668842182,
+            "gradient": [
+              -2.9238903410504112e-09,
+              -1.4810953480258166e-09,
+              -1.5344093835061878e-09
+            ],
+            "projected_gradient": 2.9238903520578674e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.15299688261408698,
+              -0.42314389499742466,
+              -0.42576106153088716
+            ],
+            "value": 1.3629616668842233,
+            "gradient": [
+              1.0079470141211317e-07,
+              -3.218248959675936e-08,
+              -2.686723016262376e-08
+            ],
+            "projected_gradient": 1.0079470141866054e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              -0.15299695075008973,
+              -0.42314382823414,
+              -0.42576100764171626
+            ],
+            "value": 1.362961666884218,
+            "gradient": [
+              -4.529229748781612e-09,
+              9.856629272527461e-10,
+              5.703043063793448e-10
+            ],
+            "projected_gradient": 4.529229741256913e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 257014,
+        "shape": [
+          251,
+          1024
+        ]
+      },
+      "sigma_ratio": 1.0040632780225436,
+      "true_rho": -0.4
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.05255077530887085,
+        [
+          0.3815595871541889,
+          0.38440557819494164
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05255077530887085,
+        "rhos": [
+          0.3815595871541889,
+          0.38440557819494164
+        ],
+        "objective": 1.4153836441749141,
+        "projected_gradient": 3.7093846882996218e-09,
+        "fits": [
+          {
+            "theta": [
+              0.2623198285149444,
+              0.4018836977322043,
+              0.4052188565497473
+            ],
+            "value": 1.4153836441749146,
+            "gradient": [
+              -1.5446679682270017e-08,
+              1.0071035575333682e-08,
+              4.936119922118164e-10
+            ],
+            "projected_gradient": 1.5446679657582507e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              0.2623190213441958,
+              0.4018826674229684,
+              0.40521762627438357
+            ],
+            "value": 1.4153836441749856,
+            "gradient": [
+              1.6891913904140893e-07,
+              -5.471412839486284e-08,
+              -1.791061519120118e-07
+            ],
+            "projected_gradient": 1.7910615190963597e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              0.26231986230728416,
+              0.40188371492676106,
+              0.4052189002739121
+            ],
+            "value": 1.4153836441749141,
+            "gradient": [
+              -2.227009801825764e-09,
+              -1.4693650454031068e-09,
+              3.7093846790995275e-09
+            ],
+            "projected_gradient": 3.7093846882996218e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 257014,
+        "shape": [
+          251,
+          1024
+        ]
+      },
+      "sigma_ratio": 0.9848126688507968,
+      "true_rho": 0.4
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.05245986680596649,
+        [
+          0.3800235548211338,
+          0.3827493972826378
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05245986680596649,
+        "rhos": [
+          0.3800235548211338,
+          0.3827493972826378
+        ],
+        "objective": 1.4155652376200631,
+        "projected_gradient": 5.138782954716703e-09,
+        "fits": [
+          {
+            "theta": [
+              0.26089755511515966,
+              0.40008697318327047,
+              0.4032767957952377
+            ],
+            "value": 1.4155652376200647,
+            "gradient": [
+              1.6846298511149745e-09,
+              -1.1495875263069938e-08,
+              -6.453053274427744e-09
+            ],
+            "projected_gradient": 1.1495875251732457e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.26089732840361907,
+              0.4000867133138128,
+              0.4032763338859778
+            ],
+            "value": 1.4155652376200858,
+            "gradient": [
+              1.0674501410224654e-07,
+              -1.3371346795171966e-08,
+              -1.2113134874843505e-07
+            ],
+            "projected_gradient": 1.2113134872926423e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              0.26089772217204954,
+              0.4000871805230509,
+              0.4032770041554722
+            ],
+            "value": 1.4155652376200631,
+            "gradient": [
+              -3.787009111277668e-09,
+              -1.4204516127380902e-09,
+              5.138782979430563e-09
+            ],
+            "projected_gradient": 5.138782954716703e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 257014,
+        "shape": [
+          251,
+          1024
+        ]
+      },
+      "sigma_ratio": 0.9831090242358453,
+      "true_rho": 0.4
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.37600309673744425,
+        [
+          0.002739246272221977
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.37600309673744425,
+        "rhos": [
+          0.002739246272221977
+        ],
+        "objective": 1.4310510217977193,
+        "projected_gradient": 4.731394958115698e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.001711671655970746,
+              0.0027392531235370253
+            ],
+            "value": 1.4310510217977193,
+            "gradient": [
+              -4.73139495811904e-09,
+              -2.005525966663243e-09
+            ],
+            "projected_gradient": 4.731394958115698e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              -0.0017116725866402453,
+              0.0027392573775195245
+            ],
+            "value": 1.4310510217977195,
+            "gradient": [
+              -9.443485847725259e-09,
+              2.322359120681179e-09
+            ],
+            "projected_gradient": 9.443485847688074e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.001711672291927903,
+              0.002739437544224681
+            ],
+            "value": 1.431051021797734,
+            "gradient": [
+              -1.4898259257738134e-07,
+              1.5476477245807236e-07
+            ],
+            "projected_gradient": 1.5476477245807488e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 519,
+        "shape": [
+          1041
+        ]
+      },
+      "sigma_ratio": 0.9685736673391027,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "raw",
+      "model": [
+        0.419629112147135,
+        [
+          -0.041366010443325336
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.419629112147135,
+        "rhos": [
+          -0.041366010443325336
+        ],
+        "objective": 1.4597948950527766,
+        "projected_gradient": 1.9807382435621523e-09,
+        "fits": [
+          {
+            "theta": [
+              0.00553965870214285,
+              -0.04138962246809839
+            ],
+            "value": 1.4597948950527768,
+            "gradient": [
+              -6.760412883749137e-09,
+              5.102954385318291e-09
+            ],
+            "projected_gradient": 6.760412884013189e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              0.005539658781417522,
+              -0.04138962913617768
+            ],
+            "value": 1.4597948950527766,
+            "gradient": [
+              -1.9807382435153583e-09,
+              -6.781209017564355e-10
+            ],
+            "projected_gradient": 1.9807382435621523e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.00553966660540995,
+              -0.04138960298217376
+            ],
+            "value": 1.4597948950527773,
+            "gradient": [
+              -8.228772232653202e-09,
+              1.6314301633880084e-08
+            ],
+            "projected_gradient": 1.6314301631847883e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 519,
+        "shape": [
+          1041
+        ]
+      },
+      "sigma_ratio": 0.9510995821033092,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "w",
+      "mode": "raw",
+      "model": [
+        0.4564692222583681,
+        [
+          0.031240319160124215
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.4564692222583681,
+        "rhos": [
+          0.031240319160124215
+        ],
+        "objective": 1.4340002435706407,
+        "projected_gradient": 1.9907359184723195e-08,
+        "fits": [
+          {
+            "theta": [
+              0.015587736217357602,
+              0.03125048819053876
+            ],
+            "value": 1.4340002435706407,
+            "gradient": [
+              -1.9907359184790044e-08,
+              5.966710825272698e-09
+            ],
+            "projected_gradient": 1.9907359184723195e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              0.015587672920124732,
+              0.031250408768849026
+            ],
+            "value": 1.4340002435706436,
+            "gradient": [
+              -5.13021299293516e-08,
+              -1.2810247365983944e-08
+            ],
+            "projected_gradient": 5.1302129929625684e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.015587798439620873,
+              0.031250473561183996
+            ],
+            "value": 1.434000243570644,
+            "gradient": [
+              8.588538893132127e-08,
+              -5.721035626954673e-08
+            ],
+            "projected_gradient": 8.588538893093689e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 519,
+        "shape": [
+          1041
+        ]
+      },
+      "sigma_ratio": 1.0179714780596165,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.3760028981612374,
+        [
+          0.002738504269907537
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.3760028981612374,
+        "rhos": [
+          0.002738504269907537
+        ],
+        "objective": 1.4310508804415345,
+        "projected_gradient": 4.7300320680631475e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.0017121677050259037,
+              0.002738511115656459
+            ],
+            "value": 1.4310508804415345,
+            "gradient": [
+              -4.730032068014264e-09,
+              -2.0050935119061607e-09
+            ],
+            "projected_gradient": 4.7300320680631475e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              -0.0017121686367172954,
+              0.002738515367614565
+            ],
+            "value": 1.4310508804415345,
+            "gradient": [
+              -9.442091474348061e-09,
+              2.321868161235099e-09
+            ],
+            "projected_gradient": 9.442091474355999e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.0017121683408377838,
+              0.002738695541088364
+            ],
+            "value": 1.4310508804415492,
+            "gradient": [
+              -1.4898452671338405e-07,
+              1.5476906182718917e-07
+            ],
+            "projected_gradient": 1.5476906182728192e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 519,
+        "shape": [
+          1041
+        ]
+      },
+      "sigma_ratio": 0.9685731558122387,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "noise_only",
+      "model": [
+        0.4196296026105432,
+        [
+          -0.04136409004709066
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.4196296026105432,
+        "rhos": [
+          -0.04136409004709066
+        ],
+        "objective": 1.4597949588203107,
+        "projected_gradient": 1.986774142773151e-09,
+        "fits": [
+          {
+            "theta": [
+              0.005540786961887733,
+              -0.04138769877315831
+            ],
+            "value": 1.459794958820311,
+            "gradient": [
+              -6.7562132313485185e-09,
+              5.099787975345277e-09
+            ],
+            "projected_gradient": 6.7562132312348755e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              0.005540787031238103,
+              -0.04138770544838356
+            ],
+            "value": 1.4597949588203107,
+            "gradient": [
+              -1.9867741431909555e-09,
+              -6.805123991611677e-10
+            ],
+            "projected_gradient": 1.986774142773151e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.0055407948647688094,
+              -0.041387679279142775
+            ],
+            "value": 1.459794958820311,
+            "gradient": [
+              -8.230867027981624e-09,
+              1.6318388802505463e-08
+            ],
+            "projected_gradient": 1.6318388799951844e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 519,
+        "shape": [
+          1041
+        ]
+      },
+      "sigma_ratio": 0.9511006937505451,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "w",
+      "mode": "noise_only",
+      "model": [
+        0.4564678745531064,
+        [
+          0.031237317457291955
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.4564678745531064,
+        "rhos": [
+          0.031237317457291955
+        ],
+        "objective": 1.4340001154045936,
+        "projected_gradient": 1.9857230238590207e-08,
+        "fits": [
+          {
+            "theta": [
+              0.015585722112376655,
+              0.03124748355559211
+            ],
+            "value": 1.4340001154045936,
+            "gradient": [
+              -1.9857230239051462e-08,
+              5.968400743013873e-09
+            ],
+            "projected_gradient": 1.9857230238590207e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              0.01558565879226139,
+              0.031247404113056168
+            ],
+            "value": 1.434000115404596,
+            "gradient": [
+              -5.127006852123104e-08,
+              -1.2808762630292669e-08
+            ],
+            "projected_gradient": 5.12700685205425e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.015585784279897156,
+              0.031247468858993883
+            ],
+            "value": 1.4340001154045958,
+            "gradient": [
+              8.590701099149013e-08,
+              -5.7223264494667076e-08
+            ],
+            "projected_gradient": 8.590701099098208e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 519,
+        "shape": [
+          1041
+        ]
+      },
+      "sigma_ratio": 1.0179684725436904,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.05764724494449278,
+        [
+          -0.004325601443768896
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05764724494449278,
+        "rhos": [
+          -0.004325601443768896
+        ],
+        "objective": 1.4207369031075894,
+        "projected_gradient": 1.6960584343223006e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.01615761994740136,
+              -0.004325628422599762
+            ],
+            "value": 1.4207369031075894,
+            "gradient": [
+              -1.4504806244985957e-09,
+              -1.696058434241883e-09
+            ],
+            "projected_gradient": 1.6960584343223006e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              -0.016157767391271515,
+              -0.004325770896625713
+            ],
+            "value": 1.4207369031075985,
+            "gradient": [
+              -1.1334863404904309e-07,
+              -1.3519499536062724e-08
+            ],
+            "projected_gradient": 1.1334863404821593e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.016157598948425337,
+              -0.0043256303484697665
+            ],
+            "value": 1.4207369031075894,
+            "gradient": [
+              3.1749022013329694e-08,
+              -1.9721008749502365e-08
+            ],
+            "projected_gradient": 3.174902201211194e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 151,
+        "shape": [
+          301
+        ]
+      },
+      "sigma_ratio": 0.9168298107336976,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "raw",
+      "model": [
+        0.07279501495155244,
+        [
+          0.038917680501882476
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.07279501495155244,
+        "rhos": [
+          0.038917680501882476
+        ],
+        "objective": 1.465245250330826,
+        "projected_gradient": 7.659308982888025e-08,
+        "fits": [
+          {
+            "theta": [
+              0.05027169283609497,
+              0.03893734643256352
+            ],
+            "value": 1.465245250330826,
+            "gradient": [
+              7.659308982786929e-08,
+              -7.31599515126604e-08
+            ],
+            "projected_gradient": 7.659308982888025e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          },
+          {
+            "theta": [
+              0.05027170656463468,
+              0.038937588489959006
+            ],
+            "value": 1.4652452503308337,
+            "gradient": [
+              -1.0592884610384426e-07,
+              1.3911546901936547e-07
+            ],
+            "projected_gradient": 1.3911546901945737e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              0.05027171593328094,
+              0.038937582478290274
+            ],
+            "value": 1.4652452503308322,
+            "gradient": [
+              -8.632631458531115e-08,
+              1.2566730421244923e-07
+            ],
+            "projected_gradient": 1.256673042154821e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 151,
+        "shape": [
+          301
+        ]
+      },
+      "sigma_ratio": 1.0627915808342643,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.05770599473902907,
+        [
+          -0.003342079933365567
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05770599473902907,
+        "rhos": [
+          -0.003342079933365567
+        ],
+        "objective": 1.420047097865143,
+        "projected_gradient": 2.557784580057426e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.01649800907912929,
+              -0.0033420923765676482
+            ],
+            "value": 1.420047097865143,
+            "gradient": [
+              -2.2740997076612345e-09,
+              -2.5577845801636924e-09
+            ],
+            "projected_gradient": 2.557784580057426e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 5
+          },
+          {
+            "theta": [
+              -0.01649815267495464,
+              -0.0033422280286673784
+            ],
+            "value": 1.4200470978651523,
+            "gradient": [
+              -1.1324250552732545e-07,
+              -1.0819658308364802e-08
+            ],
+            "projected_gradient": 1.1324250552904869e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.01649798509568127,
+              -0.00334209210966176
+            ],
+            "value": 1.4200470978651434,
+            "gradient": [
+              3.369848904998847e-08,
+              -2.1001316171025232e-08
+            ],
+            "projected_gradient": 3.369848905129813e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 151,
+        "shape": [
+          301
+        ]
+      },
+      "sigma_ratio": 0.9177641756466646,
+      "true_rho": 0.0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "noise_only",
+      "model": [
+        0.07280318306827455,
+        [
+          0.039234078758696125
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.07280318306827455,
+        "rhos": [
+          0.039234078758696125
+        ],
+        "objective": 1.4656163475820316,
+        "projected_gradient": 7.225859514903288e-09,
+        "fits": [
+          {
+            "theta": [
+              0.05074699532163215,
+              0.03925426284837112
+            ],
+            "value": 1.4656163475820383,
+            "gradient": [
+              -1.471580070456478e-07,
+              8.570708809624184e-08
+            ],
+            "projected_gradient": 1.4715800704390158e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              0.0507470668734535,
+              0.03925422854705956
+            ],
+            "value": 1.4656163475820316,
+            "gradient": [
+              -7.225859516327829e-09,
+              -6.2656418596531395e-09
+            ],
+            "projected_gradient": 7.225859514903288e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              0.05074708707585548,
+              0.03925428736210023
+            ],
+            "value": 1.4656163475820316,
+            "gradient": [
+              -2.5395122519951306e-08,
+              3.111982160411585e-08
+            ],
+            "projected_gradient": 3.111982160158844e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 151,
+        "shape": [
+          301
+        ]
+      },
+      "sigma_ratio": 1.0629108335837734,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.01920326431918777,
+        [
+          0.1391963657673832,
+          0.13506513082376193,
+          0.14958917637940075
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.01920326431918777,
+        "rhos": [
+          0.1391963657673832,
+          0.13506513082376193,
+          0.14958917637940075
+        ],
+        "objective": 1.343677052621413,
+        "projected_gradient": 6.9662446540441625e-09,
+        "fits": [
+          {
+            "theta": [
+              0.023432115401627707,
+              0.14010582778494604,
+              0.135895771037139,
+              0.15072044933781759
+            ],
+            "value": 1.3436770526214334,
+            "gradient": [
+              8.615539797940247e-08,
+              -8.615525181998335e-08,
+              4.310091839988992e-08,
+              2.8147398138853878e-08
+            ],
+            "projected_gradient": 8.615539797904304e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              0.023431989766034146,
+              0.1401059695837242,
+              0.1358955519539001,
+              0.15072018248656577
+            ],
+            "value": 1.343677052621413,
+            "gradient": [
+              6.966244654192931e-09,
+              -4.726863811650988e-09,
+              -2.3652661920521423e-09,
+              7.546569294250854e-10
+            ],
+            "projected_gradient": 6.9662446540441625e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              0.02343198749729384,
+              0.14010597922514956,
+              0.13589554987509847,
+              0.15072017393469497
+            ],
+            "value": 1.343677052621413,
+            "gradient": [
+              3.884786455727606e-09,
+              -1.3502584420762396e-09,
+              -2.4827169314315048e-09,
+              -7.512347047805142e-10
+            ],
+            "projected_gradient": 3.884786454327882e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 51120,
+        "shape": [
+          50,
+          20,
+          36
+        ]
+      },
+      "sigma_ratio": 1.1356576439378596,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "raw",
+      "model": [
+        0.015511508814491875,
+        [
+          0.04263054677554377,
+          0.08279169308597258,
+          0.06882419576007123
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.015511508814491875,
+        "rhos": [
+          0.04263054677554377,
+          0.08279169308597258,
+          0.06882419576007123
+        ],
+        "objective": 1.4179741660197787,
+        "projected_gradient": 2.6701746397295167e-08,
+        "fits": [
+          {
+            "theta": [
+              0.028279401448582514,
+              0.04265635224243295,
+              0.08298150020937382,
+              0.06893314670140341
+            ],
+            "value": 1.4179741660197807,
+            "gradient": [
+              -5.5654563734414055e-08,
+              2.6013659642315388e-08,
+              -1.1897452262813421e-08,
+              -1.046192596497494e-08
+            ],
+            "projected_gradient": 5.565456373535227e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              0.028279440930813866,
+              0.04265579706667826,
+              0.08298153560901995,
+              0.06893317201616568
+            ],
+            "value": 1.4179741660198137,
+            "gradient": [
+              1.4439181363890673e-07,
+              -1.4035297823375212e-07,
+              -1.2703869473408084e-08,
+              -1.5116313798118384e-08
+            ],
+            "projected_gradient": 1.443918136376232e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.028279480952530696,
+              0.04265640003909742,
+              0.08298163912594865,
+              0.06893317377721582
+            ],
+            "value": 1.4179741660197787,
+            "gradient": [
+              3.0445183559398475e-09,
+              1.6750795820772083e-08,
+              6.907406865300456e-09,
+              -2.670174639293687e-08
+            ],
+            "projected_gradient": 2.6701746397295167e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 51120,
+        "shape": [
+          50,
+          20,
+          36
+        ]
+      },
+      "sigma_ratio": 1.0526453474299575,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "p",
+      "mode": "raw",
+      "model": [
+        0.006206730247524677,
+        [
+          0.04940708932992527,
+          0.06859110500835891,
+          0.04644421548680194
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.006206730247524677,
+        "rhos": [
+          0.04940708932992527,
+          0.06859110500835891,
+          0.04644421548680194
+        ],
+        "objective": 1.420963158880775,
+        "projected_gradient": 1.959360014514022e-09,
+        "fits": [
+          {
+            "theta": [
+              0.025661755696025763,
+              0.04944732285908783,
+              0.06869898861994296,
+              0.046477676294619616
+            ],
+            "value": 1.4209631588807758,
+            "gradient": [
+              6.617000770302112e-10,
+              -6.817514224586263e-09,
+              7.294535860410534e-10,
+              5.580576779674669e-09
+            ],
+            "projected_gradient": 6.817514226764576e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.025661739509372377,
+              0.04944732406302533,
+              0.06869895414239546,
+              0.04647764341622934
+            ],
+            "value": 1.4209631588807752,
+            "gradient": [
+              -4.810590628540795e-09,
+              -1.8153528783490798e-09,
+              -4.753797805826978e-09,
+              1.0869460033076207e-09
+            ],
+            "projected_gradient": 4.810590627235545e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 12
+          },
+          {
+            "theta": [
+              0.025661752625113197,
+              0.04944735021161144,
+              0.0686989774441396,
+              0.04647765317342581
+            ],
+            "value": 1.420963158880775,
+            "gradient": [
+              -1.8789700987608613e-09,
+              1.9593600120924675e-09,
+              -1.6695557348377387e-09,
+              -2.7994619339966274e-11
+            ],
+            "projected_gradient": 1.959360014514022e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 51120,
+        "shape": [
+          50,
+          20,
+          36
+        ]
+      },
+      "sigma_ratio": 1.0503595178683316,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.016566689642790833,
+        [
+          -0.013859588350205275,
+          -0.02343242782151246,
+          -0.01870755371971295
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.016566689642790833,
+        "rhos": [
+          -0.013859588350205275,
+          -0.02343242782151246,
+          -0.01870755371971295
+        ],
+        "objective": 1.4267189103564044,
+        "projected_gradient": 1.8908499231640175e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.008067619447437887,
+              -0.01386086549066624,
+              -0.023435800183704204,
+              -0.018709222143348813
+            ],
+            "value": 1.426718910356537,
+            "gradient": [
+              6.970410437042886e-08,
+              -1.7552099598782068e-07,
+              1.6698341586096916e-07,
+              7.815841519399965e-08
+            ],
+            "projected_gradient": 1.7552099598749926e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.008067794472101533,
+              -0.013860446018577622,
+              -0.02343684272269492,
+              -0.01870952162498054
+            ],
+            "value": 1.4267189103564113,
+            "gradient": [
+              4.5836975744340675e-08,
+              -8.914755373129651e-10,
+              -4.897784003495374e-08,
+              3.659937615674938e-08
+            ],
+            "projected_gradient": 4.897784003365935e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              -0.008067831913258655,
+              -0.013860475873573763,
+              -0.023436717983779044,
+              -0.018709736554951478
+            ],
+            "value": 1.4267189103564044,
+            "gradient": [
+              1.8908499231811745e-08,
+              -1.0402966403456252e-09,
+              -8.03650392180569e-09,
+              -1.5843923552481225e-08
+            ],
+            "projected_gradient": 1.8908499231640175e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 51120,
+        "shape": [
+          50,
+          20,
+          36
+        ]
+      },
+      "sigma_ratio": 0.9797338314394115,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "noise_only",
+      "model": [
+        0.014570978175164175,
+        [
+          -0.013680091651073836,
+          -0.011964837487939107,
+          -0.004356711497044167
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.014570978175164175,
+        "rhos": [
+          -0.013680091651073836,
+          -0.011964837487939107,
+          -0.004356711497044167
+        ],
+        "objective": 1.4226538009248042,
+        "projected_gradient": 2.220413766913787e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.008444463184773827,
+              -0.013680945133406727,
+              -0.011965408488406251,
+              -0.00435673906217744
+            ],
+            "value": 1.4226538009248042,
+            "gradient": [
+              -4.796703345424598e-10,
+              -2.220413766925352e-08,
+              1.9943830442733456e-08,
+              -1.6291195520137564e-08
+            ],
+            "projected_gradient": 2.220413766913787e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.008444616921256809,
+              -0.01368125739605295,
+              -0.011965888248028085,
+              -0.0043562482982908105
+            ],
+            "value": 1.4226538009248797,
+            "gradient": [
+              -1.6052549200297753e-07,
+              -7.966531361116219e-08,
+              -6.263075243308199e-08,
+              1.659275225658139e-07
+            ],
+            "projected_gradient": 1.659275225655843e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              -0.008444440679360487,
+              -0.01368088756076682,
+              -0.01196517680436543,
+              -0.00435683210076601
+            ],
+            "value": 1.422653800924817,
+            "gradient": [
+              -1.6573468619127585e-08,
+              -1.0174979425107776e-08,
+              7.332692397175719e-08,
+              -4.910036756651521e-08
+            ],
+            "projected_gradient": 7.332692397200857e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 51120,
+        "shape": [
+          50,
+          20,
+          36
+        ]
+      },
+      "sigma_ratio": 0.9888188548918065,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "p",
+      "mode": "noise_only",
+      "model": [
+        0.005912375394454923,
+        [
+          0.005638923907474423,
+          -0.008186244024958362,
+          -0.006695951006889389
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.005912375394454923,
+        "rhos": [
+          0.005638923907474423,
+          -0.008186244024958362,
+          -0.006695951006889389
+        ],
+        "objective": 1.4249537727285444,
+        "projected_gradient": 1.003350777895734e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.0023335438563392235,
+              0.005638592591207767,
+              -0.008186877870788409,
+              -0.006696482662452034
+            ],
+            "value": 1.4249537727285924,
+            "gradient": [
+              1.594261125632591e-07,
+              -9.057919026907978e-08,
+              -8.531812857879969e-08,
+              -9.379581571331353e-08
+            ],
+            "projected_gradient": 1.5942611256321293e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.002333423592828829,
+              0.005638983676439186,
+              -0.008186426898243889,
+              -0.006696051082265429
+            ],
+            "value": 1.4249537727285444,
+            "gradient": [
+              1.0033507778885943e-08,
+              -5.693553614661216e-10,
+              -4.91668900522568e-09,
+              -1.533489468081652e-10
+            ],
+            "projected_gradient": 1.003350777895734e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 13
+          },
+          {
+            "theta": [
+              -0.002333461010409144,
+              0.00563899033572651,
+              -0.00818646683068182,
+              -0.006695963115177441
+            ],
+            "value": 1.424953772728547,
+            "gradient": [
+              -6.122353899302827e-08,
+              1.1117486969905082e-08,
+              -4.990847862823303e-09,
+              3.517881292689597e-08
+            ],
+            "projected_gradient": 6.122353899285643e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          }
+        ],
+        "contrast_count": 51120,
+        "shape": [
+          50,
+          20,
+          36
+        ]
+      },
+      "sigma_ratio": 1.0005461041669943,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.0963134216213229,
+        [
+          0.02950155207418894
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0963134216213229,
+        "rhos": [
+          0.02950155207418894
+        ],
+        "objective": 1.4018997756071283,
+        "projected_gradient": 5.847083785898155e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.016492059554182207,
+              0.029510098966633418
+            ],
+            "value": 1.4018997756071307,
+            "gradient": [
+              8.185291785576929e-08,
+              -4.7397198341933954e-08
+            ],
+            "projected_gradient": 8.185291785686721e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.01649210555777243,
+              0.029510115355518753
+            ],
+            "value": 1.4018997756071283,
+            "gradient": [
+              1.4360597099657523e-11,
+              5.847083784800229e-09
+            ],
+            "projected_gradient": 5.847083785898155e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.016492088534521773,
+              0.02951007655679771
+            ],
+            "value": 1.4018997756071299,
+            "gradient": [
+              5.748097228577023e-08,
+              -4.389991211619676e-08
+            ],
+            "projected_gradient": 5.748097228405746e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 158,
+        "shape": [
+          320
+        ]
+      },
+      "sigma_ratio": 0.9349794612969029,
+      "true_rho": 0.0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.09631387068976703,
+        [
+          0.029509583415708973
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09631387068976703,
+        "rhos": [
+          0.029509583415708973
+        ],
+        "objective": 1.4019045713388205,
+        "projected_gradient": 5.4663924532738495e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.01648279452704709,
+              0.02951813814446771
+            ],
+            "value": 1.401904571338823,
+            "gradient": [
+              8.209135990106187e-08,
+              -4.750177462908563e-08
+            ],
+            "projected_gradient": 8.209135990075445e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.016482841124008232,
+              0.02951815369504462
+            ],
+            "value": 1.4019045713388205,
+            "gradient": [
+              6.862449848883063e-11,
+              5.466392452615094e-09
+            ],
+            "projected_gradient": 5.4663924532738495e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.016482823643326868,
+              0.02951811561646588
+            ],
+            "value": 1.4019045713388218,
+            "gradient": [
+              5.761602743145879e-08,
+              -4.400004794269104e-08
+            ],
+            "projected_gradient": 5.7616027431678374e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 158,
+        "shape": [
+          320
+        ]
+      },
+      "sigma_ratio": 0.9349838207077191,
+      "true_rho": 0.0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.008905237873273384,
+        [
+          0.0023573912602673783,
+          0.01735800421313642
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.008905237873273384,
+        "rhos": [
+          0.0023573912602673783,
+          0.01735800421313642
+        ],
+        "objective": 1.458377226953572,
+        "projected_gradient": 4.4147418810924766e-09,
+        "fits": [
+          {
+            "theta": [
+              0.003282447238078801,
+              0.002357412949066726,
+              0.01735979131747341
+            ],
+            "value": 1.4583772269535726,
+            "gradient": [
+              -2.2000826214483318e-08,
+              8.605152166701084e-09,
+              2.218506509731271e-08
+            ],
+            "projected_gradient": 2.2185065097490853e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          },
+          {
+            "theta": [
+              0.003282444569233438,
+              0.0023573956271870245,
+              0.01735974785238103
+            ],
+            "value": 1.458377226953572,
+            "gradient": [
+              -3.4191163435604557e-09,
+              2.7280175255765733e-09,
+              4.414741881185893e-09
+            ],
+            "projected_gradient": 4.4147418810924766e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              0.0032824101240888207,
+              0.0023574066209315343,
+              0.017359469376317938
+            ],
+            "value": 1.4583772269535853,
+            "gradient": [
+              4.39088982959206e-08,
+              2.011806693183639e-08,
+              -1.0306202911533051e-07
+            ],
+            "projected_gradient": 1.0306202911578022e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 25552,
+        "shape": [
+          251,
+          100
+        ]
+      },
+      "sigma_ratio": 1.0072457143784548,
+      "true_rho": 0.0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.00875586764448923,
+        [
+          -0.013222428134068593,
+          -0.0038664515081678293
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.00875586764448923,
+        "rhos": [
+          -0.013222428134068593,
+          -0.0038664515081678293
+        ],
+        "objective": 1.4586907418444237,
+        "projected_gradient": 2.2022589613035493e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.0034772132109405886,
+              -0.01322319878543292,
+              -0.0038664707754449586
+            ],
+            "value": 1.4586907418444237,
+            "gradient": [
+              -2.1085395277418014e-08,
+              8.676542930870362e-10,
+              2.2022589613018112e-08
+            ],
+            "projected_gradient": 2.2022589613035493e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.003477534477136102,
+              -0.01322356130797459,
+              -0.0038672297153680897
+            ],
+            "value": 1.4586907418445139,
+            "gradient": [
+              -9.675754498319962e-08,
+              -3.016308575566738e-08,
+              -1.9554355382432107e-07
+            ],
+            "projected_gradient": 1.9554355382448915e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.003477308222642417,
+              -0.01322315902111525,
+              -0.0038665813998806156
+            ],
+            "value": 1.4586907418444306,
+            "gradient": [
+              -1.3708560610082584e-07,
+              5.1554354702899584e-08,
+              7.354707730157349e-09
+            ],
+            "projected_gradient": 1.3708560610064743e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 25552,
+        "shape": [
+          251,
+          100
+        ]
+      },
+      "sigma_ratio": 0.9903508795700428,
+      "true_rho": 0.0
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.010649326531577888,
+        [
+          -0.013217232891003608,
+          -0.0038594387168730546
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.010649326531577888,
+        "rhos": [
+          -0.013217232891003608,
+          -0.0038594387168730546
+        ],
+        "objective": 1.4586926453740645,
+        "projected_gradient": 2.2063529924939984e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.003471748537900749,
+              -0.013218002634268184,
+              -0.0038594578795013027
+            ],
+            "value": 1.4586926453740645,
+            "gradient": [
+              -2.1037143739538323e-08,
+              8.543481114938891e-10,
+              2.2063529924723822e-08
+            ],
+            "projected_gradient": 2.2063529924939984e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.0034720570808631545,
+              -0.013218347035534157,
+              -0.0038601762575984342
+            ],
+            "value": 1.4586926453741453,
+            "gradient": [
+              -9.879097826219034e-08,
+              -2.7414080858158625e-08,
+              -1.822952369595937e-07
+            ],
+            "projected_gradient": 1.8229523695949268e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.003471843721743842,
+              -0.013217963156517465,
+              -0.003859567914506643
+            ],
+            "value": 1.4586926453740718,
+            "gradient": [
+              -1.3739647450524578e-07,
+              5.14869800660344e-08,
+              7.715086174039321e-09
+            ],
+            "projected_gradient": 1.3739647450545026e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 25552,
+        "shape": [
+          251,
+          100
+        ]
+      },
+      "sigma_ratio": 0.9903591681271849,
+      "true_rho": 0.0
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.010649237404769833,
+        [
+          -0.013222428134068705,
+          -0.003866451508167989
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.010649237404769833,
+        "rhos": [
+          -0.013222428134068705,
+          -0.003866451508167989
+        ],
+        "objective": 1.4586907418444235,
+        "projected_gradient": 2.2022589595254577e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.0034772132109408974,
+              -0.013223198785433033,
+              -0.003866470775445118
+            ],
+            "value": 1.4586907418444235,
+            "gradient": [
+              -2.1085395740138392e-08,
+              8.676543642747868e-10,
+              2.2022589595221175e-08
+            ],
+            "projected_gradient": 2.2022589595254577e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.0034775344771356903,
+              -0.013223561307974493,
+              -0.0038672297153679166
+            ],
+            "value": 1.4586907418445139,
+            "gradient": [
+              -9.675754418233742e-08,
+              -3.0163085911390584e-08,
+              -1.9554355399339197e-07
+            ],
+            "projected_gradient": 1.95543553993191e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 10
+          },
+          {
+            "theta": [
+              -0.0034773082226423426,
+              -0.013223159021115373,
+              -0.0038665813998799967
+            ],
+            "value": 1.4586907418444304,
+            "gradient": [
+              -1.3708560623430288e-07,
+              5.1554354553850234e-08,
+              7.3547079259236624e-09
+            ],
+            "projected_gradient": 1.3708560623422114e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 25552,
+        "shape": [
+          251,
+          100
+        ]
+      },
+      "sigma_ratio": 0.9903508795700426,
+      "true_rho": 0.0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.0502741084401368,
+        [
+          0.029509378375166335
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0502741084401368,
+        "rhos": [
+          0.029509378375166335
+        ],
+        "objective": 1.401904673047767,
+        "projected_gradient": 5.477078613563835e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.016482771522258653,
+              0.029517932901324866
+            ],
+            "value": 1.4019046730477693,
+            "gradient": [
+              8.208382727393784e-08,
+              -4.7498492095909273e-08
+            ],
+            "projected_gradient": 8.208382727345476e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.016482818101760256,
+              0.029517948475795117
+            ],
+            "value": 1.401904673047767,
+            "gradient": [
+              6.713281407570908e-11,
+              5.477078613432084e-09
+            ],
+            "projected_gradient": 5.477078613563835e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.016482800633975083,
+              0.02951791037732135
+            ],
+            "value": 1.4019046730477682,
+            "gradient": [
+              5.7611925356941874e-08,
+              -4.3996873462321895e-08
+            ],
+            "projected_gradient": 5.761192535536086e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 158,
+        "shape": [
+          320
+        ]
+      },
+      "sigma_ratio": 0.9349839646472845,
+      "true_rho": 0.0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.05027410070050319,
+        [
+          0.029509583415709063
+        ],
+        [
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.05027410070050319,
+        "rhos": [
+          0.029509583415709063
+        ],
+        "objective": 1.4019045713388205,
+        "projected_gradient": 5.46639270307403e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.01648279452704686,
+              0.0295181381444677
+            ],
+            "value": 1.401904571338823,
+            "gradient": [
+              8.209136004159642e-08,
+              -4.75017751026871e-08
+            ],
+            "projected_gradient": 8.209136004300177e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.016482841124008284,
+              0.02951815369504471
+            ],
+            "value": 1.4019045713388205,
+            "gradient": [
+              6.862427363353451e-11,
+              5.466392701361265e-09
+            ],
+            "projected_gradient": 5.46639270307403e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.01648282364332647,
+              0.029518115616466382
+            ],
+            "value": 1.401904571338822,
+            "gradient": [
+              5.761602793176182e-08,
+              -4.400004824202966e-08
+            ],
+            "projected_gradient": 5.7616027931278735e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          }
+        ],
+        "contrast_count": 158,
+        "shape": [
+          320
+        ]
+      },
+      "sigma_ratio": 0.9349838207077191,
+      "true_rho": 0.0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.09376160504161898,
+        [
+          -0.03333175348201609,
+          -0.008231742306220237
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09376160504161898,
+        "rhos": [
+          -0.03333175348201609,
+          -0.008231742306220237
+        ],
+        "objective": 1.4198110177826404,
+        "projected_gradient": 2.3238381219314874e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.006786007991886261,
+              -0.03334419713519924,
+              -0.008231991695969847
+            ],
+            "value": 1.4198110177826426,
+            "gradient": [
+              -1.5491890607528855e-08,
+              -2.0756681333027867e-08,
+              -9.572569939421293e-09
+            ],
+            "projected_gradient": 2.0756681332056992e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.006785714711600683,
+              -0.03334366647021036,
+              -0.008231522052937385
+            ],
+            "value": 1.4198110177826817,
+            "gradient": [
+              5.813975653724395e-08,
+              8.188038499392166e-08,
+              7.926812631013778e-08
+            ],
+            "projected_gradient": 8.18803849930716e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.006785959408248571,
+              -0.03334410564075929,
+              -0.0082319282457388
+            ],
+            "value": 1.4198110177826404,
+            "gradient": [
+              9.146793739924575e-10,
+              -2.3238381250593712e-09,
+              -1.0307405033956989e-09
+            ],
+            "projected_gradient": 2.3238381219314874e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 9
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 0.966615632267473,
+      "true_rho": 0.0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.09376186510964409,
+        [
+          -0.033329314725495544,
+          -0.008211793737529897
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09376186510964409,
+        "rhos": [
+          -0.033329314725495544,
+          -0.008211793737529897
+        ],
+        "objective": 1.4198141416986287,
+        "projected_gradient": 2.2578363720326955e-08,
+        "fits": [
+          {
+            "theta": [
+              -0.0067779471569413595,
+              -0.03334166417195122,
+              -0.008211978328483877
+            ],
+            "value": 1.4198141416986287,
+            "gradient": [
+              -1.118828724169498e-08,
+              -2.2578363722993564e-08,
+              1.4592291810751098e-08
+            ],
+            "projected_gradient": 2.2578363720326955e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 7
+          },
+          {
+            "theta": [
+              -0.0067776422891386995,
+              -0.03334113103110715,
+              -0.008211535490028473
+            ],
+            "value": 1.4198141416986776,
+            "gradient": [
+              8.97400049627383e-08,
+              7.673765014120018e-08,
+              8.741850561979615e-08
+            ],
+            "projected_gradient": 8.974000496268092e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.006777864759197417,
+              -0.033341687808200765,
+              -0.00821170826181775
+            ],
+            "value": 1.4198141416986456,
+            "gradient": [
+              2.0346079031545566e-08,
+              -6.262850376863605e-08,
+              9.899173550574582e-08
+            ],
+            "projected_gradient": 9.899173550494134e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 0.9666183133843161,
+      "true_rho": 0.0
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.09764406196415017,
+        [
+          -0.42450923907644755,
+          -0.4292457759158154
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09764406196415017,
+        "rhos": [
+          -0.42450923907644755,
+          -0.4292457759158154
+        ],
+        "objective": 1.3335120161426552,
+        "projected_gradient": 9.436046388699992e-11,
+        "fits": [
+          {
+            "theta": [
+              -0.1646867160825627,
+              -0.4531797328605258,
+              -0.4589717341830864
+            ],
+            "value": 1.3335120161426552,
+            "gradient": [
+              9.436046218247898e-11,
+              8.082388825956977e-11,
+              8.566168013396249e-11
+            ],
+            "projected_gradient": 9.436046388699992e-11,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.16468672445215377,
+              -0.4531797391473171,
+              -0.45897173259814045
+            ],
+            "value": 1.3335120161426555,
+            "gradient": [
+              -1.2719506909234468e-08,
+              -2.8522272426834367e-09,
+              9.575358362777247e-10
+            ],
+            "projected_gradient": 1.2719506919944834e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              -0.16468670822484707,
+              -0.45317952138497347,
+              -0.4589718687918177
+            ],
+            "value": 1.3335120161426708,
+            "gradient": [
+              1.0765739627266649e-08,
+              1.025997677138049e-07,
+              -6.583932600350591e-08
+            ],
+            "projected_gradient": 1.0259976773729917e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.0066410088729385,
+      "true_rho": -0.4
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.09764349070417605,
+        [
+          -0.42450974757667465,
+          -0.4292829992853991
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09764349070417605,
+        "rhos": [
+          -0.42450974757667465,
+          -0.4292829992853991
+        ],
+        "objective": 1.3335060432257637,
+        "projected_gradient": 2.8886057434895918e-09,
+        "fits": [
+          {
+            "theta": [
+              -0.16469464158140412,
+              -0.45318035392650186,
+              -0.45901736784492697
+            ],
+            "value": 1.333506043225764,
+            "gradient": [
+              2.6627965774456035e-12,
+              1.2431839526020727e-11,
+              1.3839110435159554e-11
+            ],
+            "projected_gradient": 1.383909653540627e-11,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              -0.1646946434388804,
+              -0.4531803531403277,
+              -0.45901736603973836
+            ],
+            "value": 1.3335060432257637,
+            "gradient": [
+              -2.888605736302488e-09,
+              4.201451885214265e-10,
+              9.181375755344054e-10
+            ],
+            "projected_gradient": 2.8886057434895918e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              -0.1646946337947744,
+              -0.45318014274554913,
+              -0.4590175016807014
+            ],
+            "value": 1.333506043225779,
+            "gradient": [
+              1.0557452231845663e-08,
+              1.0239099724365213e-07,
+              -6.553137800036666e-08
+            ],
+            "projected_gradient": 1.0239099723641232e-07,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 6
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.0066351195878647,
+      "true_rho": -0.4
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "model": [
+        0.09836955138861503,
+        [
+          0.3997387011183206,
+          0.401712157329007
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09836955138861503,
+        "rhos": [
+          0.3997387011183206,
+          0.401712157329007
+        ],
+        "objective": 1.394302239269321,
+        "projected_gradient": 8.584064403738267e-09,
+        "fits": [
+          {
+            "theta": [
+              0.2828414691910373,
+              0.42333796579041616,
+              0.4256890374371768
+            ],
+            "value": 1.3943022392693234,
+            "gradient": [
+              4.6788040642574064e-08,
+              -4.205189017459798e-08,
+              9.967710255794281e-09
+            ],
+            "projected_gradient": 4.6788040664047514e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.28284133861426797,
+              0.42333789878736133,
+              0.4256888787521034
+            ],
+            "value": 1.394302239269321,
+            "gradient": [
+              -8.584064406497131e-09,
+              3.80655030833268e-09,
+              3.124683138802798e-09
+            ],
+            "projected_gradient": 8.584064403738267e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              0.2828413457631262,
+              0.4233378998189324,
+              0.4256888812001358
+            ],
+            "value": 1.394302239269321,
+            "gradient": [
+              1.826580132266761e-10,
+              -2.363313070969999e-10,
+              -8.010362659138708e-11
+            ],
+            "projected_gradient": 2.363312878728152e-10,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 13
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.014120290167464,
+      "true_rho": 0.4
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "model": [
+        0.09837101692471606,
+        [
+          0.3997520151036493,
+          0.40178033031319965
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.09837101692471606,
+        "rhos": [
+          0.3997520151036493,
+          0.40178033031319965
+        ],
+        "objective": 1.3942903818614019,
+        "projected_gradient": 5.477409359411212e-09,
+        "fits": [
+          {
+            "theta": [
+              0.2828692557959162,
+              0.4233538081678308,
+              0.4257703058090486
+            ],
+            "value": 1.3942903818614032,
+            "gradient": [
+              3.8551046856640703e-08,
+              -3.278951098245132e-08,
+              6.872569564759236e-09
+            ],
+            "projected_gradient": 3.85510468547956e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 11
+          },
+          {
+            "theta": [
+              0.2828691448080748,
+              0.4233537449281752,
+              0.425770172560665
+            ],
+            "value": 1.3942903818614019,
+            "gradient": [
+              -5.47740935777698e-09,
+              2.5354834621705324e-09,
+              1.9899371450346215e-09
+            ],
+            "projected_gradient": 5.477409359411212e-09,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 8
+          },
+          {
+            "theta": [
+              0.28286913503345246,
+              0.42335375278747306,
+              0.4257701852158386
+            ],
+            "value": 1.3942903818614025,
+            "gradient": [
+              -3.380083256726174e-08,
+              1.345009462800824e-08,
+              1.5551968309689144e-08
+            ],
+            "projected_gradient": 3.3800832577313145e-08,
+            "success": true,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "iterations": 13
+          }
+        ],
+        "contrast_count": 6318,
+        "shape": [
+          81,
+          81
+        ]
+      },
+      "sigma_ratio": 1.014135398804995,
+      "true_rho": 0.4
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\screen6.py": "6b527a8a20c2bda6228efe453f2a8304cc17e142b33747d68db19342cc3fcac0"
+  }
+}

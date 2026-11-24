@@ -1,0 +1,23 @@
+Exact-algebra runtime work; statistical specification remains frozen
+===================================================================
+The full KS procedure is expensive. Test two computational identities without
+changing MC16, bootstrap128, estimators, reconstruction, streams or cutoffs.
+
+1. For temporal contrasts D with n rows and r>2n spatial replicates, thin QR of
+D'=Q R gives D D'=R'R. Replace D by sqrt(n/r)*R' and use count n*n during the
+normalized Gaussian profile optimization. Both q/count and logdet/count match
+the original n*r profile algebraically, including normalized derivatives.
+Four starts/bounds/optimizer tolerances are unchanged. Final state-score
+certification, any polishing and sigma profiling use the ORIGINAL contrasts.
+This is sufficient-statistic compression, not frequency removal or subsampling.
+
+2. For polynomial weak terms through degree3, corrected moment error around mu
+equals the sum of pilot products times Wick noise polynomials. E.g.
+  (mu+e)^2-v-mu^2 = 2mu*e+(e^2-v),
+  (mu+e)^3-3v(mu+e)-mu^3 = 3mu^2*e+3mu*(e^2-v)+(e^3-3v*e).
+Mixed factors use the corresponding pair covariance. Compute shared noise and
+linear terms once for both pilot choices. The same16 realizations and exact weak
+kernels are retained. Constants have exact zero error. Verify against the
+uncompressed likelihood and original per-pilot metric before use. Preserve the
+original implementation and unfinished execution records if a faster variant
+is deployed; no result is selected or discarded based on coverage.

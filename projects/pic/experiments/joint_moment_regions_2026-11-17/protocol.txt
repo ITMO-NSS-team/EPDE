@@ -1,0 +1,64 @@
+Frozen before outcomes,2026-11-17: joint coefficient regions/full-library
+compatibility and correlated-noise stress. No candidate ODE/PDE integration.
+
+Primary iid study: all15 default systems, fresh anchors30/31/32, full
+historical candidate panels and explicit constants. Fixed local/broad
+native banks from the previous direct-moment protocol. Estimate iid common
+relative amplitude from pooled high-order differences with frozen orders;
+do not use the true5% amplitude. Keep the fixed-amplitude version as primary.
+
+For corrected operator error E_b=M(pilot+noise_b)-M(pilot), estimate
+S=mean(E_b^T E_b) from256 calibration fields. Select stochastic columns
+symbolically (a term contains data factors); deterministic columns have
+exactly zero noise and remain in every law/region. On the stochastic
+subspace, form lambda_max(S^-1/2 E_b^T E_b S^-1/2) for256 independent check
+fields. Its95th percentile c gives a common bound ||E v||^2 <= c*v^T*S*v
+simultaneously over all coefficient vectors in the fixed finite library.
+There is no row-independence or chi-square approximation. Normalize column
+units for eigensolves; require full stochastic-subspace rank at the existing
+1e-12 numerical tolerance. No ridge, arbitrary covariance truncation or
+silent fallback. Record rank failures/incomplete cases explicitly.
+
+The inferred region is v^T A v <=0, A=M_observed^T*M_observed-c*S, with
+target coefficient1. For each candidate v=e_y-X_indices*beta, partition
+into beta^T H beta-2g^T beta+a. Positive-definite H gives an ellipsoid or
+an empty set; a negative eigenvalue gives an unbounded feasible region.
+Near-singular cases remain unresolved unless an explicit feasible witness
+is found. Verify all witnesses directly; do not turn numerical optimizer
+failure into rejection. Report exact coordinate projections for bounded
+ellipsoids, negative directions for unbounded sets and numerical diagnostics.
+
+Every candidate gets the SAME c and S within a bank. A feasible reference
+witness must remain feasible under zero extension to any strict superset
+with the same target. Therefore compatibility cannot penalize redundant
+extra terms. Report candidate compatibility and nested-drop behavior,
+not a recovery rate based on labeling every unregistered law false.
+
+Freeze geometry, noise estimates,256 calibration draws,256 check draws,
+c/S and all candidate-region decisions before accessing clean diagnostics.
+Then use256 fresh actual fields for operator-wide coverage, registered-law
+coverage and zero-residual acceptance. Pointwise directional cutoffs
+from the SAME check matrices are controls for conservatism. Also evaluate
+clean weak residual floors and true coefficients after the freeze.
+
+IID actual seeds1500000+1000*anchor+b. Calibration/check RNG domains
+940101/940102 with profile-id0 and anchor. Constant identities are retained.
+
+Correlated-noise stress: core4 AC/forcedKdV/KS/wave, the same three fresh
+anchor labels30/31/32, two different records with rho=+0.4 or-0.4 on every
+axis. Known field std times5% defines only the injected benchmark noise.
+Raw anchor RNG[940100,profile-id,anchor]; actual RNG[940103,profile-id,anchor,b].
+Profile ids1/2 distinguish positive/negative correlation. Compare iid
+amplitude estimation, existing estimated separable AR, and known-rho shape
+with estimated amplitude. The last is an attribution control using known
+correlations, not a deployable unknown-noise estimator. For known-rho
+amplitude estimation replace binomial(2k,k) by d_k^T R(rho) d_k, with
+d_k the signed binomial differencing coefficients. Keep the pilot identical
+across models; all controls share underlying standard-normal draws.
+
+Each model gets256 calibration/check/actual fields, the same full library,
+and the same matrix-region test. No per-system noise-model/bank choice.
+No general colored-noise or post-search confidence claim from a partial
+stress test. All sources, input/array hashes, processes, covariance ranks,
+nonfinite values and independently recomputed regions/coverage are audited.
+Seven workers, one BLAS thread each. Save Gram matrices to limit storage.

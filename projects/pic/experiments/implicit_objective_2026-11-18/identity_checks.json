@@ -1,0 +1,59 @@
+{
+  "rows": [
+    {
+      "identity": "phase_sin",
+      "fold": 0,
+      "constant": 1.0,
+      "without_constant_score": 0.9286219803934929
+    },
+    {
+      "identity": "phase_sin",
+      "fold": 1,
+      "constant": 1.0,
+      "without_constant_score": 0.9001198052256887
+    },
+    {
+      "identity": "phase_sin",
+      "fold": 2,
+      "constant": 1.0,
+      "without_constant_score": 0.9155213477097301
+    },
+    {
+      "identity": "phase_cos",
+      "fold": 0,
+      "constant": 1.3,
+      "without_constant_score": 0.6723027752144589
+    },
+    {
+      "identity": "phase_cos",
+      "fold": 1,
+      "constant": 1.3,
+      "without_constant_score": 0.6604609348424968
+    },
+    {
+      "identity": "phase_cos",
+      "fold": 2,
+      "constant": 1.3,
+      "without_constant_score": 0.6806390936176615
+    },
+    {
+      "identity": "energy",
+      "fold": 0,
+      "constant": 2.69,
+      "without_constant_score": 0.4957093046836621
+    },
+    {
+      "identity": "energy",
+      "fold": 1,
+      "constant": 2.69,
+      "without_constant_score": 0.484653173099514
+    },
+    {
+      "identity": "energy",
+      "fold": 2,
+      "constant": 2.69,
+      "without_constant_score": 0.4964671025359095
+    }
+  ],
+  "rank_checks": "PASS"
+}

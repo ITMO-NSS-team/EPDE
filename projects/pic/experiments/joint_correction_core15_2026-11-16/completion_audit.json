@@ -1,0 +1,164 @@
+{
+  "completed_system_runs": 45,
+  "reference_seed_cases": 60,
+  "registered_equation_seed_cases": 93,
+  "source_and_input_hashes_verified": true,
+  "fresh_noise_replay_verified": true,
+  "frozen_selection_replayed": true,
+  "actual_score_transforms_saved_and_unchanged": true,
+  "finite_scored_fits_verified": true,
+  "registered_supports_preserved": true,
+  "selection_records": 837,
+  "forced_selections": 0,
+  "validation_support_checks": 10845,
+  "no_incomplete_case_averages": true,
+  "duffing_coordinate_repair_verified": true,
+  "initial_failed_attempts": [
+    {
+      "system": "duffing",
+      "seed": 12,
+      "exit_code": 1,
+      "seconds": 14.692125600005966
+    },
+    {
+      "system": "duffing",
+      "seed": 13,
+      "exit_code": 1,
+      "seconds": 18.17564470000798
+    },
+    {
+      "system": "duffing",
+      "seed": 14,
+      "exit_code": 1,
+      "seconds": 17.265098900010344
+    }
+  ],
+  "final_missing_results": 0,
+  "fit_statuses": [
+    {
+      "method": "corrected_gls",
+      "status": "indefinite_corrected_design",
+      "count": 77
+    },
+    {
+      "method": "corrected_gls",
+      "status": "ok",
+      "count": 760
+    },
+    {
+      "method": "corrected_ols",
+      "status": "indefinite_corrected_design",
+      "count": 89
+    },
+    {
+      "method": "corrected_ols",
+      "status": "ok",
+      "count": 748
+    },
+    {
+      "method": "gls",
+      "status": "ok",
+      "count": 837
+    },
+    {
+      "method": "irls",
+      "status": "nonconverged",
+      "count": 2
+    },
+    {
+      "method": "irls",
+      "status": "ok",
+      "count": 811
+    },
+    {
+      "method": "irls",
+      "status": "singular_residual_covariance",
+      "count": 24
+    },
+    {
+      "method": "ols",
+      "status": "ok",
+      "count": 837
+    }
+  ],
+  "conditional_fit_statuses": [
+    {
+      "method": "corrected_gls",
+      "status": "indefinite_corrected_design",
+      "count": 51
+    },
+    {
+      "method": "corrected_gls",
+      "status": "ok",
+      "count": 1677
+    },
+    {
+      "method": "corrected_ols",
+      "status": "indefinite_corrected_design",
+      "count": 237
+    },
+    {
+      "method": "corrected_ols",
+      "status": "ok",
+      "count": 1491
+    },
+    {
+      "method": "gls",
+      "status": "ok",
+      "count": 1728
+    },
+    {
+      "method": "ols",
+      "status": "ok",
+      "count": 1728
+    }
+  ],
+  "ode_simple_identity_controls": 3,
+  "result_sha256": {
+    "ac_seed12.json": "c64236a5fe7cbc16e27ce594ae7472f80ef8cb9a3c559f3943f85b8e448f1727",
+    "ac_seed13.json": "7ab0d15d0b89eb2ba909384b9ddcf8c3f3e09fbb3407b3e52137da8d67cc2dc7",
+    "ac_seed14.json": "edf9b2cb76132364adb65866fbf5ea3bb1bcefb2ec8ec7b0e5a48a4c12220f39",
+    "burgers_inviscid_seed12.json": "219ccc609d7f4c0ebd4ce7043cf6d9d56b3b7436bb1894495dcc1bd04caa77a1",
+    "burgers_inviscid_seed13.json": "b675ef08e3ad0a72f8774133d3b09b8a26d966f935a946b2348a666fc4f34b40",
+    "burgers_inviscid_seed14.json": "ca866c3ff1862fe21b933036a812d4dda9ef7a1ec7a4cabecad4291c03230c09",
+    "burgers_seed12.json": "b73c16df69f1c52b5ac0b211bd652a488af366fae04d877a5c395a7c94c9e942",
+    "burgers_seed13.json": "a55c1d42dd6b02fe02c43df9b9a35aa7b54a17c26df8ce0c1655599c0a58eaab",
+    "burgers_seed14.json": "2bdfa4bf2ec6d8a2706ff62b0eb2bef84b4f1b0822d10ab088ab58a522bf8543",
+    "duffing_seed12.json": "9706e5329bce92ef2dd0830353a5c26ea4cc8c63c44f1d7fe3220c2ad189a022",
+    "duffing_seed13.json": "259196e1c2a1fa1a72cc04012620217539b0e24282841cf5764bd47c2b6dd4e5",
+    "duffing_seed14.json": "2288e2102027ca81a4c769db448fe33ca7d2c5aeae1d7c6c1fdb7e1f906a29ad",
+    "kdv_cossin_seed12.json": "6a06c7d82d20c7c5549ce789bf6eb7eb6d5f1138bbc72fec6d71e338ec5fc820",
+    "kdv_cossin_seed13.json": "217206631a67b6c36c4a1c1f6e84bef209bfcef19eb334abd4a55422d1db4ec9",
+    "kdv_cossin_seed14.json": "e83a31a1a22716d0683ae59f9dfa0fdbd5e139767125d32d423cebad4a4b5ee8",
+    "kdv_seed12.json": "5ee62507db0deb5d7d6385c706d1e19eaa35abae195a3dee20b3728fa5fdac96",
+    "kdv_seed13.json": "3138a125b2df89fbd7ccdcc7e6cbadf8ca4e8c8aeb228f207782cd32bdd0ec41",
+    "kdv_seed14.json": "1d1f28a12533b7f7a873ee426ce3bf86df74d527b33e096f11eb5259268f39c7",
+    "ks_seed12.json": "6194cfbcd32164c09ff0b548b185dc9b3570d236cc622d614ad9b5e8ea8d2261",
+    "ks_seed13.json": "0d89ca71e6c96fab6840ba88a01635fccdd747416c9b04a71cca85ed94f595dc",
+    "ks_seed14.json": "b7515504fcc8d4e696f32a3917480bf35237cc996a3cc9359ce0ffab00c99129",
+    "lorenz_seed12.json": "e4bcc2a113513017bf928292589b6d337cbd556d411c909aacd1fa8a564a64e2",
+    "lorenz_seed13.json": "58e0e58630d051a5b21050e02eead2ce3a1f526eefff8e2beafa0ac2e5bc2546",
+    "lorenz_seed14.json": "53612b0954f00f57af8c9988d65fe6118056727b53c1e5cf650133e48b68533b",
+    "lv_seed12.json": "62469e0682bc4e7bf61b665773840f55606393dc4a571a184d9dfa12786dd1bb",
+    "lv_seed13.json": "29508ae5cf3ecc7085f7ab93401e5afe9661c1830c9ce219521f33cb628d58b3",
+    "lv_seed14.json": "26de1dc6b735ce22505686cd99b887e4a1f5bcf82f9388f44c9b778c74efd486",
+    "ns_seed12.json": "16222dfd99f63b3ad79745d4ddd1b77a3518c5d67d915abde0ac2d09b8f0f412",
+    "ns_seed13.json": "6a66e1cf0c078a37e24708fb0d3c7e87d064a917cbb4639ca0b54099609145ce",
+    "ns_seed14.json": "5c7ece6d6e1da7bf5e481ee70e8e832dfd7d9a2b27b628e602a296fe60c0ee85",
+    "ode_seed12.json": "f1510aeba68e72a73cd12eb5b60d06ff3849af2d9e5ff9fbec2d2b19f00c5b78",
+    "ode_seed13.json": "059b37f7889622afdcd8d03ed7498df63d7ec1adae003ab93778363147b88be1",
+    "ode_seed14.json": "9ec0be78f6358e57fa9234ebd7dbfa1ebe0796d1ee754ec878556a683f39b9de",
+    "pde_compound_seed12.json": "5813a937cc876df4c0ee3ccbd151cbb1653776de7c798c50aa08552bd0bfa16c",
+    "pde_compound_seed13.json": "8c8630228c4a10a4cfc2808ff33602c50b601ca2e0d8d57ad439a2d86576f1ef",
+    "pde_compound_seed14.json": "1e97ae46910f74ca3e4816e1d87e52aac30a01a286782de19a5f845c15cc03d0",
+    "pde_divide_seed12.json": "da0b54e103bb3f9ae6f799c9c691f619f2ac1faefa6831c818a481d2e696b3b6",
+    "pde_divide_seed13.json": "32d487f82b9af4ba9f346217ba30c68c18e54f2b05fae0d698e2c591508df301",
+    "pde_divide_seed14.json": "b19822e4be27d5e5da7b380b080ff4448b8943fe6d92cd6202d710b7b48d0441",
+    "vdp_seed12.json": "8779e01baa93fb4fd3e93f13c0871bcaf60be9f3e61c678f99f1bbac536bfb95",
+    "vdp_seed13.json": "c20b05e63ca84bf94f9b2aabfd59202a067bfe2dd84fa40342111d5a4ae80bfe",
+    "vdp_seed14.json": "acaf9a73b164a2a21704e3752b8731f333fddf3057f2f8a6efaf9cf39ccf13b3",
+    "wave_seed12.json": "41949473807603b9a3d4fa1bd86b2167c2b1ac23943023ffe4d95f900312a64a",
+    "wave_seed13.json": "d8db76b8c19948db8850ce6df18e0bda44f25c5fa76cba72484b98a6cb78bb62",
+    "wave_seed14.json": "36964b38d045b7a13a0f6507e838df5111144bc07ae917031fca71a10ef67691"
+  }
+}

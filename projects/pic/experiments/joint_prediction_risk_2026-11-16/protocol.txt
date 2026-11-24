@@ -1,0 +1,68 @@
+Joint target/predictor prediction risk, 2026-11-16
+Frozen before testing. Initial ac/wave/kdv_cossin/ks x seeds 0/1/2 at 5% noise.
+Expand to the core-15 if targeted behavior justifies the cost, without changing
+the method after observing clean outcomes. No equation integration or PINNs.
+
+Fixed fitting choices: existing local continuous weak bank, broad minimum-q
+bank, broad q+1 bank; ordinary and mean/covariance-corrected least squares in
+each. Broad mode selection uses the previously defined training-only numerical
+rank routine. Infeasible broad banks are reported and excluded; the local
+candidate remains. Preserve candidate panel, dyad and registered equivalents.
+
+For each outer training group, reconstruct 128 bootstrap operator draws with
+the original RNG and noise model. The original 32/128-draw prefix defines
+the observed mean-bias correction and corrected-fit noise Gram, reproducing
+the previous coefficients exactly. All 128 draws estimate the new risk.
+
+For bank a let P_a be the observed reconstructed operator matrix, beta_a its
+old bootstrap mean bias, and Z_a=P_a-beta_a. Center the 128 operator draws
+and multiply their errors by sqrt((1+1/B_old)*128/127). Reuse each entire
+error draw across banks, targets, predictors and candidates. This retains
+the joint covariance, including fitting/evaluation dependence. No independent
+column perturbations or coefficient-only error model is substituted.
+
+Conditional perturbation fits:
+  OLS uses P_a + e_a (the estimated reconstruction bias remains present).
+  CLSM uses the real Hermitian Gram of Z_a + e_a minus the ORIGINAL fixed
+  covariance correction, with the original signed numerical solve.
+Bias and covariance-estimation maps are frozen, not nested-bootstrap refitted.
+Negative Gram eigenvalues and score estimates remain signed; no clipping,
+stability penalty, confidence gate or tuned tradeoff weight is introduced.
+
+All options use one common TRAINING evaluation bank: the existing local weak
+bank. Let Z be its bias-corrected matrix, N the empirical noise Gram of the
+128 centered/scaled perturbations, and v(c) the residual coefficient vector.
+Use a common training target-energy denominator d. The estimated risk is
+
+  v(c_hat)'(Z'Z-N)v(c_hat)/d
+  + mean_b { ||Z v(c_b)||^2/d
+              - v(c_b)'[(Z+e_b)'(Z+e_b)-N]v(c_b)/d }.
+
+The second term is conditional bootstrap optimism: latent-proxy loss minus
+apparent noise-corrected training loss after refitting. Both terms preserve
+target/predictor error correlations and the estimator's sensitivity. The
+latent proxy is the NOISY DATA-DERIVED Z, never the saved clean field.
+The model cannot identify common reconstruction bias from this proxy alone.
+
+Primary choice: minimum estimated risk across all six available options,
+per candidate and training fold. Also report OLS-only and CLSM-only choices,
+and a prediction-perturbation-only selector as an ablation. All arms are
+frozen now. Half/full risk averaging (64/128 draws) tests numerical sensitivity
+while holding covariance/bias estimates and original coefficients fixed.
+
+Score selected coefficients on unchanged LOCAL held-out cross-products and
+the frozen old spectral control, using the other two raw groups. Neither
+held-out scores nor clean fields enter selection. Diagnose fitted coefficients
+on the old common clean bank after selection. No claim of improved discovery
+from training risk alone; report retention, accuracy and every regression.
+
+Checks: reproduce stored coefficients and frozen baseline scores; fixed
+coefficients have zero mean optimism under centered empirical perturbations;
+in the fixed-X linear Gaussian case optimism equals 2*sigma^2*rank(X), matching
+the standard quadratic prediction-risk correction; test feature-rescaling
+invariance. Preserve source/input hashes and finite-score audits.
+
+Limits: conditional plug-in noise model, frozen correction maps, finite
+bootstrap risk variability, reused records, only three noise seeds, and finite
+candidate panel. The primary risk is not calibrated physical-model confidence.
+Parallel processes use one BLAS thread each and below-normal priority.

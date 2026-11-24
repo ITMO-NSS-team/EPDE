@@ -1,0 +1,2416 @@
+{
+  "status": "COMPLETE",
+  "anchors": 69,
+  "summary": [
+    {
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 45,
+      "coverage": 0.9408854166666667,
+      "min": 0.6796875,
+      "max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 45,
+      "coverage": 0.9408854166666667,
+      "min": 0.68359375,
+      "max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 45,
+      "coverage": 0.90703125,
+      "min": 0.4765625,
+      "max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 45,
+      "coverage": 0.940625,
+      "min": 0.671875,
+      "max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 45,
+      "coverage": 0.9407118055555556,
+      "min": 0.67578125,
+      "max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 45,
+      "coverage": 0.9059895833333333,
+      "min": 0.46875,
+      "max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "anchors": 45,
+      "coverage": 0.9489583333333333,
+      "min": 0.890625,
+      "max": 0.9921875
+    },
+    {
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "anchors": 45,
+      "coverage": 0.9490451388888889,
+      "min": 0.890625,
+      "max": 0.9921875
+    },
+    {
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "anchors": 45,
+      "coverage": 0.9359375,
+      "min": 0.8828125,
+      "max": 0.98828125
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9381510416666666,
+      "min": 0.875,
+      "max": 0.9765625
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9381510416666666,
+      "min": 0.875,
+      "max": 0.9765625
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.927734375,
+      "min": 0.78515625,
+      "max": 0.98046875
+    },
+    {
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9446614583333334,
+      "min": 0.8984375,
+      "max": 0.98046875
+    },
+    {
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9446614583333334,
+      "min": 0.8984375,
+      "max": 0.98046875
+    },
+    {
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.9319661458333334,
+      "min": 0.78515625,
+      "max": 0.9765625
+    },
+    {
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9430338541666666,
+      "min": 0.8984375,
+      "max": 0.984375
+    },
+    {
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9430338541666666,
+      "min": 0.8984375,
+      "max": 0.984375
+    },
+    {
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.9368489583333334,
+      "min": 0.89453125,
+      "max": 0.96875
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9423828125,
+      "min": 0.8359375,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9423828125,
+      "min": 0.8359375,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.8717447916666666,
+      "min": 0.48046875,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9554036458333334,
+      "min": 0.875,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9554036458333334,
+      "min": 0.875,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.8896484375,
+      "min": 0.4921875,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.7408854166666666,
+      "min": 0.01953125,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.7418619791666666,
+      "min": 0.0390625,
+      "max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.5579427083333334,
+      "min": 0.0,
+      "max": 1.0
+    }
+  ],
+  "systems": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9635416666666666
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9635416666666666
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9622395833333334
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9622395833333334
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9375
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9375
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9114583333333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9231770833333334
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9908854166666666
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9908854166666666
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9752604166666666
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9921875
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9921875
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.98046875
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.4765625
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.484375
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.4908854166666667
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.953125
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.953125
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9453125
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9192708333333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9231770833333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9453125
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9453125
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.90625
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.90625
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.7799479166666666
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.77734375
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9609375
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9609375
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9388020833333334
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9296875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.953125
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.953125
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9296875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.8932291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.89453125
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9375
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.8098958333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.91796875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.91796875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8072916666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.8450520833333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.8411458333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.796875
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.95703125
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.95703125
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.86328125
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8645833333333334
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9583333333333334
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9583333333333334
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9088541666666666
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9322916666666666
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9322916666666666
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9466145833333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9466145833333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.8255208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8294270833333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.7005208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.7005208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9010416666666666
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8997395833333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.953125
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.83984375
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9088541666666666
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9088541666666666
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8059895833333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9401041666666666
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9401041666666666
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.8736979166666666
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.8736979166666666
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.8645833333333334
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.87109375
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.8723958333333334
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8671875
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9375
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9583333333333334
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9583333333333334
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9817708333333334
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.98046875
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.98046875
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.98046875
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9869791666666666
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9869791666666666
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9153645833333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.94921875
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.8203125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.8229166666666666
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9518229166666666
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9518229166666666
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9518229166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9388020833333334
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9388020833333334
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9127604166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.93359375
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9296875
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9296875
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9596354166666666
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.8763020833333334
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9609375
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9609375
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.94140625
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9440104166666666
+    }
+  ],
+  "geometry": {
+    "refit": {
+      "bounded_outer": 71,
+      "unbounded_certified": 13
+    },
+    "studentized": {
+      "bounded_outer": 75,
+      "unbounded_certified": 9
+    }
+  },
+  "reference_anchors": 84,
+  "reference_accepted": 84,
+  "bounded_width_ratio_quantiles": [
+    0.20903158303333313,
+    0.7370143833986165,
+    1.0107839983792712,
+    1.2898858986500201,
+    3.2800092361672717
+  ],
+  "computing": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 274,
+      "response_metrics": 240,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 42,
+      "exact_metrics": 177,
+      "response_metrics": 337,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 43,
+      "exact_metrics": 137,
+      "response_metrics": 377,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 44,
+      "exact_metrics": 205,
+      "response_metrics": 309,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 42,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 43,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 44,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 5,
+      "response_metrics": 509,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 3,
+      "response_metrics": 511,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 2,
+      "response_metrics": 512,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 58,
+      "response_metrics": 456,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 28,
+      "response_metrics": 486,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 78,
+      "response_metrics": 436,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 378,
+      "response_metrics": 136,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 428,
+      "response_metrics": 86,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 360,
+      "response_metrics": 154,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 128,
+      "response_metrics": 386,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 122,
+      "response_metrics": 392,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 42,
+      "exact_metrics": 109,
+      "response_metrics": 405,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 43,
+      "exact_metrics": 179,
+      "response_metrics": 335,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 44,
+      "exact_metrics": 204,
+      "response_metrics": 310,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 42,
+      "exact_metrics": 229,
+      "response_metrics": 287,
+      "patches": 2,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 43,
+      "exact_metrics": 514,
+      "response_metrics": 2,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 44,
+      "exact_metrics": 514,
+      "response_metrics": 2,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 42,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 43,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 44,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 42,
+      "exact_metrics": 514,
+      "response_metrics": 2,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 43,
+      "exact_metrics": 514,
+      "response_metrics": 2,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 44,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 501,
+      "response_metrics": 13,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 497,
+      "response_metrics": 17,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 505,
+      "response_metrics": 9,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 507,
+      "response_metrics": 7,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 510,
+      "response_metrics": 4,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 506,
+      "response_metrics": 8,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 446,
+      "response_metrics": 68,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 436,
+      "response_metrics": 78,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 475,
+      "response_metrics": 39,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 55,
+      "response_metrics": 459,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 1,
+      "response_metrics": 513,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 446,
+      "response_metrics": 68,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 435,
+      "response_metrics": 79,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 476,
+      "response_metrics": 38,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 42,
+      "exact_metrics": 128,
+      "response_metrics": 386,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 43,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 44,
+      "exact_metrics": 121,
+      "response_metrics": 393,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 42,
+      "exact_metrics": 111,
+      "response_metrics": 403,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 43,
+      "exact_metrics": 513,
+      "response_metrics": 1,
+      "patches": 1,
+      "disabled_patches": 1
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 44,
+      "exact_metrics": 201,
+      "response_metrics": 313,
+      "patches": 1,
+      "disabled_patches": 0
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 42,
+      "exact_metrics": 323,
+      "response_metrics": 193,
+      "patches": 2,
+      "disabled_patches": 1
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 43,
+      "exact_metrics": 514,
+      "response_metrics": 2,
+      "patches": 2,
+      "disabled_patches": 2
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 44,
+      "exact_metrics": 514,
+      "response_metrics": 2,
+      "patches": 2,
+      "disabled_patches": 2
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\analyze_student.py": "fb3a1bffbdd8162b12e343774683172697537d3fe24fd4bbb40173b8793de3b6"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_iid_seed42.json": "7e1bde67d72d1e39796316fdb53286c2bed3929f94fa1210dd9cc4ccf1bbad91",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_iid_seed43.json": "f35b47119c36098f5a86bf2db0663c75cdeb69fcd4bf0a6931b47ce6756da58e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_iid_seed44.json": "0daff3f4e88ebb1b0f50365b57c17c9305bc00ab20976f573bac386d510a92a9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_negative_seed42.json": "7afdf275ddf9c585993256ee7bb7aee187b97b4a97d532c135838275865c617d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_negative_seed43.json": "c72fa7d4f556fc53b346fdd5e03c0d80fa26551541ca4dee2089a23f366c5a13",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_negative_seed44.json": "b027bdd3625df3716d292d472019b59221abcb21080f6668223d996aecaa2f5f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_positive_seed42.json": "020c78b4fabe379c495999a72fed255634d62fa3b2b7660bf1e8bc65ccaeb6ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_positive_seed43.json": "c9e08c5f11840ded57ac1e25ca893014aaa8234bf7e15a9309577ec390bb9535",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ac_positive_seed44.json": "2572a542b73dc102b1d8ed0bf4826e686f4064a1084ef75f8dd8fda687eb95f9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\burgers_iid_seed42.json": "4e4723c2cfa7031f77dd736ec7809a7d32391e8ac07336efad9eae89f010f22c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\burgers_iid_seed43.json": "fa4758d6d4ec2fa6f829afe1503df97f1213326b37cb09ea5ce63276bdce406a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\burgers_iid_seed44.json": "20e8b4ccb5b12b499391043cdbf2d6eef0104fe77f595db1d970c9e3d7ef52eb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\burgers_inviscid_iid_seed42.json": "ffe66631a27d7ff84b131c33a6833b7ca5b6b9cc686e864d05a440f155aab717",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\burgers_inviscid_iid_seed43.json": "289d7657a2ee51cb39442c83ff2917a4a3366f7e62f01c04835f83fea89a6a33",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\burgers_inviscid_iid_seed44.json": "8029d444e8aaa709022a0c3d502408a37b77ea6079e800214a9edbc1248db24e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\duffing_iid_seed42.json": "cfad2982d674acc45f54339777d6987c5085357a729228352d5c65a8e36219d5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\duffing_iid_seed43.json": "ab2f3f6f3d9acd294e3a71079ac935f52b193ea157dbad9caadbb95340406075",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\duffing_iid_seed44.json": "c835619446d250c17a9e585b56722091cda8db254d9f2f122090dd2a6bbccc83",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_iid_seed42.json": "5c398edd7c00c5b2821976749ee996ae9b217d120a0718d5806e7b7614819488",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_iid_seed43.json": "61ec9a5df457dc33749cfcd237d25425439e1dbe944876ac00f1d415949eb73e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_iid_seed44.json": "5ab4662164e56d37065533e4e7d2fc105574efb620bec816e2cc8ca54a11b37a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_negative_seed42.json": "9a813a9e5cba1cc71f502d4f4e6ddd817722d5fe8004a41f758391c722a01e32",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_negative_seed43.json": "986e8d9ae116ccfa7ecbef8ef3dfb2cdd738cdf7e7806f02cf99d0527a7bf616",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_negative_seed44.json": "f5698163df531f1f2558cf486f12470004fdac8b96374e5d30585158fc91c24f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_positive_seed42.json": "d6cd4475070e05d4ad43f329578442a70089ab6af70d305e285719d7b1075710",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_positive_seed43.json": "f950d027ae165bf2c6ed37e1a4942e3e2bb9b4383c0efc84a39509e1eeff7d0d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_cossin_positive_seed44.json": "ab82fb79e3b56b07ceae4773d5acf7953761c988d84a5d5fdff28159c0990ee4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_iid_seed42.json": "91158bb5accbe679163cc0cab8cf8e897849c2233e7b2a63702c4f962c4f80b3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_iid_seed43.json": "7d49a0f22f9a94f439e519fe728eb8bb5ad4a27cf6302a82cf8f739179265922",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\kdv_iid_seed44.json": "6cba82b5381e60f1c38e9fdda0789dc1a29e1fe2aff452d80a1f255b81a7344a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_iid_seed42.json": "9e9b1ec518c509783136da9cb0c244fb08563b79356b14ca5a4f4e8f81f276db",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_iid_seed43.json": "f6306704efa555904ed60526021c88e3eab2cf03d47fd225619644fc6300f9dc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_iid_seed44.json": "303d341d149fce941ee69f8b35c99399d437ebf314183286969d8960b2e83fab",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_negative_seed42.json": "6f884375ae16b6664d0ab7e209c19b3d55ab98db9d4966db73cd3d870dff45da",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_negative_seed43.json": "09013b2ac7e7979d8b5de6e0bb42f29914d07e785828a7e59e725c382a4de381",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_negative_seed44.json": "36870bd92defbf5e3e9bc72290068de0b208f444d8e53fab11b00263a88beb9a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_positive_seed42.json": "8fbe7d1ad56d372353ea324c8f89f4ad42fd201a13293ffef647b67dc9c45331",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_positive_seed43.json": "8d52114a140902978762ce5acc0acaf7d4c0d21a0b4b64b819c025201d036659",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ks_positive_seed44.json": "f122c24586c62d2358b0a562d3f2105a5fb4bb1335e4c2d8543c2b85e15b6614",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\lorenz_iid_seed42.json": "de2dc8dae5e17f557b3ef29c32a2f1b670d5b210250f844354accb0fd0de0c72",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\lorenz_iid_seed43.json": "a2dbaae328842cd9a38d43adff424109b55d1c652f9ee99be5065378d3ede30b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\lorenz_iid_seed44.json": "40b980fde40a5d28257d5d45a3b0f7b48bfb93c9d4cd735ad3b1e1c3dc44a6c6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\lv_iid_seed42.json": "7b479600b48e60d5c803e76a897f9cc0c649d0a45ab05fa01fde8a32295babd0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\lv_iid_seed43.json": "f3a212543c69721c03e68a620a66a597a4d21e976b5f010fd005ab5360c95a47",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\lv_iid_seed44.json": "7bcebccb205221d766cfda8253b95df2f77ffd16e7fc40acd3c23a7e9c0af774",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ns_iid_seed42.json": "091b57241038a5e6984cec55316c10474efb349f5ef16c3dd8e9f262e0961914",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ns_iid_seed43.json": "e53c27c93945c86adeb9428803c5788c3854d67b57b5592a199ea67da58b96fa",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ns_iid_seed44.json": "18733e5d376534ac71b5247b048f3b8de64d59f60d3da087375314010b03abe8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ode_iid_seed42.json": "afca98e68c57869f64170464f75d9793a44b1ee669cb507ba9e30abaa95e080f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ode_iid_seed43.json": "7d2d3b6769bfcb8f9b688e70ce6431e6cc5bccb48bb0ef66594149eebd79ffe3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\ode_iid_seed44.json": "e13781df5b39d4cad8e94eadfcde99df952b5785502510d8f651b9d53d07c897",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\pde_compound_iid_seed42.json": "9c144fc852cb1078487ac54b627fdf990815cec7dd76447a034b8edfe2738137",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\pde_compound_iid_seed43.json": "9b76d79479ba51f6581e5e9de74e5a319d6daf6a7f07d3256854578b0b7d709a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\pde_compound_iid_seed44.json": "b4fe5a3ef21f4e0932cb6d46181a95d2c659cf31da286fc4c7d8a1fe0cf20eb5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\pde_divide_iid_seed42.json": "81965051b09e218c6ba9a7fec8b5dd6aa6fc7bec914f985dfe92ce1e78ffd0ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\pde_divide_iid_seed43.json": "2b57c773e4daccc25f2988a6f06423561ce0683cfde4e94afd8a743b29efa3f8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\pde_divide_iid_seed44.json": "2a5774ab94a002e89a246cc6fd2a4d32894e4af726277b3c0e49574f6f2951f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\vdp_iid_seed42.json": "64e9a2dac4349947677a43d732117a05bb9efda5af403a6fd3df921fb8df65fe",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\vdp_iid_seed43.json": "d579070e40a178b1745c6c947e1da795266382c1468a8d118705eccb0165d46b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\vdp_iid_seed44.json": "e86fd3309373259c9136dd423d8592deea3364d4300376c70bccf8c1c5042ea4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_iid_seed42.json": "9977ba9867822cbd8fbe5d48aaf98e6ba465b7b27ecf10b00abe7f401e8699d4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_iid_seed43.json": "223ca1dde30bc723b4e8c3d71832b8616ab22696ae08fd412588d242ec2a46f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_iid_seed44.json": "da8f26f2655e84c12a0aca6b7ae78e22344232d46cb4dde9e65e7eff9b18bed2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_negative_seed42.json": "c02a62dc9dfa51ca64bc73e61d0253c13c2652696415e58c069c3ff69122fd1a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_negative_seed43.json": "f161d149854c57149bbc83e2b6972c023a4bf88388b0677232a748cf7a2e2f8a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_negative_seed44.json": "0d89fc4e78b35470539a02b58bfc8fcad2aeec515ec1a4ab46ecc6ccab1ea18f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_positive_seed42.json": "d68bc5e757de44529849d251f9e1250758833688e577307b1198fa85bce09d4a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_positive_seed43.json": "d58707d782c874b43583364052646145078c8daf40b7f7f5ef5426df369be443",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\studentized_all\\wave_positive_seed44.json": "56463304e9347653db6102d6ddd09168bc7c974def84bec7647ab3b78b230e96"
+  }
+}

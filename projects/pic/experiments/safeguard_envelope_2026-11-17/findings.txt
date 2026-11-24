@@ -1,0 +1,98 @@
+Guarded full bootstrap and finite nuisance sensitivity
+====================================================
+
+Scope: ODE positive seeds57..59 paired with prior observed fields; fresh
+seeds60..62 under iid,+.4,-.4. 12 observed fits,1536 bootstrap refits,
+MC16 covariance. Guard applied throughout. The same observed raw fields
+are paired in the historical reruns; bootstrap fields change when the
+fitted noise model and reconstructed pilot change. Do not call those
+bootstrap samples paired. All cutoffs frozen before clean-field scoring.
+
+1. Full procedure with the profile-start guard
+All3 historically unbounded reference regions become bounded under both
+bootstrap normalizations. Every fresh reference region is also bounded.
+Fresh full-library error coverage:8/9 for either normalization, with the
+same negative/60 miss in both banks. Historical reruns:3/3. Each profile
+has only3 fresh outer datasets; this cannot establish95% calibration.
+All reference-equation noise projections are covered and the true
+reference equation remains accepted in every case and method.
+Grouped coverage counts (each group has3 datasets):
+{'paired_previous': {'studentized': {'local': 3, 'broad': 3, 'joint': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'joint': 3}, 'envelope': {'local': 3, 'broad': 3, 'joint': 3}}, 'fresh_iid': {'studentized': {'local': 3, 'broad': 3, 'joint': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'joint': 3}, 'envelope': {'local': 3, 'broad': 3, 'joint': 3}}, 'fresh_positive': {'studentized': {'local': 3, 'broad': 3, 'joint': 3}, 'fixed_metric': {'local': 3, 'broad': 3, 'joint': 3}, 'envelope': {'local': 3, 'broad': 3, 'joint': 3}}, 'fresh_negative': {'studentized': {'local': 2, 'broad': 2, 'joint': 2}, 'fixed_metric': {'local': 2, 'broad': 2, 'joint': 2}, 'envelope': {'local': 3, 'broad': 3, 'joint': 3}}}
+Selected fit diagnostics:
+{'total': 1548, 'guard_triggers': 7, 'guard_triggers_observed': 5, 'statuses': {'ok': 1548}, 'near_unit': 0, 'original_python_polishes': 0, 'max_original_value_discrepancy': 1.554312234475219e-14}
+Observed noise-estimation errors:
+{'paired_previous': {'sigma_ratio': {'min': 1.3036468548223752, 'median': 1.4478904727155488, 'max': 1.478983388264215}, 'rho_error': {'min': 0.2375504797368061, 'median': 0.2839688207453043, 'max': 0.29151907244151887}}, 'fresh_iid': {'sigma_ratio': {'min': 0.9895564720274739, 'median': 0.9919178516661827, 'max': 0.9962219676830739}, 'rho_error': {'min': 0.011043315530113442, 'median': 0.017318343825773054, 'max': 0.04293391993541143}}, 'fresh_positive': {'sigma_ratio': {'min': 1.3769832926774102, 'median': 1.3978459612559446, 'max': 1.4454134946200554}, 'rho_error': {'min': 0.28715628244615776, 'median': 0.29210929786705486, 'max': 0.29377525487997136}}, 'fresh_negative': {'sigma_ratio': {'min': 0.9854244686081275, 'median': 1.025501663336869, 'max': 1.1140733770775588}, 'rho_error': {'min': -0.08648868566347195, 'median': -0.0073124847534351, 'max': 0.0570477554724218}}}
+The guard removes catastrophic optimization basins; positive-correlation
+amplitude/correlation bias remains. Convergence is not identifiability.
+
+2. Why the remaining fresh failure occurs (posthoc diagnostic)
+negative/60: fitted sigma0.10151 versus true0.10301; fitted rho−0.48649
+versus true−0.4. Broad full-library score9.598 exceeds cutoff6.072
+(studentized) or5.513(fixed). Using true noise only in the moment
+correction barely changes the score:9.623. Using it only in covariance
+lowers the score to7.427; changing both gives7.447. Thus the covariance
+normalization matters more here than the small correction shift.
+A separate known-noise conditional97.5% cutoff is7.195: the broad score
+still exceeds it by about3.5%. Parameter error does not explain the
+entire miss; finite-sample tails/pilot approximation remain possible.
+This one case cannot distinguish a chance tail from systematic undercoverage.
+The reference equation itself is accepted, so full-library failure must
+not be presented as failure to recover this reference equation.
+
+3. Finite scalar sensitivity envelope
+129 nuisance points per dataset: observed estimate plus all128 basic
+bootstrap reflections in(log sigma,atanh rho). 128 known-noise conditional
+fields per point;198144 conditional fields total. No point discarded.
+All129 scenarios completed in every dataset. Joint conditional rank126
+(97.5%) and triangle/Loewner bounds produce one scalar cutoff per dataset.
+The envelope covers all12 datasets but positive/57 becomes unbounded.
+This trades precision for robustness to the considered finite scenarios.
+Its finite noise set is NOT a95% nuisance confidence region. Convex-hull
+inclusion is only a diagnostic and does not mean a finite point equals truth.
+Nuisance truth in coordinate box / convex hull:
+{'paired_previous': {'n': 3, 'truth_in_coordinate_box': 3, 'truth_in_convex_hull': 3}, 'fresh_iid': {'n': 3, 'truth_in_coordinate_box': 3, 'truth_in_convex_hull': 3}, 'fresh_positive': {'n': 3, 'truth_in_coordinate_box': 3, 'truth_in_convex_hull': 3}, 'fresh_negative': {'n': 3, 'truth_in_coordinate_box': 2, 'truth_in_convex_hull': 1}}
+Finite scalar outer-width ratios versus studentized primary enclosure
+(33 coordinates in11 bounded cases; the unbounded case excluded):
+{'min': 1.1557469176544088, 'median': 1.5568411739720596, 'max': 3.0603989008794756}
+
+4. A useful geometric fix: retain separate scenarios
+Exploratory diagnostic after primary evaluation, on the fixed reference
+support only. Keep each nuisance model own corrected moments, covariance
+and frozen conditional cutoff. UNION the129 two-bank feasible sets, then
+include both primary sets. An intersection across nuisance models would
+be unjustified because only one model needs to describe the data.
+All131 components in each of12 datasets have bounded outer certificates.
+Thus all12 finite unions are bounded, including positive/57 where scalar
+compression was provably unbounded. The scalar construction discards
+directional information and can cause avoidable loss of precision.
+Union outer boxes are coordinate envelopes of component ellipsoids, not
+exact coefficient intervals. Width ratios over36 coordinates:
+{'min': 1.1330298564446504, 'median': 1.4179652060729278, 'max': 2.0614270059530044}
+Reoptimized outer enclosures need not be nested even when feasible sets
+are nested; compare these widths as enclosure sizes, not exact-set widths.
+This geometric fix does not calibrate the underlying nuisance set and
+was not validated for an adaptive EPDE candidate search.
+
+5. Verification and implementation
+New C backend implements the same statistical stationary innovations
+likelihood/Joseph covariance recurrence. No ODE/PDE solver is called.
+104 arithmetic/gradient cases and54 complete-fit comparisons passed.
+Every selected fit was checked with the original Python likelihood.
+Independent audit totals:
+{'original_python_fits': 1548, 'bootstrap_field_hashes': 1536, 'primary_scores': 6144, 'conditional_scores': 396288, 'regions': 672, 'certificates': 504, 'loewner_bounds': 3096}
+Each scenario-union certificate also passed independent region, witness
+and curvature checks. Source/input hashes and old manifests are checked
+by complete.py. Compiler and preflight issues are retained in histories.
+Deterministic-column batch roundoff was checked then canonicalized before
+envelope freezing. Constants and valid identities remain in the library.
+
+6. Decision and next experiment
+Keep the profile-start guard as the tested experimental numerical fix.
+Prefer preserving scenario geometry to one global scalar inflation when
+investigating nuisance sensitivity. Before calling this uncertainty
+calibrated, construct/test a nuisance region under a stated signal model
+and validate it on substantially more fresh outer fields. The positive
+noise bias remains the main statistical obstacle. The separate KdV weak
+direction problem has not been retested here and remains unresolved.
+Dyad remains provisional; keep weak accuracy and coefficient precision
+as separate checks. No production changes, solver or omitted failures.

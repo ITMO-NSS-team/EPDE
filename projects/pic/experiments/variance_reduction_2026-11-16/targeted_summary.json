@@ -1,0 +1,98 @@
+{
+  "q0_plain": {
+    "baseline": {
+      "evaluated": 12,
+      "retained": 5,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 0,
+      "losses": 1
+    },
+    "joint": {
+      "evaluated": 12,
+      "retained": 5,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 0,
+      "losses": 1
+    }
+  },
+  "q0_white128": {
+    "baseline": {
+      "evaluated": 12,
+      "retained": 6,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 1,
+      "losses": 1
+    },
+    "joint": {
+      "evaluated": 12,
+      "retained": 8,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 2,
+      "losses": 0
+    }
+  },
+  "q0_white64": {
+    "baseline": {
+      "evaluated": 12,
+      "retained": 8,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 2,
+      "losses": 0
+    },
+    "joint": {
+      "evaluated": 12,
+      "retained": 8,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 2,
+      "losses": 0
+    }
+  },
+  "q1_plain": {
+    "baseline": {
+      "evaluated": 12,
+      "retained": 5,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 0,
+      "losses": 1
+    },
+    "joint": {
+      "evaluated": 12,
+      "retained": 5,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 0,
+      "losses": 1
+    }
+  },
+  "q1_white128": {
+    "baseline": {
+      "evaluated": 12,
+      "retained": 7,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 1,
+      "losses": 0
+    },
+    "joint": {
+      "evaluated": 12,
+      "retained": 8,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 2,
+      "losses": 0
+    }
+  },
+  "q1_white64": {
+    "baseline": {
+      "evaluated": 12,
+      "retained": 7,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 1,
+      "losses": 0
+    },
+    "joint": {
+      "evaluated": 12,
+      "retained": 8,
+      "old_local_retained_on_same_cases": 6,
+      "gains": 2,
+      "losses": 0
+    }
+  }
+}

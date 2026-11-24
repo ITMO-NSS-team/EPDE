@@ -1,0 +1,26 @@
+Decision frozen after exploratory69 records and before coverage anchors33..35.
+Keep the original PRIMARY strips design, lower-half nuisance modes, for every
+system. The corner control fails pure-noise amplitude identification in one
+synthetic case (sigma2.884 versus true0.2); do not promote it or choose designs
+per system. The strips estimator passes the dense covariance and synthetic
+primary checks, but exploratory LV32 has a boundary estimate even on pure
+noise. That statistical non-identification persists after stable algebra;
+record any such fresh fits as incomplete, without a fallback.
+
+Use stable_fit.py: identical estimator with algebraically equivalent precision
+diagonal expressed without cancellation at rho near+/-1. The original fit
+source and all exploratory results remain immutable. Dense near-boundary
+checks and representative fit replays pass. No parameter cutoff was tuned.
+
+Run162 fresh paired model records:
+  all15 x seeds33/34/35 x (spectral,iid) =90 iid records;
+  core4 x seeds33/34/35 x two correlation signs x
+  (spectral,ar,known_rho) =72 correlated records.
+Noise shape remains unknown to spectral/AR; iid and known-rho controls use
+the specified family but estimate amplitude. Hold each estimated model fixed
+while calibrating the weak-moment test. This first test does not account for
+noise-parameter estimation uncertainty by re-estimation within every draw.
+
+The protocol's seven workers is the initial default; execution may use more
+independent one-thread workers if available memory/CPU permit, as authorized
+by the user. Numerical calculations and random namespaces are unchanged.

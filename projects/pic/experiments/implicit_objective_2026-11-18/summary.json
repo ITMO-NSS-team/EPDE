@@ -1,0 +1,7410 @@
+{
+  "summary": {
+    "replay": {
+      "current": {
+        "slots": 20,
+        "registered": [
+          18,
+          18
+        ],
+        "reference": [
+          16,
+          16
+        ],
+        "mean_known_front_size": 3.3,
+        "unknown": 0
+      },
+      "symmetric_score_only": {
+        "slots": 20,
+        "registered": [
+          18,
+          18
+        ],
+        "reference": [
+          16,
+          16
+        ],
+        "mean_known_front_size": 3.35,
+        "unknown": 0
+      },
+      "symmetric_score_and_dyad_old_fit": {
+        "slots": 20,
+        "registered": [
+          18,
+          18
+        ],
+        "reference": [
+          16,
+          16
+        ],
+        "mean_known_front_size": 3.55,
+        "unknown": 0
+      },
+      "implicit_fit_and_score": {
+        "slots": 20,
+        "registered": [
+          18,
+          18
+        ],
+        "reference": [
+          17,
+          17
+        ],
+        "mean_known_front_size": 3.25,
+        "unknown": 21
+      },
+      "all_symmetric": {
+        "slots": 20,
+        "registered": [
+          18,
+          18
+        ],
+        "reference": [
+          17,
+          17
+        ],
+        "mean_known_front_size": 3.35,
+        "unknown": 21
+      },
+      "angles": {
+        "paired_folds": 60,
+        "old_deg": 0.35720060077945726,
+        "new_deg": 0.3381543648886666
+      }
+    },
+    "fresh": {
+      "current": {
+        "slots": 60,
+        "registered": [
+          55,
+          55
+        ],
+        "reference": [
+          50,
+          50
+        ],
+        "mean_known_front_size": 3.033333333333333,
+        "unknown": 0
+      },
+      "symmetric_score_only": {
+        "slots": 60,
+        "registered": [
+          55,
+          55
+        ],
+        "reference": [
+          49,
+          49
+        ],
+        "mean_known_front_size": 3.2333333333333334,
+        "unknown": 0
+      },
+      "symmetric_score_and_dyad_old_fit": {
+        "slots": 60,
+        "registered": [
+          56,
+          56
+        ],
+        "reference": [
+          50,
+          50
+        ],
+        "mean_known_front_size": 3.3,
+        "unknown": 0
+      },
+      "implicit_fit_and_score": {
+        "slots": 60,
+        "registered": [
+          54,
+          56
+        ],
+        "reference": [
+          50,
+          52
+        ],
+        "mean_known_front_size": 3.066666666666667,
+        "unknown": 63
+      },
+      "all_symmetric": {
+        "slots": 60,
+        "registered": [
+          55,
+          56
+        ],
+        "reference": [
+          51,
+          52
+        ],
+        "mean_known_front_size": 3.05,
+        "unknown": 63
+      },
+      "angles": {
+        "paired_folds": 180,
+        "old_deg": 0.3080631877701441,
+        "new_deg": 0.4354430658311045
+      }
+    }
+  },
+  "numerics": {
+    "replays": 15,
+    "largest_replay_error": 1.6708856520608606e-14,
+    "orientations": 18164,
+    "largest_angle_difference": 3.623060433417473e-13,
+    "largest_score_difference": 9.492406860545088e-14
+  },
+  "slots": [
+    {
+      "system": "ac",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0",
+            "e0:add_6"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0",
+            "e0:add_6"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_2",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_2",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_7",
+            "e0:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_7",
+            "e0:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_7",
+            "e0:add_10"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_7"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_7"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 21,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_0",
+            "e1:drop_2",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_0",
+            "e1:drop_2",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_0",
+            "e1:drop_2",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_0",
+            "e1:drop_2"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_0",
+            "e1:drop_2"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 21,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_0",
+            "e2:add_4",
+            "e2:add_5"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_0",
+            "e2:add_4",
+            "e2:add_5"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_4",
+            "e2:add_5"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_0",
+            "e2:add_9",
+            "e2:add_12",
+            "e2:add_13",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_5",
+            "e2:add_9",
+            "e2:add_12",
+            "e2:add_13",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 21,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_6",
+            "e1:add_9",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_3"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_3"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 21,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_9"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_9"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_9"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_8"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_8"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 21,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_0",
+            "e2:add_3",
+            "e2:add_9"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_0",
+            "e2:add_3",
+            "e2:add_9"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_0",
+            "e2:add_3",
+            "e2:add_9"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_0",
+            "e0:add_3",
+            "e0:add_4",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_0",
+            "e0:add_4",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_2",
+            "e0:add_7",
+            "e0:time_poly"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_2",
+            "e0:add_7",
+            "e0:time_poly",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_4",
+            "e0:add_6",
+            "e0:add_7",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 21,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:equivalent_3",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:equivalent_3",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_4"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_4"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_0"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_0",
+            "e0:add_6"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4",
+            "e0:add_5"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4",
+            "e0:add_5"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4",
+            "e0:add_5"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4",
+            "e0:add_7",
+            "e0:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4",
+            "e0:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4",
+            "e0:add_10"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6101,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_2",
+            "e1:add_9"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_2",
+            "e1:add_9"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_2",
+            "e1:add_9"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_2"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6101,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_2",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_2",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 6101,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_5"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_5",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_5",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_10",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_9",
+            "e1:add_10",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_12",
+            "e0:add_13"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_12",
+            "e0:add_13"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6101,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_6",
+            "e1:add_7"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_6",
+            "e1:add_7"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6101,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_3",
+            "e2:add_6",
+            "e2:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_3",
+            "e2:add_6",
+            "e2:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_3",
+            "e2:add_6",
+            "e2:add_7"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_2",
+            "e0:add_7",
+            "e0:time_poly"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_2",
+            "e0:add_7",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_1",
+            "e0:add_2",
+            "e0:add_3",
+            "e0:add_4",
+            "e0:add_7",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_1",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_1",
+            "e0:add_3"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 6101,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_2",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_2",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            1
+          ],
+          "reference": [
+            0,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_3",
+            "e0:add_6"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:add_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:add_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_1",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6",
+            "e0:add_13"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6102,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_1",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_1",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_1",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_1",
+            "e1:add_13"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_1",
+            "e1:add_13"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6102,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_6",
+            "e2:add_13"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_13"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_6",
+            "e2:add_12",
+            "e2:add_13",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_12",
+            "e2:add_13",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 6102,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_5",
+            "e1:add_7",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_5",
+            "e1:add_7",
+            "e1:add_10",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_7",
+            "e1:add_9",
+            "e1:add_10",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_3"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6102,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_9",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_9",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_9",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6102,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_1",
+            "e2:add_2",
+            "e2:add_12"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_1",
+            "e2:add_2",
+            "e2:add_12"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_0",
+            "e2:add_1",
+            "e2:add_2",
+            "e2:add_10",
+            "e2:add_12"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_6",
+            "e0:add_7",
+            "e0:time_poly",
+            "e0:time_harmonic"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_6",
+            "e0:add_7",
+            "e0:time_poly",
+            "e0:time_harmonic"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_4",
+            "e0:add_6",
+            "e0:time_poly",
+            "e0:time_harmonic"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:drop_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:drop_2"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 6102,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            1
+          ],
+          "reference": [
+            0,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            1
+          ],
+          "reference": [
+            0,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_5",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_5",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_5",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_5",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_5",
+            "e0:add_6"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:drop_0"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_0",
+            "e0:add_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_2",
+            "e0:add_0"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_1",
+            "e0:equivalent_2",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:drop_1",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_0",
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:add_4",
+            "e0:add_5",
+            "e0:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:add_4",
+            "e0:add_5",
+            "e0:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:drop_2",
+            "e0:add_5"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6",
+            "e0:add_9",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4",
+            "e0:add_6",
+            "e0:add_9",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_4",
+            "e0:add_6",
+            "e0:add_9",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:add_6",
+            "e0:add_13"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6103,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_2"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 6103,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:add_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:equivalent_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 6103,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_6",
+            "e1:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_6",
+            "e1:add_7",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_6",
+            "e1:add_7",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_0",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:add_0",
+            "e1:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_3",
+            "e0:add_13"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_3"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            0,
+            0
+          ],
+          "reference": [
+            0,
+            0
+          ],
+          "known_front": [
+            "e0:drop_3"
+          ],
+          "unknown": [
+            "e0:time_poly",
+            "e0:time_harmonic",
+            "e0:field_harmonic",
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6103,
+      "slot": 1,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_3",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_3",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_3",
+            "e1:add_10"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_2",
+            "e1:add_6",
+            "e1:add_7"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e1:reference",
+            "e1:drop_4",
+            "e1:add_2",
+            "e1:add_5",
+            "e1:add_6",
+            "e1:add_7"
+          ],
+          "unknown": [
+            "e1:time_poly",
+            "e1:time_harmonic",
+            "e1:field_harmonic",
+            "e1:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 6103,
+      "slot": 2,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_11"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_11"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_11"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e2:reference",
+            "e2:drop_0",
+            "e2:add_0"
+          ],
+          "unknown": [
+            "e2:time_poly",
+            "e2:time_harmonic",
+            "e2:field_harmonic",
+            "e2:first_order_fit"
+          ]
+        }
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2",
+            "e0:add_3",
+            "e0:add_4"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_1",
+            "e0:add_2",
+            "e0:add_4"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_1",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_1",
+            "e0:add_2",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_1",
+            "e0:add_4",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:time_harmonic",
+            "e0:first_order_fit"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_0"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_6"
+          ],
+          "unknown": []
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:drop_0",
+            "e0:add_6"
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 6103,
+      "slot": 0,
+      "arms": {
+        "current": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_2",
+            "e0:drop_0",
+            "e0:add_2"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_only": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_2",
+            "e0:drop_0",
+            "e0:add_7"
+          ],
+          "unknown": []
+        },
+        "symmetric_score_and_dyad_old_fit": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_0",
+            "e0:equivalent_2",
+            "e0:drop_0",
+            "e0:add_7"
+          ],
+          "unknown": []
+        },
+        "implicit_fit_and_score": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0",
+            "e0:add_2"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        },
+        "all_symmetric": {
+          "registered": [
+            1,
+            1
+          ],
+          "reference": [
+            1,
+            1
+          ],
+          "known_front": [
+            "e0:reference",
+            "e0:equivalent_2",
+            "e0:drop_0",
+            "e0:add_2"
+          ],
+          "unknown": [
+            "e0:first_order_fit"
+          ]
+        }
+      }
+    }
+  ]
+}

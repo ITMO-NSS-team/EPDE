@@ -1,0 +1,37 @@
+2026-11-17, before outcomes: globally test stationary AR(2) signal curvature
+plus stationary AR(1) observation noise. The previous AR(1) curvature model
+underestimates covariance on KS/NS and biases nonlinear corrections on compound.
+AR(2) curvature permits smoother and oscillating signal covariance without
+per-system frequency cutoffs, derivative-order selection or arbitrary ridges.
+
+Contrast covariance on each axis:
+  sigma^2 [D2 R_AR1(rho) D2' + kappa R_AR2(p1,p2)].
+Stable partial correlations p1,p2 in(-1+1e-6,1-1e-6), AR coefficients
+a1=p1*(1-p2), a2=p2. Signal innovation variance for unit marginal variance
+is (1-p1^2)*(1-p2^2). Exact finite boundaries, unrestricted constant/linear
+signal trends, shared noise sigma across axes and axis composite likelihood.
+Two AR filters turn the covariance into bandwidth4 with determinant1.
+Three fixed AR2 starts plus a nested AR1 start. Nested initialization always
+uses the previous estimator on the same observed field; a hash-verified cached
+fit may avoid redundant optimization. No truth is used for the fit or starts.
+All successes/failures and objective spreads retained. Noise-rho and upper-kappa
+edges remain incomplete; signal partial-correlation edges are reported.
+
+First verify dense covariance/logdet/quadratic identities including oscillatory
+and smooth AR2, exact nested AR1 reduction, synthetic recovery and invariance.
+Screen old anchor36 for all15 iid plus core4 colored(+/-0.4):23 records,
+28 variables. Raw fits frozen before noiseless diagnostics. Compare raw versus
+exact injected-noise-only fields, using the identical prior fields. These are
+exploratory data, not fresh validation. Preserve constants and valid identities.
+
+After screening, freeze a global decision before fresh anchors39..41. If the
+model is promising, use the same 138-record primary design as the previous
+round (15 iid systems plus colored core4),256 calibration/check/actual fields
+per complete record. Keep pilot, banks, candidate libraries and regions fixed.
+If screening exposes a clear failure, investigate it rather than promote a
+per-system oracle choice or relabel old anchors as fresh validation.
+
+Pure-noise follow-up uses the fixed576 draws960105 from the prior study when
+needed; fresh domains970101/2/3/4, synthetic970100. Parameter uncertainty remains
+conditional until covariance adequacy is supported. Seven one-thread workers.
+No candidate equation solver, production changes, commits, or prior-artifact edits.

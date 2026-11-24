@@ -1,0 +1,96 @@
+Failure analysis: fitting, quadrature, and discrepancy are separate issues
+2026-11-16; default core-15 saved datasets; no equation solves
+
+1. Short weak windows attenuate the high-derivative coefficients.
+
+The previous window radius was selected from the bandwidth of the observed
+field. That controls field reconstruction, not the noise amplification of
+third/fourth derivatives and derivative products. On KS, old spatial radii
+were 9-10 samples. The training-only PCR selector consistently chose radius
+64 with smoothness 5-6. The new fit uses the observed raw training planes,
+production integration by parts, and noise/grid-sensitive window selection.
+
+For seed 0, old KS coefficients averaged about [-0.104,-0.0026,-0.021] against
+[-1,-1,-1]. The new raw weak CLSM fit reduces clean-field residual energy
+from 0.859 to 0.000102. Across all three seeds the median is 0.866 -> 0.0000553.
+The primary-noise scale estimate was already close to correct: estimated
+sigma 0.05319-0.05344 versus injected sigma 0.05336. Wrong noise amplitude
+alone cannot explain this failure. Estimated correlations can still be wrong.
+
+Nonlinear diffusion is especially sensitive to derivative products. After
+IBP, u*u_xx contains -u_x^2 plus a second-derivative test of u^2/2. The two
+physical terms therefore share a noisy component that should cancel at the
+correct coefficients. The old estimates did not recover that cancellation.
+New raw weak CLSM lowers the median clean residual energy 0.370 -> 0.00114;
+mean correction and covariance correction help here. Yet structural retention
+remains 1/3, because its evaluation bank is also noisy (see point 3).
+
+2. Coarse weak quadrature creates a different, noise-free error.
+
+The first adaptive fitting implementation evaluates on the raw modulo-3 time
+grid. This is a real change from evaluating on the previous reconstructed
+full grid. Even with clean input, the new selected NS momentum windows yield
+clean held-out residual energies 0.00927 and 0.00460 (seed 0, means over folds).
+The corresponding previous clean full-grid fits gave about 8.1e-6 and 3.4e-6.
+
+Integrating a clean reconstruction over the SAME physical windows on a time
+grid three times finer lowers those errors to 0.00132 and 0.000693. On noisy
+fields the same control improves 0.0112 -> 0.00275 and 0.00481 -> 0.000821.
+This diagnoses a quadrature/discretization contribution, not merely noise or
+selection of the wrong physical law. Refinement alone did not recover the old
+accuracy; other spatial/derivative and window effects remain.
+
+The production selector can use q larger than the coarse window radius.
+Production kernels then explicitly cap exactness at the available number of
+moments; they are not exact for all polynomials through the declared 2q.
+A follow-up selector requires m_coarse >= q, so 2m_coarse+1 >= 2q+1. This is
+a dimension requirement for retaining all those moments, not a tuned cutoff.
+
+This follow-up improved NS seed-0 momentum clean residuals to 0.00247 and
+0.000599 under raw CLSM, but still fell short of the old fit. It did not
+resolve the AC or forced-KdV failures. It also had NO admissible window for
+wave seed 0: a 27x81 training grid, derivative edge crops, full moment order,
+and the selector's library row requirement cannot all be met on its existing
+window lattice. That failure is reported, not replaced by an oracle-selected
+window or hidden fallback. Four seed-0 cases completed; wave was infeasible.
+The strict follow-up is not a second full core-15 validation.
+
+3. Accurate coefficients do not make the current held-out discrepancy accurate.
+
+Use the KNOWN coefficients only as a diagnostic, never in fitting. Under the
+unchanged evaluation bank, the three forced-KdV cross-product scores are
++1996.56, +1459.51, and -1337.85. The corresponding clean residual energies
+are about 3.7e-7. Ordinary energies are 10603, 21045, and 12037. Thus even an
+oracle coefficient estimator cannot make this noisy test bank report a small,
+stable discrepancy. The sign changes demonstrate severe finite-record
+variation; the controls do not separately identify residual bias and variance.
+
+For nonlinear diffusion, the known-law cross-products are -2.236, +4.043,
+and -0.497, while clean energy is 8.2e-9. For KS they are -0.0437, +0.0334,
+and +0.0133 with clean energy around 4e-11. Negative estimates are retained;
+they are not negative physical error or proof of higher precision.
+
+An explicit KS seed-0 ranking reversal remains after fitting is repaired:
+the extra-u^2 candidate has a cross-product advantage of 7.54e-6 and lower
+frozen dyad, although its clean residual energy is worse by 2.23e-6. This is
+evidence about ranking error at this finite record, not a general proof that
+every unregistered extra term is false. Registered equivalent laws remain
+credited throughout.
+
+4. Small terms and finite-record competitors remain delicate.
+
+AC loses a small diffusion term in some new fits; NS can lose small viscosity
+terms. For several such cases, the incomplete model even predicts the clean
+field better than the currently biased full-model fit. That is a coefficient
+estimation problem before it is a discrepancy problem. Other close rankings
+reverse between half/full bootstrap counts. Do not make a structural decision
+from a tiny signed discrepancy gap without accounting for measurement and
+fit uncertainty. No hand-tuned structural threshold was introduced here.
+
+Implication for the next method revision:
+Keep the successful broad weak supports for high derivatives, but require
+quadrature convergence separately from noise robustness. Evaluate fitting
+windows on a sufficiently resolved reconstruction/integral representation.
+Then choose evaluation weak moments by their measured operator uncertainty,
+not only the field's DCT bandwidth. A new fit alone cannot fix point 3.
+Use the existing frozen evaluation cache as a control when testing that change.

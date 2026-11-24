@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "records": 138,
+  "complete": 137,
+  "incomplete": 1,
+  "exploration_records": 138,
+  "paired_pure_noise_draws": 576,
+  "linked_hashes": 8693,
+  "main_audit": {
+    "hash_links": 9890,
+    "operator_scores": 140288,
+    "registered_scores": 429660,
+    "regions": 5600,
+    "intersection_certificates": 2800,
+    "matrix_replays": 2466
+  },
+  "followup_audit": {
+    "status": "PASS",
+    "hash_links": 1400,
+    "exploration_records": 138,
+    "likelihood_replays": 1487,
+    "field_replays": 912,
+    "noise_trials": 576,
+    "source_sha256": {
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_followups.py": "f89290c7be3b67da2a0d161618538e098e88c9b55c65eee9f0006515ad020c1d"
+    }
+  },
+  "master_log_sha256": "4b10b07bb98495b481c4b42710be217cbff51a92a6f2ba546cf8f79244fd9a23",
+  "findings_sha256": "d2c363ea3467ce3bea36858ca237b796820c63ceae636169be6237b44a7fed84",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\complete.py": "1d14cf161df23727c3ee5909f0dbd25b0ed4c7e3072903a6830a862f25d5828a"
+  }
+}

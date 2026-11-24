@@ -1,0 +1,160 @@
+Solver-free repairs and full noise-refit bootstrap: method notes
+==============================================================
+
+1. Numerical repair of the existing AR2 contrast model
+-----------------------------------------------------
+The existing model is Cov(D2 y)=sigma^2[D2 R(rho)D2'+kappa R_AR2(p1,p2)].
+It is first reoptimized in Fisher coordinates for rho,p1,p2, retaining all
+finite old starts (including unsuccessful starts) for initialization. Noise
+scale is profiled. Banded Cholesky score evaluation leaves11/84 fits above
+the declared2e-5 transformed projected-gradient tolerance.
+
+The next implementation evaluates EXACTLY the same covariance model by a
+stationary innovations recursion. State components are
+(epsilon_t, epsilon_(t-1), epsilon_(t-2), curvature_t, curvature_(t-1)).
+Observation row H=(1,-2,1,1,0). Noise follows AR1 with innovation variance
+1-rho^2. Curvature follows AR2 with coefficients a1=p1*(1-p2),a2=p2 and
+innovation variance kappa*(1-p1^2)*(1-p2^2). Initial noise covariance is the
+stationary3x3 AR1 correlation; initial curvature covariance is
+kappa*[[1,p1],[p1,1]]. Exact initial covariance is essential.
+
+For each scalar innovation e with variance f, add e'e/f to the quadratic and
+replicates*log(f) to the determinant. Analytic sensitivities propagate through
+the state mean, covariance, innovation variance and Kalman gain. Joseph-form
+posterior covariance updates reduce cancellation. Final profile objective is
+log(q/N)+logdet/N; the gradient is dq/q+dlogdet/N. The state representation is
+statistical covariance algebra, not integration of a candidate PDE/ODE.
+
+All84 variable solutions are reevaluated. The11 unresolved ones are refined
+from their saved best transformed solution with the same parameter bounds.
+All84 pass the stated projected-score criterion afterward. The11 refinements
+also pass centered finite-difference checks of the normalized profile score,
+maximum discrepancy6.23e-10. This is local numerical verification, not proof
+of global optimality or a statistical adequacy certificate.
+Relative to the preceding transformed banded fits, maximum sigma change is
+0.000254 or less and maximum rho change0.000687 or less. Compound estimates
+are essentially unchanged. Small numerical errors were enough to stall the
+gradient criterion; they do not explain the main covariance-model bias.
+
+2. Robust local polynomial noise estimator
+------------------------------------------
+Each axis is divided into nonoverlapping segments. Polynomial means are
+eliminated using an orthonormal contrast matrix Q from full QR. The initial
+version uses degree3/length16; it fails the NS screen. The separately archived
+follow-up uses degree5/length12 globally, merging final segments shorter than8.
+For each segment/line, z=Q'y and V(rho)=Q'R_AR1(rho)Q. One sigma is shared
+across axes of a variable; rho is axis-specific. Axis objectives are composite.
+
+For contrast rank m, define t=z'V^-1 z/sigma^2 and nu=4. Minimize
+  alpha_m*[logdet(V)+2m log(sigma)] + (nu+m)*log(1+t/nu),
+summed over segments/lines and divided by total contrast count.
+alpha_m=E[(nu+m)*X/(nu+X)]/m, X~chi-square_m.
+This normalization makes covariance scores Fisher-consistent under Gaussian
+noise with exactly eliminated polynomial signal. It does not turn the loss
+into a Gaussian likelihood-ratio statistic. It does not remove approximation
+bias from signal that is not locally polynomial.
+
+Scores use w=(nu+m)/(nu+t):
+d/dlog(sigma)=2*(alpha_m*m-w*t);
+d/drho=alpha_m*trace(V^-1*dV)-w*s' dV s/sigma^2, s=V^-1*z.
+Correlations are optimized in Fisher coordinates. Three common starts use
+rho0,+0.4,-0.4, with robust contrast-scale initialization. The best finite
+objective is retained; transformed projected gradient must be<=2e-5 for status
+ok. Noise-boundary and numerical-warning statuses are recorded separately.
+Unit changes and additive polynomials through the tested degree are nuisance
+changes. Physical additive constants and valid candidate identities remain.
+
+The flexible projection removes more signal but also useful noise information.
+Paired pure-noise trials demonstrate especially weak short-series identification
+for positive rho. A small gradient can coexist with a flat statistical objective,
+large amplitude estimates, and poor correlation precision. Numerical stationarity
+must not be interpreted as parameter identification.
+
+3. Fixed versus refitted moment procedures
+------------------------------------------
+For each fresh anchor, fit the noise model to the raw field and reconstruct the
+same observed-data pilot as in previous experiments. Simulate256 calibration and
+256 independent check fields around that pilot using the anchor noise model.
+Both branches share every generated field:
+  fixed: correct all fields using the anchor noise estimate;
+  refit: reestimate noise on each field and correct it using its own estimate.
+Construct each branch's second-moment metric and check-draw95th percentile.
+Freeze all calibration, models, metrics, regions and cutoffs before clean truth
+and256 independent actual noisy fields are evaluated. Apply the same fixed or
+refitted rule to the actual fields. This preserves dependence between the field,
+its estimated noise and its corrected weak moments.
+
+This is a parametric bootstrap of the estimated correction procedure around a
+fixed nuisance pilot. It is not an independent confidence interval from a
+composite-likelihood Hessian. Pilot/covariance misspecification can still prevent
+nominal calibration. Three fitted anchors per system/profile are insufficient
+to establish unconditional95% validity. The256 draws share a fitted anchor.
+
+All finite fitted outputs remain in the draw distributions, including flagged
+fits. They are not rejected, redrawn, or replaced with generating truth. Warning
+counts are reported. Noise parameters are now propagated through refitting;
+that does not establish that the resulting confidence regions are informative.
+Boundedness, reference compatibility and failure rates are separate outputs.
+
+4. Exact covariance acceleration and implementation failures
+-----------------------------------------------------------
+For identity observation maps, finite derivative stencils allow exact covariance
+diagonal contractions without dense matrix multiplication. For stencil rows a,b,
+sum coefficients a_i*b_j grouped by lag |i-j|, then evaluate the polynomial in
+rho. The stencil and covariance family are unchanged.120 full weak-matrix
+comparisons across all15 datasets and rhos(-.4,0,.4,.98) pass, with maximum
+error1.17e-14 relative to matrix scale.
+
+Two execution failures are retained: an initial module-name collision before
+any data generation, and missing final vectors in two einsum reporting calls
+after simulation. The latter saved all69 frozen calibrations but no final result.
+Separate *_fast sources repair reporting and speed contractions; no model or
+statistical setting is selected from those failures. Four-draw preflight cases
+exercise the complete output path. Final analysis verifies the initial and final
+runs have identical noise fits and calibration/check refit parameters and fields,
+and reports numerical cutoff differences.
+
+5. Attribution and scope
+------------------------
+Oracle correction on NS, compound, KS and positive-noise AC changes only actual
+moment correction, retaining each branch's fitted metric and cutoff. It is a
+diagnostic, never a deployable estimator. For refits, correction depends on its
+own field; fixed-parameter analytic bias formulas cannot be used directly.
+Empirical means and generalized second-moment ratios are reported as finite
+Monte Carlo diagnostics, not confidence bounds. Constants have exactly zero
+stochastic error in all simulated weak matrices.
+
+Dyad is not ablated or replaced in this round. No production source, completed
+prior artifact, or candidate dynamics solver is changed or used. All screens,
+failures, checks, sources, inputs, frozen calibrations and final draws are kept.
+
+6. Studentized follow-up: propagate the normalization as well
+------------------------------------------------------------
+Correction-only refitting leaves the metric fixed. It therefore does not
+propagate estimation fluctuations in variance normalization, which matters for
+KS's concentrated local statistic. The follow-up recalculates the covariance
+metric at each field's estimated noise parameters, using32 common Gaussian
+fields around the same pilot. The observed region uses the anchor metric; check
+and actual statistics use the corresponding field's metric. Cutoffs still come
+from the check fields without access to clean evaluation truth.
+
+For speed, differentiate the moment-error matrices with common random numbers
+in log-sigma/Fisher-rho coordinates (central step.001), then form their Gram.
+The resulting covariance response is positive semidefinite. Use within max
+coordinate distance.05 only. At the furthest assigned in-radius check parameter,
+compare generalized covariance eigenvalues against direct32-field computation;
+disable a response if maximum error exceeds1%. Outside validated responses,
+evaluate the metric directly. A second response may be built at the median
+check-field parameter if it is outside the anchor radius. No in-radius check
+parameters means the response is disabled, including for actual evaluation.
+These are computational choices for the same covariance function, not statistical
+parameter selection from coverage. Per-draw metrics are saved for direct audits.
+
+The first three KS iid exploratory cases give228/235/235 local successes of256,
+90.89% overall, versus192/247/225=86.46% with correction-only refits. The first
+case's response validation error is0.000436 or less. This improves consistency
+but still misses95%; hence extend the identical method to all69 anchors to
+characterize limitations, not to claim a validated fix. These studentized tests
+reuse anchors42..44 after seeing some primary outcomes and are explicitly
+follow-ups, not fresh confirmation of a newly selected procedure. The32-field
+studentizer and fixed-pilot bootstrap have approximation and model limitations.

@@ -1,0 +1,212 @@
+Completed 2026-11-17: joint spectral noise estimation for solver-free moments.
+
+The new joint correlation/amplitude estimator substantially repairs positive-
+correlation coverage on the tested PDEs, but is NOT a universal replacement.
+On fresh anchors, positive-rho operator coverage improves from36.07/59.08%
+with the existing AR estimator to97.10/97.56% (local/broad). On the full iid
+suite, broad coverage instead falls94.64 ->87.80%. We traced an important
+failure to wrong nonlinear moment corrections caused by signal leakage into
+the noise estimate. Short one-dimensional contrasts also lose too much
+correlation information. Keep the known-iid path for the current iid benchmark.
+
+Design, scope and independence
+-----------------------------
+Primary noise estimator fits stationary separable AR(1) correlation and a
+common amplitude within each variable jointly, using exact Gaussian profile
+likelihood for high-frequency DCT-II contrasts. Remove the tensor block of
+the lower half of frequencies on every axis, retaining the complementary
+frequency strips. Each variable has its own amplitude and per-axis rhos.
+There is no minimum across axis amplitudes or differencing orders, no signal
+variance cap, and no supplied true amplitude/correlation.
+
+The covariance in DCT coordinates is evaluated exactly using diagonal plus
+rank-two precision matrices and a Schur complement. It is not a diagonal
+periodogram approximation. Details/derivation are in method_notes.txt.
+This is solver-free with respect to candidate dynamics: only transforms,
+linear algebra and low-dimensional statistical optimization are used.
+
+Prespecified corner-only control retains frequencies high on every axis.
+It passes covariance algebra checks but fails noise identification in a
+synthetic positive-rho example: sigma2.884 instead of0.2. Its failure is
+preserved in checks.json; the initial all-design adequacy assertion is
+retained in checks_initial.py. The original primary strips design remains
+primary throughout, with no per-system choice or cutoff adjustment.
+
+Exploration uses69 prior noisy anchors30..32:45 iid/default15 plus24 colored
+core4.84 variable records are fitted both raw/noise-only and strips/corner,
+336 fits. Raw estimates are frozen before pure-noise diagnostics. The strips
+method has a boundary estimate on LV32 even on pure noise. A cancellation-
+free algebraic version retains that boundary result, confirming it is not
+removed by numerical stabilization. Original sources/results are immutable.
+
+The method was then frozen before162 fresh paired model records, seeds33..35:
+  15 systems x3 anchors x(spectral,known-iid-family) =90 iid records;
+  AC/forcedKdV/KS/wave x3 anchors x rho+/-0.4 x
+  (spectral,existing AR,known-rho/estimated-amplitude) =72 colored records.
+These are69 distinct fresh noisy anchors, not162 independent anchors.
+Each model record has256 calibration,256 independent check and256 actual
+fields. Models share anchor/actual fields and underlying standard innovations.
+The noise model is held fixed during this first coverage experiment; parameter
+estimation uncertainty is not propagated by refitting within every bootstrap.
+
+All162 fresh noise fits/covariance metrics complete without boundary/rank
+failure. The absence of boundary failures on these three anchors does not
+erase the exploratory and replicated pure-noise failures described below.
+All constants, full candidate libraries and valid ODE_simple identities are
+retained. Dyad/structural objectives and production code were not changed.
+
+Fresh simultaneous operator coverage
+-------------------------------------
+All entries below are percentages; nominal target95%.
+                                      Local      Broad      Both banks
+IID, default15:
+  Known iid family, estimated amp       93.82      94.64       94.64
+  Joint spectral, unknown rho           92.72      87.80       87.79
+
+Positive rho=0.4, core4:
+  Existing estimated AR                 36.07      59.08       59.02
+  Joint spectral                        97.10      97.56       97.56
+  Known rho, estimated amp              94.92      95.83       95.83
+
+Negative rho=-0.4, core4:
+  Existing estimated AR                 94.47      96.13       96.13
+  Joint spectral                        96.94      96.84       96.84
+  Known rho, estimated amp              94.40      95.15       95.15
+
+These are observed conditional benchmark rates over three anchor estimates
+per system, not guarantees of generic95% coverage. Rates near98-100% can
+reflect conservative bounds and signal contamination, not superior precision.
+The known-shape controls do not receive the true5% amplitude. The spectral
+model does not receive either the true shape or amplitude.
+
+Directional reference residual coverage also changes. On iid data it is
+94.05/95.03% for known-iid versus89.86/95.90% spectral (local/broad). On
+positive-rho data it improves51.20/67.77 ->96.91/96.61% from AR to spectral.
+Negative-rho spectral rates are98.60/96.65%. Aggregation averages equations
+within each record, then averages records, so coupled systems do not receive
+extra weight. All individual counts are saved in results/ and coverage.csv.
+
+Operator-wide coverage is stronger than coverage of a particular true law.
+For example, compound's broad operator coverage is0% under spectral, while
+its reference direction remains covered100%. Do not describe this as0%
+coverage of the reference coefficients. Simultaneous reference-law regions
+are generally conservative: all60 iid reference anchors are accepted under
+both models. Acceptance alone is not coefficient precision or structure.
+
+IID failures and coefficient geometry
+-------------------------------------
+Selected iid system operator rates, known-iid ->spectral:
+  LV:    local92.19 ->84.64%; broad93.62 ->90.36%.
+  ODE:   local94.66 ->86.07%; broad92.58 ->84.90%.
+  VDP:   local91.80 ->78.65%; broad93.23 ->88.93%.
+  Compound: local95.31 ->99.48%; broad95.44 ->0.00%.
+See system_coverage.csv for exact values; iid_systems.png shows all15.
+
+The known-iid combined test gives57 bounded outer reference regions and3
+certified unbounded cases (forced KdV), reproducing the earlier pattern.
+Spectral gives54 bounded and6 unbounded: compound's three cases also become
+unbounded. Thus this noise-model change does not resolve the existing
+coefficient-identification problem. An outer ellipsoid remains only an outer
+bound on the intersection, not an exact joint shape. The current experiment
+does not introduce a new structural recovery score or replace dyad.
+
+Compound failure attribution: covariance error changes the mean
+---------------------------------------------------------------
+For iid compound anchors33/34/35, the spectral estimator infers spurious
+time correlation about0.245/0.250/0.249 and spatial correlation0.045..0.056.
+Its sigmas are0.010398/0.010511/0.010482. Fitting the exact injected noise
+instead gives0.008752/0.008910/0.008795 with rhos close tozero. This paired
+raw/noise-only comparison supports signal leakage into the spectral estimate.
+
+For polynomial columns of degree<=3, mean corrected-matrix error under
+covariance misspecification can be evaluated from clean fields as
+  corrected_M(clean,assumed_cov) - corrected_M(clean,true_cov).
+Its whitened broad operator score is4.29/4.15/4.29 TIMES the saved test cutoff.
+The empirical actual-field mean errors agree with this predicted bias, with
+finite Monte Carlo residuals explicitly saved. Calibration assumes the fitted
+covariance; it therefore does not anticipate this actual-field mean shift.
+
+Keep the spectral pilot/calibration/whitening/cutoff and all256 actual fields
+unchanged; use the injected covariance ONLY for correcting the actual fields.
+Broad coverage changes0/256 ->256/256 on EACH of the three anchors. All1536
+local/broad oracle operator scores are independently replayed. This is a
+cause-isolating oracle control, not a deployable fix or an independent sample.
+It also leaves model-variance misspecification in place, so100% coverage is
+not evidence that every part of the spectral model is now correct.
+
+The failure is more specific than simply underestimating noise amplitude:
+a wrong correlation model can bias nonlinear Gaussian contractions even when
+the inferred marginal amplitude is larger than the true one. Inflating a
+scalar residual threshold or preferring a more stable coefficient ratio
+would not address that modeling error directly.
+
+Short-series information-loss diagnostic
+-----------------------------------------
+576 fresh pure-noise draws: n=301/320/1001 x rho0,+0.4,-0.4 x64 draws.
+Compare spectral strips with exact full-sample Gaussian AR fitting when
+zero mean/no signal is known. The latter is an attribution oracle and is
+not proposed for raw EPDE data. Neither fit receives the true rho or sigma.
+
+Spectral reaches the stationarity boundary in26/576 draws:3/192 iid,
+23/192 positive-rho,0/192 negative-rho. Positive-rho breakdown by length:
+15/64 at301,5/64 at320,3/64 at1001. The boundary implies an unstable amplitude
+extrapolation; the numerical rho limit is not a meaningful finite uncertainty
+bound. Boundary fits are reported, never silently clipped into successful
+model selection or replaced with the iid model.
+
+For positive rho, correlation RMSE is0.413/0.357/0.327 for spectral versus
+0.052/0.057/0.025 for the full-noise oracle, at the three lengths. On iid
+noise the respective values are0.306/0.261/0.126 versus0.050/0.057/0.030.
+The loss occurs without signal, supporting insufficient correlation
+information in the retained high frequencies, rather than only leakage.
+
+Fresh raw-fit local curvature diagnostics are consistent with this:
+median approximate rho SD0.143 in one-dimensional variables versus0.0083
+across multidimensional axes. These are uncalibrated likelihood-curvature
+diagnostics, not confidence intervals or model-selection gates. The current
+fixed-parameter weak bootstrap does not propagate their uncertainty.
+
+Validation and artifacts
+------------------------
+All162 worker processes exited0; all arrays are finite; no fresh model/rank
+fallbacks. Same raw and actual fields across paired models are verified.
+Main audit PASS:11340 source/input/array hash links,165888 independently
+recomputed generalized-eigenvalue scores,508200 registered-query scores,
+6504 candidate regions,3252 combined-bank certificates and2916 fresh native
+moment-matrix replays. All noise models are independently refitted from the
+same raw fields. Regions use the previously audited condition-aware numeric
+checks; no tolerance/decision modifications were needed for this audit.
+
+Follow-up audit PASS: all69 exploratory records,912 spectral/noise-fit replays,
+1344 fresh field replays,1536 oracle-correction operator scores. The zero-mean
+oracle estimates are also replayed on all576 pure-noise draws. Source and
+input hashes link every diagnostic to the frozen experiment.
+
+Dense covariance checks:24 dimension/design/rho combinations agree with
+maximum absolute quadratic error4.55e-13. Stable algebra is also tested near
+rho=+/-0.999999; the worst relative dense-comparison quadratic error is7.69e-6
+in an extremely ill-conditioned tensor covariance. Representative fits,
+including LV's boundary result, match the original implementation. Constant
+shift and measurement-unit invariance of the contrast likelihood are checked.
+
+Main artifacts: protocol.txt, coverage_decision.txt, method_notes.txt;
+explore/ and explore_frozen/; results/ and frozen/; summary.json and CSVs;
+coverage_comparison.png/.pdf; iid_systems.png; identification.json;
+compound_attribution_seed*.json/.npz; audit.json; audit_followups.json;
+completion_audit.json and final_manifest.json. Original exploratory sources
+and failed corner adequacy control remain available for review.
+
+Decision
+--------
+Keep the known-iid amplitude estimator for the specified iid benchmark.
+Keep the joint spectral estimator as a research candidate for unknown
+correlation on multidimensional fields; these core4 results support that
+direction but do not establish a general production default.
+
+The next targeted repair is joint nuisance-signal/covariance estimation that
+retains informative frequencies, followed by propagation of noise-parameter
+uncertainty. It must address both leakage-induced correction bias and weak
+correlation identification in short ODE records. No per-system oracle model
+choice, arbitrary ridge/penalty, new instability objective or candidate
+dynamics solver was introduced. Production and prior completed studies remain
+unchanged; dyad remains the provisional structural objective.

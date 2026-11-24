@@ -1,0 +1,733 @@
+[
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.8545488043139186,
+    "sampled_minimum_pointwise_ratio": 0.8545488043139186,
+    "sampled_direction": [
+      -0.9992896841412497,
+      -0.005423273461191647,
+      0.037292295100281994
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.5459928301160526,
+    "sampled_minimum_pointwise_ratio": 0.502626719976807,
+    "sampled_direction": [
+      -0.9150678411961067,
+      -0.24868326863783638,
+      0.31750193370796753
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.6870877008089853,
+    "sampled_minimum_pointwise_ratio": 0.6870877008089853,
+    "sampled_direction": [
+      -0.9999872608281609,
+      -0.003919302347456695,
+      0.003180762565944462
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.2688489744808786,
+    "sampled_minimum_pointwise_ratio": 0.18606329105183006,
+    "sampled_direction": [
+      0.6512821112846892,
+      0.4721849781184545,
+      -0.5940311085791993
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.7510397402961055,
+    "sampled_minimum_pointwise_ratio": 0.7510397402961055,
+    "sampled_direction": [
+      -0.9999938256101463,
+      -0.0030819515607356275,
+      -0.001688287938003398
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.41983043918418417,
+    "sampled_minimum_pointwise_ratio": 0.41983043918418417,
+    "sampled_direction": [
+      -0.999072618805041,
+      -0.028843915669686415,
+      0.03196765369678523
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.11223289080297874,
+    "sampled_minimum_pointwise_ratio": 0.11181737601511442,
+    "sampled_direction": [
+      0.4435730137668358,
+      0.10097946713193469,
+      -0.8905313743353218
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.16672364415711874,
+    "sampled_minimum_pointwise_ratio": 0.05089067375986652,
+    "sampled_direction": [
+      -0.9150678411961067,
+      -0.24868326863783638,
+      0.31750193370796753
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.10988623130745945,
+    "sampled_minimum_pointwise_ratio": 0.10988623130745945,
+    "sampled_direction": [
+      -0.9999916438655873,
+      -0.0035671878446243343,
+      0.0019968399739935124
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.1508838221614848,
+    "sampled_minimum_pointwise_ratio": 0.02302066123497152,
+    "sampled_direction": [
+      0.6512821112846892,
+      0.4721849781184545,
+      -0.5940311085791993
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.09839485581892096,
+    "sampled_minimum_pointwise_ratio": 0.09839485581892096,
+    "sampled_direction": [
+      -0.9999945072643208,
+      -0.0031003406880610322,
+      -0.0011718911239611593
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.14597757601704128,
+    "sampled_minimum_pointwise_ratio": 0.045763971617706636,
+    "sampled_direction": [
+      -0.9371991133753333,
+      -0.22368966833075324,
+      0.26762054138381597
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.7961864803205075,
+    "sampled_minimum_pointwise_ratio": 0.7961864803205075,
+    "sampled_direction": [
+      -0.9993097056662482,
+      -0.0054826274077171555,
+      0.03674306680102423
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.5128339075567443,
+    "sampled_minimum_pointwise_ratio": 0.46414239002315427,
+    "sampled_direction": [
+      -0.9150678411961067,
+      -0.24868326863783638,
+      0.31750193370796753
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.7739348185709112,
+    "sampled_minimum_pointwise_ratio": 0.7739348185709112,
+    "sampled_direction": [
+      -0.9999877420624089,
+      -0.003801312973913189,
+      0.0031726557644017506
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.28537898921703525,
+    "sampled_minimum_pointwise_ratio": 0.2118030001562848,
+    "sampled_direction": [
+      0.6512821112846892,
+      0.4721849781184545,
+      -0.5940311085791993
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.6752449878067881,
+    "sampled_minimum_pointwise_ratio": 0.6752449878067881,
+    "sampled_direction": [
+      -0.9999936200368261,
+      -0.0031761052942977865,
+      -0.0016346989947498443
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.388944025089128,
+    "sampled_minimum_pointwise_ratio": 0.388944025089128,
+    "sampled_direction": [
+      -0.9990836338375847,
+      -0.02885668176362387,
+      0.03160988002950988
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.7908657497900116,
+    "sampled_minimum_pointwise_ratio": 0.7908657497900116,
+    "sampled_direction": [
+      -0.9998724014946869,
+      0.0023423791867948135,
+      -0.01580170842007002
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.2672529490177434,
+    "sampled_minimum_pointwise_ratio": 0.24453743946449033,
+    "sampled_direction": [
+      0.9991272442572346,
+      0.029581707419470596,
+      -0.02949020802051231
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.3792362871050372,
+    "sampled_minimum_pointwise_ratio": 1.3792362871050372,
+    "sampled_direction": [
+      -0.9999919646472951,
+      0.0012059395654034758,
+      0.0038231336110078145
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.0630270972406788,
+    "sampled_minimum_pointwise_ratio": 1.0503147412399605,
+    "sampled_direction": [
+      0.2959241044639418,
+      -0.620794911866938,
+      0.7259769981186281
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9201142649780517,
+    "sampled_minimum_pointwise_ratio": 0.9201142649780517,
+    "sampled_direction": [
+      -0.9998951484039496,
+      0.0019659947047090806,
+      -0.014346674285870173
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.3461017833091501,
+    "sampled_minimum_pointwise_ratio": 0.3201881110892631,
+    "sampled_direction": [
+      0.9991272442572346,
+      0.029581707419470596,
+      -0.02949020802051231
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9007391720723733,
+    "sampled_minimum_pointwise_ratio": 0.9005474133818692,
+    "sampled_direction": [
+      -0.7605645794473586,
+      0.08239332138540269,
+      0.6440130907684598
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.6650352827656261,
+    "sampled_minimum_pointwise_ratio": 0.6650352827656261,
+    "sampled_direction": [
+      -0.9998633245289218,
+      -0.014985550553101908,
+      0.0069832325317452
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.0328892997473755,
+    "sampled_minimum_pointwise_ratio": 1.0328892997473755,
+    "sampled_direction": [
+      -0.999986574541218,
+      0.0015955465082070294,
+      0.004930006963626668
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.6309790505276451,
+    "sampled_minimum_pointwise_ratio": 0.6076848704762561,
+    "sampled_direction": [
+      0.2959241044639418,
+      -0.620794911866938,
+      0.7259769981186281
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9962444682458855,
+    "sampled_minimum_pointwise_ratio": 0.9961568115839948,
+    "sampled_direction": [
+      0.5273536449025882,
+      0.6134551222228746,
+      0.5878528270124022
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9625696507571603,
+    "sampled_minimum_pointwise_ratio": 0.9625696507571603,
+    "sampled_direction": [
+      0.5396999480062669,
+      0.5893938922596313,
+      0.6011146362292926
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.0112360275450154,
+    "sampled_minimum_pointwise_ratio": 1.0112360275450154,
+    "sampled_direction": [
+      0.5543558650896647,
+      0.5693471166470349,
+      0.6070695475861043
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "ks",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.1511320979873972,
+    "sampled_minimum_pointwise_ratio": 0.1269300283330043,
+    "sampled_direction": [
+      0.5273536449025882,
+      0.6134551222228746,
+      0.5878528270124022
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.15034049146333164,
+    "sampled_minimum_pointwise_ratio": 0.12616310749190562,
+    "sampled_direction": [
+      -0.5110810233779193,
+      -0.631172951753766,
+      -0.5834525623539734
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.15183822137327818,
+    "sampled_minimum_pointwise_ratio": 0.1289379014675444,
+    "sampled_direction": [
+      0.5935200924857262,
+      0.5483894079049779,
+      0.5890695689927997
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 30,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.993896403499266,
+    "sampled_minimum_pointwise_ratio": 0.9937894528545103,
+    "sampled_direction": [
+      0.5273536449025882,
+      0.6134551222228746,
+      0.5878528270124022
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 31,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9829019039521368,
+    "sampled_minimum_pointwise_ratio": 0.9829019039521368,
+    "sampled_direction": [
+      0.5396173012322131,
+      0.5917528491263557,
+      0.5988670418061955
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 32,
+    "profile": "negative",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.0084437867674192,
+    "sampled_minimum_pointwise_ratio": 1.0084437867674192,
+    "sampled_direction": [
+      0.5543416505573149,
+      0.5690469346856196,
+      0.6073639111622386
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "ks",
+    "seed": 30,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.0156776775230603,
+    "sampled_minimum_pointwise_ratio": 1.0151691842935073,
+    "sampled_direction": [
+      0.35366067068105983,
+      0.6958714412170083,
+      0.6250496518773423
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "ks",
+    "seed": 31,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.8756818029025488,
+    "sampled_minimum_pointwise_ratio": 0.8732688947999234,
+    "sampled_direction": [
+      0.603360049246723,
+      0.5236333438308415,
+      0.6014688455784919
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 32,
+    "profile": "positive",
+    "model_kind": "ar",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9667734669497845,
+    "sampled_minimum_pointwise_ratio": 0.9657224954931969,
+    "sampled_direction": [
+      0.44682548853213494,
+      0.6958666432739188,
+      0.5622424722276927
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 30,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9630045982409122,
+    "sampled_minimum_pointwise_ratio": 0.961711482162133,
+    "sampled_direction": [
+      0.35366067068105983,
+      0.6958714412170083,
+      0.6250496518773423
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 31,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9524438665441174,
+    "sampled_minimum_pointwise_ratio": 0.9513782680974385,
+    "sampled_direction": [
+      0.603360049246723,
+      0.5236333438308415,
+      0.6014688455784919
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 32,
+    "profile": "positive",
+    "model_kind": "known_rho",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.987207931516713,
+    "sampled_minimum_pointwise_ratio": 0.9864659722836429,
+    "sampled_direction": [
+      0.44682548853213494,
+      0.6958666432739188,
+      0.5622424722276927
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  }
+]

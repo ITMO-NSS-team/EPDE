@@ -1,0 +1,290 @@
+{
+  "system_runs": 45,
+  "reference_seed_cases": 60,
+  "registered_equation_seed_cases": 93,
+  "fit_statuses": [
+    {
+      "bank": "broad",
+      "method": "corrected_gls",
+      "status": "indefinite_corrected_design",
+      "count": 25
+    },
+    {
+      "bank": "broad",
+      "method": "corrected_gls",
+      "status": "ok",
+      "count": 254
+    },
+    {
+      "bank": "broad",
+      "method": "corrected_ols",
+      "status": "indefinite_corrected_design",
+      "count": 30
+    },
+    {
+      "bank": "broad",
+      "method": "corrected_ols",
+      "status": "ok",
+      "count": 249
+    },
+    {
+      "bank": "broad",
+      "method": "gls",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "bank": "broad",
+      "method": "irls",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "bank": "broad",
+      "method": "ols",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "bank": "local",
+      "method": "corrected_gls",
+      "status": "indefinite_corrected_design",
+      "count": 30
+    },
+    {
+      "bank": "local",
+      "method": "corrected_gls",
+      "status": "ok",
+      "count": 249
+    },
+    {
+      "bank": "local",
+      "method": "corrected_ols",
+      "status": "indefinite_corrected_design",
+      "count": 31
+    },
+    {
+      "bank": "local",
+      "method": "corrected_ols",
+      "status": "ok",
+      "count": 248
+    },
+    {
+      "bank": "local",
+      "method": "gls",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "bank": "local",
+      "method": "irls",
+      "status": "nonconverged",
+      "count": 1
+    },
+    {
+      "bank": "local",
+      "method": "irls",
+      "status": "ok",
+      "count": 266
+    },
+    {
+      "bank": "local",
+      "method": "irls",
+      "status": "singular_residual_covariance",
+      "count": 12
+    },
+    {
+      "bank": "local",
+      "method": "ols",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "bank": "mixed",
+      "method": "corrected_gls",
+      "status": "indefinite_corrected_design",
+      "count": 22
+    },
+    {
+      "bank": "mixed",
+      "method": "corrected_gls",
+      "status": "ok",
+      "count": 257
+    },
+    {
+      "bank": "mixed",
+      "method": "corrected_ols",
+      "status": "indefinite_corrected_design",
+      "count": 28
+    },
+    {
+      "bank": "mixed",
+      "method": "corrected_ols",
+      "status": "ok",
+      "count": 251
+    },
+    {
+      "bank": "mixed",
+      "method": "gls",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "bank": "mixed",
+      "method": "irls",
+      "status": "nonconverged",
+      "count": 1
+    },
+    {
+      "bank": "mixed",
+      "method": "irls",
+      "status": "ok",
+      "count": 266
+    },
+    {
+      "bank": "mixed",
+      "method": "irls",
+      "status": "singular_residual_covariance",
+      "count": 12
+    },
+    {
+      "bank": "mixed",
+      "method": "ols",
+      "status": "ok",
+      "count": 279
+    }
+  ],
+  "metric_statuses": [
+    {
+      "rule": "broad_transfer",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "rule": "broad_white",
+      "status": "ok",
+      "count": 279
+    },
+    {
+      "rule": "mixed_transfer",
+      "status": "ok",
+      "count": 279
+    }
+  ],
+  "comparisons": [
+    {
+      "method": "mixed/corrected_gls",
+      "baseline": "mixed/gls",
+      "cases": 60,
+      "outcomes": {
+        "worse": 26,
+        "better": 33,
+        "incomplete": 1
+      },
+      "median_ratio": 0.9763727306034418
+    },
+    {
+      "method": "mixed/corrected_ols",
+      "baseline": "mixed/ols",
+      "cases": 60,
+      "outcomes": {
+        "better": 30,
+        "worse": 28,
+        "incomplete": 2
+      },
+      "median_ratio": 0.9978786705061509
+    },
+    {
+      "method": "mixed/corrected_gls",
+      "baseline": "mixed/irls",
+      "cases": 60,
+      "outcomes": {
+        "worse": 30,
+        "better": 25,
+        "incomplete": 5
+      },
+      "median_ratio": 1.084113259955993
+    },
+    {
+      "method": "select/broad_white",
+      "baseline": "mixed/irls",
+      "cases": 60,
+      "outcomes": {
+        "better": 34,
+        "worse": 22,
+        "incomplete": 4
+      },
+      "median_ratio": 0.7621878602293677
+    },
+    {
+      "method": "select/broad_transfer",
+      "baseline": "mixed/irls",
+      "cases": 60,
+      "outcomes": {
+        "better": 36,
+        "worse": 20,
+        "incomplete": 4
+      },
+      "median_ratio": 0.796221336340205
+    },
+    {
+      "method": "select/mixed_transfer",
+      "baseline": "mixed/irls",
+      "cases": 60,
+      "outcomes": {
+        "better": 37,
+        "worse": 19,
+        "incomplete": 4
+      },
+      "median_ratio": 0.6778547056201651
+    },
+    {
+      "method": "select/broad_transfer",
+      "baseline": "select/broad_white",
+      "cases": 60,
+      "outcomes": {
+        "better": 22,
+        "same": 25,
+        "worse": 13
+      },
+      "median_ratio": 1.0
+    },
+    {
+      "method": "select/mixed_transfer",
+      "baseline": "select/broad_white",
+      "cases": 60,
+      "outcomes": {
+        "better": 28,
+        "same": 18,
+        "worse": 14
+      },
+      "median_ratio": 1.0
+    }
+  ],
+  "selected_options": {
+    "broad_white": {
+      "local/irls": 26,
+      "mixed/irls": 32,
+      "mixed/corrected_gls": 37,
+      "broad/irls": 43,
+      "local/corrected_gls": 11,
+      "broad/corrected_gls": 31
+    },
+    "broad_transfer": {
+      "local/irls": 24,
+      "mixed/irls": 33,
+      "broad/irls": 41,
+      "mixed/corrected_gls": 29,
+      "local/corrected_gls": 16,
+      "broad/corrected_gls": 37
+    },
+    "mixed_transfer": {
+      "local/irls": 25,
+      "mixed/irls": 38,
+      "broad/irls": 30,
+      "mixed/corrected_gls": 36,
+      "local/corrected_gls": 21,
+      "broad/corrected_gls": 30
+    }
+  }
+}

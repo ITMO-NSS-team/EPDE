@@ -1,0 +1,263 @@
+{
+  "control_only": true,
+  "maximum_derivative_order": 1,
+  "energy_derivative_power": 2,
+  "phase_derivative_power": 1,
+  "rows": [
+    {
+      "identity": "energy",
+      "coefficients": [
+        -0.9999989404301098,
+        2.689997149756994
+      ],
+      "clean_energy": 3.2248879754824616e-31,
+      "constant": 2.689997149756994,
+      "fit": {
+        "status": "ok",
+        "iterations": 1,
+        "trace": [
+          {
+            "iteration": 1,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.1122668377600237,
+            "prediction_change": 6.171655349649247e-17,
+            "weighted_loss": 1.625293680481171e-28,
+            "design_eigen_ratio": 0.0011399747339951598,
+            "coefficients": [
+              -0.9999989404301098,
+              2.689997149756994
+            ]
+          }
+        ]
+      },
+      "without_constant_energy": 0.011403438795128857,
+      "without_constant_fit": {
+        "status": "ok",
+        "iterations": 4,
+        "trace": [
+          {
+            "iteration": 1,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.11627094063944182,
+            "prediction_change": 0.01178584015005453,
+            "weighted_loss": 12.058166118957423,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              1.0173686539174294
+            ]
+          },
+          {
+            "iteration": 2,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.1160596412596584,
+            "prediction_change": 1.089150663171928e-05,
+            "weighted_loss": 12.071426713651597,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              1.0173906186210893
+            ]
+          },
+          {
+            "iteration": 3,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.11605943655151474,
+            "prediction_change": 1.0329544517240577e-08,
+            "weighted_loss": 12.071438702153952,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              1.017390639452721
+            ]
+          },
+          {
+            "iteration": 4,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.11605943635736031,
+            "prediction_change": 9.79683116011047e-12,
+            "weighted_loss": 12.071438713523671,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              1.0173906394724783
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "identity": "phase_sin",
+      "coefficients": [
+        -0.9999994702149133,
+        0.999999470214914
+      ],
+      "clean_energy": 1.793260816961818e-31,
+      "constant": 0.999999470214914,
+      "fit": {
+        "status": "ok",
+        "iterations": 1,
+        "trace": [
+          {
+            "iteration": 1,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.1313629671135608,
+            "prediction_change": 2.206153154838519e-16,
+            "weighted_loss": 4.023755111500783e-28,
+            "design_eigen_ratio": 0.004885512195785689,
+            "coefficients": [
+              -0.9999994702149133,
+              0.999999470214914
+            ]
+          }
+        ]
+      },
+      "without_constant_energy": 0.03921084337800977,
+      "without_constant_fit": {
+        "status": "ok",
+        "iterations": 4,
+        "trace": [
+          {
+            "iteration": 1,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.03124876760763164,
+            "prediction_change": 0.016483531534895703,
+            "weighted_loss": 1010.4791377113538,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              0.9516816262342471
+            ]
+          },
+          {
+            "iteration": 2,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.033132229739312104,
+            "prediction_change": 8.553458645162481e-05,
+            "weighted_loss": 996.4025642630239,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              0.9515143666531657
+            ]
+          },
+          {
+            "iteration": 3,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.033144303175081706,
+            "prediction_change": 7.764226486745876e-07,
+            "weighted_loss": 996.3292202124469,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              0.9515128485185201
+            ]
+          },
+          {
+            "iteration": 4,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.03314441287480509,
+            "prediction_change": 7.0632739832185326e-09,
+            "weighted_loss": 996.3285544474824,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              0.9515128347077527
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "identity": "phase_cos",
+      "coefficients": [
+        0.9999994702149163,
+        -1.29999931127939
+      ],
+      "clean_energy": 2.938819932822531e-31,
+      "constant": -1.29999931127939,
+      "fit": {
+        "status": "ok",
+        "iterations": 1,
+        "trace": [
+          {
+            "iteration": 1,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.08993478745621111,
+            "prediction_change": 7.153596476515794e-16,
+            "weighted_loss": 4.740521702010951e-27,
+            "design_eigen_ratio": 0.004784246038035492,
+            "coefficients": [
+              0.9999994702149163,
+              -1.29999931127939
+            ]
+          }
+        ]
+      },
+      "without_constant_energy": 0.026198398322178938,
+      "without_constant_fit": {
+        "status": "ok",
+        "iterations": 4,
+        "trace": [
+          {
+            "iteration": 1,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.03721444007643319,
+            "prediction_change": 0.020345599286687915,
+            "weighted_loss": 1659.1437547203923,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              -1.0246509745294137
+            ]
+          },
+          {
+            "iteration": 2,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.035695405171632145,
+            "prediction_change": 0.0001682523656670668,
+            "weighted_loss": 1767.4418609794043,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              -1.024310881399364
+            ]
+          },
+          {
+            "iteration": 3,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.03570357791462965,
+            "prediction_change": 7.310837037401109e-07,
+            "weighted_loss": 1766.4766247393475,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              -1.024312358910307
+            ]
+          },
+          {
+            "iteration": 4,
+            "covariance_rank": 5,
+            "rows": 5,
+            "covariance_eigen_ratio": 0.035703542259718946,
+            "prediction_change": 3.2039568316486887e-09,
+            "weighted_loss": 1766.4808161592491,
+            "design_eigen_ratio": 1.0,
+            "coefficients": [
+              -1.0243123524351458
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "all_constants_preserved": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\check_invariants.py": "12a7626bac9f68859d89513e10b7c937bd7709d03f72ac9200081123d5bdbef8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\ode_simple_constants.py": "73146ec4c7d67505ab9b4593f56df021a8fb6f234ed105b4a03468c4d2c4f3da"
+  }
+}

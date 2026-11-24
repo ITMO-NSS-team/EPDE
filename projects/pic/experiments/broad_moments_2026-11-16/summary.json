@@ -1,0 +1,42 @@
+{
+  "legacy_broad_q0_clsm": {
+    "available_cases": 12,
+    "retained": 4
+  },
+  "legacy_broad_q0_ols": {
+    "available_cases": 12,
+    "retained": 4
+  },
+  "legacy_broad_q1_clsm": {
+    "available_cases": 12,
+    "retained": 5
+  },
+  "legacy_broad_q1_ols": {
+    "available_cases": 12,
+    "retained": 4
+  },
+  "legacy_continuous": {
+    "available_cases": 12,
+    "retained": 7
+  },
+  "local_broad_q0_clsm": {
+    "available_cases": 12,
+    "retained": 5
+  },
+  "local_broad_q0_ols": {
+    "available_cases": 12,
+    "retained": 3
+  },
+  "local_broad_q1_clsm": {
+    "available_cases": 12,
+    "retained": 4
+  },
+  "local_broad_q1_ols": {
+    "available_cases": 12,
+    "retained": 3
+  },
+  "local_continuous": {
+    "available_cases": 12,
+    "retained": 6
+  }
+}

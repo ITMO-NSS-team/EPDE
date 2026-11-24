@@ -1,0 +1,9 @@
+Paired comparison on the24 bootstrap validation fields
+====================================================
+Before their bootstrap regions are scored, also register evaluation of the
+already-frozen nominal/model-calibrated LR and nominal Wald procedures on the
+same24 observed fields. Reuse their saved original guarded fits. Do not refit
+or tune the calibration cutoffs; they remain the controlled-model cutoffs.
+This permits a paired method comparison instead of comparing192-field and
+24-field cohorts as if their sampling variability were the same. Evaluate only
+after all24 bootstrap regions are frozen. Preserve this as a separate result.

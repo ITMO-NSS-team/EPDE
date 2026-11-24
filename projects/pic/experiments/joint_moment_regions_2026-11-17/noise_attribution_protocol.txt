@@ -1,0 +1,18 @@
+Post-stress diagnostic,2026-11-17. The correlated runs already show an AR
+noise-amplitude shortfall for positive correlation. To locate its source,
+replay the existing estimator on the anchor's exact injected noise only,
+with no signal present, for core4 x three anchors x both correlation signs.
+This uses clean benchmark fields solely as an attribution control. It is
+not a proposed deployable estimator or a new coverage experiment.
+
+Record raw-field and noise-only per-axis orders/correlations/amplitudes.
+Also estimate pooled amplitude using the raw-field selected orders and
+estimated correlations. This tests whether replacing the minimum axis
+amplitude alone repairs the observed amplitude shortfall; it does not
+establish coverage or fix incorrect correlation shape.
+
+For each raw selected differencing order, measure the derivative of the
+theoretical lag1/lag0 ratio with respect to rho at the injected rho, by
+a symmetric step1e-4 and verify against step5e-5. Compare with order1.
+Small slope means lag-ratio inversion amplifies sampling errors in rho.
+No tuning of orders or noise-model selection on clean data is performed.

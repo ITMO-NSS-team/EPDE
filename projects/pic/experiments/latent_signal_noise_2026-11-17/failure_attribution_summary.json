@@ -1,0 +1,408 @@
+{
+  "status": "COMPLETE",
+  "workers": 1,
+  "rows": [
+    {
+      "system": "ns",
+      "seed": 36,
+      "bank": "local",
+      "cutoff": 2.360090145410349,
+      "original_coverage_count": 4,
+      "oracle_correction_coverage_count": 6,
+      "analytic_bias_score": 0.02053195771945011,
+      "analytic_bias_cutoff_ratio": 0.008699649782182458,
+      "empirical_mean_score": 0.03037609459452697,
+      "oracle_mean_score": 0.012777167058631451,
+      "mean_minus_bias_norm": 0.0760131376317475,
+      "oracle_mean_norm": 0.07601312854793409
+    },
+    {
+      "system": "ns",
+      "seed": 36,
+      "bank": "broad",
+      "cutoff": 5.657685915015818,
+      "original_coverage_count": 123,
+      "oracle_correction_coverage_count": 128,
+      "analytic_bias_score": 0.05778103828095206,
+      "analytic_bias_cutoff_ratio": 0.010212839515816516,
+      "empirical_mean_score": 0.07345376054820447,
+      "oracle_mean_score": 0.02876939513033385,
+      "mean_minus_bias_norm": 0.007489987223794621,
+      "oracle_mean_norm": 0.00748998588766692
+    },
+    {
+      "system": "ns",
+      "seed": 37,
+      "status": "unavailable_incomplete_noise_model",
+      "fit_info": {
+        "u": {
+          "status": "ok",
+          "sigma": 0.016238366940649448,
+          "rhos": [
+            -0.05569568509016343,
+            0.36665252565580325,
+            -0.07264712629506857
+          ],
+          "kappas": [
+            0.0774171791991372,
+            16.84019145235076,
+            0.8304719856508035
+          ],
+          "phis": [
+            0.6897624668602437,
+            0.4347718961551985,
+            0.5607394394012231
+          ],
+          "signal_phi_boundary": false,
+          "contrast_count": 100960,
+          "shape": [
+            50,
+            20,
+            36
+          ],
+          "objective": -0.5889142376045151,
+          "fits": [
+            {
+              "success": true,
+              "value": -0.5889142376045151,
+              "theta": [
+                -0.05569568509016343,
+                0.36665252565580325,
+                -0.07264712629506857,
+                -2.55854656953726,
+                2.8237683776539946,
+                -0.18576108240524242,
+                0.6897624668602437,
+                0.4347718961551985,
+                0.5607394394012231
+              ],
+              "iterations": 81,
+              "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+            },
+            {
+              "success": true,
+              "value": -0.47103901481272326,
+              "theta": [
+                0.9893337574173217,
+                0.9930956810743086,
+                0.9976420430354709,
+                -2.998676523882615,
+                -1.982850170440735,
+                -3.0552219595591104,
+                0.9996396576310912,
+                0.4251070833721589,
+                -0.5284359603966023
+              ],
+              "iterations": 44,
+              "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+            },
+            {
+              "success": true,
+              "value": -0.3924570191222809,
+              "theta": [
+                0.999999,
+                0.999999,
+                0.999999,
+                -22.897225467605264,
+                -11.687376176195038,
+                -12.602684860796048,
+                0.999999,
+                0.5027839762555665,
+                -0.6117112102962025
+              ],
+              "iterations": 100,
+              "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+            }
+          ],
+          "failed_evaluations": 0,
+          "successful_objective_spread": 0.19645721848223419,
+          "likelihood": "axis_composite"
+        },
+        "v": {
+          "status": "boundary",
+          "sigma": 0.014001274464345959,
+          "rhos": [
+            -0.09301540807800145,
+            0.016398500473761072,
+            0.999999
+          ],
+          "kappas": [
+            0.2472781642623637,
+            3.0086155128890963,
+            8.920616948205174
+          ],
+          "phis": [
+            0.7307138589314136,
+            0.42499090060960487,
+            -0.28383170568216104
+          ],
+          "signal_phi_boundary": false,
+          "contrast_count": 100960,
+          "shape": [
+            50,
+            20,
+            36
+          ],
+          "objective": -0.2920947196378427,
+          "fits": [
+            {
+              "success": true,
+              "value": -0.2920947196378427,
+              "theta": [
+                -0.09301540807800145,
+                0.016398500473761072,
+                0.999999,
+                -1.3972414049064577,
+                1.1014800104502704,
+                2.18836510879715,
+                0.7307138589314136,
+                0.42499090060960487,
+                -0.28383170568216104
+              ],
+              "iterations": 128,
+              "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+            },
+            {
+              "success": true,
+              "value": -0.25767485126634204,
+              "theta": [
+                0.9930768546603926,
+                0.999999,
+                0.9846666763568438,
+                -3.18659917950586,
+                -2.410826955486114,
+                -3.6650758355001782,
+                -0.6734093314047476,
+                -0.30237275225481935,
+                0.6494437359770495
+              ],
+              "iterations": 77,
+              "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+            },
+            {
+              "success": true,
+              "value": -0.10679033153782669,
+              "theta": [
+                0.999999,
+                0.999999,
+                0.999999,
+                -10.872125568602861,
+                -11.557670641331034,
+                -11.546613701853442,
+                0.998924621841165,
+                -0.4246287635206892,
+                -0.35605422189677255
+              ],
+              "iterations": 17,
+              "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+            }
+          ],
+          "failed_evaluations": 0,
+          "successful_objective_spread": 0.18530438810001604,
+          "likelihood": "axis_composite"
+        },
+        "p": {
+          "status": "ok",
+          "sigma": 0.005437316376826004,
+          "rhos": [
+            -0.08511825568828585,
+            0.02965849461085455,
+            -0.09282076018153468
+          ],
+          "kappas": [
+            0.11105745068366214,
+            6.790058043642232,
+            2.2688362844880143
+          ],
+          "phis": [
+            0.7515031033475943,
+            0.523659282580818,
+            0.6073128996678844
+          ],
+          "signal_phi_boundary": false,
+          "contrast_count": 100960,
+          "shape": [
+            50,
+            20,
+            36
+          ],
+          "objective": -0.38779570053232404,
+          "fits": [
+            {
+              "success": true,
+              "value": -0.3877957005307193,
+              "theta": [
+                -0.08512255046299869,
+                0.029657781700100177,
+                -0.09282266080106051,
+                -2.1977108665172516,
+                1.9154563176160608,
+                0.8192666458175275,
+                0.7515005418374308,
+                0.523659737653731,
+                0.6073163265427975
+              ],
+              "iterations": 65,
+              "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+            },
+            {
+              "success": true,
+              "value": -0.38779570053232404,
+              "theta": [
+                -0.08511825568828585,
+                0.02965849461085455,
+                -0.09282076018153468,
+                -2.1977076378382,
+                1.9154594899349853,
+                0.8192670500380902,
+                0.7515031033475943,
+                0.523659282580818,
+                0.6073128996678844
+              ],
+              "iterations": 120,
+              "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+            },
+            {
+              "success": true,
+              "value": -0.03260630754900973,
+              "theta": [
+                0.999999,
+                0.999999,
+                0.999999,
+                -9.902903097052441,
+                -10.98863563478142,
+                -10.892235980024715,
+                0.9997849809045668,
+                0.022427649496791206,
+                0.21447976825420262
+              ],
+              "iterations": 8,
+              "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+            }
+          ],
+          "failed_evaluations": 0,
+          "successful_objective_spread": 0.3551893929833143,
+          "likelihood": "axis_composite"
+        }
+      },
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_curvature_seed37.json": "8a346e0f4ad37c62dbbe4113f727cb31b2eedae9b0a5921f9b7b6c90855d64e1"
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 38,
+      "bank": "local",
+      "cutoff": 2.3021138192960735,
+      "original_coverage_count": 5,
+      "oracle_correction_coverage_count": 7,
+      "analytic_bias_score": 0.018288230619850358,
+      "analytic_bias_cutoff_ratio": 0.00794410357409801,
+      "empirical_mean_score": 0.028533377489770122,
+      "oracle_mean_score": 0.010055671502367842,
+      "mean_minus_bias_norm": 0.07194232589660353,
+      "oracle_mean_norm": 0.07194231786178872
+    },
+    {
+      "system": "ns",
+      "seed": 38,
+      "bank": "broad",
+      "cutoff": 5.501580367239558,
+      "original_coverage_count": 118,
+      "oracle_correction_coverage_count": 116,
+      "analytic_bias_score": 0.05493153855765812,
+      "analytic_bias_cutoff_ratio": 0.009984683471091466,
+      "empirical_mean_score": 0.07848279702116598,
+      "oracle_mean_score": 0.02159079601645353,
+      "mean_minus_bias_norm": 0.008773079221771831,
+      "oracle_mean_norm": 0.008773078375011428
+    },
+    {
+      "system": "pde_compound",
+      "seed": 36,
+      "bank": "local",
+      "cutoff": 1.5162013751492383,
+      "original_coverage_count": 255,
+      "oracle_correction_coverage_count": 255,
+      "analytic_bias_score": 0.2560651613561489,
+      "analytic_bias_cutoff_ratio": 0.1688859841133864,
+      "empirical_mean_score": 0.26191432565901657,
+      "oracle_mean_score": 0.004876361330599485,
+      "mean_minus_bias_norm": 2.6227010326029627,
+      "oracle_mean_norm": 2.6227010326250904
+    },
+    {
+      "system": "pde_compound",
+      "seed": 36,
+      "bank": "broad",
+      "cutoff": 4.002852332622203,
+      "original_coverage_count": 12,
+      "oracle_correction_coverage_count": 253,
+      "analytic_bias_score": 5.229308181406301,
+      "analytic_bias_cutoff_ratio": 1.3063954767426222,
+      "empirical_mean_score": 5.303092346003056,
+      "oracle_mean_score": 0.008867946583375835,
+      "mean_minus_bias_norm": 0.004419227640004177,
+      "oracle_mean_norm": 0.004419227649180108
+    },
+    {
+      "system": "pde_compound",
+      "seed": 37,
+      "bank": "local",
+      "cutoff": 1.5949800430018928,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.28810450445943164,
+      "analytic_bias_cutoff_ratio": 0.18063204346882838,
+      "empirical_mean_score": 0.28883998070115213,
+      "oracle_mean_score": 0.0033947586105931124,
+      "mean_minus_bias_norm": 2.707823943671023,
+      "oracle_mean_norm": 2.70782394369007
+    },
+    {
+      "system": "pde_compound",
+      "seed": 37,
+      "bank": "broad",
+      "cutoff": 4.451744171070928,
+      "original_coverage_count": 25,
+      "oracle_correction_coverage_count": 251,
+      "analytic_bias_score": 5.678370731593859,
+      "analytic_bias_cutoff_ratio": 1.275538421208928,
+      "empirical_mean_score": 5.574419950867096,
+      "oracle_mean_score": 0.00840444780493262,
+      "mean_minus_bias_norm": 0.005108145739190531,
+      "oracle_mean_norm": 0.005108145747262436
+    },
+    {
+      "system": "pde_compound",
+      "seed": 38,
+      "bank": "local",
+      "cutoff": 1.535328209832035,
+      "original_coverage_count": 256,
+      "oracle_correction_coverage_count": 256,
+      "analytic_bias_score": 0.27044997993882,
+      "analytic_bias_cutoff_ratio": 0.17615124779633093,
+      "empirical_mean_score": 0.27267412555959797,
+      "oracle_mean_score": 0.003508633832102122,
+      "mean_minus_bias_norm": 2.5798662346096877,
+      "oracle_mean_norm": 2.5798662346310763
+    },
+    {
+      "system": "pde_compound",
+      "seed": 38,
+      "bank": "broad",
+      "cutoff": 3.973819203323358,
+      "original_coverage_count": 21,
+      "oracle_correction_coverage_count": 253,
+      "analytic_bias_score": 5.282303857746426,
+      "analytic_bias_cutoff_ratio": 1.3292763428514223,
+      "empirical_mean_score": 5.210057779374534,
+      "oracle_mean_score": 0.007620401113063363,
+      "mean_minus_bias_norm": 0.009505240124391063,
+      "oracle_mean_norm": 0.00950524012600332
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\failure_attribution.py": "390c9958e882a27bb1fc2ad842ed25a706b78e75e37f1745923b830b795c452f"
+  }
+}

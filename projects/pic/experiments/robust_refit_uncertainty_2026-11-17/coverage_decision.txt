@@ -1,0 +1,26 @@
+After both23-case old-anchor screens and before fresh42..44 evaluation:
+Freeze local6_fit.py (degree5/length12/nu4) globally. The cubic version fails
+on NS and remains archived. The new variant returns all28 raw/noise-only
+variable fits interior and numerically stationary. Compound amplitude bias is
+much smaller (1.007x truth); KS estimates are near generating values. NS and
+AC still have signal leakage, so the screen does not authorize promotion.
+
+Run69 fresh anchors (15 iid + core4 x2 signs, each3 seeds), producing138 paired
+fixed/refit records.256 calibration/check/actual draws per anchor. Both branches
+share every generated field. Fixed uses the anchor estimate for correction;
+refit estimates noise from each field and uses that estimate for correction.
+The bootstrap generating model remains the anchor estimate, with the same
+observed-data pilot. The refit estimator uses its prescribed three starts.
+
+All returned fits, including boundary/numerical warnings, are recorded. If a
+finite fit returns a warning, retain its resulting matrix in the experiment
+and mark COMPLETE_WITH_FIT_WARNINGS; never discard or redraw it. Nonfinite fits
+cause explicit incomplete results. Report warning counts and affected rates.
+No nominal validity claim for a procedure with unresolved numerical warnings.
+This is a stress test of the entire fitted procedure, not an uncertainty interval
+for the noise parameters obtained from a composite-likelihood Hessian.
+
+Numerical AR2 track has finished69 old-anchor records (84 variable fits). The
+coordinate repair improves several objectives but some stationarity diagnostics
+remain unresolved. Preserve these. It is separate from the new robust estimator,
+which requires a projected-score threshold rather than optimizer success alone.

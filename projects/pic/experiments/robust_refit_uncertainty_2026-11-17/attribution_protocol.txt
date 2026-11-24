@@ -1,0 +1,10 @@
+Before fresh paired results are available: evaluate oracle-correction attribution
+on NS iid, compound iid, KS all three profiles, and AC positive; seeds42..44
+(18 anchors). These are the previously identified covariance/calibration failures
+or screen leakage cases. Keep fitted metrics/cutoffs fixed. Replace only the
+actual-field moment correction with the generating covariance; do not alter
+the estimator, pilot or calibration. One oracle moment sequence is evaluated
+against both fixed/refit metrics. Record original and oracle coverage, empirical
+mean-error scores and actual-oracle/calibration second-moment eigenvalue ratios.
+The refit estimator's correction depends on its field: do not use fixed-parameter
+Gaussian bias formula for that branch. All oracle results are diagnostics only.

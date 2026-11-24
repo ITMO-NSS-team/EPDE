@@ -1,0 +1,61 @@
+Common-contrast noise compatibility and fresh uncertainty validation
+==================================================================
+Preserve spline_noise_2026-11-17 and all earlier artifacts. No equation solver,
+production edits, derivative-power exclusions, rho clipping, or dropped fields.
+Development used only three archived p24 errors and the two archived p16
+boundary refits. A rich-mean compatibility check repaired both boundary choices
+but retained all three moderate errors. These examples are not validation.
+
+Keep the previously frozen candidate cubic splines p=8,16,24,32,48,64 and
+conditional four-fold Student-t selection score. New compatible-CV rule:
+evaluate every candidate's (sigma,rho) on the SAME error-contrast space,
+orthogonal to the p64 mean basis. Compare its restricted Gaussian negative
+twice log likelihood to the optimum for p64. Admit candidates with LR<=
+chi-square2(.975)=7.3777589082, then choose the smallest CV score (tie smaller p).
+Retain rejected fits and their LR evidence. The threshold is a nominal
+compatibility rule, not a validated confidence guarantee. The p64 fit itself
+must be admitted unless arithmetic/optimization is unresolved. Also report
+the unchanged CV and the fixed-p64 estimator. Reuse all fits; no truth in choices.
+
+Noise uncertainty is studied directly on the fixed p64 error-contrast model,
+avoiding a transplanted basic-bootstrap bias correction. Region for (sigma,rho):
+restricted likelihood-ratio <= cutoff. Report nominal chi-square2(.975) and a
+finite-grid model-calibrated cutoff. No ellipse approximation or point scan is
+treated as the full region. Region membership is evaluated at truth only after
+the fitted models and calibration cutoff have been frozen.
+
+Controlled calibration: Gaussian stationary AR1 with sigma1 and zero mean
+(a member of every spline space). n320 and n1001, rho=-.8,-.4,0,.4,.8,.95;
+128 calibration and64 independent validation fields per configuration. RNG
+SeedSequence [990501, phase0/1, n, rho_index, replicate]. No dynamic system is
+integrated. Invariance removes dependence on spline coefficients and scale
+under this exact model. For each n take the maximum of the six rank126/128
+true-parameter LR scores. This covers only a finite calibration grid; it is
+not a uniform-in-rho guarantee. Freeze these two cutoffs before validation.
+Total1536 controlled calibration plus768 controlled validation fields.
+
+Fresh signal cohort: ODE seeds500..563, VDP500..515, Duffing500..507, each under
+iid,+.4,-.4 noise;264 paired fields. Additional stress cohort: ODE positive
+seeds700..1723,1024 fields. Existing raw RNG domain984101, system/profile/seed,
+and5% signal-standard-deviation noise. Select all models and freeze them before
+truth scoring. The stress cohort is explicitly concentrated on the known
+positive-noise failure mode, not representative of the full15-system suite.
+
+Report paired noise bias/absolute error, changes in selected p, selected-fit
+boundary/unresolved counts, rich-model likelihood coverage, and noncompact
+noise regions. For rho->1 and sigma^2*(1-rho)->eta>0, error-contrast covariance
+tends to eta*K, K=-Q_perp' |i-j| Q_perp, since the spline mean contains a constant.
+Profile eta analytically. A limiting LR STRICTLY below the region cutoff
+certifies an escaping sequence with sigma->infinity, hence no finite upper
+noise-amplitude bound. Near equality is unresolved, not declared bounded.
+Failure of this sufficient test alone is not a certified compactness proof.
+Validate the limit with dense contrasts and finite-rho sequences; report
+limiting likelihood below the stored optimum as a separate optimization warning.
+
+Independent checks: dense contrast vs AR1-whitened likelihood, profile variance,
+compatibility decisions, true-parameter LR, raw RNG/hashes, and boundary limit.
+Recheck selected fits with a129-point rho grid on controlled/fresh fields; retain
+any missed lower basin as a warning rather than silently replacing frozen fits.
+Fresh coverage failure or unbounded nuisance regions blocks production use.
+This round validates nuisance inference before another coefficient-propagation
+study; it does not rerun the default15 systems or claim to repair KdV/dyad.

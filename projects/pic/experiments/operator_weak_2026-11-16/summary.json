@@ -1,0 +1,98 @@
+{
+  "full_continuous_clsm": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "full_continuous_clsm_half": {
+    "cross": 53,
+    "ordinary": 48,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "full_continuous_ols": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 54,
+    "uncorrected_cross": 50
+  },
+  "full_old_clsm": {
+    "cross": 50,
+    "ordinary": 46,
+    "oracle": 52,
+    "uncorrected_cross": 45
+  },
+  "legacy_continuous_clsm": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "legacy_continuous_clsm_half": {
+    "cross": 53,
+    "ordinary": 48,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "legacy_continuous_ols": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 54,
+    "uncorrected_cross": 50
+  },
+  "legacy_old_clsm": {
+    "cross": 50,
+    "ordinary": 46,
+    "oracle": 52,
+    "uncorrected_cross": 45
+  },
+  "risk_energy_continuous_clsm": {
+    "cross": 52,
+    "ordinary": 46,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "risk_energy_continuous_clsm_half": {
+    "cross": 52,
+    "ordinary": 47,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "risk_energy_continuous_ols": {
+    "cross": 51,
+    "ordinary": 46,
+    "oracle": 54,
+    "uncorrected_cross": 50
+  },
+  "risk_energy_old_clsm": {
+    "cross": 52,
+    "ordinary": 47,
+    "oracle": 52,
+    "uncorrected_cross": 47
+  },
+  "risk_units_continuous_clsm": {
+    "cross": 53,
+    "ordinary": 46,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "risk_units_continuous_clsm_half": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 53,
+    "uncorrected_cross": 50
+  },
+  "risk_units_continuous_ols": {
+    "cross": 52,
+    "ordinary": 48,
+    "oracle": 54,
+    "uncorrected_cross": 50
+  },
+  "risk_units_old_clsm": {
+    "cross": 52,
+    "ordinary": 47,
+    "oracle": 52,
+    "uncorrected_cross": 47
+  }
+}

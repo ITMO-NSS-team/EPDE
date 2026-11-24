@@ -1,0 +1,185 @@
+{
+  "status": "PASS",
+  "gaussian_polynomial_expectation_max_error": 2.220446049250313e-16,
+  "operator_replay_max_error": 0.0,
+  "correlated_linear_gaussian_coverage": 0.950469970703125,
+  "units_invariant": true,
+  "zero_variance_explicit": true,
+  "identities": [
+    {
+      "candidate": "energy",
+      "constant_present": true,
+      "max_weak_residual": 2.703927304281706e-09
+    },
+    {
+      "candidate": "phase_sin",
+      "constant_present": true,
+      "max_weak_residual": 6.714212519298712e-10
+    },
+    {
+      "candidate": "phase_cos",
+      "constant_present": true,
+      "max_weak_residual": 5.234936928388834e-10
+    }
+  ],
+  "geometries": {
+    "ac": {
+      "local": [
+        6,
+        59
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "burgers": {
+      "local": [
+        15,
+        30
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "burgers_inviscid": {
+      "local": [
+        10,
+        21
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "duffing": {
+      "local": [
+        96
+      ],
+      "broad": [
+        5
+      ]
+    },
+    "kdv": {
+      "local": [
+        20,
+        45
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "kdv_cossin": {
+      "local": [
+        18,
+        12
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "ks": {
+      "local": [
+        48,
+        112
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "lorenz": {
+      "local": [
+        73
+      ],
+      "broad": [
+        5
+      ]
+    },
+    "lv": {
+      "local": [
+        144
+      ],
+      "broad": [
+        5
+      ]
+    },
+    "ns": {
+      "local": [
+        18,
+        3,
+        11
+      ],
+      "broad": [
+        5,
+        5,
+        5
+      ]
+    },
+    "ode": {
+      "local": [
+        96
+      ],
+      "broad": [
+        5
+      ]
+    },
+    "pde_compound": {
+      "local": [
+        26,
+        18
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "pde_divide": {
+      "local": [
+        21,
+        15
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    },
+    "vdp": {
+      "local": [
+        147
+      ],
+      "broad": [
+        5
+      ]
+    },
+    "wave": {
+      "local": [
+        5,
+        21
+      ],
+      "broad": [
+        5,
+        5
+      ]
+    }
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\checks.py": "0fea3ac027bb7505b2c365925d074e0cf0f830f6a05caf778211326582e736cf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\ode_simple_constants.py": "73146ec4c7d67505ab9b4593f56df021a8fb6f234ed105b4a03468c4d2c4f3da"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "records": 3,
+  "totals": {
+    "operator_scores": 3072,
+    "regions": 84,
+    "direct_metric_checks": 12,
+    "hash_links": 231
+  },
+  "max_direct_metric_relative_error": 0.004274514652723882,
+  "rows": [
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed50",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0029519656843206565,
+      "hash_links": 77,
+      "result_sha256": "a4409e3708d01d8aa157643b792a461cc70564a26e757807319f7fc2fdac5a51"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed49",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.004274514652723882,
+      "hash_links": 77,
+      "result_sha256": "039e546412d8ddf9ddad6de569638bf1804f2fd1ac23e65d4288792590e356ee"
+    },
+    {
+      "status": "PASS",
+      "record": "ac_positive_seed48",
+      "operator_scores": 1024,
+      "regions": 28,
+      "direct_metric_checks": 4,
+      "max_direct_metric_relative_error": 0.0027781399178884447,
+      "hash_links": 77,
+      "result_sha256": "49424f41def3550360bb7122fc4319798a0fc17dfff84d88ff0c32c32eae3a20"
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\audit_time_pilot_student.py": "2ccc28691b2eca92866ddf33184a98814379ecd252f471de88300218a5fb4794"
+  }
+}

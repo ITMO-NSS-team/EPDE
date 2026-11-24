@@ -1,0 +1,80 @@
+{
+  "status": "PASS",
+  "dense_checks": 96,
+  "max_error": 1.0264926686431863e-09,
+  "synthetic_signal": {
+    "model": [
+      0.2030141977290132,
+      [
+        0.41187908553406694
+      ],
+      [
+        2
+      ]
+    ],
+    "info": {
+      "status": "ok",
+      "sigma": 0.2030141977290132,
+      "rhos": [
+        0.41187908553406694
+      ],
+      "kappas": [
+        9.830055571465197e-06
+      ],
+      "phis": [
+        0.9706090301414957
+      ],
+      "signal_phi_boundary": false,
+      "contrast_count": 999,
+      "shape": [
+        1001
+      ],
+      "objective": -1.1687108511745385,
+      "fits": [
+        {
+          "success": true,
+          "value": -1.1636584176097298,
+          "theta": [
+            0.40620460700702044,
+            -2.9375819889497,
+            -0.9894949540541388
+          ],
+          "iterations": 37,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.14996286667185,
+          "theta": [
+            0.4170990774085808,
+            -2.0456526675427953,
+            0.999999
+          ],
+          "iterations": 19,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.1687108511745385,
+          "theta": [
+            0.41187908553406694,
+            -11.530065970569378,
+            0.9706090301414957
+          ],
+          "iterations": 18,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "failed_evaluations": 0,
+      "successful_objective_spread": 0.018747984502688553,
+      "likelihood": "exact"
+    }
+  },
+  "trend_unit_invariant": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\checks_correlated.py": "673efc45f4976f7b016046714f40cff346b3d52a4148d56cedbd6df2ed7dd9e9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_fit.py": "485b11c45108b921fc5a46dda07997a45c4ad788ef24de1852d84c33cb9e3b14",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\latent_fit.py": "84e33329e5f57c3b73f2151154e0341ad9071ea145696ccf2bb58b5a48a7fe9a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_curvature_protocol.txt": "f989aa36a86f2f4589c9044686bcd4156cfce124ac0bf7208e9ec72348e3ea88"
+  }
+}

@@ -1,0 +1,229 @@
+Completed 2026-11-17: solver-free joint weak-moment regions and correlated noise.
+
+The direct residual approach now supplies joint coefficient regions and
+explicit boundedness/emptiness certificates. Combining local and broad banks
+is a useful partial repair: 57/60 iid reference cases have bounded outer
+regions, versus 51/60 local and45/60 broad. Forced KdV remains provably
+unbounded for these constraints; KS still accepts the wrong sign of its
+fourth-derivative coefficient. Positive noise correlation exposes a separate,
+severe failure of the current noise estimator. None of these results supports
+replacing dyad by compatibility or uncertainty as the structural objective.
+
+Scope and independence
+----------------------
+Primary: all15 default systems, anchors30/31/32,45 records/60 reference
+equation cases. Full historical candidate panels:1050 candidate/anchor cases.
+Each record has256 calibration,256 independent check and256 fresh actual
+fields. IID amplitude is estimated; the injected5% amplitude is not supplied
+to the estimator. Two native weak-moment banks, all explicit constants and
+registered ODE_simple identities retained. No candidate ODE/PDE integration,
+PINNs, new regularization, tuned search penalty or production edits.
+
+Stress: AC/forcedKdV/KS/wave x anchors30/31/32 x rho=+0.4/-0.4 x three noise
+models:72 records. Correlation is separable AR(1) on every axis. The models
+are assumed iid, current estimated AR, and known correlation shape with
+estimated amplitude. The last is an attribution control, not an unknown-noise
+solution. Models share raw anchor/pilot/actual fields and standardized random
+innovations. Thus72 model records are24 distinct noisy stress anchors; paired
+controls and subsequent analyses are not independent replications.
+
+117 records total; each model record has768 fields. All main decisions,
+covariance matrices and regions were frozen before clean-field diagnostics.
+The follow-up bank combination, directional tests, and noise diagnostics are
+explicitly later analyses of the same records. Results are conditional on
+the fixed finite candidate library/pilot/noise estimate and these benchmarks.
+They do not establish generic post-search confidence or universal95% coverage.
+
+Construction and its limitations
+-------------------------------
+Use corrected raw weak moments at fixed coefficients, with error matrix E.
+S=mean(E_cal^T E_cal) is a second moment, not a centered covariance. On the
+symbolically stochastic columns, calibrate c as the empirical95% check
+quantile of lambda_max(S^-1/2 E_check^T E_check S^-1/2). Exact deterministic
+columns remain in equations and have zero noise. No covariance-rank fallback
+was needed in117 records. The common bound is ||E v||^2<=c v^T S v.
+
+Invert v^T(M_obs^T M_obs-cS)v<=0, with the target coefficient fixed to1.
+A positive-definite feature block yields an ellipsoid or an empty region;
+a negative eigenvalue gives an explicit unbounded feasible direction. This
+uses only moment computation and linear algebra. The common-library cutoff
+is intentionally simultaneous and can be much wider than directional tests.
+Residual noise coverage and acceptance of a zero residual differ when the
+clean discrete weak residual is nonzero; both are saved separately.
+
+IID results
+-----------
+                                    Local       Broad       Both banks
+Operator-wide coverage              93.96%      94.49%       94.51%
+Reference geometry bounded            51          45          57 outer
+Reference geometry unbounded           9          15           3 certified
+Exact reference accepted at anchor   60/60       59/60        59/60
+
+Combined actual-field exact-reference acceptance:99.9544%, much higher than
+the95% operator event. The simultaneous bound is conservative at individual
+reference directions; high acceptance does not demonstrate precise recovery.
+The sole rejected exact reference anchor is AC32. Its intersection is still
+nonempty: another coefficient vector is an explicit feasible witness.
+
+Local compatible candidates average12.05 per equation; broad12.85. Registered
+laws are among the fewest-feature compatible candidates in only31/60 local
+and33/60 broad cases. Local accepts49/153 single-feature drops; broad54/153.
+Candidate labels are not a universal validity oracle: an unregistered law
+or alternative target need not be mathematically false.
+
+All candidates share c and S. A feasible equation extends to every same-target
+strict superset by setting new coefficients tozero. The audit checks4385 such
+extensions. Compatibility alone cannot prefer the smaller support. Ranking
+by a large acceptance probability or an uncertainty-normalized residual
+would again reward some broad, weakly identified models.
+
+Combining banks
+---------------
+Joint cutoff cJ is the95% quantile of max(local_score,broad_score) on shared
+check fields. Require both original inequalities with cJ. A nonnegative
+mixture of their quadratics is a necessary condition. Choose its weight to
+maximize the minimum eigenvalue of the normalized feature block; a scalar
+bounded search is checked against endpoints and a101-point grid. This is
+a geometric certificate, not a tuned preference for particular coefficients.
+
+An ellipsoid from the mixture is an OUTER bound, not the exact intersection.
+Its center need not satisfy both constraints. Before querying true laws,
+47/60 references have an explicit common feasible witness. Post-freeze truth
+queries and the AC32 fitted witness establish nonemptiness for all60 reference
+intersections. All57 bounded outer regions are therefore bounds on nonempty
+reference sets; no exact multidimensional intersection shape is claimed.
+
+Across1050 candidates:679 bounded outer certificates,307 certified empty,
+62 certified unbounded,2 unresolved geometry.586 have an explicit common
+witness;157 have unresolved nonemptiness in the truth-free certificate
+procedure. Do not count every nonempty outer ellipse as an accepted model.
+
+Compound is the clearest complementary-information improvement. BOTH banks
+alone are unbounded on all3 anchors. Positive mixtures, local weights
+0.04646/0.04615/0.04447, give finite outer bounds on all3 intersections.
+Seed30 projections are[-1.7568,6.2465] and[0.6067,2.8284]. They remain broad.
+For several other systems one already-bounded bank supplies the certificate.
+
+Forced KdV: all3 joint regions remain unbounded. Explicit directions have
+strictly negative curvature in BOTH bank constraints, and finite witnesses
+are checked directly. This is a property of these moment tests, not proof
+that no solver-free method could identify the equation. Directional-cutoff
+controls also find unbounded witnesses in each bank separately on all3
+anchors, so full-library simultaneous calibration is not the sole cause.
+Separate pointwise witnesses do not by themselves prove a joint pointwise ray.
+
+KS: local is unbounded; broad and combined outer regions are bounded.
+For coefficients of [u*u_x,u_xx,u_xxxx], truth is[-1,-1,-1]. Third-coordinate
+outer projections are:
+  seed30 [-3.78635, 3.62881]
+  seed31 [-4.67797, 3.07853]
+  seed32 [-5.22068, 1.79641].
+An outer interval spanning zero alone would not prove sign ambiguity in the
+intersection. Explicit positive-coefficient witnesses DO prove it:
+  seed30 [-0.99597433,-0.94074863,+1]
+  seed31 [-0.99656593,-0.94723237,+1]
+  seed32 [-1.00023245,-0.97535125,+1].
+Each satisfies both original constraints. Tested zero-coefficient conditional
+centers fail the local constraint; that does not prove that every possible
+zero-coefficient vector fails. See ks_sign_witnesses.json.
+
+Correlated-noise stress
+-----------------------
+Mean operator-wide coverage,12 records per sign/model:
+                          rho=+0.4             rho=-0.4
+                         Local  Broad        Local  Broad
+Assume iid                0.00   0.00        75.00  75.00
+Estimate AR              30.24  36.72        94.11  95.61
+Known rho, estimate amp  94.66  95.31        93.10  94.04
+
+All entries are percentages. Three anchors per system and256 check/actual
+fields limit precision; these are observed rates, not coverage guarantees.
+The two-bank joint rates are0/36.46/95.31% for positive correlation and
+75.00/95.61/94.04% for negative correlation, in the same model order.
+
+Positive correlation plus assumed iid even makes every local reference
+region empty. Such apparent exclusion is erroneous confidence, not improved
+structural selection. Supplying the correlation shape repairs calibration
+without supplying the true amplitude. Improving discrepancy or structural
+ranking alone cannot repair a misspecified uncertainty model.
+
+Noise estimator diagnosis and tested partial fixes
+--------------------------------------------------
+Positive-correlation raw-field AR sigma/true_sigma: median0.7657, range
+[0.6553,1.0286]. Some axis correlations collapse from true0.4 to aboutzero;
+raw selected difference orders range2..58. The theoretical lag-ratio slope
+with respect to rho at selected orders ranges0.000263..0.204 (median0.0420),
+versus0.5 at order1. High orders amplify lag-ratio sampling error when
+inverting for rho. Selecting small amplitudes across orders/axes is another
+source of downward selection; the present tests do not isolate its full bias.
+
+Pool amplitude using the estimated correlations and existing selected orders:
+median ratio improves0.7657 ->0.9326, but minimum remains0.7123. No coverage
+claim is made for this diagnostic; pooling alone is not a complete repair.
+
+Remove clean signal and run the SAME estimator on the actual injected noise:
+positive-correlation median sigma ratio is0.6833, not near1. Thus signal
+reconstruction cannot be the whole explanation. The variance guard rejects
+some accurate low-order noise estimates. For stationary noise on n samples,
+E[sample variance with denominator n] = sigma^2 *
+  (1 - [n+2*sum_{k=1}^{n-1}(n-k)*rho^k]/n^2).
+This is less than marginal variance, especially for positive correlation;
+finite sample fluctuations add further differences. Treating estimated
+sigma^2>observed within-axis variance as impossible is too strong.
+
+Example AC30, pure noise, axis0: true sigma0.0337684, order1 estimate
+sigma0.0335279/rho0.399239, but sigma^2 exceeds observed variance0.00104647;
+the guard rejects it. Raw-field high-order selection is also problematic.
+
+Guard-removal ablation on all24 stress anchors: pure positive-noise median
+ratio0.6833 ->0.9760, but minimum remains0.6508. For raw fields the selected
+sigma is unchanged in all24 records. Therefore simply removing the guard is
+NOT a supported fix for the reported coverage failure. No production guard
+was removed; its original role in avoiding signal-dominated divergent fits
+still needs a statistically valid replacement. Negative-correlation estimates
+are much better in these controls. See noise_attribution.json and
+noise_guard_diagnostic.json for every case and the raw/pure traces.
+
+Validation and numerical qualifications
+---------------------------------------
+All45 iid and72 correlated worker processes exited0; all saved arrays finite.
+Main audit PASS:7137 source/input/array hash links;119808 independently
+recomputed generalized-eigenvalue scores;364980 registered-query scores;
+4404 candidate regions;2202 joint-bank certificates;4385 nested-support
+extensions;2106 fresh field-level moment-matrix replays. Raw/pilot/calibration/
+check/actual hashes and paired-control field identity are verified.
+Synthetic checks cover95% Gaussian operator calibration (observed95.18%),
+units, constants, exact ellipsoids, empty/unbounded/singular cases, correlated
+amplitude normalization, complementary indefinite banks and common rays.
+
+Three earlier audit attempts are retained as audit_joint_initial/second/third.py.
+They exposed overly narrow audit comparisons for ill-conditioned candidate
+ellipses and a different floating-point operation order in mixture replay.
+No statistical arrays or region decisions were changed. Final checks replay
+the exact operation order, independently verify LU-inverse backward residuals
+and coordinate extrema, and include explicit condition/roundoff bounds.
+Compound broad first_order_fit has normalized condition numbers about6.2e10;
+31 endpoint checks initially exceeded2e-7 relative to the tiny residual while
+their natural matrix backward errors were below8e-17. Those unregistered
+candidate coordinates should not be interpreted as high-precision estimates.
+The reference bounded/unbounded and KS sign conclusions have direct witnesses.
+
+Files: protocol.txt; bank_intersection_protocol.txt; checks*.json;
+results/ and frozen/; iid_*/correlated_* tables; intersection/ and its summary;
+noise diagnostics; audit_joint.json; joint_results.png/.pdf. Completion audit
+and final artifact manifest provide the final provenance snapshot.
+
+Decision and next target
+-----------------------
+Keep dyad provisionally for structural ranking, with complexity as comparator,
+as supported by the prior fresh-seed replacement study. Direct weak residuals
+remain a useful experimental path for uncertainty and coefficient precision.
+Combined banks are a supported boundedness improvement, not a complete method.
+
+The next focused repair should estimate correlation and amplitude jointly
+without selecting the minimum of noisy high-order fits. It must first pass
+noise-only checks and then fresh raw-field/coverage tests for iid and both
+correlation signs. After calibration, target complementary moments for forced
+KdV and KS and report uncertainty widths/sign resolution separately from
+structural selection. Do not hide unresolved coefficients behind high coverage,
+or turn compatibility into a new reward for redundant equations.

@@ -1,0 +1,23 @@
+Follow-up after the first fresh results: refitting the nonlinear correction
+does not propagate uncertainty in the statistic's normalization. KS shows little
+change between fixed/refit corrections. Test a studentized refit bootstrap on
+the already observed anchors42..44; these follow-ups are NOT fresh confirmation.
+
+For each check/actual field, use its estimated noise covariance to compute its
+own model-moment covariance metric. The observed region uses the anchor metric.
+Covariance is estimated using32 fixed common Gaussian fields around the same
+observed-data pilot, RNG981105. This is a deterministic, shared simulation-based
+studentizer as a function of noise parameters, not a Hessian confidence interval.
+The check cutoff is the95th percentile of these studentized bootstrap errors;
+actual coverage is evaluated with the same studentization rule.
+
+Computational acceleration: finite differences of the moment-error matrices in
+log(sigma)/Fisher(rho) coordinates, step.001. The Gram of their linear response
+is positive semidefinite. Use it only within max-coordinate displacement.05;
+outside, recompute the32-field metric directly. Validate the response at the
+check-field parameter furthest from the anchor within that radius, comparing
+generalized covariance eigenvalues to direct calculation. If error exceeds1%,
+use direct metrics throughout that case. This decision uses only check fields
+and numerical approximation error, before actual outcomes; no truth-based tuning.
+Keep all fit warnings. Record exact fallbacks, approximation errors, geometry,
+scores and source hashes. Start with the3 KS iid anchors as an exploratory test.

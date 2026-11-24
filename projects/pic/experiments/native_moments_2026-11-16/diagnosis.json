@@ -1,0 +1,97 @@
+{
+  "failed_fits": [
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 0,
+      "bank": "native_local",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.08268905460452743,
+      "covariance_eigen_ratio": 0.20028246990722084
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 0,
+      "bank": "interpolated_local",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.09493411167424884,
+      "covariance_eigen_ratio": 0.14214353749596545
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 1,
+      "bank": "native_local",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.2814169005828763,
+      "covariance_eigen_ratio": 0.009646326150831788
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 1,
+      "bank": "interpolated_local",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.1922655713795331,
+      "covariance_eigen_ratio": 0.020103650794857857
+    },
+    {
+      "system": "wave",
+      "seed": 3,
+      "training": 2,
+      "bank": "native_mixed",
+      "candidate": "e0:equivalent_3",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 2.2333881673009716e-06,
+      "covariance_eigen_ratio": 1.892876516955597e-05
+    },
+    {
+      "system": "wave",
+      "seed": 4,
+      "training": 1,
+      "bank": "interpolated_local",
+      "candidate": "e0:equivalent_3",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.00041761987048701574,
+      "covariance_eigen_ratio": 0.01277582942895291
+    }
+  ],
+  "ranking_agreement": [
+    {
+      "metric": "native_broad_white_cross",
+      "pairs": 771,
+      "agree": 601,
+      "fraction": 0.7795071335927367
+    },
+    {
+      "metric": "native_local_white_cross",
+      "pairs": 771,
+      "agree": 435,
+      "fraction": 0.5642023346303502
+    },
+    {
+      "metric": "native_mixed_white_cross",
+      "pairs": 771,
+      "agree": 565,
+      "fraction": 0.7328145265888456
+    },
+    {
+      "metric": "old_cross",
+      "pairs": 771,
+      "agree": 579,
+      "fraction": 0.7509727626459144
+    }
+  ],
+  "limitation": "Pairs share records and fitted coefficients; these are descriptive diagnostics, not independent tests or final fit selection."
+}

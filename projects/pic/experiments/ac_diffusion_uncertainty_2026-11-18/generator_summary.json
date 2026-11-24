@@ -1,0 +1,96 @@
+{
+  "cells": {
+    "pilot_fitted": {
+      "positive": 32,
+      "n": 64,
+      "median": 5.0225947922716356e-08,
+      "iqr": [
+        -1.5703387804152234e-05,
+        1.832172763196417e-05
+      ]
+    },
+    "pilot_iid": {
+      "positive": 39,
+      "n": 64,
+      "median": 1.6006526942487375e-06,
+      "iqr": [
+        -3.4545552955885643e-06,
+        7.928214698974132e-06
+      ]
+    },
+    "clean_fitted": {
+      "positive": 25,
+      "n": 64,
+      "median": -5.107773453887489e-06,
+      "iqr": [
+        -1.473994790901739e-05,
+        9.25383443257952e-06
+      ]
+    },
+    "clean_iid": {
+      "positive": 22,
+      "n": 64,
+      "median": -1.64548550284948e-06,
+      "iqr": [
+        -5.3580329466530625e-06,
+        1.1228674030615277e-06
+      ]
+    }
+  },
+  "paired_shifts": {
+    "pilot_fitted_to_pilot_iid": {
+      "median": 1.7189039990721574e-06,
+      "increased": 35
+    },
+    "clean_fitted_to_clean_iid": {
+      "median": 3.86790679330189e-06,
+      "increased": 36
+    },
+    "pilot_fitted_to_clean_fitted": {
+      "median": -5.49997085332952e-06,
+      "increased": 18
+    },
+    "pilot_iid_to_clean_iid": {
+      "median": -4.772480362002882e-06,
+      "increased": 5
+    }
+  },
+  "archives": {
+    "73001_000.npz": "25019d184380d633d4ff5121f84917b715f6657a8cab962ed83ea0316dae80f6",
+    "73001_008.npz": "781630f3ea801a665c80692fffaebb87d39eb531ad583734ad0eaa892d219ca5",
+    "73001_016.npz": "11fea004a592a6bfe2cc91da7bf2e6fc23e706bb5f9ebc5719da2d6dbffc105c",
+    "73001_024.npz": "3711fe98a4b0c52e548bb8bb3a020e6a5e9579390b57d2315489123cd5448486",
+    "73001_032.npz": "a7fc9cd5752891368198cf194aa7828ec480df88755cc13f211180dcebd85b34",
+    "73001_040.npz": "3d683a59dd3573fdfe76321706c930b936c85e2ff7670d1aa3d707a13ecad88e",
+    "73001_048.npz": "c4194ce86f142bc6910feb55214bcd56e7c53d84b59c370d6277e49fb534b28d",
+    "73001_056.npz": "039ba391a36c5929f1917124e8d1f2a6ebfd865ee5efeab70385a6d34bf34039",
+    "pilot_iid_000.npz": "e793a4bd7a54f40bf8d1de841262347906b6026ec37db7695831222a5ad159a0",
+    "pilot_iid_008.npz": "3597568aefd1cbe6cb66d881d5e685327125ef3409f2ece399cf9dc0cb859078",
+    "pilot_iid_016.npz": "6b5ca1a7315c2fccb32824eee3e5375f5b8ad816dc8ac63ade4104f13d8275c8",
+    "pilot_iid_024.npz": "55c9aae656d3cf2c8955e14fc370032fdad00c17cb2784d23f77eadee969705e",
+    "pilot_iid_032.npz": "1edb588677083e564a5b795ed4955ad164f7bdbdace9ac9296aaffb27c828f88",
+    "pilot_iid_040.npz": "7636f32542f141868f7a6d0b31483e22d63b5cc1b4d98d75da48af4b7613d658",
+    "pilot_iid_048.npz": "c261c4218d034c008cf3f889e8dc2af33ef64bbce17ca82307051f1495af91b9",
+    "pilot_iid_056.npz": "490544e55f9856b01ff5f205c1fa213ac429436ce42febbdf703cbb327aaac7d",
+    "clean_fitted_000.npz": "ba79e7c613f33d73ddcc6c71888aef070afdc450fa1346e533754a01e8c7a77e",
+    "clean_fitted_008.npz": "65c1493677fa413125cc0951199fbbdf10c99e4e8d45bb632c344e81a7768c30",
+    "clean_fitted_016.npz": "671aaee6e428984df2a56d054be100eff2fb2e1daa788a0d6dd7f0c2f31d3fe4",
+    "clean_fitted_024.npz": "1edd6dcee8cf3b95ef6bc4becdc465c8d659ce6fa3272fe9275ea0c8dc9362c8",
+    "clean_fitted_032.npz": "86b5726f8582d462a56eed4a422129a48c1874c699e9a9cd14b7bdbeac555786",
+    "clean_fitted_040.npz": "7e5c01c78b0c67353b46a7da1e06be0304f9b231dd7a97daeb16e014c607f41a",
+    "clean_fitted_048.npz": "ac8a58436e795f59057d24972cd4194d7bd25ae78622f7f00393d777472d0f74",
+    "clean_fitted_056.npz": "9310720a237feb57de59faee2192c4da160e4ffcd33b9952ecd47daa126d3865",
+    "clean_iid_000.npz": "910a4a1ec682f3b06cce2e517c0563d815a282060a5436c70c723f041b9fa5ca",
+    "clean_iid_008.npz": "6917788dfa145cd6133ec4da4a75393fe65baba588488c4b132cb6ec14876f21",
+    "clean_iid_016.npz": "f224b719bd8e8dc56f0d0e2f9b5f97f8f0f2a33dcca1dbbd680140b6c9dc914d",
+    "clean_iid_024.npz": "ce26984479de92dc8a482dbbce691b3691fdbeacad95984599c795559035c631",
+    "clean_iid_032.npz": "700bb7fa2d97b9b234c79168fb326febdd7f4edbb48c8f0eace35d5b0fc200e0",
+    "clean_iid_040.npz": "521bbf6a21cac45b22e4458342fc0dc4eac5256ed7e8540017ee03b7b8b50dc1",
+    "clean_iid_048.npz": "4670fdbd93ec13c4d34d5680bb22b0c7d03d162e55fc98f872f75858b27727fc",
+    "clean_iid_056.npz": "d0cdc911153d21403f57f2e44e750c332f82e82b3395dd95f2735e914cbcc35b"
+  },
+  "source_sha256": {
+    "generator.py": "b74db8628e1f04b7c66dc051fcd4b91fc9c2b817a143036bc797e2d83133f248",
+    "generator_protocol.txt": "437cc61590e2b918bf6aa49cbd7ba3b27ab59e90935a1b9dd44333c14ebc8593"
+  }
+}

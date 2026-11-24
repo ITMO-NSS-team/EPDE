@@ -1,0 +1,391 @@
+{
+  "status": "PASS",
+  "meaning": "Implementation and primary strips recovery checks pass; corner adequacy failures remain explicit.",
+  "dense_covariance_checks": 24,
+  "max_quadratic_error": 4.547473508864641e-13,
+  "recovery": [
+    {
+      "shape": [
+        4096
+      ],
+      "true_rho": -0.4,
+      "design": "strips",
+      "model": [
+        0.20039991485108294,
+        [
+          -0.3782800330638449
+        ],
+        [
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        4096
+      ],
+      "true_rho": -0.4,
+      "design": "corner",
+      "model": [
+        0.20039991462514953,
+        [
+          -0.37828003981017483
+        ],
+        [
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        4096
+      ],
+      "true_rho": 0.0,
+      "design": "strips",
+      "model": [
+        0.20805012267111134,
+        [
+          0.06430413906973086
+        ],
+        [
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        4096
+      ],
+      "true_rho": 0.0,
+      "design": "corner",
+      "model": [
+        0.20805010499944343,
+        [
+          0.06430401775589514
+        ],
+        [
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        4096
+      ],
+      "true_rho": 0.4,
+      "design": "strips",
+      "model": [
+        0.18309053247765214,
+        [
+          0.2913751935355177
+        ],
+        [
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        4096
+      ],
+      "true_rho": 0.4,
+      "design": "corner",
+      "model": [
+        0.18309054349300327,
+        [
+          0.2913752576922571
+        ],
+        [
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "true_rho": -0.4,
+      "design": "strips",
+      "model": [
+        0.19965937698946143,
+        [
+          -0.3977458503073467,
+          -0.40811821690722255
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "true_rho": -0.4,
+      "design": "corner",
+      "model": [
+        0.19861531240262337,
+        [
+          -0.4034820781314005,
+          -0.41621358795164665
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "true_rho": 0.0,
+      "design": "strips",
+      "model": [
+        0.19884997238816798,
+        [
+          0.005228625864527282,
+          0.010534751194458493
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "true_rho": 0.0,
+      "design": "corner",
+      "model": [
+        0.19983254264474457,
+        [
+          -0.0011779839537448822,
+          0.030978847062811878
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "true_rho": 0.4,
+      "design": "strips",
+      "model": [
+        0.19906154024446088,
+        [
+          0.4013535476387009,
+          0.40415867552082485
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "true_rho": 0.4,
+      "design": "corner",
+      "model": [
+        2.8839811912336275,
+        [
+          0.9960566019461421,
+          0.4165683540306938
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "adequate": false,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        20,
+        24,
+        28
+      ],
+      "true_rho": -0.4,
+      "design": "strips",
+      "model": [
+        0.19856129635603206,
+        [
+          -0.4027396552441949,
+          -0.39702892275597845,
+          -0.399069442696778
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        20,
+        24,
+        28
+      ],
+      "true_rho": -0.4,
+      "design": "corner",
+      "model": [
+        0.19739781975140885,
+        [
+          -0.41562298313638885,
+          -0.3713097387588626,
+          -0.3776034857254792
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        20,
+        24,
+        28
+      ],
+      "true_rho": 0.0,
+      "design": "strips",
+      "model": [
+        0.2008714201555699,
+        [
+          -0.0007822640699301815,
+          -0.002092500269118769,
+          -0.00501929468646801
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        20,
+        24,
+        28
+      ],
+      "true_rho": 0.0,
+      "design": "corner",
+      "model": [
+        0.18889325791023187,
+        [
+          -0.06506839767529458,
+          -0.02837152452974163,
+          -0.023972991469662846
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        20,
+        24,
+        28
+      ],
+      "true_rho": 0.4,
+      "design": "strips",
+      "model": [
+        0.20539927612604097,
+        [
+          0.4071009804196735,
+          0.40083728922526846,
+          0.4005900416862688
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    },
+    {
+      "shape": [
+        20,
+        24,
+        28
+      ],
+      "true_rho": 0.4,
+      "design": "corner",
+      "model": [
+        0.16166290253996735,
+        [
+          0.3864266939776574,
+          0.2966786443582049,
+          0.2717790312835815
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "adequate": true,
+      "fit_status": "ok"
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\noise_fit.py": "e9180663afdea70060c986aadb7ef6fcaddd3c3eca19da1e955d8c5159f6656b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\checks.py": "fd6ff80cc0a955b8b15d82d9c724905fd1df67a75e7ffe7ba9d59c9b77ec4d30",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\protocol.txt": "f386ea3d1a6dbba54e5c247cbde7ccd769f01b3cf4e59eeb32fcfc68a28097ec"
+  }
+}

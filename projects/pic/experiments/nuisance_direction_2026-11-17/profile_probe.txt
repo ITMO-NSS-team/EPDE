@@ -1,0 +1,10 @@
+Post-survey diagnostic, separate from frozen primary experiment
+=============================================================
+Positive-correlation ODE survey fits frequently approach rho1 despite polishing
+all original starts. Distinguish remaining optimizer basin failure from a better
+likelihood at the extreme branch. Do not modify/rerun primary cutoffs or fits.
+Inspect positive seeds100,102,103,121; iid112; negative101. Reuse the entire14-rho
+grid and five nuisance starts from the prior frozen profile study. Refine the
+best fixed-rho nuisance solution jointly with the exact likelihood, then compare
+with the original repaired estimate. Report all likelihood values and warnings.
+This selected-case probe is diagnostic; any new guard requires independent tests.

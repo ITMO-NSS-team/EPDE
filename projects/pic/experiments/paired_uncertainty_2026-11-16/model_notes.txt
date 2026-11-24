@@ -1,0 +1,50 @@
+Interpretation of the conditional uncertainty calculation
+
+For a fixed candidate and training rotation g, let a and b be its two
+held-out corrected weak residual vectors, and let e and f be perturbations
+from independent raw groups. The exact score perturbation is
+
+  [Re(<e,b> + <a,f> + <e,f>)] / training_target_energy.
+
+The last term is essential when a physically correct residual is small.
+A first-order delta-method approximation drops it and can miss uncertainty
+near zero. The experiment evaluates all three terms and reports the
+first-order and quadratic-only standard deviations separately.
+
+For candidates i,j scored on the same observations,
+  Var(S_i-S_j) = Var(S_i) + Var(S_j) - 2 Cov(S_i,S_j).
+Independent candidate error bars omit the covariance. Likewise the three
+rotations reuse groups: Var((S_0+S_1+S_2)/3) includes off-diagonal rotation
+covariances. Group-level common indices/signs preserve both dependencies.
+
+The operator-error pools have 128 reconstructed bootstrap draws per group.
+The same sample index maps to the same reconstructed field in every test
+bank. Each complete field draw carries all its moment/column correlations.
+One random sign multiplies the entire group's centered field-derived operator
+error, rather than assigning independent signs to individual moments.
+
+With B_original bias-correction draws, the factor sqrt(1+1/B_original)
+approximates the extra variance of the estimated bootstrap mean. It does not
+differentiate the nonlinear bias-correction map. This matches the earlier
+experiment's approximation and remains a limitation requiring calibration.
+
+The 512 joint wild/empirical draws estimate uncertainty within this finite
+covariance model. Reusing the same covariance pool does not create additional
+independent observations. Their quantiles have Monte Carlo error. Changing
+64 to 128 covariance draws tests one numerical sensitivity, not validity of
+the noise model or absence of reconstruction bias.
+
+Basic diagnostic intervals are gap_observed minus the simulated error
+quantiles. The sign fraction is the frequency of a negative gap under local
+perturbations; it is NOT a posterior probability that a candidate is correct.
+Pointwise 90/95% intervals have no multiple-comparison guarantee. No interval
+is used to modify dominance or to report an improved recovery count.
+
+The coefficients, window/bandwidth choices, and training normalizations come
+from the observed data and are frozen here. The method describes a local
+evaluation sensitivity with those objects held fixed. It does not include
+refitting uncertainty, selection effects, random denominators, dependence
+between fitted coefficients and other rotations, or common reconstruction
+bias. A clean-oracle gap lying outside the interval is therefore evidence
+that this conditional noise account is incomplete, not proof that the
+reference equation is wrong. Apparent coverage is descriptive on reused data.

@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "fields": 9,
+  "objective_replays": 36,
+  "hash_links": 11,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_profile.py": "223617a543eb0acc1a3b55baa7ea6b12bbefad34eb5a08b3aff48bc3545f7c7f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_followups.py": "f89290c7be3b67da2a0d161618538e098e88c9b55c65eee9f0006515ad020c1d"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\profile_diagnostic.json": "d4fdef5546e901af7f7887bf5e68e7102cb1b21158c8da70b2cecb31b0e530c0"
+  }
+}

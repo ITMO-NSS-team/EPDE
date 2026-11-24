@@ -1,0 +1,11 @@
+Diagnostic specified before inspecting structural-region outcomes.
+For every unbounded registered reference region, test its saved negative
+eigenvector direction at infinite coefficient magnitude under the narrower
+pointwise directional cutoff, using the same independent check Gram matrices.
+Also test1024 fixed-seed random unit feature directions (RNG[940104,seed,slot])
+and coordinate directions. The target coefficient is zero on these limiting
+directions. A strict accepted witness certifies an unbounded ray of the
+pointwise test by continuity; absence of a sampled witness does not prove
+boundedness. This distinguishes common-bound conservatism from lack of
+precision in the pointwise residual test. It never changes the main bound,
+candidate feasibility or method choice and uses no clean data for directions.

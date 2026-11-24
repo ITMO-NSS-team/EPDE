@@ -1,0 +1,407 @@
+[
+  {
+    "system": "duffing",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.23103490741013719,
+    "sampled_minimum_pointwise_ratio": 0.23103490741013719,
+    "sampled_direction": [
+      -0.3590121439999583,
+      -0.11672514317693895,
+      -0.8426833074814635,
+      0.3838884795132274
+    ],
+    "tested_directions": 1029,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "duffing",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.23499568389306094,
+    "sampled_minimum_pointwise_ratio": 0.23499568389306094,
+    "sampled_direction": [
+      -0.29899301992044935,
+      -0.024198778846684338,
+      -0.8911060723666266,
+      0.3405107354144703
+    ],
+    "tested_directions": 1029,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "duffing",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.13834354008594912,
+    "sampled_minimum_pointwise_ratio": 0.13834354008594912,
+    "sampled_direction": [
+      -0.3401848506668264,
+      -0.07850279760528492,
+      -0.8610643325648233,
+      0.36970230365745393
+    ],
+    "tested_directions": 1029,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.8838797417244741,
+    "sampled_minimum_pointwise_ratio": 0.8838797417244741,
+    "sampled_direction": [
+      -0.9999437628451084,
+      -0.008887451174899901,
+      0.005786567097971379
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.41713685290606095,
+    "sampled_minimum_pointwise_ratio": 0.3367459706111101,
+    "sampled_direction": [
+      -0.7487214326380054,
+      0.3869356705548436,
+      -0.5382350816890017
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9338784786443108,
+    "sampled_minimum_pointwise_ratio": 0.9338784786443108,
+    "sampled_direction": [
+      -0.9994996775586018,
+      -0.0026473777911052115,
+      0.03151802581194066
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.5985297019142733,
+    "sampled_minimum_pointwise_ratio": 0.5939231496543739,
+    "sampled_direction": [
+      -0.7836952207371045,
+      -0.4001752550224735,
+      0.4750595397016246
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.8010599150436161,
+    "sampled_minimum_pointwise_ratio": 0.8010599150436161,
+    "sampled_direction": [
+      -0.9997049965017016,
+      -0.0041113019801758315,
+      -0.023937776955273903
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.4944730783092088,
+    "sampled_minimum_pointwise_ratio": 0.4134415610577084,
+    "sampled_direction": [
+      0.949174111065634,
+      0.1823535371669175,
+      -0.25654569644700187
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.985885445210541,
+    "sampled_minimum_pointwise_ratio": 0.9855615153596522,
+    "sampled_direction": [
+      0.5718099351841899,
+      0.5541841690759581,
+      0.6049076828494102
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9454620989485429,
+    "sampled_minimum_pointwise_ratio": 0.9447953611584411,
+    "sampled_direction": [
+      -0.5110810233779193,
+      -0.631172951753766,
+      -0.5834525623539734
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ks",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9663811948002643,
+    "sampled_minimum_pointwise_ratio": 0.9658662368015613,
+    "sampled_direction": [
+      0.5935200924857262,
+      0.5483894079049779,
+      0.5890695689927997
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "lorenz",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 1,
+    "negative_eigenvector_pointwise_ratio": 1.553788454834887,
+    "sampled_minimum_pointwise_ratio": 1.553788454834887,
+    "sampled_direction": [
+      -0.9579252892410255,
+      0.024178422678183886,
+      0.28599745472519994
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "lorenz",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 1,
+    "negative_eigenvector_pointwise_ratio": 3.743845592840299,
+    "sampled_minimum_pointwise_ratio": 3.743845592840299,
+    "sampled_direction": [
+      -0.9562933972837079,
+      0.023810481286907614,
+      0.2914378137655959
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "lorenz",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 1,
+    "negative_eigenvector_pointwise_ratio": 2.041011717852846,
+    "sampled_minimum_pointwise_ratio": 2.041011717852846,
+    "sampled_direction": [
+      -0.9574940366799414,
+      0.024007491820035153,
+      0.28745227440196397
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "ode",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.7213361445663253,
+    "sampled_minimum_pointwise_ratio": 0.7213361445663253,
+    "sampled_direction": [
+      0.8828553400220176,
+      0.34923841787847587,
+      -0.31400473893294445
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ode",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.6216899971536992,
+    "sampled_minimum_pointwise_ratio": 0.6216899971536992,
+    "sampled_direction": [
+      0.9080718224294912,
+      0.2446888447111267,
+      -0.339901360078945
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "ode",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.3147679731756114,
+    "sampled_minimum_pointwise_ratio": 1.3147679731756114,
+    "sampled_direction": [
+      0.9062308850697398,
+      0.2531744153304593,
+      -0.3385975463109505
+    ],
+    "tested_directions": 1028,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "pde_compound",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.1216040089279016,
+    "sampled_minimum_pointwise_ratio": 1.1195774418688824,
+    "sampled_direction": [
+      0.7787848198269753,
+      0.6272911639797468
+    ],
+    "tested_directions": 1027,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "pde_compound",
+    "seed": 30,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.2957954879011278,
+    "sampled_minimum_pointwise_ratio": 1.2818257163918705,
+    "sampled_direction": [
+      -0.9995843858302241,
+      -0.02882803504253567
+    ],
+    "tested_directions": 1027,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "pde_compound",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.2032153983654985,
+    "sampled_minimum_pointwise_ratio": 1.202449039319536,
+    "sampled_direction": [
+      -0.773914092836764,
+      -0.6332905943630052
+    ],
+    "tested_directions": 1027,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "pde_compound",
+    "seed": 31,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.6635388541481315,
+    "sampled_minimum_pointwise_ratio": 1.6626497419045976,
+    "sampled_direction": [
+      -0.9997793201874186,
+      -0.02100740168567382
+    ],
+    "tested_directions": 1027,
+    "pointwise_unbounded_witness": false
+  },
+  {
+    "system": "pde_compound",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "local",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 0.9858159886273149,
+    "sampled_minimum_pointwise_ratio": 0.9803015911697452,
+    "sampled_direction": [
+      -0.7693498674158722,
+      -0.638827661820604
+    ],
+    "tested_directions": 1027,
+    "pointwise_unbounded_witness": true
+  },
+  {
+    "system": "pde_compound",
+    "seed": 32,
+    "profile": "iid",
+    "model_kind": "iid",
+    "bank": "broad",
+    "slot": 0,
+    "negative_eigenvector_pointwise_ratio": 1.2175145433864232,
+    "sampled_minimum_pointwise_ratio": 1.1917925478134705,
+    "sampled_direction": [
+      -0.9990426581683369,
+      -0.04374662455485742
+    ],
+    "tested_directions": 1027,
+    "pointwise_unbounded_witness": false
+  }
+]

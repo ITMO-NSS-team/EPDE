@@ -1,0 +1,29 @@
+[
+  {
+    "system": "kdv_cossin",
+    "seed": 1,
+    "slot": 0,
+    "method": "smooth_clsm",
+    "bandwidth": "gcv",
+    "half": true,
+    "full": false
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 1,
+    "slot": 0,
+    "method": "smooth_clsm",
+    "bandwidth": "loo",
+    "half": true,
+    "full": false
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 1,
+    "method": "smooth_clsm",
+    "bandwidth": "loo",
+    "half": false,
+    "full": true
+  }
+]

@@ -1,0 +1,184 @@
+{
+  "system_runs": 12,
+  "reference_seed_cases": 12,
+  "registered_equation_seed_cases": 24,
+  "paired_reused_seeds": [
+    3,
+    4,
+    5
+  ],
+  "source_and_input_hashes_verified": true,
+  "raw_data_replay_verified": true,
+  "registered_supports_unchanged": true,
+  "matched_physical_fitting_geometry_verified": true,
+  "common_validation_support_checks": 1845,
+  "finite_scored_fits": 1932,
+  "checked_new_irls_iterations": 4744,
+  "new_fit_statuses": [
+    {
+      "bank": "interpolated_broad",
+      "method": "irls",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "interpolated_broad",
+      "method": "ols",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "interpolated_local",
+      "method": "irls",
+      "status": "nonconverged",
+      "count": 3
+    },
+    {
+      "bank": "interpolated_local",
+      "method": "irls",
+      "status": "ok",
+      "count": 69
+    },
+    {
+      "bank": "interpolated_local",
+      "method": "ols",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "interpolated_mixed",
+      "method": "irls",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "interpolated_mixed",
+      "method": "ols",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "native_broad",
+      "method": "irls",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "native_broad",
+      "method": "ols",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "native_local",
+      "method": "irls",
+      "status": "nonconverged",
+      "count": 2
+    },
+    {
+      "bank": "native_local",
+      "method": "irls",
+      "status": "ok",
+      "count": 70
+    },
+    {
+      "bank": "native_local",
+      "method": "ols",
+      "status": "ok",
+      "count": 72
+    },
+    {
+      "bank": "native_mixed",
+      "method": "irls",
+      "status": "nonconverged",
+      "count": 1
+    },
+    {
+      "bank": "native_mixed",
+      "method": "irls",
+      "status": "ok",
+      "count": 71
+    },
+    {
+      "bank": "native_mixed",
+      "method": "ols",
+      "status": "ok",
+      "count": 72
+    }
+  ],
+  "infeasible_validation_weights": [],
+  "prior_coefficients_and_scores_reproduced": true,
+  "maximum_baseline_score_error": 0.0,
+  "incomplete_averages_excluded": true,
+  "ode_simple_identity_controls": 3,
+  "result_sha256": {
+    "ac_seed3.json": "7f57597691e8db19902a1ad8577b202f06dbab7da4ffd8dbcdc017c485431ee2",
+    "ac_seed4.json": "019e3ec2d9e4ab629ab0c062c1e237558f7a335dba727d60fa7e849b4c9a2c84",
+    "ac_seed5.json": "bf0ce185258095e3ecb4aa664088abd06a37bf2e1c949b55df663ee6e64e2a37",
+    "kdv_cossin_seed3.json": "30149d04974fe3bdcd9f1824e0f173a4bef0257dc8ea7bb8647c2bfd801c3e43",
+    "kdv_cossin_seed4.json": "98ce15fa8bb86e63bc18cee6f12f80a56de82fa061ff9ae0c0457f968a2dd667",
+    "kdv_cossin_seed5.json": "4d5bc6fd38c329990fba78829b43efacf64653850a4093d91f1cac7ff3581cdb",
+    "ks_seed3.json": "9271a1012f4bddc331e3f9d877394cd34be30681efc21f3221e5e4f4140a3750",
+    "ks_seed4.json": "f47bf10280b54fd05ed266107a7836238a9c1c948ae70d09d0970fe6401c9942",
+    "ks_seed5.json": "c17a50bd976009c3dd10263c8c11a4acd1b70056d2609232aa9405602ac25444",
+    "wave_seed3.json": "6e06be233f55e03561ad38103ebba7b5cd9eef7961d5e3b02f66be3fe97d54f7",
+    "wave_seed4.json": "4eee542d287a5922e84a562a93fe55644da24f1146704546ffba18f525bf8fcc",
+    "wave_seed5.json": "8b77cef3b721a224bab87765ce3a4e5ad7a15e53b2b536e628a32d07a32955d8"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\followup128\\ac_seed0_b128.json": "0f8d8d847f2ac9c974d0f508fa880c3db2887c7644e79c4468667f15ffd670d7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\ac_seed3.json": "0b01bf3f4ae846f033baa4a726ad34e46a0dd1febf0925725516ae91370462c8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\fit_results\\ac_seed0.json": "fcc25970bbc2e36febb0e78bc894f20df6929a28b39fa2d8ee69980aac03e237",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_prediction_risk_2026-11-16\\results\\ac_seed0.json": "9ef1762cffd95253c110e6995c6ece8c3b5199220310d8a0f5aedda5976dd194",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\results\\ac_seed0.json": "6d00c5d6b096c146163b83dfedc0619a91a415900b2d04e55f542e2032519bf6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\ac_seed4.json": "96ffe102cacda1223fc674a38d76e25b15c1946a749a4ed480708faa169f2738",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\ac_seed5.json": "e880bf68becad24fdc2e968e0d977be338faa46e662bef5bdd3f99be3bc9a3b4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\followup128\\kdv_cossin_seed0_b128.json": "1063e5c551366bff432f0edd3de729c784db58641b769c722698876f4240cf07",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\kdv_cossin_seed3.json": "119c6517d94d425063e5fdfcdce94bfd6eee3b239bda9001c32683b435947122",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\fit_results\\kdv_cossin_seed0.json": "7cdcc82820f492628ea5384c0986d9d38d50504cb6b26c50ae05442db8c31219",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_prediction_risk_2026-11-16\\results\\kdv_cossin_seed0.json": "8ded7a5ecbdade28836549a8364116ee0fadb69e4a0a493a28ce9538727dd764",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\results\\kdv_cossin_seed0.json": "30c6bf4a7e5f5d913266197867f07b8a237491a1b22697e1db0075ca1ee126d8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\kdv_cossin_seed4.json": "17c9a2319af6b5e897c4087dd318173175f64a8160d45b913f43b2e13c81e837",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\kdv_cossin_seed5.json": "ad97407b30017c235047f2eb8692395849004cbfcfc9323a54bc03991b6eac9a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\audited\\ks_seed0_b32.json": "b58674b4c9edae57e350a7d86ce03f7d05a38d0223965d86c26b120e16bb0506",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\ks_seed3.json": "47f68c4dd7cbf97e8881fdb93be0113c9de37f0503ba7d0011ae054674474b96",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\fit_results\\ks_seed0.json": "7979c1c514bbe49cb72042ddec7eb5db2a5f94426d2f7eb3de3630b5962a9709",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_prediction_risk_2026-11-16\\results\\ks_seed0.json": "e057f155f0b550a9a70665908f2325ba8a5e2ce2fba3f32a851631eaa3af0feb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\results\\ks_seed0.json": "b6fb2f5668f84729165cf74273512362234fe96b68651834863f166fdf118f42",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\ks_seed4.json": "e99b2e76b67ff95f66bd798a9032fdf328808447a01919130c193081171c04b0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\ks_seed5.json": "798d16f2295c0606e4617f79ad673cd0d40ce1b2abade92bc5918820bfb3d178",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\audited\\wave_seed0_b32.json": "db788dff71b1043924f37b8f008e6806eae570d914a45c58491adef9d608f2f1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\wave_seed3.json": "bf80a5747fd94559e1e32f6044e88273b6a0d0084512e133ac733f97db9e43ba",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\fit_results\\wave_seed0.json": "733a809e8ffb0dd1305e9ab4afbeb1a0f0c551fc3353e64d51dadc35f98779a6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_prediction_risk_2026-11-16\\results\\wave_seed0.json": "d94136cc8bd355d5fce65dbeb78e0339d74ecda7f3ae9fd9101be8ee5acc4852",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\results\\wave_seed0.json": "aeffdd5679857ebc29129785ff95fd98526dc8b32f0df174b001e0308dc2fb4c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\wave_seed4.json": "7708936de018fdce6790e67dae74ceb4d36a46b3e2798562bab0793decd15ea6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\results\\wave_seed5.json": "c3c7ebbbd5fba03c772cce69c216f73aabe921a1c4025d681abc9a2f2113f60d"
+  },
+  "artifact_sha256": {
+    "audit_native.py": "c8e9d9825019f8c98453f4a7cca4a231c60a48c4e13b3a23de273cc470a520d8",
+    "check_invariants.py": "5dbad1f2846a9ee99d3009968fd0dd8c770a307d84af407d310f94aec5e306b5",
+    "checks.json": "3c0b3f4a0580be2d59aa85670c6d43b31603c9b076ca22a511983013262e952b",
+    "clean_controls.csv": "fcbedc38aff97c230de3fc69dca3d4219ec6d0beed848469c3fbf87744336fe7",
+    "coefficient_errors.csv": "01653f4889617bc8b305279ce55ae9cdc4ed94ce1e93eb8ba44448a49046f9f6",
+    "comparison.png": "bd45568af47ee804f82849b0376956ab200919a77766f667d4b78dd10ceab4f1",
+    "comparison.svg": "2cc2a677430467459ead145a7e242109085a2d541e721444a829d04600d833ce",
+    "diagnose_native.py": "27ae76cfaee300d600ae0a5c0924fe98281541cf09a93cb5f493818977a85eb3",
+    "diagnosis.json": "3644870e7ffa7ad102349aa7d5cf48281b6a6447b77d23a31eedc6ec522d85ed",
+    "failed_fits.csv": "3d2119197a9a5f8f48037af73c3d5d6a9a31b26dffe5f7caac54fed5e75afeeb",
+    "findings.txt": "3da651b76fbf397da7c7d85cb135eed84458d52cb5b9f77374e249401e675112",
+    "invariant_checks.json": "c8b8793517e3111031818d5f54d2ec6150ebda1cd551edf3eed859b0e754eecc",
+    "native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "paired_input_comparison.csv": "936138458739aa6da75ae73e14ae2b5df5b113c56345b29eb1376a16054a1ad1",
+    "per_case.csv": "8f26693c957ba57de641cc5d33eb1c1575244d473f8011315218d24cdf84036d",
+    "per_fold.csv": "36cca38f2a2d1e6825d339996c1d8692c4c46e941ef29feab04a72a75df9472a",
+    "protocol.txt": "61a75e9f09257f079228af885ea5d900124fd6ce7a756d3aa528b77b1b84844b",
+    "ranking_agreement.csv": "1469443dd032a41c66093719da3f2bbf13879646616b0b46d72e21227f5d501c",
+    "ranking_diagnostic.csv": "4f114a4e44e5ac0de9125ade82cad1010a0fedfd0f6f8f344dd5077284a6e9a7",
+    "run_native.py": "c38bfa301e350f127ee16106052aa29a9155b88174828e677fe7805be8ef68c5",
+    "summarize_native.py": "9bb5a4a1e3c9d0bc4cd0b11e3350a448d4f00dbf6f85861f5ba63a37bab9e9ef",
+    "summary.csv": "cbaa5ca47e560b1726779a3dc002272196c657145f36ce154625ca50c373225b",
+    "summary.json": "375e2813c5b93f36625fa4c043cf92e0af7304700b70c07576f0d54a6078ad67",
+    "validation_weighting.csv": "ee69c86578687a5e81a71c2d9cfed20c267215ef72b446499c4ea5866accbfc3"
+  }
+}

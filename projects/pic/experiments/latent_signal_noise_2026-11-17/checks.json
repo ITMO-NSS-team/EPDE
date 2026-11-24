@@ -1,0 +1,548 @@
+{
+  "status": "PASS",
+  "dense_checks": 40,
+  "max_quadratic_error": 3.3787728170864284e-10,
+  "recovery": [
+    {
+      "shape": [
+        1001
+      ],
+      "rho": -0.4,
+      "model": [
+        0.20356862649753998,
+        [
+          -0.419254748848231
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.20356862649753998,
+        "rhos": [
+          -0.419254748848231
+        ],
+        "kappas": [
+          1.6701652501390254e-10
+        ],
+        "signal_curvature_sigma": [
+          2.630816567257887e-06
+        ],
+        "log_kappas": [
+          -22.51292835622818
+        ],
+        "shape": [
+          1001
+        ],
+        "contrast_count": 999,
+        "objective": -2.4481622267367955,
+        "fits": [
+          {
+            "success": true,
+            "value": -2.4465527174010173,
+            "theta": [
+              -0.4114276938532108,
+              -19.02522452337343
+            ],
+            "iterations": 11,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -2.4481622267367955,
+            "theta": [
+              -0.419254748848231,
+              -22.51292835622818
+            ],
+            "iterations": 18,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -2.4453263228459394,
+            "theta": [
+              -0.42017969711852404,
+              -18.455599862392614
+            ],
+            "iterations": 10,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.002835903890856084,
+        "likelihood": "exact"
+      }
+    },
+    {
+      "shape": [
+        1001
+      ],
+      "rho": 0.0,
+      "model": [
+        0.20452467207010544,
+        [
+          0.003198504366591939
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.20452467207010544,
+        "rhos": [
+          0.003198504366591939
+        ],
+        "kappas": [
+          6.675458566168079e-09
+        ],
+        "signal_curvature_sigma": [
+          1.6710377356431653e-05
+        ],
+        "log_kappas": [
+          -18.824827935968372
+        ],
+        "shape": [
+          1001
+        ],
+        "contrast_count": 999,
+        "objective": -1.744754363330072,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.744754363330072,
+            "theta": [
+              0.003198504366591939,
+              -18.824827935968372
+            ],
+            "iterations": 9,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.744464221213708,
+            "theta": [
+              0.006955829963800693,
+              -18.642408978660455
+            ],
+            "iterations": 15,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.743760577096757,
+            "theta": [
+              -0.0049681794833513065,
+              -18.32443276878141
+            ],
+            "iterations": 10,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.0009937862333149194,
+        "likelihood": "exact"
+      }
+    },
+    {
+      "shape": [
+        1001
+      ],
+      "rho": 0.4,
+      "model": [
+        0.19611108522971346,
+        [
+          0.37547553162464686
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.19611108522971346,
+        "rhos": [
+          0.37547553162464686
+        ],
+        "kappas": [
+          5.382431131485059e-09
+        ],
+        "signal_curvature_sigma": [
+          1.4387700335238359e-05
+        ],
+        "log_kappas": [
+          -19.04012568166551
+        ],
+        "shape": [
+          1001
+        ],
+        "contrast_count": 999,
+        "objective": -1.3210914210070954,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.320884891387687,
+            "theta": [
+              0.37204940571403833,
+              -18.366597444506144
+            ],
+            "iterations": 16,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.3210914210070954,
+            "theta": [
+              0.37547553162464686,
+              -19.04012568166551
+            ],
+            "iterations": 22,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.3191563727389441,
+            "theta": [
+              0.36880619560093775,
+              -16.268385943041967
+            ],
+            "iterations": 22,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.0019350482681512737,
+        "likelihood": "exact"
+      }
+    },
+    {
+      "shape": [
+        81,
+        128
+      ],
+      "rho": -0.4,
+      "model": [
+        0.19960717664508015,
+        [
+          -0.40559730251365345,
+          -0.41110710570669823
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.19960717664508015,
+        "rhos": [
+          -0.40559730251365345,
+          -0.41110710570669823
+        ],
+        "kappas": [
+          6.774314613371781e-07,
+          8.812002860358911e-08
+        ],
+        "signal_curvature_sigma": [
+          0.00016428913119350015,
+          5.925342606004384e-05
+        ],
+        "log_kappas": [
+          -14.204957453387951,
+          -16.24456599041417
+        ],
+        "shape": [
+          81,
+          128
+        ],
+        "contrast_count": 20318,
+        "objective": -2.266771522308232,
+        "fits": [
+          {
+            "success": true,
+            "value": -2.2667714959506986,
+            "theta": [
+              -0.4055125669785868,
+              -0.41113175272353747,
+              -14.200464995008318,
+              -16.221656911157133
+            ],
+            "iterations": 40,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -2.266771522308232,
+            "theta": [
+              -0.40559730251365345,
+              -0.41110710570669823,
+              -14.204957453387951,
+              -16.24456599041417
+            ],
+            "iterations": 38,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -2.266771384781803,
+            "theta": [
+              -0.4054376959512509,
+              -0.4111087560739855,
+              -14.224855383094237,
+              -16.18458935299999
+            ],
+            "iterations": 37,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 1.3752642891162736e-07,
+        "likelihood": "axis_composite"
+      }
+    },
+    {
+      "shape": [
+        81,
+        128
+      ],
+      "rho": 0.0,
+      "model": [
+        0.20168278357514427,
+        [
+          0.010864065362244806,
+          0.015280710776457854
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.20168278357514427,
+        "rhos": [
+          0.010864065362244806,
+          0.015280710776457854
+        ],
+        "kappas": [
+          1.0894404534159909e-08,
+          5.887773071965111e-09
+        ],
+        "signal_curvature_sigma": [
+          2.1050895508645563e-05,
+          1.5475488191654965e-05
+        ],
+        "log_kappas": [
+          -18.335016525008136,
+          -18.950387997029345
+        ],
+        "shape": [
+          81,
+          128
+        ],
+        "contrast_count": 20318,
+        "objective": -1.610633679333683,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.6106259987993146,
+            "theta": [
+              0.010747584658114342,
+              0.015243470200759494,
+              -16.773251897283977,
+              -18.281510623854555
+            ],
+            "iterations": 19,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.610633679333683,
+            "theta": [
+              0.010864065362244806,
+              0.015280710776457854,
+              -18.335016525008136,
+              -18.950387997029345
+            ],
+            "iterations": 23,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.6106321353642457,
+            "theta": [
+              0.010733470186606888,
+              0.015062031315335074,
+              -16.843900031762892,
+              -22.128495492125527
+            ],
+            "iterations": 23,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 7.6805343685038e-06,
+        "likelihood": "axis_composite"
+      }
+    },
+    {
+      "shape": [
+        81,
+        128
+      ],
+      "rho": 0.4,
+      "model": [
+        0.20268658555063765,
+        [
+          0.40559068716165875,
+          0.3921817003579707
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.20268658555063765,
+        "rhos": [
+          0.40559068716165875,
+          0.3921817003579707
+        ],
+        "kappas": [
+          5.993225337398384e-08,
+          6.649735053377937e-13
+        ],
+        "signal_curvature_sigma": [
+          4.9619834349477874e-05,
+          1.6528261585858467e-07
+        ],
+        "log_kappas": [
+          -16.630051023083336,
+          -28.03902919664583
+        ],
+        "shape": [
+          81,
+          128
+        ],
+        "contrast_count": 20318,
+        "objective": -1.1694046781893763,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.1693961294257964,
+            "theta": [
+              0.4066562926322377,
+              0.3906317488469261,
+              -15.521029448257611,
+              -17.068883007534883
+            ],
+            "iterations": 22,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.1693899554744174,
+            "theta": [
+              0.4067438678234686,
+              0.39051671045738434,
+              -15.887121885380278,
+              -16.512399621158984
+            ],
+            "iterations": 27,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.1694046781893763,
+            "theta": [
+              0.40559068716165875,
+              0.3921817003579707,
+              -16.630051023083336,
+              -28.03902919664583
+            ],
+            "iterations": 24,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 1.4722714958947947e-05,
+        "likelihood": "axis_composite"
+      }
+    }
+  ],
+  "latent_signal": {
+    "model": [
+      0.20466939007154672,
+      [
+        0.44749196273336456
+      ],
+      [
+        2
+      ]
+    ],
+    "info": {
+      "status": "ok",
+      "sigma": 0.20466939007154672,
+      "rhos": [
+        0.44749196273336456
+      ],
+      "kappas": [
+        9.044077502237292e-06
+      ],
+      "signal_curvature_sigma": [
+        0.0006155098863796663
+      ],
+      "log_kappas": [
+        -11.613400434120729
+      ],
+      "shape": [
+        1001
+      ],
+      "contrast_count": 999,
+      "objective": -1.1982071001715044,
+      "fits": [
+        {
+          "success": true,
+          "value": -1.198207099861309,
+          "theta": [
+            0.4474855550656168,
+            -11.613105897665006
+          ],
+          "iterations": 15,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.198207099809026,
+          "theta": [
+            0.4474907454372783,
+            -11.613574401064179
+          ],
+          "iterations": 15,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.1982071001715044,
+          "theta": [
+            0.44749196273336456,
+            -11.613400434120729
+          ],
+          "iterations": 14,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        }
+      ],
+      "failed_evaluations": 0,
+      "successful_objective_spread": 3.6247849166670676e-10,
+      "likelihood": "exact"
+    }
+  },
+  "trend_units_invariant": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\checks.py": "e7819a2eef946f19a312e4741a20ccff9cc6f9207a40ab6bc3d0855a56daf63a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\latent_fit.py": "84e33329e5f57c3b73f2151154e0341ad9071ea145696ccf2bb58b5a48a7fe9a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\protocol.txt": "1b9ce55e3d7aad010f4d6c3b3c921ebcd9b11a011ec100ed1a51b6c5d994a427"
+  }
+}

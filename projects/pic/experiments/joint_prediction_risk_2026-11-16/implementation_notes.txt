@@ -1,0 +1,18 @@
+Numerical reproduction correction
+
+The first implementation used algebraically equivalent einsum/centered-product
+arithmetic for the covariance correction and a precomputed feature norm.
+AC seed 1 fold 1 contained an ill-conditioned extra candidate whose coefficient
+differed from the stored baseline by 8.07e-8 (relative 1.09e-6), exceeding the
+predefined reproduction tolerance. The check stopped that worker.
+
+The correction preserves the original sequential accumulation, matrix-product
+ordering, and point-fit helper. The statistical criterion, all options,
+selection rule, noise draws, and tolerances were unchanged. Earlier source,
+checks, and seven completed results are retained as run_joint_initial.py,
+initial_checks.json, and initial_results/. They are excluded from the reported
+experiment. The complete targeted suite is rerun under one corrected source.
+
+The fast normalized solver remains in use for new conditional perturbation
+fits, where no previous baseline values exist. Its agreement with the existing
+helper and feature-rescaling invariance are checked before every worker runs.

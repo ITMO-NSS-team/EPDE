@@ -1,0 +1,23 @@
+After the local-polynomial/normalization failures, before this screen:
+Test one global time-contrast estimator on old anchor36, all15 iid plus core4
+colored profiles. Axis0 is the dataset's known time coordinate, not an axis
+selected using clean signal or noise truth. Fit the same AR2-curvature/AR1-noise
+model to temporal second differences, jointly across all spatial lines, with
+one temporal sigma/rho. Use Fisher coordinates and the verified innovations
+score to certify/refine the best banded solution. Four fixed starts globally.
+
+For each spatial axis, estimate its noise correlation from fourth temporal
+differences. Under separable Gaussian AR1 noise, ANY common temporal linear
+filter preserves the spatial correlation. Estimate Gaussian correlation by
+sin(pi/2 * mean(sign(z_left)*sign(z_right))) after pooled median centering.
+The bounded sign statistic limits influence of localized remaining temporal
+signal. This uses temporal smoothness; it is not a universal identification
+claim for arbitrary signals or arbitrary noise families. No spatial polynomial
+projection removes the informative spatial noise frequencies. No axis oracle.
+
+One-dimensional systems use the temporal likelihood alone. The fixed starts
+(rho,logk,p1,p2) are (0,-5,.99,-.8),(.4,-3,.95,-.5),(-.4,-11,.9,0),
+(0,-15,.9,0). Best finite objective is polished with the stable state score if
+needed; require transformed projected gradient<=2e-5. Preserve warnings.
+Screen and noise-only diagnostics are separated by a frozen raw fit. No fresh
+validation or promotion before screening and numerical/invariance checks.

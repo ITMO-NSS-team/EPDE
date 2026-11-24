@@ -1,0 +1,29 @@
+{
+  "python": "3.14.2",
+  "numpy": "2.4.4",
+  "scipy": "1.18.0",
+  "checks": {
+    "primary_cases": 45,
+    "followup_cases": 15,
+    "source_hashes_match": true,
+    "split_indices_disjoint": true,
+    "same_observed_records": true,
+    "finite_scores": true,
+    "same_dyad_axis_across_budgets": true
+  },
+  "source_sha256": {
+    "projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen_initial.py": "57b4787dd9da34441f3ac60569b54f0c7ee45e495912554758a657f15a1a0e5f",
+    "projects\\pic\\experiments\\core15_residual_products_2026-11-16\\analyze_screen.py": "8c31f731eb9c0d57c3fbe7aed64ac3b71124f7aa74ad561107840c040a1b9a43",
+    "projects\\pic\\experiments\\core15_residual_products_2026-11-16\\diagnose_fits.py": "c2ff2ecd98fc132b846c175c23080a2d8c1845a64552c62f7c8616e1e89abdb1",
+    "projects\\pic\\experiments\\core15_residual_products_2026-11-16\\finalize.py": "7a0ca890838602b37668cb73552cf11eda1590e23d075e8e34a6141bb4070086",
+    "projects\\pic\\experiments\\core15_residual_products_2026-11-16\\protocol.txt": "7911137238fc8863ae166388f89828301d3e1122f647f60c6b582f3903b13d4c",
+    "epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "epde\\interface\\search_config.py": "4bed4c9f32b3bc824d341e9af02e7d7010fbc57527895512d0a0256cf61cf182",
+    "projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "projects\\pic\\epde_bench\\problem.py": "eb52710e49c86d3384475739a1db0e565c2141b685cf2e17ab26820b2288ecf2",
+    "projects\\pic\\epde_bench\\reconstruction.py": "ed6f3a1d180252738e80bbebcf8516023a64b9e29135ec15de350412af676247",
+    "projects\\pic\\epde_bench\\metrics.py": "410e4fd132d1a042f0f1a1ab847caad4989750607372a080cb6960a5a70627e1"
+  }
+}

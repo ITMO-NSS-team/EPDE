@@ -1,0 +1,272 @@
+[
+  {
+    "system": "kdv_cossin",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 13.18154240003787
+  },
+  {
+    "system": "ac",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 13.738534100004472
+  },
+  {
+    "system": "duffing",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 14.432312299963087
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 14.772876400034875
+  },
+  {
+    "system": "burgers",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 15.354422600008547
+  },
+  {
+    "system": "ode",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 13.01080250000814
+  },
+  {
+    "system": "lv",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 14.498749299964402
+  },
+  {
+    "system": "lorenz",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 17.10091919999104
+  },
+  {
+    "system": "pde_compound",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 19.595052799966652
+  },
+  {
+    "system": "vdp",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 17.01466420001816
+  },
+  {
+    "system": "pde_divide",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 20.259088499995414
+  },
+  {
+    "system": "ac",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 19.000491000013426
+  },
+  {
+    "system": "wave",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 25.34071350004524
+  },
+  {
+    "system": "burgers",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 17.99025720002828
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 17.085986000020057
+  },
+  {
+    "system": "ns",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 54.7680000999826
+  },
+  {
+    "system": "duffing",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 17.114973700023256
+  },
+  {
+    "system": "kdv",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 74.36692419997416
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 15.999327800003812
+  },
+  {
+    "system": "lv",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 15.77321860002121
+  },
+  {
+    "system": "lorenz",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 18.17718800000148
+  },
+  {
+    "system": "ode",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 15.588657000043895
+  },
+  {
+    "system": "pde_divide",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 19.21452599996701
+  },
+  {
+    "system": "pde_compound",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 22.05633890000172
+  },
+  {
+    "system": "vdp",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 14.803128900006413
+  },
+  {
+    "system": "ks",
+    "seed": 24,
+    "exit_code": 0,
+    "seconds": 115.41018579999218
+  },
+  {
+    "system": "ac",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 16.34249720000662
+  },
+  {
+    "system": "burgers",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 17.574415499984752
+  },
+  {
+    "system": "wave",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 22.180260799999814
+  },
+  {
+    "system": "ns",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 56.289124400005676
+  },
+  {
+    "system": "kdv",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 76.41270039998926
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 16.704765200032853
+  },
+  {
+    "system": "duffing",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 15.102014500007499
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 14.741749399981927
+  },
+  {
+    "system": "lv",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 15.114045900001656
+  },
+  {
+    "system": "lorenz",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 17.68269169999985
+  },
+  {
+    "system": "ode",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 14.556975000014063
+  },
+  {
+    "system": "pde_divide",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 18.02699110005051
+  },
+  {
+    "system": "pde_compound",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 20.830918799969368
+  },
+  {
+    "system": "vdp",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 14.069784999999683
+  },
+  {
+    "system": "ks",
+    "seed": 25,
+    "exit_code": 0,
+    "seconds": 114.14557180000702
+  },
+  {
+    "system": "wave",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 19.108406300016213
+  },
+  {
+    "system": "ns",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 49.9390877999831
+  },
+  {
+    "system": "kdv",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 67.35005349997664
+  },
+  {
+    "system": "ks",
+    "seed": 26,
+    "exit_code": 0,
+    "seconds": 88.50433719996363
+  }
+]

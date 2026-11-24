@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "records": 45,
+  "query_rows": 1116,
+  "scalar_scores": 859320,
+  "field_matrix_replays": 1260,
+  "fit_replays": 372,
+  "source_input_array_hashes": true,
+  "fresh_data_and_innovation_replay": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\audit.py": "65dda57ccec5bf827388c0bc5af731587477b783e061330b51b6c2ad9fcc16a6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\analyze.py": "aafdcebc46527e9e6010e3b29bd1ea7e25c05236598a9e5c8f96f0cf5b12b83d"
+  }
+}

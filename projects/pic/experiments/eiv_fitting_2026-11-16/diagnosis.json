@@ -1,0 +1,385 @@
+{
+  "nonconverged": [
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 0,
+      "bank": "local",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.09493411167424884,
+      "last_two_step_change_over_one_step": 1.8998792766948382e-14,
+      "last_coefficients": "[4.104516491698804, 0.009323971059695301, -0.1473260545298417]",
+      "previous_coefficients": "[4.138602631641447, -0.0014997470488843853, -0.11596505714664766]"
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 1,
+      "bank": "local",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.1922655713795331,
+      "last_two_step_change_over_one_step": 8.267340537924368e-15,
+      "last_coefficients": "[5.200842856014934, 0.008096102704738872, -0.14343822342215584]",
+      "previous_coefficients": "[4.557569241627729, 0.0006436207430245527, -0.10166211101742352]"
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 3,
+      "training": 2,
+      "bank": "local_dense",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.010947899076927205,
+      "last_two_step_change_over_one_step": 2.0531230811507338e-11,
+      "last_coefficients": "[4.3203006967543445, 0.0004749248854686806, -0.16210429198049534]",
+      "previous_coefficients": "[3.9618687187628665, -0.0012327213518288005, -0.15794492025514875]"
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 4,
+      "training": 2,
+      "bank": "local_dense",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 1.0454409280995326e-08,
+      "last_two_step_change_over_one_step": 2.1458701318559266,
+      "last_coefficients": "[4.082842980336509, -0.022120440975144096, -0.12835614694295125]",
+      "previous_coefficients": "[4.082842917355948, -0.02212043881110469, -0.12835615196500522]"
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 5,
+      "training": 1,
+      "bank": "local_dense",
+      "candidate": "e0:reference",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.039132102771126706,
+      "last_two_step_change_over_one_step": 8.46410372366126e-09,
+      "last_coefficients": "[6.300774265859609, -0.0004603080826300637, -0.1754375052453601]",
+      "previous_coefficients": "[5.65323455617523, -0.0022036657906119774, -0.16689984325746282]"
+    },
+    {
+      "system": "wave",
+      "seed": 4,
+      "training": 1,
+      "bank": "local",
+      "candidate": "e0:equivalent_3",
+      "status": "nonconverged",
+      "iterations": 100,
+      "last_prediction_change": 0.00041761987048701574,
+      "last_two_step_change_over_one_step": 1.9934663382201814,
+      "last_coefficients": "[0.2006794810367185, -0.007863371452820267, 0.0462402347714659]",
+      "previous_coefficients": "[0.200871836915201, -0.007844349125405468, 0.046098907301880834]"
+    }
+  ],
+  "coefficients": [
+    {
+      "system": "ac",
+      "bank": "local_dense",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": 0.0001,
+      "median": 2.808587645318983e-05,
+      "minimum": -0.00012098629530989403,
+      "maximum": 7.986849558550841e-05
+    },
+    {
+      "system": "ac",
+      "bank": "local_dense",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -5.0,
+      "median": -4.9277414997184135,
+      "minimum": -4.981913636508917,
+      "maximum": -4.777915764582887
+    },
+    {
+      "system": "ac",
+      "bank": "local_dense",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": 5.0,
+      "median": 4.93110437922558,
+      "minimum": 4.798291562563021,
+      "maximum": 4.9951065545483235
+    },
+    {
+      "system": "ac",
+      "bank": "local",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": 0.0001,
+      "median": 0.00012303057992594116,
+      "minimum": -0.0003338919191058272,
+      "maximum": 0.001041216542395902
+    },
+    {
+      "system": "ac",
+      "bank": "local",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -5.0,
+      "median": -4.996527175565082,
+      "minimum": -5.083423083260699,
+      "maximum": -4.899398811477797
+    },
+    {
+      "system": "ac",
+      "bank": "local",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": 5.0,
+      "median": 4.991204266898297,
+      "minimum": 4.930445544645766,
+      "maximum": 5.062327207077181
+    },
+    {
+      "system": "ac",
+      "bank": "broad",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": 0.0001,
+      "median": 5.735455126403032e-05,
+      "minimum": -0.0003261198566138435,
+      "maximum": 0.0004831915856374766
+    },
+    {
+      "system": "ac",
+      "bank": "broad",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -5.0,
+      "median": -4.96047185504478,
+      "minimum": -5.043828423273173,
+      "maximum": -4.923769837104895
+    },
+    {
+      "system": "ac",
+      "bank": "broad",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": 5.0,
+      "median": 4.962014474490765,
+      "minimum": 4.9411572588512165,
+      "maximum": 5.027897036064371
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "local_dense",
+      "index": 0,
+      "fitted_folds": 6,
+      "exact": -6.0,
+      "median": 5.800080264133641,
+      "minimum": 2.424313061022036,
+      "maximum": 13.312778426181179
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "local_dense",
+      "index": 1,
+      "fitted_folds": 6,
+      "exact": -1.0,
+      "median": -0.00475452938847526,
+      "minimum": -0.14813499753327197,
+      "maximum": 0.004149100319927275
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "local_dense",
+      "index": 2,
+      "fitted_folds": 6,
+      "exact": 1.0,
+      "median": -0.15975207737756422,
+      "minimum": -0.17292838466994942,
+      "maximum": 0.0566280377271858
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "local",
+      "index": 0,
+      "fitted_folds": 7,
+      "exact": -6.0,
+      "median": 4.376789715402159,
+      "minimum": 3.9628397682378527,
+      "maximum": 8.473536430561046
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "local",
+      "index": 1,
+      "fitted_folds": 7,
+      "exact": -1.0,
+      "median": -0.0131482999934854,
+      "minimum": -0.03555338986688568,
+      "maximum": 0.025419448403813282
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "local",
+      "index": 2,
+      "fitted_folds": 7,
+      "exact": 1.0,
+      "median": -0.10986332196972885,
+      "minimum": -0.16663944768015967,
+      "maximum": -0.08481985078494828
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "broad",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": -6.0,
+      "median": -4.095867771521514,
+      "minimum": -9.39750235652884,
+      "maximum": 1.6828879217741994
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "broad",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.5198837628893455,
+      "minimum": -0.6661691197101471,
+      "maximum": -0.42797764078226025
+    },
+    {
+      "system": "kdv_cossin",
+      "bank": "broad",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": 1.0,
+      "median": 0.43953482706172753,
+      "minimum": 0.33409034775430235,
+      "maximum": 0.6145874869843049
+    },
+    {
+      "system": "wave",
+      "bank": "local_dense",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": 0.04,
+      "median": 0.03684378970398412,
+      "minimum": 0.0014006932222475166,
+      "maximum": 0.059742692954311775
+    },
+    {
+      "system": "wave",
+      "bank": "local",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": 0.04,
+      "median": 0.036817497990583016,
+      "minimum": 0.005084974462310254,
+      "maximum": 0.05562579295220408
+    },
+    {
+      "system": "wave",
+      "bank": "broad",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": 0.04,
+      "median": 0.04048995907667351,
+      "minimum": 0.03852113561919097,
+      "maximum": 0.0425946053827363
+    },
+    {
+      "system": "ks",
+      "bank": "local_dense",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.9989167931532962,
+      "minimum": -1.0011037907541585,
+      "maximum": -0.99511810512849
+    },
+    {
+      "system": "ks",
+      "bank": "local_dense",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.997709939031228,
+      "minimum": -1.0017164816477861,
+      "maximum": -0.9931139792910064
+    },
+    {
+      "system": "ks",
+      "bank": "local_dense",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.9973745430944904,
+      "minimum": -1.002338450854425,
+      "maximum": -0.9922032241235255
+    },
+    {
+      "system": "ks",
+      "bank": "local",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.9989167931532962,
+      "minimum": -1.0011037907541585,
+      "maximum": -0.99511810512849
+    },
+    {
+      "system": "ks",
+      "bank": "local",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.997709939031228,
+      "minimum": -1.0017164816477861,
+      "maximum": -0.9931139792910064
+    },
+    {
+      "system": "ks",
+      "bank": "local",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.9973745430944904,
+      "minimum": -1.002338450854425,
+      "maximum": -0.9922032241235255
+    },
+    {
+      "system": "ks",
+      "bank": "broad",
+      "index": 0,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -0.9992350357935026,
+      "minimum": -1.0026460093454936,
+      "maximum": -0.9969619882945343
+    },
+    {
+      "system": "ks",
+      "bank": "broad",
+      "index": 1,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -1.0016780259282136,
+      "minimum": -1.0260007712661892,
+      "maximum": -0.9791362161937445
+    },
+    {
+      "system": "ks",
+      "bank": "broad",
+      "index": 2,
+      "fitted_folds": 9,
+      "exact": -1.0,
+      "median": -1.1238632497755767,
+      "minimum": -1.5133548275748134,
+      "maximum": -0.6043114832254874
+    }
+  ],
+  "note": "Coefficient summaries include only successful individual folds; fitted_folds is explicit. They are diagnostics, not complete-case accuracy summaries."
+}

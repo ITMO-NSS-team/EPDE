@@ -1,0 +1,244 @@
+KS reconstruction bias and full nuisance-procedure uncertainty
+=============================================================
+
+Scope: solver-free noise estimation, signal reconstruction, corrected weak
+moments and confidence-region calibration. The candidate library and weak-bank
+design remain fixed. This does not calibrate an adaptive structure search or
+ablate dyad. Constants and valid identities are retained. No candidate dynamics
+are integrated, and no production source is changed.
+
+1. Paired KS-positive diagnostic
+-------------------------------
+On three existing anchors 45-47, reuse the same generating noise model and 16
+noise increments per anchor. Change only ordinary versus correlation-aware
+GCV reconstruction; fit both noise estimators to identical fields within each
+pilot arm. These are procedure diagnostics, not coverage trials.
+
+Noise amplitude relative to its generating anchor estimate (min / median / max):
+  time    ordinary  : 1.26724 / 1.34852 / 5.03117; near-unit fits 6/48
+  local6  ordinary  : 1.04924 / 1.07996 / 1.12055; near-unit fits 0/48
+  time    correlated: 1.01728 / 1.03483 / 1.04910; near-unit fits 0/48
+  local6  correlated: 0.98623 / 1.00034 / 1.02739; near-unit fits 0/48
+
+Changing the pilot removes most of the bootstrap noise inflation. The local
+estimator median changes 1.07996 -> 1.00034; temporal changes 1.34852 -> 1.03483.
+The six temporal near-unit-root fits disappear. The temporal estimator retains
+a small systematic discrepancy; accurate bootstrap parameters alone would
+still not establish calibrated regions. This identifies reconstruction bias
+as a major contributor to the previous KS-positive collapse.
+
+2. Fresh complete nuisance-procedure test
+----------------------------------------
+69 fresh observed datasets: 15 iid systems plus 4 core systems under positive
+and negative correlation, three independent noise seeds 51-53 per case. Noise
+scale is the benchmark 5% of clean signal SD. Each observed dataset gets its own
+temporal noise fit, correlation-aware pilot, covariance metric and cutoff.
+Fit noise and reconstruct all 128 bootstrap fields. Covariance normalization
+uses 16 fixed common Gaussian realizations and exact polynomial calculations.
+The paired modes differ only in whether normalization uses the anchor pilot
+(fixed_pilot) or each bootstrap field reconstructed anew (refit_pilot).
+Both modes center bootstrap errors on the generating anchor pilot. The 123rd
+ordered statistic of 128 sets the cutoff. All fits, cutoffs and regions are
+frozen before clean-field evaluation. Each observed dataset contributes ONE
+coverage indicator; bootstrap draws are never counted as independent trials.
+
+Completion: 69/69 datasets; {'COMPLETE': 69}
+Retained numerical warnings: 0.
+
+Observed datasets covered by operator bounds (local / broad / joint):
+  iid      fixed_pilot: 44/45 / 44/45 / 44/45
+  iid      refit_pilot: 44/45 / 44/45 / 44/45
+  positive fixed_pilot: 11/12 / 12/12 / 12/12
+  positive refit_pilot: 11/12 / 12/12 / 12/12
+  negative fixed_pilot: 12/12 / 12/12 / 12/12
+  negative refit_pilot: 12/12 / 12/12 / 12/12
+
+KS specifically (local / broad / joint):
+  iid      fixed_pilot: 3/3 / 3/3 / 3/3
+  iid      refit_pilot: 3/3 / 3/3 / 3/3
+  positive fixed_pilot: 2/3 / 3/3 / 3/3
+  positive refit_pilot: 2/3 / 3/3 / 3/3
+  negative fixed_pilot: 3/3 / 3/3 / 3/3
+  negative refit_pilot: 3/3 / 3/3 / 3/3
+
+Cases with at least one uncovered dataset under refitted reconstruction:
+  kdv / iid / local: 2/3
+  pde_compound / iid / broad: 2/3
+  pde_compound / iid / both: 2/3
+  ks / positive / local: 2/3
+
+3. Effect of propagating reconstruction uncertainty
+--------------------------------------------------
+  local: fixed-only coverage 0, refit-only 0, both 67, neither 2
+  broad: fixed-only coverage 0, refit-only 0, both 68, neither 1
+  both: fixed-only coverage 0, refit-only 0, both 68, neither 1
+  local refit/fixed cutoff ratio min/10%/median/90%/max: 0.956027, 0.991441, 1.00424, 1.01668, 1.06182
+  broad refit/fixed cutoff ratio min/10%/median/90%/max: 0.956438, 0.98559, 0.999511, 1.01618, 1.0861
+  Both normalization variants make identical coverage decisions on all
+  observed datasets. This screen provides no coverage-based reason to pay
+  for reconstruction inside every bootstrap normalization. It does not
+  prove the variants equivalent on other data or at other noise levels.
+  Joint reference geometries: {'fixed_pilot': {'bounded_outer': 75, 'unbounded_certified': 9}, 'refit_pilot': {'bounded_outer': 75, 'unbounded_certified': 9}}
+  Refitted/fixed coordinate-width ratio quantiles for pairs with bounded
+  outer regions under both methods: 0.982049, 0.993119, 0.999996, 1.01087, 1.04442
+
+Reference-direction coverage and equation-zero acceptance are separate from
+uniform library-wide operator coverage. A bounded or accepted region alone
+does not prove calibration or precise coefficients. See reference_directions.csv
+and reference_geometry.csv; equations within one dataset are not independent
+coverage trials. The covariance changes themselves are in pilot_metric_effect.csv.
+
+Statistical noise-identification warning, separate from numerical convergence:
+  One of 10,752 bootstrap variable fits is extreme: ode/iid/seed52, draw 112.
+  Marginal sigma is 72.47 times its generating anchor value and rho=0.999916,
+  despite projected gradient 1.60e-7. The correlation length is about 37
+  record lengths, while temporal innovation amplitude changes only 9.4%.
+  Curvature contrasts weakly constrain such long-range level variance.
+  The observed anchor itself estimated rho=0.516 under iid generating noise
+  and sigma about 38.6% above its generating value. Optimizer convergence
+  therefore must not be treated as statistical noise identification.
+  The extreme draw ranks 123rd locally, exactly selecting the cutoff.
+  A diagnostic leave-one-out calculation lowers local cutoffs by 14.46%
+  (fixed pilot) and 5.11% (refitted pilot); broad/joint cutoffs do not change.
+  The original draw is retained everywhere. These are sensitivity diagnostics,
+  not a license to delete finite fits or impose a truth-selected rho cap.
+  See noise_tail_diagnostic.json. Profile-based noise-identification checks
+  are a remaining solver-free task before production promotion.
+
+Post-calibration diagnostics for refitted-pilot bank failures:
+  kdv/iid/seed53/local: observed/cutoff 1.04608; bootstrap exceedances 1/128.
+    Leading covariance-scaled coordinates: [['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]] (-0.446), [['du/dx0', [['power', 1.0]]], ['u', [['power', 1.0]]]] (-0.433), [['u', [['power', 3.0]]]] (-0.411), [['d^2u/dx1^2', [['power', 1.0]]], ['u', [['power', 1.0]]]] (-0.405), [['d^3u/dx1^3', [['power', 1.0]]], ['u', [['power', 1.0]]]] (-0.335)
+  ks/positive/seed51/local: observed/cutoff 1.01043; bootstrap exceedances 4/128.
+    Leading covariance-scaled coordinates: [['u', [['power', 3.0]]]] (-0.781), [['u', [['power', 2.0]]]] (-0.541), [['u', [['power', 1.0]]]] (+0.202), [['d^4u/dx1^4', [['power', 1.0]]]] (+0.166), [['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]] (-0.138)
+  pde_compound/iid/seed52/broad: observed/cutoff 1.40701; bootstrap exceedances 0/128.
+    Leading covariance-scaled coordinates: [['u', [['power', 2.0]]]] (-0.822), [['u', [['power', 1.0]]]] (+0.42), [['u', [['power', 3.0]]]] (+0.381), [['d^2u/dx1^2', [['power', 1.0]]], ['u', [['power', 1.0]]]] (-0.0466), [['du/dx1', [['power', 2.0]]]] (-0.0264)
+  Reference-direction failures (noise or zero acceptance): 0.
+  Exceedance ranks are diagnostics, not certified p-values. Coordinates can
+  mix correlated library columns; they do not identify a unique causal term.
+
+Post hoc attribution using the known generating noise model:
+  kdv_iid_seed53/local: original score 1.82539, oracle-correction-only score 1.8254, oracle correction+covariance score 1.80298; original refitted-pilot cutoff 1.74499.
+  ks_positive_seed51/local: original score 1.0529, oracle-correction-only score 1.05302, oracle correction+covariance score 1.15331; original refitted-pilot cutoff 1.04203.
+  pde_compound_iid_seed52/broad: original score 6.04462, oracle-correction-only score 5.55336, oracle correction+covariance score 5.98755; original refitted-pilot cutoff 4.29608.
+  These diagnostic scores retain the original reconstructed pilot and do
+  not recalibrate any cutoff. They are not oracle coverage experiments.
+  Noise-parameter error alone does not explain every remaining miss.
+  Distinguishing tail realizations from systematic bootstrap error needs
+  further independent outer datasets; do not force every 95% bound to pass.
+
+Coefficient precision, beyond coverage and boundedness:
+  21/186 nonzero reference coefficient coordinates in bounded outer regions have an explicit accepted zero-coefficient witness.
+  Each witness is checked against BOTH original joint quadratic inequalities.
+  An outer interval crossing zero alone is not counted as a witness. Failure
+  to find a witness among three proposals is not proof that zero is excluded.
+  Coordinates/equations within a dataset are not independent statistical trials.
+  ac/iid: 3/9 accepted zero witnesses; full width/absolute truth min/median/max: 0.165121, 0.210664, 43.2893
+  ns/iid: 4/33 accepted zero witnesses; full width/absolute truth min/median/max: 0.0913537, 0.468758, 9.8217
+  pde_compound/iid: 3/6 accepted zero witnesses; full width/absolute truth min/median/max: 1.96376, 4.74271, 9.25111
+  wave/iid: 2/3 accepted zero witnesses; full width/absolute truth min/median/max: 1.75931, 1.80778, 2.0444
+  ac/positive: 3/9 accepted zero witnesses; full width/absolute truth min/median/max: 0.292697, 0.378361, 72.037
+  ac/negative: 3/9 accepted zero witnesses; full width/absolute truth min/median/max: 0.0690453, 0.0872861, 15.6404
+  wave/positive: 3/3 accepted zero witnesses; full width/absolute truth min/median/max: 4.24241, 4.36831, 4.41566
+  Certified unbounded regions have a common coefficient direction whose
+  data-residual curvature is smaller than its calibrated error allowance
+  in both banks. Growing coefficients along that direction remains accepted.
+  This is insufficient coefficient information at the tested noise/design;
+  better calibration alone cannot turn it into precise identification.
+  Full coordinate bounds, explicit witnesses and recession diagnostics:
+  coefficient_precision.csv and precision_summary.json.
+
+4. Exploratory calibration over the fixed candidate panel
+---------------------------------------------------------
+This comparison was proposed after inspecting initial primary results.
+It reuses the archived draws and fits, restricting the operator maximum
+to the union of the existing candidate supports, with a maximum over all
+candidates and both banks. The same order-statistic cutoff rule applies.
+It does not account for adaptive searches outside that fixed panel.
+All gains/losses are exploratory and need independent outer validation.
+  iid/fixed_pilot: panel-union coverage 44/45; original-library coverage 44/45; original-only 0, panel-only 0.
+  iid/refit_pilot: panel-union coverage 44/45; original-library coverage 44/45; original-only 0, panel-only 0.
+  positive/fixed_pilot: panel-union coverage 12/12; original-library coverage 12/12; original-only 0, panel-only 0.
+  positive/refit_pilot: panel-union coverage 12/12; original-library coverage 12/12; original-only 0, panel-only 0.
+  negative/fixed_pilot: panel-union coverage 12/12; original-library coverage 12/12; original-only 0, panel-only 0.
+  negative/refit_pilot: panel-union coverage 12/12; original-library coverage 12/12; original-only 0, panel-only 0.
+  Panel reference geometries: {'fixed_pilot': {'bounded_outer': 75, 'unbounded_certified': 9}, 'refit_pilot': {'bounded_outer': 75, 'unbounded_certified': 9}}
+  Geometry changes: 0; reference-direction failures: 0.
+  fixed_pilot panel/original cutoff min/median/max: 0.411544, 0.908999, 1
+  refit_pilot panel/original cutoff min/median/max: 0.408904, 0.914966, 1
+  A smaller panel cutoff can select a different enclosing ellipsoid.
+  In KdV the raw enclosure width increased by up to about 30 times,
+  despite tighter joint inequalities. This is an enclosure artifact.
+  Reevaluate the original positive combination at the new cutoff and
+  intersect its coordinate bounds with the new enclosure. Both contain
+  the unchanged joint region. All 300 component ellipsoids were checked.
+  These retained enclosures do not alter thresholds or coverage.
+  fixed_pilot retained/original width min/median/max: 0.275084, 0.866075, 1
+  refit_pilot retained/original width min/median/max: 0.278412, 0.864196, 1
+  All nine forced-KdV reference regions remain certified unbounded.
+  Along each archived recession direction, the cutoff would need a
+  reduction of about 59-83% merely to remove that one direction.
+  The panel restriction reduces these cutoffs only about 1-10%.
+  That is an explanatory calculation, not a license to shrink calibrated
+  bounds. Even removing one direction would not establish boundedness.
+  Clean normalized feature-Gram minimum eigenvalues are about 0.0156
+  locally and 0.00136 broadly: the current trajectory/weak design poorly
+  separates a combination of the reference terms. Test new informative
+  weak functions or additional trajectories with full recalibration.
+  See panel_summary.json and forced_geometry_probe.json.
+
+5. Numerical verification and runtime
+------------------------------------
+The direct implementation was interrupted before any case reached frozen
+calibration or clean evaluation. Its sources/partial logs are retained. It was
+replaced by equivalent algebra: temporal QR sufficient-statistic compression
+during profile optimization, and shared Wick noise features for both pilots.
+Final state-score certification and sigma profiling use original contrasts.
+The model, starts, bounds, convergence tolerances, streams, MC16, bootstrap128
+and cutoff rule remain unchanged. Tiny floating-point fit differences can
+occur; this is not a claim of bit-identical optimizer trajectories.
+Covariance comparison: 180 pairs over 15 systems, max relative error 6.08e-13.
+Independent audits reconstruct scores via generalized eigenvalues, verify
+regions/certificates, replay exact stored inputs and noise streams, reestimate
+selected bootstrap fits, and compare metrics with individual-field evaluation.
+finish_audit.py checks the full queue after execution ends, preserving the
+live watcher summary as audit_live.json and auditing any unprocessed records.
+One Lorenz nonreference-region check failed because the historical auditor
+combined an eigensolve center/minimum with a separate LU inverse to construct
+boundary points. At condition number about 1.22e7, those ingredients can
+describe slightly different quadrics. An independent 80-digit calculation
+verified the stored endpoints to about 6.64e-10 on center/radius scale, using
+the existing condition-dependent forward-error criterion. No stored region
+or cutoff was changed; the failed record and diagnostic are preserved.
+The panel watcher also stopped before auditing two late-arriving records;
+finish_panel_audit.py retained its original report and checked both records.
+Cold-process pilot recomputation sometimes differs at relative 7.43e-11.
+Exact original arrays were recovered for the diagnostic, and primary pilots
+are explicitly archived. Saved hashes remain exact; recomputation is checked
+numerically. Failed initial replay logs are preserved, not silently discarded.
+
+An optional native selected-inverse runtime probe is NOT used in this study.
+Four complete fits agreed closely and were faster, but ill-conditioned stress
+cases produced gradient discrepancies up to 2.50e-4, above the convergence
+threshold. Strict numerical comparison therefore did not pass. This is not a
+validated drop-in replacement; native_checks.json and native_probe retain
+the characterization, strict checks and initial build/harness failures.
+
+6. Limits and decision
+----------------------
+Three observed datasets per case are a preliminary failure screen, not precise
+95% coverage certification. In particular 3/3 does not establish 95% reliability.
+The earlier percentages from many conditional actual draws cannot be pooled
+with these observed-dataset counts or presented as a paired percentage gain.
+The result applies to the existing trajectories, library/design, 5% noise level
+and separable Gaussian AR1 family. Reconstruction and noise-model misspecification
+can remain outside that setting. MC16 and 128 bootstrap draws also leave finite
+Monte Carlo uncertainty in each cutoff. No unconditional validity theorem is
+claimed. Independent outer replication is required before production promotion.
+Keep dyad provisional. Continue judging structure, weak-moment accuracy and
+coefficient-region precision separately. Do not remove valid identities to
+make a ranking appear unique, or tune per-system cutoffs to force 95%.
+
+Artifacts: summary.json and system_coverage.csv contain all counts;
+full_pipeline_coverage.png/.pdf visualizes all 23 cases; the paired diagnostic
+is ks_reconstruction_diagnostic.png/.pdf. method_notes.txt describes the full
+procedure. completion_audit.json and artifact_manifest.json record verification.

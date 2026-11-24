@@ -1,0 +1,334 @@
+{
+  "status": "COMPLETE",
+  "records": 23,
+  "workers": 5,
+  "summary": [
+    {
+      "profile": "iid",
+      "mode": "raw",
+      "variables": 20,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9143909179113517,
+        0.9303389259904569,
+        0.9894090682815957,
+        1.037127342256202,
+        1.076267241341334
+      ],
+      "rho_error_quantiles": [
+        -0.05793083114478738,
+        -0.02363683523018001,
+        0.01280917110890033,
+        0.03361207629983539,
+        0.0914870800896396
+      ]
+    },
+    {
+      "profile": "iid",
+      "mode": "noise_only",
+      "variables": 20,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.8938839578233146,
+        0.9081711166476439,
+        0.9862584201954214,
+        0.9992077312447925,
+        1.0080605279316488
+      ],
+      "rho_error_quantiles": [
+        -0.07163947807293838,
+        -0.043499062439652125,
+        0.0013686931082227422,
+        0.011515946083214821,
+        0.03242008823820821
+      ]
+    },
+    {
+      "profile": "positive",
+      "mode": "raw",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9935416958944885,
+        0.9948036465088879,
+        1.000069899212978,
+        1.0060368968285434,
+        1.007599166690718
+      ],
+      "rho_error_quantiles": [
+        -0.060716970891353306,
+        -0.04877254674529181,
+        -0.012112327362739483,
+        0.00038771390134678544,
+        0.004997332543503874
+      ]
+    },
+    {
+      "profile": "positive",
+      "mode": "noise_only",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9846880672240972,
+        0.9878658166490834,
+        0.995951978896201,
+        0.9992228173354979,
+        1.0003368565571324
+      ],
+      "rho_error_quantiles": [
+        -0.04054739578162392,
+        -0.026665186891293473,
+        -0.011420725783067465,
+        -0.0007167295517529759,
+        -0.000501739980225846
+      ]
+    },
+    {
+      "profile": "negative",
+      "mode": "raw",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        1.0033810403581176,
+        1.006975339144471,
+        1.015477076508077,
+        1.0197374497940912,
+        1.0215140211186193
+      ],
+      "rho_error_quantiles": [
+        -0.02849292808201248,
+        -0.025023266942248257,
+        -0.009162982459575753,
+        0.018971954974532086,
+        0.05473858957910194
+      ]
+    },
+    {
+      "profile": "negative",
+      "mode": "noise_only",
+      "variables": 4,
+      "incomplete": 0,
+      "sigma_ratio_quantiles": [
+        0.9964829047938181,
+        0.9989250703671672,
+        1.0093715118951816,
+        1.0146290113145187,
+        1.0148473445555775
+      ],
+      "rho_error_quantiles": [
+        -0.026065184145249443,
+        -0.025773376334821397,
+        -0.00697155535093541,
+        0.0006094423206567039,
+        0.008186523208938423
+      ]
+    }
+  ],
+  "processes": [
+    {
+      "record": "pde_compound_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 21.9
+    },
+    {
+      "record": "ac_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 8.5
+    },
+    {
+      "record": "ac_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 8.7
+    },
+    {
+      "record": "ac_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 9.4
+    },
+    {
+      "record": "burgers_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 13.6
+    },
+    {
+      "record": "burgers_inviscid_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 3.5
+    },
+    {
+      "record": "ns_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "seconds": 74.5
+    },
+    {
+      "record": "duffing_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 13.0
+    },
+    {
+      "record": "kdv_cossin_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 10.8
+    },
+    {
+      "record": "kdv_cossin_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 12.2
+    },
+    {
+      "record": "kdv_cossin_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 12.2
+    },
+    {
+      "record": "kdv_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 63.7
+    },
+    {
+      "record": "lv_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "seconds": 6.6
+    },
+    {
+      "record": "ode_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 3.7
+    },
+    {
+      "record": "pde_divide_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 11.5
+    },
+    {
+      "record": "lorenz_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "seconds": 48.9
+    },
+    {
+      "record": "vdp_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 4.0
+    },
+    {
+      "record": "wave_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 8.7
+    },
+    {
+      "record": "wave_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 7.9
+    },
+    {
+      "record": "ks_negative_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 174.9
+    },
+    {
+      "record": "wave_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 8.3
+    },
+    {
+      "record": "ks_positive_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 189.4
+    },
+    {
+      "record": "ks_iid_seed36",
+      "statuses": [
+        "ok",
+        "ok"
+      ],
+      "seconds": 201.5
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen_score.py": "3c1fc7464e508f5edf07fd13016980cc601a5414ae148195ea7fced7df86324b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\fit.py": "f40ec40d042db19311acb0cb86142da2966c9f5589181b0e12e5b5b2cc382023",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_fit.py": "1bda821f1f18b901819f855c0fd2b08e2ed106684eda2fafeb20ae25df7d6572",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_core.py": "6cdfd9faedcca6f8dd06dfbf4e8e195fbeb953fcddd46a5dca070a796210c001",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_protocol.txt": "f2ab671b499742a8aba77924c02997d5958accb4dd512fe1c41e824cf5be89bb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\protocol.txt": "c1fc5f7673022b57672802a276d331c9153ac89c672c65952d2000c1349526e5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_fit.py": "485b11c45108b921fc5a46dda07997a45c4ad788ef24de1852d84c33cb9e3b14",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\latent_fit.py": "84e33329e5f57c3b73f2151154e0341ad9071ea145696ccf2bb58b5a48a7fe9a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\coverage.py": "cfa35e5bcc39350d05977c66f412dda9954de23a4341917cebe26d295628ad3c"
+  }
+}

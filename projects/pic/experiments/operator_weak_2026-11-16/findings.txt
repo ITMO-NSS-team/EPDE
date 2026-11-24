@@ -1,0 +1,122 @@
+Continuous weak fitting and operator-uncertainty evaluation
+2026-11-16
+
+Completed all 15 default systems, seeds 0/1/2, 5% noise: 45 system runs,
+60 equation-seed cases. Every calculation uses saved fields, reconstruction,
+weak integration, and linear algebra. No candidate ODE/PDE solves occur.
+
+The useful change is continuous weak fitting on the previously selected
+adaptive supports. The new bandwidth selection is not a consistent improvement.
+The dyad axis remains fixed throughout, so these tests do not validate a new
+instability objective. They isolate fitting and discrepancy changes.
+
+Structure retention (at least one registered reference/equivalent survives
+on the discrepancy/dyad Pareto front of the SAME finite candidate panel):
+
+  Previous local fit + previous corrected cross-product             50/60
+  Previous coarse-grid adaptive weak-fit experiment                 49/60
+  Continuous weak CLSM fit + previous corrected cross-product       53/60
+  Continuous weak CLSM fit + full continuous spectral score         53/60
+  Continuous weak CLSM fit + energy-normalized operator-risk bank   52/60
+  Continuous weak CLSM fit + natural-unit operator-risk bank        53/60
+
+OLS on the continuous weak integrals also retains 53/60 with the full bank.
+Ordinary residual energy with the new CLSM fit retains 47/60, versus 46/60
+with the previous fit. The signed, mean-corrected cross-product remains more
+useful than ordinary energy in this panel. Negative estimates are not clipped.
+
+Per-system changes, old fit -> continuous fit, with the old score frozen:
+  KS:             0/3 -> 2/3
+  forced KdV:     0/3 -> 1/3
+  NS (all slots): 8/9 -> 9/9
+  Allen-Cahn:     2/3 -> 1/3
+  Other slots: unchanged; nonlinear diffusion remains 1/3.
+Thus four previously lost cases survive and one previously surviving case is
+lost. This is a net gain of three, not improvement on every system.
+
+Do not equate retention with recovery of accurate equations. The surviving
+forced-KdV reference has poor coefficients and a favorable negative score.
+Wave retains registered structures in all seeds while its fitted reference
+becomes less accurate. These qualifications materially limit the 53/60 result.
+
+Fitted-reference accuracy, measured on the SAME previous clean evaluation
+bank after all choices are frozen; median over three seeds:
+
+  System             Previous clean residual energy     Continuous weak CLSM
+  KS                 8.664791e-1                         4.951901e-5
+  KdV                5.647765e-3                         1.391201e-5
+  nonlinear diffusion3.704532e-1                         8.090103e-4
+  variable-coeff PDE  7.101319e-2                         7.640611e-6
+  forced KdV         2.765668e-1                         1.469299e-1
+  wave               1.334425e-3                         7.763464e-2
+  Allen-Cahn         1.137531e-4                         1.367628e-4
+  NS u momentum      1.276006e-4                         1.537259e-4
+  NS v momentum      2.291797e-5                         5.760612e-5
+  NS continuity      8.437605e-6                         1.314785e-5
+
+These are residual energies of noisy-fitted coefficients on clean saved data,
+not coefficient-vector errors or trajectory prediction errors. They improve
+in 38/60 equation-seed cases. Selecting easier evaluation moments cannot
+produce this improvement because this diagnostic bank is held fixed.
+
+Bandwidth result:
+The natural-unit risk bank gains nonlinear-diffusion seed 2 but loses the
+forced-KdV seed 1 survivor, leaving 53/60. The energy-normalized variant also
+loses KS seed 2 and exchanges nonlinear-diffusion survivors, leaving 52/60.
+The operator-risk rule therefore cannot be recommended as a universal fix.
+
+Exact-coefficient controls expose the remaining discrepancy problem. For
+forced KdV, the full continuous cross-products are +1996.4, +1458.8, -1337.7
+across the three seeds, while clean residual energy is about 3.7e-7. The
+natural-unit bank reduces them to +617.1, +916.7, +29.2, still far from zero.
+These controls diagnose severe finite-record error; three seeds do not
+separately identify bias and sampling variance. See failure_analysis.txt.
+
+Validation and limits:
+- All 45 result files passed coverage, source-hash, baseline-hash, and finite
+  score checks. Frozen baseline reproduction max scaled error: 4.79e-10.
+- Polynomial/modulated integration-by-parts max error: 4.15e-13.
+- Exact finite-noise enumeration checks prefix-risk differences to 1.28e-15.
+- Brute-force 2D prefix sums match; natural-unit selection is invariant under
+  consistent rescaling of operator columns and units.
+- Half/full fitting-bootstrap budgets give the same 60 binary retention
+  outcomes in each primary arm. This holds the evaluation and selected banks
+  fixed; it does NOT validate bank-selection or score uncertainty.
+- Existing budgets retained: 128 for ac, kdv_cossin, pde_compound, pde_divide,
+  ns; 32 for the other ten systems. Three rotations reuse each noisy record.
+- Tests ran in two parallel processes, one BLAS thread each, below-normal
+  priority. No production files were changed and no method was promoted.
+- Fixed candidate panel, three noise seeds, one noise level; no new
+  evolutionary search or independent-dataset generalization test.
+- Risk normalizations are exploratory ablations, both reported. The initial
+  four energy-only seed-0 probes are in results/; the full battery is in
+  unit_results/. Do not mix the two directories.
+
+Decision:
+Keep the continuous weak-fit implementation as an experimental improvement,
+especially for high derivatives. Preserve the old fit as a control because
+wave and small-term cases regress. Do not promote the bandwidth rule or
+claim that the discrepancy problem is solved. The next diagnostic should
+measure uncertainty in PAIRWISE residual-score differences, with full
+operator covariance and shared-data dependence, and check continuous-window
+selection for wave/Allen-Cahn. No structural threshold is chosen here.
+
+Artifacts:
+  protocol.txt                    frozen method and normalization design
+  quadrature.py                   continuous weak integration
+  run_operator.py                 fitting/scoring ablations and full battery
+  summarize.py                    coverage audit, CSV tables, figures
+  diagnose_controls.py            post-selection clean reconstruction controls
+  per_equation.csv                every method/equation/seed score and frontier
+  selected_banks.csv              every training fold's selected frequencies
+  exact_coefficient_controls.csv  full and selected-bank known-law scores
+  clean_reconstruction_controls.json  clean fit/reconstruction diagnostic
+  structural_results.png/.svg     structure-retention comparison
+  exact_score_controls.png/.svg   exact-law discrepancy comparison
+  audit.json                      hashes and numerical audit
+
+Reproduce from the repository root with the EPDE_3_14 Python environment:
+  python -B -X utf8 projects/pic/experiments/operator_weak_2026-11-16/run_operator.py
+  python -B -X utf8 projects/pic/experiments/operator_weak_2026-11-16/summarize.py
+  python -B -X utf8 projects/pic/experiments/operator_weak_2026-11-16/diagnose_controls.py
+Existing result files are skipped by the runner; use --output for a fresh run.

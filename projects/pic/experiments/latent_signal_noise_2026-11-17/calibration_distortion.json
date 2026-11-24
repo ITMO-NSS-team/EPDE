@@ -1,0 +1,117 @@
+{
+  "status": "COMPLETE",
+  "note": "Finite-256-field empirical second moments after oracle correction; diagnostic eigenvalue ratios, not confidence bounds.",
+  "rows": [
+    {
+      "system": "ns",
+      "seed": 36,
+      "bank": "local",
+      "min_actual_to_calibration_second_moment": 0.711614037521276,
+      "max_actual_to_calibration_second_moment": 1.9051648919451674,
+      "oracle_mean_score_over_cutoff": 0.005413847044562734,
+      "analytic_bias_score_over_cutoff": 0.008699649782182458
+    },
+    {
+      "system": "ns",
+      "seed": 36,
+      "bank": "broad",
+      "min_actual_to_calibration_second_moment": 0.7526729370757791,
+      "max_actual_to_calibration_second_moment": 2.0280666155419995,
+      "oracle_mean_score_over_cutoff": 0.005085011003169733,
+      "analytic_bias_score_over_cutoff": 0.010212839515816516
+    },
+    {
+      "system": "ns",
+      "seed": 38,
+      "bank": "local",
+      "min_actual_to_calibration_second_moment": 0.7350529442856943,
+      "max_actual_to_calibration_second_moment": 1.827602357941294,
+      "oracle_mean_score_over_cutoff": 0.0043680166541212135,
+      "analytic_bias_score_over_cutoff": 0.00794410357409801
+    },
+    {
+      "system": "ns",
+      "seed": 38,
+      "bank": "broad",
+      "min_actual_to_calibration_second_moment": 0.815410102505109,
+      "max_actual_to_calibration_second_moment": 1.9893649549222134,
+      "oracle_mean_score_over_cutoff": 0.003924471620013216,
+      "analytic_bias_score_over_cutoff": 0.009984683471091466
+    },
+    {
+      "system": "pde_compound",
+      "seed": 36,
+      "bank": "local",
+      "min_actual_to_calibration_second_moment": 0.7010667792476559,
+      "max_actual_to_calibration_second_moment": 0.8091302608207325,
+      "oracle_mean_score_over_cutoff": 0.0032161699695856757,
+      "analytic_bias_score_over_cutoff": 0.1688859841133864
+    },
+    {
+      "system": "pde_compound",
+      "seed": 36,
+      "bank": "broad",
+      "min_actual_to_calibration_second_moment": 0.6657003151462884,
+      "max_actual_to_calibration_second_moment": 0.9018690906752485,
+      "oracle_mean_score_over_cutoff": 0.0022154068765176224,
+      "analytic_bias_score_over_cutoff": 1.3063954767426222
+    },
+    {
+      "system": "pde_compound",
+      "seed": 37,
+      "bank": "local",
+      "min_actual_to_calibration_second_moment": 0.6697826074217583,
+      "max_actual_to_calibration_second_moment": 0.7803213426491646,
+      "oracle_mean_score_over_cutoff": 0.0021284019354899752,
+      "analytic_bias_score_over_cutoff": 0.18063204346882838
+    },
+    {
+      "system": "pde_compound",
+      "seed": 37,
+      "bank": "broad",
+      "min_actual_to_calibration_second_moment": 0.6053761960592068,
+      "max_actual_to_calibration_second_moment": 0.8883081251347674,
+      "oracle_mean_score_over_cutoff": 0.0018878999964885258,
+      "analytic_bias_score_over_cutoff": 1.275538421208928
+    },
+    {
+      "system": "pde_compound",
+      "seed": 38,
+      "bank": "local",
+      "min_actual_to_calibration_second_moment": 0.6877913004964201,
+      "max_actual_to_calibration_second_moment": 0.771221862839921,
+      "oracle_mean_score_over_cutoff": 0.002285266309596413,
+      "analytic_bias_score_over_cutoff": 0.17615124779633093
+    },
+    {
+      "system": "pde_compound",
+      "seed": 38,
+      "bank": "broad",
+      "min_actual_to_calibration_second_moment": 0.6380691843820572,
+      "max_actual_to_calibration_second_moment": 0.8547511130250621,
+      "oracle_mean_score_over_cutoff": 0.0019176516905173543,
+      "analytic_bias_score_over_cutoff": 1.3292763428514223
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\analyze_calibration.py": "00e4bee654b979fd6e94c413e9a7181105287d0df22e3439b65f8c8df460c8cd"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ns_attribution_seed36.json": "fa77e5fae305c95c850caafa7746eecdf2501c81859aa1c299234eeb4b3b161d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ns_attribution_seed36.npz": "9a5d55e5e43c4c5c6ec32eb9f711196008fb12d19223740a90c2328e083bca7d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_curvature_seed36.npz": "8368686790a590ee405ba644fa3666f08635b6ed83a2dcf7eec06dfcd0f198d7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ns_attribution_seed37.json": "3e217dceb3215f53d35fb0760504ebe8beed016b2fb3ab0975d3d4458adbeabe",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ns_attribution_seed38.json": "5cce9eec8d3222a6b75e5def8f7ef7739006bfaccdbf57b8279bcb42953fc2ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\ns_attribution_seed38.npz": "5c5fa60cd03c8ad0a26dcc51d3eab80b795df7de1f2f25a618b388da301e9bf7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\ns_iid_curvature_seed38.npz": "6321b45aa99dbb3125d7c30ee92704797ffeb08c0f6085ea0f69b31cd2bbfff7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\pde_compound_attribution_seed36.json": "fbe6710c4a3c3a21373f585080c2c276217962a07b1b24299f5adc022abd43d1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\pde_compound_attribution_seed36.npz": "f9687114e94b8c1777dc32ed264d9dfa252ebf2ea6371f38809de9a3e94c1dd0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_curvature_seed36.npz": "db595c1c02620e1430d1a1828b17d66ca7bff55b3a435da9fd6fd80c107156f0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\pde_compound_attribution_seed37.json": "1e2f4f3e5e0dab760f2b3e1ade6e8f7b739a8b1428e6f10d63f35e2741ca2db5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\pde_compound_attribution_seed37.npz": "5ec12623cd0586c7872dc82c962992273bc2dc18e5f51314c1b2fd5382385e63",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_curvature_seed37.npz": "4b1f9dfd157a7e38a1b59ef1d0c47eb46aa47547a036246a91049b7fce481900",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\pde_compound_attribution_seed38.json": "dd64fdbd9760f87e0a92b251692c3823f066b3ad224fceb369d0c90e12fc3fee",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\pde_compound_attribution_seed38.npz": "9b9c499d88630e81a0745cd0c5011d5941585d9ee1d07d0634a265b675e87924",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\results\\pde_compound_iid_curvature_seed38.npz": "0c3d23fc5a7a602b09ea02a9d3d2430bb68905ac05b36d1d2a1da97ffc914600"
+  }
+}

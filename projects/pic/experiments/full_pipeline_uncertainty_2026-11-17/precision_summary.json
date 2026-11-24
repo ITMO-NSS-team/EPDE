@@ -1,0 +1,6880 @@
+{
+  "status": "COMPLETE",
+  "datasets": 69,
+  "coordinate_records": 186,
+  "nonzero_truth_coordinates": 186,
+  "zero_witnesses": 21,
+  "summaries": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 3,
+      "relative_full_width_quantiles": [
+        0.16512067186362317,
+        0.2106639185708538,
+        43.28927638261595
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "nonzero_coefficients": 6,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.4744973903916464,
+        0.8649692503302969,
+        1.4217086272583879
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "nonzero_coefficients": 3,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.0985356181911945,
+        0.10418671157537507,
+        0.2291638613261452
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "nonzero_coefficients": 12,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        5.849928198702479,
+        11.974251108239613,
+        18.304683406200905
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "nonzero_coefficients": 6,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.035957085255650334,
+        0.3960798499177,
+        11.10046756939946
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "nonzero_coefficients": 0,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": []
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.021229529605021114,
+        0.19760237907610612,
+        7.33225009885887
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "nonzero_coefficients": 21,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.3679602553772089,
+        0.7422518959221737,
+        13.086201186655993
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "nonzero_coefficients": 12,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.33252515776293556,
+        0.37981760435768075,
+        0.47951392058712383
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "nonzero_coefficients": 33,
+      "zero_witnesses": 4,
+      "relative_full_width_quantiles": [
+        0.09135371810052018,
+        0.46875824609458183,
+        9.82170311559265
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.6400322153649589,
+        0.9236058559369469,
+        4.540492671327797
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "nonzero_coefficients": 6,
+      "zero_witnesses": 3,
+      "relative_full_width_quantiles": [
+        1.9637625402210297,
+        4.742709570270698,
+        9.251111012293356
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "nonzero_coefficients": 6,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.09451059920193272,
+        0.17022222346106902,
+        0.25400281733978325
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        1.4330512744085198,
+        11.946669105173697,
+        17.226372532309473
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "nonzero_coefficients": 3,
+      "zero_witnesses": 2,
+      "relative_full_width_quantiles": [
+        1.759305521313982,
+        1.807779586056673,
+        2.0443964991191206
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 3,
+      "relative_full_width_quantiles": [
+        0.29269717770315606,
+        0.37836063158134897,
+        72.03701390073147
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 3,
+      "relative_full_width_quantiles": [
+        0.0690453324757943,
+        0.08728605052303884,
+        15.640442024084946
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "nonzero_coefficients": 0,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": []
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "nonzero_coefficients": 0,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": []
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.04964380404156454,
+        0.46226144549549264,
+        18.302912708016358
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "nonzero_coefficients": 9,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.012206943393944125,
+        0.11013542552768629,
+        4.044590679085372
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "nonzero_coefficients": 3,
+      "zero_witnesses": 3,
+      "relative_full_width_quantiles": [
+        4.242410834508494,
+        4.3683138279289855,
+        4.415663696382669
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "nonzero_coefficients": 3,
+      "zero_witnesses": 0,
+      "relative_full_width_quantiles": [
+        0.8424325208603537,
+        0.8543150552166954,
+        0.9230277040782063
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.0020922292457941634,
+      "upper": 0.002236698392467432,
+      "full_width": 0.004328927638261595,
+      "width_over_absolute_truth": 43.28927638261595,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -3.9537376161341484,
+          "broad": -0.007282712481195552
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.523808394141968,
+      "upper": -4.361170905431242,
+      "full_width": 1.1626374887107254,
+      "width_over_absolute_truth": 0.23252749774214507,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.485779321655569,
+      "upper": 5.40855272271563,
+      "full_width": 0.922773401060061,
+      "width_over_absolute_truth": 0.1845546802120122,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.0018422498993817683,
+      "upper": 0.0019517628845021927,
+      "full_width": 0.003794012783883961,
+      "width_over_absolute_truth": 37.94012783883961,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -3.2891058480130653,
+          "broad": -0.0049172168827166796
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.550840292287186,
+      "upper": -4.497520699432917,
+      "full_width": 1.053319592854269,
+      "width_over_absolute_truth": 0.2106639185708538,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.592057634918597,
+      "upper": 5.4306754531363195,
+      "full_width": 0.8386178182177222,
+      "width_over_absolute_truth": 0.16772356364354443,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.0016339759615067906,
+      "upper": 0.0020498830818979443,
+      "full_width": 0.003683859043404735,
+      "width_over_absolute_truth": 36.83859043404735,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -3.1065021983495456,
+          "broad": -0.004799156244890634
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.583327282695625,
+      "upper": -4.547403978052407,
+      "full_width": 1.0359233046432177,
+      "width_over_absolute_truth": 0.20718466092864354,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.642136819100892,
+      "upper": 5.467740178419008,
+      "full_width": 0.8256033593181158,
+      "width_over_absolute_truth": 0.16512067186362317,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.0006813226820856843,
+      "upper": 0.0008827215203228103,
+      "full_width": 0.0015640442024084946,
+      "width_over_absolute_truth": 15.640442024084946,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -0.538295458330424,
+          "broad": -0.0011150160958877664
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.239887541892806,
+      "upper": -4.793381639093067,
+      "full_width": 0.4465059027997391,
+      "width_over_absolute_truth": 0.08930118055994782,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.829201235677635,
+      "upper": 5.187406995127402,
+      "full_width": 0.35820575944976696,
+      "width_over_absolute_truth": 0.07164115188995339,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.0006132508552072647,
+      "upper": 0.0009077005812929756,
+      "full_width": 0.0015209514365002402,
+      "width_over_absolute_truth": 15.209514365002402,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -0.47917132093947146,
+          "broad": -0.0013153753714520433
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.23714743832559,
+      "upper": -4.800717185710396,
+      "full_width": 0.4364302526151942,
+      "width_over_absolute_truth": 0.08728605052303884,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.839803143039701,
+      "upper": 5.190674548808083,
+      "full_width": 0.35087140576838216,
+      "width_over_absolute_truth": 0.07017428115367644,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.000589824509170642,
+      "upper": 0.0009086219550806619,
+      "full_width": 0.001498446464251304,
+      "width_over_absolute_truth": 14.98446464251304,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -0.48745575724539947,
+          "broad": -0.0009664387182219958
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.2474078504780355,
+      "upper": -4.817961729828674,
+      "full_width": 0.42944612064936116,
+      "width_over_absolute_truth": 0.08588922412987224,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.856093667581191,
+      "upper": 5.201320329960162,
+      "full_width": 0.3452266623789715,
+      "width_over_absolute_truth": 0.0690453324757943,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.003222443938595055,
+      "upper": 0.003531685651171578,
+      "full_width": 0.006754129589766633,
+      "width_over_absolute_truth": 67.54129589766633,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -8.085412739738075,
+          "broad": -0.03339917752377497
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.917656502579788,
+      "upper": -4.078297380146197,
+      "full_width": 1.8393591224335903,
+      "width_over_absolute_truth": 0.36787182448671807,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.271331096297469,
+      "upper": 5.734816984813249,
+      "full_width": 1.4634858885157804,
+      "width_over_absolute_truth": 0.29269717770315606,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.0031627349541910347,
+      "upper": 0.003832573772706278,
+      "full_width": 0.006995308726897313,
+      "width_over_absolute_truth": 69.95308726897312,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -8.27787421151045,
+          "broad": -0.03322608544309136
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -6.126117635115336,
+      "upper": -4.20261459640282,
+      "full_width": 1.923503038712516,
+      "width_over_absolute_truth": 0.3847006077425032,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.37427155242671,
+      "upper": 5.919060620832648,
+      "full_width": 1.5447890684059384,
+      "width_over_absolute_truth": 0.3089578136811877,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.0001,
+      "lower": -0.00350463069788629,
+      "upper": 0.0036990706921868574,
+      "full_width": 0.007203701390073147,
+      "width_over_absolute_truth": 72.03701390073147,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          -5.0,
+          5.0
+        ],
+        "margins": {
+          "local": -8.277999867587368,
+          "broad": -0.03599792530624163
+        }
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -5.0,
+      "lower": -5.870177689217483,
+      "upper": -3.978374531310738,
+      "full_width": 1.891803157906745,
+      "width_over_absolute_truth": 0.37836063158134897,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 5.0,
+      "lower": 4.182178796540346,
+      "upper": 5.6731365143528185,
+      "full_width": 1.4909577178124724,
+      "width_over_absolute_truth": 0.2981915435624945,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2667600800793537,
+      "upper": -0.7789126284147045,
+      "full_width": 0.48784745166464916,
+      "width_over_absolute_truth": 0.48784745166464916,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.1,
+      "lower": 0.0591933552382624,
+      "upper": 0.18739073542658707,
+      "full_width": 0.12819738018832466,
+      "width_over_absolute_truth": 1.2819738018832465,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2995688690942058,
+      "upper": -0.748080170466221,
+      "full_width": 0.5514886986279848,
+      "width_over_absolute_truth": 0.5514886986279848,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.1,
+      "lower": 0.05440275802278202,
+      "upper": 0.1965736207486208,
+      "full_width": 0.1421708627258388,
+      "width_over_absolute_truth": 1.4217086272583879,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.253735791279336,
+      "upper": -0.7792384008876897,
+      "full_width": 0.4744973903916464,
+      "width_over_absolute_truth": 0.4744973903916464,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.1,
+      "lower": 0.05784701806078177,
+      "upper": 0.1756919982640427,
+      "full_width": 0.11784498020326092,
+      "width_over_absolute_truth": 1.178449802032609,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1176123527581774,
+      "upper": -0.8884484914320322,
+      "full_width": 0.2291638613261452,
+      "width_over_absolute_truth": 0.2291638613261452,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.038178931617954,
+      "upper": -0.9396433134267594,
+      "full_width": 0.0985356181911945,
+      "width_over_absolute_truth": 0.0985356181911945,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0602900087127516,
+      "upper": -0.9561032971373765,
+      "full_width": 0.10418671157537507,
+      "width_over_absolute_truth": 0.10418671157537507,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -0.20000000298023224,
+      "lower": -1.988659949585618,
+      "upper": 1.6722767862067707,
+      "full_width": 3.6609367357923888,
+      "width_over_absolute_truth": 18.304683406200905,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -4.176055100279086,
+      "upper": 2.1164095016056157,
+      "full_width": 6.292464601884702,
+      "width_over_absolute_truth": 6.292464601884702,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -7.680536778741958,
+      "upper": 6.08374938973391,
+      "full_width": 13.764286168475868,
+      "width_over_absolute_truth": 13.764286168475868,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "cos",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "freq",
+              1.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.30000001192092896,
+      "lower": -1.4518197308453993,
+      "upper": 1.9399183643456581,
+      "full_width": 3.3917380951910574,
+      "width_over_absolute_truth": 11.305793201384999,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -0.20000000298023224,
+      "lower": -1.9070928013822122,
+      "upper": 1.5735739686957082,
+      "full_width": 3.4806667700779204,
+      "width_over_absolute_truth": 17.403333591059724,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -3.982203478618681,
+      "upper": 1.996536894145394,
+      "full_width": 5.978740372764075,
+      "width_over_absolute_truth": 5.978740372764075,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -7.312076667116977,
+      "upper": 5.575040255475369,
+      "full_width": 12.887116922592346,
+      "width_over_absolute_truth": 12.887116922592346,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "cos",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "freq",
+              1.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.30000001192092896,
+      "lower": -1.3570538339818552,
+      "upper": 1.8727650649360013,
+      "full_width": 3.2298188989178565,
+      "width_over_absolute_truth": 10.766062568587964,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -0.20000000298023224,
+      "lower": -1.888150475448571,
+      "upper": 1.5680469471906935,
+      "full_width": 3.4561974226392644,
+      "width_over_absolute_truth": 17.28098685568955,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -4.00913464286913,
+      "upper": 1.8407935558333492,
+      "full_width": 5.849928198702479,
+      "width_over_absolute_truth": 5.849928198702479,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              3.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -7.033922545830575,
+      "upper": 5.608786469263653,
+      "full_width": 12.642709015094228,
+      "width_over_absolute_truth": 12.642709015094228,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "cos",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "freq",
+              1.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.30000001192092896,
+      "lower": -1.3536084556221388,
+      "upper": 1.8672375018371359,
+      "full_width": 3.2208459574592747,
+      "width_over_absolute_truth": 10.736152764914534,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "unbounded_certified"
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -6.0,
+      "lower": -6.1258958395346665,
+      "upper": -5.883791897050918,
+      "full_width": 0.2421039424837481,
+      "width_over_absolute_truth": 0.040350657080624686,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^3u/dx1^3",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.217469983730912,
+      "upper": -0.7985559354224244,
+      "full_width": 0.41891404830848755,
+      "width_over_absolute_truth": 0.41891404830848755,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -6.0,
+      "lower": -6.1001473573124185,
+      "upper": -5.8844048457785165,
+      "full_width": 0.215742511533902,
+      "width_over_absolute_truth": 0.035957085255650334,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^3u/dx1^3",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1748573900975612,
+      "upper": -0.8016117385706487,
+      "full_width": 0.37324565152691247,
+      "width_over_absolute_truth": 0.37324565152691247,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -6.0,
+      "lower": -13.710809262710795,
+      "upper": -5.348290748192783,
+      "full_width": 8.362518514518012,
+      "width_over_absolute_truth": 1.393753085753002,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^3u/dx1^3",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -11.623377199914525,
+      "upper": -0.5229096305150653,
+      "full_width": 11.10046756939946,
+      "width_over_absolute_truth": 11.10046756939946,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0138776249834835,
+      "upper": -0.9926480953784624,
+      "full_width": 0.021229529605021114,
+      "width_over_absolute_truth": 0.021229529605021114,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1415565034610615,
+      "upper": -0.9531592494848303,
+      "full_width": 0.1883972539762312,
+      "width_over_absolute_truth": 0.1883972539762312,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -5.5798058801539465,
+      "upper": 1.2544974656570207,
+      "full_width": 6.834303345810968,
+      "width_over_absolute_truth": 6.834303345810968,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0085076080286968,
+      "upper": -0.9862874631499993,
+      "full_width": 0.0222201448786975,
+      "width_over_absolute_truth": 0.0222201448786975,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0580521781288494,
+      "upper": -0.8604497990527433,
+      "full_width": 0.19760237907610612,
+      "width_over_absolute_truth": 0.19760237907610612,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -4.2475700407196255,
+      "upper": 2.9229679725387046,
+      "full_width": 7.17053801325833,
+      "width_over_absolute_truth": 7.17053801325833,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0115550729491205,
+      "upper": -0.9888813318473538,
+      "full_width": 0.022673741101766676,
+      "width_over_absolute_truth": 0.022673741101766676,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0866998050063044,
+      "upper": -0.8850166344965459,
+      "full_width": 0.20168317050975848,
+      "width_over_absolute_truth": 0.20168317050975848,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -4.489473236784176,
+      "upper": 2.842776862074694,
+      "full_width": 7.33225009885887,
+      "width_over_absolute_truth": 7.33225009885887,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0068731173079215,
+      "upper": -0.9944787103856093,
+      "full_width": 0.012394406922312196,
+      "width_over_absolute_truth": 0.012394406922312196,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0528627420264127,
+      "upper": -0.9427273164987264,
+      "full_width": 0.11013542552768629,
+      "width_over_absolute_truth": 0.11013542552768629,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -3.1058225393569736,
+      "upper": 0.8978241893806831,
+      "full_width": 4.003646728737657,
+      "width_over_absolute_truth": 4.003646728737657,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0063161644275345,
+      "upper": -0.9941092210335903,
+      "full_width": 0.012206943393944125,
+      "width_over_absolute_truth": 0.012206943393944125,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0441875167974521,
+      "upper": -0.9357254713342411,
+      "full_width": 0.10846204546321103,
+      "width_over_absolute_truth": 0.10846204546321103,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -2.6276539807702726,
+      "upper": 1.3187504475119796,
+      "full_width": 3.946404428282252,
+      "width_over_absolute_truth": 3.946404428282252,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0057135755779418,
+      "upper": -0.9931924614206844,
+      "full_width": 0.01252111415725743,
+      "width_over_absolute_truth": 0.01252111415725743,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0492515156340971,
+      "upper": -0.937847810033654,
+      "full_width": 0.1114037056004431,
+      "width_over_absolute_truth": 0.1114037056004431,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -2.870938715016223,
+      "upper": 1.1736519640691494,
+      "full_width": 4.044590679085372,
+      "width_over_absolute_truth": 4.044590679085372,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0298265511577502,
+      "upper": -0.9801827471161857,
+      "full_width": 0.04964380404156454,
+      "width_over_absolute_truth": 0.04964380404156454,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.3515967016883677,
+      "upper": -0.9092766940143626,
+      "full_width": 0.44232000767400503,
+      "width_over_absolute_truth": 0.44232000767400503,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -11.695821175596075,
+      "upper": 4.344581987007368,
+      "full_width": 16.040403162603443,
+      "width_over_absolute_truth": 16.040403162603443,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0249617129370827,
+      "upper": -0.9686137172381658,
+      "full_width": 0.05634799569891691,
+      "width_over_absolute_truth": 0.05634799569891691,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2661957353588216,
+      "upper": -0.7635662212358825,
+      "full_width": 0.5026295141229391,
+      "width_over_absolute_truth": 0.5026295141229391,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -9.66053481466085,
+      "upper": 8.642377893355508,
+      "full_width": 18.302912708016358,
+      "width_over_absolute_truth": 18.302912708016358,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0267176908987543,
+      "upper": -0.9747689821869776,
+      "full_width": 0.0519487087117767,
+      "width_over_absolute_truth": 0.0519487087117767,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2224270948711369,
+      "upper": -0.7601656493756442,
+      "full_width": 0.46226144549549264,
+      "width_over_absolute_truth": 0.46226144549549264,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "d^4u/dx1^4",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -8.632171548503752,
+      "upper": 8.292139017518615,
+      "full_width": 16.924310566022367,
+      "width_over_absolute_truth": 16.924310566022367,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 10.0,
+      "lower": 6.877958488360125,
+      "upper": 13.454037760602855,
+      "full_width": 6.57607927224273,
+      "width_over_absolute_truth": 0.657607927224273,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -10.0,
+      "lower": -13.888276903169793,
+      "upper": -6.465757943948056,
+      "full_width": 7.422518959221737,
+      "width_over_absolute_truth": 0.7422518959221737,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 28.0,
+      "lower": 12.634828422747944,
+      "upper": 46.22394777461632,
+      "full_width": 33.589119351868376,
+      "width_over_absolute_truth": 1.1996114054238707,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "w",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.4348524310493882,
+      "upper": -0.6354289293856794,
+      "full_width": 0.7994235016637088,
+      "width_over_absolute_truth": 0.7994235016637088,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -7.193140877837238,
+      "upper": 4.4102860586064265,
+      "full_width": 11.603426936443665,
+      "width_over_absolute_truth": 11.603426936443665,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": 0.7820056835952354,
+      "upper": 1.244597184072401,
+      "full_width": 0.4625915004771657,
+      "width_over_absolute_truth": 0.4625915004771657,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "w",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -2.6666666666666665,
+      "lower": -3.3348431312020947,
+      "upper": -2.0732318309436915,
+      "full_width": 1.2616113002584033,
+      "width_over_absolute_truth": 0.47310423759690123,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 10.0,
+      "lower": 6.703701134143007,
+      "upper": 13.94597919106161,
+      "full_width": 7.242278056918604,
+      "width_over_absolute_truth": 0.7242278056918604,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -10.0,
+      "lower": -14.426474687091757,
+      "upper": -6.271168009231102,
+      "full_width": 8.155306677860654,
+      "width_over_absolute_truth": 0.8155306677860654,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 28.0,
+      "lower": 10.953276806793234,
+      "upper": 48.67054233584735,
+      "full_width": 37.71726552905412,
+      "width_over_absolute_truth": 1.3470451974662185,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "w",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.486863932093792,
+      "upper": -0.5950190215623068,
+      "full_width": 0.8918449105314852,
+      "width_over_absolute_truth": 0.8918449105314852,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -8.151140461668396,
+      "upper": 4.935060724987597,
+      "full_width": 13.086201186655993,
+      "width_over_absolute_truth": 13.086201186655993,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": 0.78096159290912,
+      "upper": 1.264452331115105,
+      "full_width": 0.483490738205985,
+      "width_over_absolute_truth": 0.483490738205985,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "w",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -2.6666666666666665,
+      "lower": -3.363955696004926,
+      "upper": -2.042531922863159,
+      "full_width": 1.3214237731417668,
+      "width_over_absolute_truth": 0.49553391492816257,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 10.0,
+      "lower": 8.357923389874339,
+      "upper": 12.037525943646427,
+      "full_width": 3.6796025537720887,
+      "width_over_absolute_truth": 0.3679602553772089,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -10.0,
+      "lower": -12.282962635879313,
+      "upper": -8.223214454272755,
+      "full_width": 4.059748181606558,
+      "width_over_absolute_truth": 0.40597481816065584,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 28.0,
+      "lower": 12.34373890581898,
+      "upper": 46.59770887256721,
+      "full_width": 34.25396996674823,
+      "width_over_absolute_truth": 1.2233560702410082,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "w",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.4395362530001439,
+      "upper": -0.6268924446358598,
+      "full_width": 0.8126438083642841,
+      "width_over_absolute_truth": 0.8126438083642841,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -7.358102680357031,
+      "upper": 4.393704199644568,
+      "full_width": 11.751806880001599,
+      "width_over_absolute_truth": 11.751806880001599,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": 0.785723220949985,
+      "upper": 1.2749405119579933,
+      "full_width": 0.48921729100800826,
+      "width_over_absolute_truth": 0.48921729100800826,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "w",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -2.6666666666666665,
+      "lower": -3.3946592711264083,
+      "upper": -2.0643181924531246,
+      "full_width": 1.3303410786732837,
+      "width_over_absolute_truth": 0.4988779045024814,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 20.0,
+      "lower": 16.174088848130275,
+      "upper": 23.933402231536142,
+      "full_width": 7.759313383405868,
+      "width_over_absolute_truth": 0.3879656691702934,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -20.0,
+      "lower": -23.561133534521367,
+      "upper": -16.910630379262656,
+      "full_width": 6.650503155258711,
+      "width_over_absolute_truth": 0.33252515776293556,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 20.0,
+      "lower": 17.126342955223063,
+      "upper": 24.160545072764695,
+      "full_width": 7.034202117541632,
+      "width_over_absolute_truth": 0.3517101058770816,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -20.0,
+      "lower": -24.057394697219543,
+      "upper": -16.701166213300603,
+      "full_width": 7.35622848391894,
+      "width_over_absolute_truth": 0.36781142419594703,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 20.0,
+      "lower": 15.920838347283903,
+      "upper": 25.51111675902638,
+      "full_width": 9.590278411742476,
+      "width_over_absolute_truth": 0.47951392058712383,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -20.0,
+      "lower": -24.526632367218294,
+      "upper": -16.424060812226674,
+      "full_width": 8.10257155499162,
+      "width_over_absolute_truth": 0.405128577749581,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 20.0,
+      "lower": 16.565403014095388,
+      "upper": 25.21206343727868,
+      "full_width": 8.646660423183292,
+      "width_over_absolute_truth": 0.4323330211591646,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -20.0,
+      "lower": -25.725285651452914,
+      "upper": -16.49974894360445,
+      "full_width": 9.225536707848462,
+      "width_over_absolute_truth": 0.46127683539242315,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 20.0,
+      "lower": 16.53235872569241,
+      "upper": 24.6901103129497,
+      "full_width": 8.157751587257287,
+      "width_over_absolute_truth": 0.40788757936286435,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -20.0,
+      "lower": -23.686866545955876,
+      "upper": -16.84343774740638,
+      "full_width": 6.843428798549496,
+      "width_over_absolute_truth": 0.3421714399274748,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 20.0,
+      "lower": 16.95353155879974,
+      "upper": 23.89667421974473,
+      "full_width": 6.943142660944993,
+      "width_over_absolute_truth": 0.34715713304724966,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -20.0,
+      "lower": -24.421159962100496,
+      "upper": -16.987769171199133,
+      "full_width": 7.433390790901363,
+      "width_over_absolute_truth": 0.37166953954506815,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1259233059126414,
+      "upper": -0.8726447581519029,
+      "full_width": 0.25327854776073855,
+      "width_over_absolute_truth": 0.25327854776073855,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1831543498992727,
+      "upper": -0.8448576660296033,
+      "full_width": 0.3382966838696694,
+      "width_over_absolute_truth": 0.3382966838696694,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "dp/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2627346712196055,
+      "upper": -0.7608727741496535,
+      "full_width": 0.501861897069952,
+      "width_over_absolute_truth": 0.501861897069952,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "d^2u/dx2^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.03582939732511705,
+      "upper": 0.05851756312754514,
+      "full_width": 0.09434696045266219,
+      "width_over_absolute_truth": 9.43469604526622,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          -1.0,
+          -1.0,
+          -1.0,
+          0.0,
+          0.01
+        ],
+        "margins": {
+          "local": -0.1179454855225373,
+          "broad": -0.00031119422814793597
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 4,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.005834419445292782,
+      "upper": 0.025675391160426067,
+      "full_width": 0.03150981060571885,
+      "width_over_absolute_truth": 3.1509810605718847,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "dv/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.052295110312856,
+      "upper": -0.9488421309126849,
+      "full_width": 0.10345297940017106,
+      "width_over_absolute_truth": 0.10345297940017106,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "dv/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.236720181128068,
+      "upper": -0.7679619350334861,
+      "full_width": 0.46875824609458183,
+      "width_over_absolute_truth": 0.46875824609458183,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "dp/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1384294711189078,
+      "upper": -0.8558709979043555,
+      "full_width": 0.2825584732145523,
+      "width_over_absolute_truth": 0.2825584732145523,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "d^2v/dx2^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.016485929042893498,
+      "upper": 0.0373564615243606,
+      "full_width": 0.053842390567254095,
+      "width_over_absolute_truth": 5.384239056725409,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 4,
+      "term": [
+        [
+          "d^2v/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.03565163251221093,
+      "upper": 0.053856478806302205,
+      "full_width": 0.08950811131851313,
+      "width_over_absolute_truth": 8.950811131851314,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "dv/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0474235101307088,
+      "upper": -0.9560697920301886,
+      "full_width": 0.09135371810052018,
+      "width_over_absolute_truth": 0.09135371810052018,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1290283832303922,
+      "upper": -0.8755937296939265,
+      "full_width": 0.25343465353646577,
+      "width_over_absolute_truth": 0.25343465353646577,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.16183789132097,
+      "upper": -0.832562680689946,
+      "full_width": 0.32927521063102394,
+      "width_over_absolute_truth": 0.32927521063102394,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "dp/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2407452860200994,
+      "upper": -0.7440097510586152,
+      "full_width": 0.49673553496148415,
+      "width_over_absolute_truth": 0.49673553496148415,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "d^2u/dx2^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.03527224329125546,
+      "upper": 0.05925449512025578,
+      "full_width": 0.09452673841151124,
+      "width_over_absolute_truth": 9.452673841151125,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          -1.0,
+          -1.0,
+          -1.0,
+          0.0,
+          0.01
+        ],
+        "margins": {
+          "local": -0.12225281085093759,
+          "broad": -0.0002095871210365008
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 4,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.0060951474644195276,
+      "upper": 0.025426346886050617,
+      "full_width": 0.03152149435047014,
+      "width_over_absolute_truth": 3.152149435047014,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "dv/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.048738707466844,
+      "upper": -0.9489145402420827,
+      "full_width": 0.09982416722476128,
+      "width_over_absolute_truth": 0.09982416722476128,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "dv/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2291742818001803,
+      "upper": -0.7781923595304109,
+      "full_width": 0.4509819222697694,
+      "width_over_absolute_truth": 0.4509819222697694,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "dp/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.142762830400517,
+      "upper": -0.8689426344551272,
+      "full_width": 0.27382019594538987,
+      "width_over_absolute_truth": 0.27382019594538987,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "d^2v/dx2^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.01710268642851686,
+      "upper": 0.0348211373928365,
+      "full_width": 0.05192382382135336,
+      "width_over_absolute_truth": 5.192382382135336,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 4,
+      "term": [
+        [
+          "d^2v/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.03033888492025443,
+      "upper": 0.055607620758283814,
+      "full_width": 0.08594650567853825,
+      "width_over_absolute_truth": 8.594650567853824,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "dv/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0408947939209767,
+      "upper": -0.9492342389393733,
+      "full_width": 0.09166055498160341,
+      "width_over_absolute_truth": 0.09166055498160341,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1321625405974052,
+      "upper": -0.8669292540404678,
+      "full_width": 0.26523328655693734,
+      "width_over_absolute_truth": 0.26523328655693734,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1790825377891117,
+      "upper": -0.829712774606131,
+      "full_width": 0.34936976318298063,
+      "width_over_absolute_truth": 0.34936976318298063,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "dp/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2631342666669534,
+      "upper": -0.7423491822854715,
+      "full_width": 0.5207850843814819,
+      "width_over_absolute_truth": 0.5207850843814819,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "d^2u/dx2^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.03766375804585328,
+      "upper": 0.060390682163639416,
+      "full_width": 0.0980544402094927,
+      "width_over_absolute_truth": 9.805444020949269,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          -1.0,
+          -1.0,
+          -1.0,
+          0.0,
+          0.01
+        ],
+        "margins": {
+          "local": -0.13501598626069974,
+          "broad": -0.0003196203600373289
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 4,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.0067887986988341,
+      "upper": 0.02619333432555032,
+      "full_width": 0.03298213302438442,
+      "width_over_absolute_truth": 3.298213302438442,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "dv/dx2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0565158030451758,
+      "upper": -0.9437626766263212,
+      "full_width": 0.1127531264188546,
+      "width_over_absolute_truth": 0.1127531264188546,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "dv/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "v",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.2750078914832863,
+      "upper": -0.7605791812889899,
+      "full_width": 0.5144287101942964,
+      "width_over_absolute_truth": 0.5144287101942964,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "dp/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.1596723678886067,
+      "upper": -0.8502756838470469,
+      "full_width": 0.30939668404155984,
+      "width_over_absolute_truth": 0.30939668404155984,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 3,
+      "term": [
+        [
+          "d^2v/dx2^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.019596098455742582,
+      "upper": 0.03939714247370717,
+      "full_width": 0.05899324092944975,
+      "width_over_absolute_truth": 5.899324092944974,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e1:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 4,
+      "term": [
+        [
+          "d^2v/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.01,
+      "lower": -0.0385708000629196,
+      "upper": 0.05964623109300689,
+      "full_width": 0.09821703115592649,
+      "width_over_absolute_truth": 9.82170311559265,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          -1.0,
+          -1.0,
+          -1.0,
+          0.01,
+          0.0
+        ],
+        "margins": {
+          "local": -0.08508153248228822,
+          "broad": -4.6790439823325876e-05
+        }
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e2:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "dv/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.0528925266278908,
+      "upper": -0.9527656389917786,
+      "full_width": 0.10012688763611222,
+      "width_over_absolute_truth": 0.10012688763611222,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -4.0,
+      "lower": -5.409325274266234,
+      "upper": -2.849196412806398,
+      "full_width": 2.5601288614598356,
+      "width_over_absolute_truth": 0.6400322153649589,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "sin",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "freq",
+              2.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -2.5963449580398636,
+      "upper": -0.017834590035969766,
+      "full_width": 2.5785103680038937,
+      "width_over_absolute_truth": 2.5785103680038937,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "x",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.5,
+      "lower": 0.9935508537033216,
+      "upper": 2.0312460320579975,
+      "full_width": 1.0376951783546757,
+      "width_over_absolute_truth": 0.6917967855697839,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -4.0,
+      "lower": -5.910477580116548,
+      "upper": -2.2160541563687604,
+      "full_width": 3.6944234237477875,
+      "width_over_absolute_truth": 0.9236058559369469,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "sin",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "freq",
+              2.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -3.6735489961827508,
+      "upper": 0.8669436751450463,
+      "full_width": 4.540492671327797,
+      "width_over_absolute_truth": 4.540492671327797,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "x",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.5,
+      "lower": 0.6986848980453574,
+      "upper": 2.252553032278893,
+      "full_width": 1.5538681342335359,
+      "width_over_absolute_truth": 1.035912089489024,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -4.0,
+      "lower": -5.46327911793621,
+      "upper": -2.7986400961356583,
+      "full_width": 2.664639021800552,
+      "width_over_absolute_truth": 0.666159755450138,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "sin",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "freq",
+              2.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -2.557662431437741,
+      "upper": -0.10139867880859343,
+      "full_width": 2.4562637526291478,
+      "width_over_absolute_truth": 2.4562637526291478,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "x",
+          [
+            [
+              "dim",
+              0.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.5,
+      "lower": 0.981467213906117,
+      "upper": 2.0368455296432804,
+      "full_width": 1.0553783157371632,
+      "width_over_absolute_truth": 0.7035855438247755,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              2.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": -2.3657273614627283,
+      "upper": 6.885383650830628,
+      "full_width": 9.251111012293356,
+      "width_over_absolute_truth": 9.251111012293356,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          1.0
+        ],
+        "margins": {
+          "local": -6751.392993652854,
+          "broad": -0.017180588850331358
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": 0.5893570808705284,
+      "upper": 3.0056288586855384,
+      "full_width": 2.41627177781501,
+      "width_over_absolute_truth": 2.41627177781501,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              2.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": -1.6577023449804609,
+      "upper": 5.411445017745924,
+      "full_width": 7.069147362726385,
+      "width_over_absolute_truth": 7.069147362726385,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          1.0
+        ],
+        "margins": {
+          "local": -4875.618191902409,
+          "broad": -0.004433493066079208
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": 0.6142205338616877,
+      "upper": 2.5779830740827174,
+      "full_width": 1.9637625402210297,
+      "width_over_absolute_truth": 1.9637625402210297,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              2.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": -2.2484092091559815,
+      "upper": 6.853352165562596,
+      "full_width": 9.101761374718578,
+      "width_over_absolute_truth": 9.101761374718578,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0,
+          1.0
+        ],
+        "margins": {
+          "local": -6537.614546038488,
+          "broad": -0.018013031674265267
+        }
+      }
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 1.0,
+      "lower": 0.5943595572229354,
+      "upper": 2.9950163422734724,
+      "full_width": 2.400656785050537,
+      "width_over_absolute_truth": 2.400656785050537,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -2.0,
+      "lower": -2.241198627208381,
+      "upper": -1.7331929925288145,
+      "full_width": 0.5080056346795665,
+      "width_over_absolute_truth": 0.25400281733978325,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "x",
+          [
+            [
+              "dim",
+              1.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.5,
+      "lower": 0.48002884724395856,
+      "upper": 0.530328552830497,
+      "full_width": 0.0502997055865384,
+      "width_over_absolute_truth": 0.1005994111730768,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -2.0,
+      "lower": -2.25119183419421,
+      "upper": -1.7715017626960876,
+      "full_width": 0.4796900714981225,
+      "width_over_absolute_truth": 0.23984503574906124,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "x",
+          [
+            [
+              "dim",
+              1.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.5,
+      "lower": 0.473792107099304,
+      "upper": 0.5210474067002704,
+      "full_width": 0.04725529960096636,
+      "width_over_absolute_truth": 0.09451059920193272,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx1",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -2.0,
+      "lower": -2.2892027162457054,
+      "upper": -1.7840943009334433,
+      "full_width": 0.505108415312262,
+      "width_over_absolute_truth": 0.252554207656131,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "x",
+          [
+            [
+              "dim",
+              1.0
+            ],
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.5,
+      "lower": 0.47360065584184236,
+      "upper": 0.5232811295888974,
+      "full_width": 0.04968047374705503,
+      "width_over_absolute_truth": 0.09936094749411006,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              2.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -0.2,
+      "lower": -1.3627819486042518,
+      "upper": 1.0265518724304876,
+      "full_width": 2.3893338210347395,
+      "width_over_absolute_truth": 11.946669105173697,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.2,
+      "lower": -0.8145764660204001,
+      "upper": 1.1802929115044858,
+      "full_width": 1.994869377524886,
+      "width_over_absolute_truth": 9.97434688762443,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.70431686176316,
+      "upper": -0.27126558735464035,
+      "full_width": 1.4330512744085198,
+      "width_over_absolute_truth": 1.4330512744085198,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              2.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -0.2,
+      "lower": -1.8867018670996138,
+      "upper": 1.413190481678242,
+      "full_width": 3.2998923487778558,
+      "width_over_absolute_truth": 16.499461743889277,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.2,
+      "lower": -1.096285655469488,
+      "upper": 1.5507975164380903,
+      "full_width": 2.6470831719075782,
+      "width_over_absolute_truth": 13.235415859537891,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.9117878760757145,
+      "upper": -0.04455717382002222,
+      "full_width": 1.8672307022556924,
+      "width_over_absolute_truth": 1.8672307022556924,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ],
+        [
+          "u",
+          [
+            [
+              "power",
+              2.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -0.2,
+      "lower": -2.0107054465280045,
+      "upper": 1.43456905993389,
+      "full_width": 3.4452745064618946,
+      "width_over_absolute_truth": 17.226372532309473,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 1,
+      "term": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.2,
+      "lower": -1.1331558898667742,
+      "upper": 1.635683088593782,
+      "full_width": 2.7688389784605563,
+      "width_over_absolute_truth": 13.84419489230278,
+      "outer_contains_zero": true,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 2,
+      "term": [
+        [
+          "u",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": -1.0,
+      "lower": -1.9558205947141354,
+      "upper": -0.001717463876826586,
+      "full_width": 1.954103130837309,
+      "width_over_absolute_truth": 1.954103130837309,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": -0.0015853498119318271,
+      "upper": 0.06878687104062746,
+      "full_width": 0.07037222085255929,
+      "width_over_absolute_truth": 1.759305521313982,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0
+        ],
+        "margins": {
+          "local": -604.7305399069903,
+          "broad": -2.3498768560463645
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": -0.0006466790892249927,
+      "upper": 0.08112918087553983,
+      "full_width": 0.08177585996476483,
+      "width_over_absolute_truth": 2.0443964991191206,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0
+        ],
+        "margins": {
+          "local": -839.0549961130505,
+          "broad": -1.1423848279101563
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": 0.0053783394364196185,
+      "upper": 0.07768952287868654,
+      "full_width": 0.07231118344226692,
+      "width_over_absolute_truth": 1.807779586056673,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": 0.023079510025991765,
+      "upper": 0.05677681086040591,
+      "full_width": 0.03369730083441415,
+      "width_over_absolute_truth": 0.8424325208603537,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": 0.02319250578838442,
+      "upper": 0.05736510799705223,
+      "full_width": 0.034172602208667816,
+      "width_over_absolute_truth": 0.8543150552166954,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": 0.022278946965964375,
+      "upper": 0.05920005512909263,
+      "full_width": 0.036921108163128255,
+      "width_over_absolute_truth": 0.9230277040782063,
+      "outer_contains_zero": false,
+      "zero_witness_found": false,
+      "zero_witness": null
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": -0.04288717343129936,
+      "upper": 0.1337393744240074,
+      "full_width": 0.17662654785530676,
+      "width_over_absolute_truth": 4.415663696382669,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0
+        ],
+        "margins": {
+          "local": -5577.564269837158,
+          "broad": -125.24689274087129
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": -0.05100305920097692,
+      "upper": 0.12372949391618249,
+      "full_width": 0.1747325531171594,
+      "width_over_absolute_truth": 4.3683138279289855,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0
+        ],
+        "margins": {
+          "local": -5365.71583354079,
+          "broad": -139.57241605358772
+        }
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "coefficient": 0,
+      "term": [
+        [
+          "d^2u/dx1^2",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "truth": 0.04,
+      "lower": -0.049470060916285356,
+      "upper": 0.1202263724640544,
+      "full_width": 0.16969643338033977,
+      "width_over_absolute_truth": 4.242410834508494,
+      "outer_contains_zero": true,
+      "zero_witness_found": true,
+      "zero_witness": {
+        "origin": "reference",
+        "coefficients": [
+          0.0
+        ],
+        "margins": {
+          "local": -5208.340084577165,
+          "broad": -130.61486752060475
+        }
+      }
+    }
+  ],
+  "recession_diagnostics": [
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.4738094917819142,
+          "error_allowance": 2.0060157222510075,
+          "curvature_ratio": 0.236194306219215,
+          "clean_cancellation_ratio": 0.01867855878784535
+        },
+        "broad": {
+          "observed_curvature": 6.775089122472287e-07,
+          "error_allowance": 1.6453357768743431e-06,
+          "curvature_ratio": 0.4117754696456534,
+          "clean_cancellation_ratio": 0.006555592775629836
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.03346164984779848
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.03586301181030059
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.44618771690571457,
+          "error_allowance": 2.0597598382344673,
+          "curvature_ratio": 0.21662123351631443,
+          "clean_cancellation_ratio": 0.035354124033138756
+        },
+        "broad": {
+          "observed_curvature": 5.750438372943994e-07,
+          "error_allowance": 1.708376037896227e-06,
+          "curvature_ratio": 0.33660261238651823,
+          "clean_cancellation_ratio": 0.002576938738776584
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.04648742032098784
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.05745811903872109
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.4102304269076431,
+          "error_allowance": 2.077014997219253,
+          "curvature_ratio": 0.19750961233157552,
+          "clean_cancellation_ratio": 0.017143880251969154
+        },
+        "broad": {
+          "observed_curvature": 1.9968379751985113e-07,
+          "error_allowance": 1.6719561468176487e-06,
+          "curvature_ratio": 0.1194312410046898,
+          "clean_cancellation_ratio": 0.0010893633160449642
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.20183039721247278
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.258185727507565
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.5225796488147662,
+          "error_allowance": 1.810435450288984,
+          "curvature_ratio": 0.28864859486227545,
+          "clean_cancellation_ratio": 0.019242032051882976
+        },
+        "broad": {
+          "observed_curvature": 4.998474886242836e-07,
+          "error_allowance": 1.5551947407760663e-06,
+          "curvature_ratio": 0.32140507906736615,
+          "clean_cancellation_ratio": 0.003940589210152594
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.032575727709701977
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.03686634598264358
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.4203176697275555,
+          "error_allowance": 1.913657023367233,
+          "curvature_ratio": 0.2196410666044916,
+          "clean_cancellation_ratio": 0.014010905888728654
+        },
+        "broad": {
+          "observed_curvature": 3.534175196710647e-07,
+          "error_allowance": 1.6475327830672844e-06,
+          "curvature_ratio": 0.21451319409443964,
+          "clean_cancellation_ratio": 0.001536985475517584
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.04272458154278121
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.05237400533046055
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.3831776694957295,
+          "error_allowance": 1.9659914549327198,
+          "curvature_ratio": 0.19490301879712016,
+          "clean_cancellation_ratio": 0.009194356519954518
+        },
+        "broad": {
+          "observed_curvature": 1.3401965799214478e-07,
+          "error_allowance": 1.7125238912535217e-06,
+          "curvature_ratio": 0.07825856250918986,
+          "clean_cancellation_ratio": 0.0008824447881623517
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.07134666851323443
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.0876952361000891
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 51,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.5426079123957657,
+          "error_allowance": 2.2676137133661673,
+          "curvature_ratio": 0.2392858665465951,
+          "clean_cancellation_ratio": 0.15890025475718908
+        },
+        "broad": {
+          "observed_curvature": 1.041496401853935e-06,
+          "error_allowance": 4.952912706548712e-06,
+          "curvature_ratio": 0.21027957962531313,
+          "clean_cancellation_ratio": 0.026009039780624594
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.008659549292793839
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.010113207251160035
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 52,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.6061111537807483,
+          "error_allowance": 2.1942802247887707,
+          "curvature_ratio": 0.27622322205409966,
+          "clean_cancellation_ratio": 0.10439508474247672
+        },
+        "broad": {
+          "observed_curvature": 1.11228928652314e-06,
+          "error_allowance": 4.284843703369179e-06,
+          "curvature_ratio": 0.25958689826855186,
+          "clean_cancellation_ratio": 0.02680261139363448
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.014833056805780103
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.02538561384471931
+        }
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 53,
+      "candidate": "e0:reference",
+      "banks": {
+        "local": {
+          "observed_curvature": 0.4046474881682189,
+          "error_allowance": 2.4129567663914853,
+          "curvature_ratio": 0.16769777801421565,
+          "clean_cancellation_ratio": 0.03528681711646942
+        },
+        "broad": {
+          "observed_curvature": 6.79038085342199e-07,
+          "error_allowance": 4.392343339757247e-06,
+          "curvature_ratio": 0.15459585756784844,
+          "clean_cancellation_ratio": 0.010331269031243581
+        }
+      },
+      "normalized_direction": [
+        {
+          "term": [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -1.0
+        },
+        {
+          "term": [
+            [
+              "d^3u/dx1^3",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": -0.029601844717474037
+        },
+        {
+          "term": [
+            [
+              "cos(t)sin(x)",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          "weight": 0.043886658411504444
+        }
+      ]
+    }
+  ],
+  "interpretation": "Widths belong to certified outer regions. Zero feasibility is claimed only for an explicit vector satisfying both original joint inequalities. Failure to find a witness among three proposals is not proof of exclusion. References supply diagnostic test vectors only after calibration. Coefficients and equations within a dataset are not independent statistical trials.",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\precision_summary.py": "0cdc6ba1eeb20a383dab47c345efb385075dd9f44c731bdf1cd94f458d963b06"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed51.json": "498d47fe0086a5711cfa4f071eec1e0e3f50f5b5334811bc832b6297cfaeb57f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed52.json": "a3bff4ed390266e9f6717de4ece5b0dc3e8cb5d341e4a327a65f46f06fab8ec3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed53.json": "8977ed39ac9c80d9d4ad4873df184af11de7f9734b77e8f161d66d875c371d67",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed51.json": "3192f0b3f598bfdc3471123b4d984104e761afa19f23d54335d6423b4bfacbb8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed52.json": "13753641da5d09a553e703823ec4b02d1dd863903dedaa8ae9f25f387769dabc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed53.json": "fac17cda922a85faf8e0484248901c1b45c93b1287702e2099fdf53ece51f32a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed51.json": "380bf8ed3bc7cd8452f6d00e82b377311e551e68f28b25aafd773c42ffde21b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed52.json": "db159ebcb2da2de7b9798c4c7c89500040e89ec7c9d0adf505248e25524b21fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed53.json": "34115e19e43648496ee5f9fa4ba7ca9c2476bf2a51da798d408f98007a0e7965",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed51.json": "1426ad5d984acde57ea065f2a4212b5c2341ef23307d6856ade540874514837f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed52.json": "2b51f04a6dd564d4c983ef4cf9961712d9a8ad7d6538abafd99cfe56d1d2b9fd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed53.json": "4ccf319497e345a6373189432df327605da96986058139ef135bdf0631e03a86",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed51.json": "ab702352b379d85e8bdd423655db6166d5545d1823a378e86f6bbac075412764",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed52.json": "469fa8677f476be2e536a517ba745e5f04f22653ca10b45053a76ba5f44b8170",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed53.json": "ba812feea38bf75e8973b8d4a01767b8b16ff62e99b0cda9966d76da095a4755",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed51.json": "d3478440b9dec1483d747be4a66d47192160af2e75a27bcce21801959950c09c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed52.json": "c457b906e32f92380610fd05b7ba6d63d94202e8ea75ea9f49e161e2d579b683",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed53.json": "e23b4d418fb370613a9d5a76479696d4042691d3c9d439ffb6e0cb9324b1935a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed51.json": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed52.json": "57ce7c9c6c94e0f5441c18368a4ebc273a85a0fd64b8d35bc4e530e386072bbf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed53.json": "3d975ec93a803a4e31ab0627921d33766618159e15feb4c63fb959a10b6bda4a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed51.json": "bc35585f99dbda3601ebe7f04770404b9804c44aa9e16973ee1a0a1b0996079b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed52.json": "1ce0a8863b2d950920a548ca1a7cb6cf10f28e9a5bd6c6a8e6effa312c9fd3ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed53.json": "ed52ae894be43bf8f7add3c140c129f3220110e984f25a65cb98ca9ceb08022d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed51.json": "06202e5695e7dc179d6464fc34b8e34421f29fb9978d3bb1e77a21e177a31b1e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed52.json": "423b300266d5b01a32756916271eaf4f8ddfcfae43c1704c707a33b7a4ccf04c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed53.json": "19928a50e8e533bc03d08deb5b8a49a4a0e09829b6d765c10699185c1d251a3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed51.json": "f3be35e3ab286c3a63f94dea22dda9b6a863208cb7fcc7db52df1b23917e4447",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed52.json": "49a31bb1aef3d22a901cc5fcec3dc783158edd3ec6d831e76a5849bddacf8cb6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed53.json": "6f7c25f5492015157c24ccc44acf0a6f682ecd3249f1866af3ce47d3f3331557",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed51.json": "ce950e421600688676628916ff8838fb0d81bd4dad6ec0f858ea5548edfeac4d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed52.json": "d27af38a2d9eafa35e38f8013907013309925017dd529646ca0e14f13c0013c9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed53.json": "a876f605d09d6a13cff9bb2d09223f5d5e9e92a7c6b08da9abc1823cb41dcb60",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed51.json": "ab166cd34475da4ab53a8029aa1b185579529242db560a201a9d9813a8340582",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed52.json": "97766fa4d13a50e18feb6188fc5caa89da03daa102500f1aaa6d40690c547bea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed53.json": "e7beef92b0a50e2b7da28f37afc32c847516bca3888264e801a786722644ca06",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed51.json": "4161dfaa220b50b483405288f89fbab051b2bcf1f9f2fc159dca4a207f1f207f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed52.json": "6d64de561814b19e1a8d3f1ac4e42977c22733e156dc8ee62521784dac0a70d2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed53.json": "d3905071a894cbe01efd4e032aa1335ae065b65c072022fb7867b905ff6d0fc3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed51.json": "369ae48a5f92204934d098db9a2f92a68068ae26387a2ee050ae20b4831106f9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed52.json": "47a643645f9da5557a24b9d19e1bc23b3b8dcf5a5738fa5f76b34dd62b639f6a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed53.json": "d7753c4f89600b1af8755b16ba0dc40f7a77e00857b68cad6003e4ee56280e24",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed51.json": "1c45111e5b59d0d79989a547f471465211260a22ef2333346477db05de6f6a76",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed52.json": "32543936f54316f89ca5de94e6dcb73aaa93c2cdb4f04d1773955fb4d3d90b65",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed53.json": "cc0c8ca48bbad7b8856bb5216ed2666305e684f4d69c19914635efaa594684fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed51.json": "10ba2a00681a3413ef890a0b91a0a593650fed46846e62c49c1af874e48b2a8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed52.json": "c94efb32df67d18b872cda7fbb6bf96bd1bf636fcd17e0013aac2ac831666425",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed53.json": "77055ee179c351cdf4eeb0edc69d26d876bb2793cac58708ddbaf34d65c7a019",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed51.json": "1113e2b1033d52dc97995f20e45bb5ce483011f3fca61642aa2b0d25dcb6f80c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed52.json": "29919957cdf0feadc306f5c6adb8a20f3776c82c0b0f64013bb40cbb8c3f492c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed53.json": "db79e241a5bae603b4ed507f01d1e1b87ae3b1ff72547af5174aaef1ab791900",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed51.json": "316f54823e14586c2b799ccbc827aac71d714258c3529c8fd3029d89a2a2b52f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed52.json": "b6848933f47920bc9e85edda90137077e90350e5f4f9ac4da9bcff1a361abee9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed53.json": "fb0e2cbf5917cc7c9f5bc33cdc8c87283c6f905291e4dc43caeee756b555b581",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed51.json": "34f969508b6b35b233a6198b6593d1f19cb675fc19fe8b2f96d180a4edd4aa63",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed52.json": "c79e640d6d0e4df528ee4012817519fc93d192192bfebb41786b67f4282e45e8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed53.json": "36b29d3c3f761152a4727343251fc46eb8be7ce8c12145e2be5b90a2ed7fe92d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed51.json": "6a6cb6fa63dbd83994c7b3c882cacc077607db78402b0db634e4017f5a76d5db",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed52.json": "7615c580c17bfee2cec4f52882dda69c631034c772a1350f422a0fd1857b4216",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed53.json": "841cb0161274a8691d14a4197494a62f9b30b98033cd3f1bf1f5da3860abc76a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed51.json": "d601cf2151ba8b0cb1fd57b08bbafe7b61028ef3833aacace3d236971558e71b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed52.json": "15554982f11afba6f40abcb0cee3bcf98e7691edb3cd59db7e6627b547f6f6ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed53.json": "4fd8eb2dbabbb3490f3e453a9202add25b603b6880d4d87e60c1b2cb0582a436",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed51.json": "4901f929cfb54cbc40a5bb849e4707c2030bc91451e2fa39661f1e42689e203b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed52.json": "c8beebbc6a727b330c6fda0541122fb279d584c8c434ebeb1d2e6fd146c69330",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed53.json": "e75593f798c551331323536056ee61e9aa198884863c39f9a7e6c87ef01bcb7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed51.json": "8bf9930839ac185a273b0eba6eaf737a4bcbc36b9fb92be9c32c855f39f209f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed52.json": "352fa6edddb50f958bbb05addae4509157cc67ff267b2e2873a09314292e6ef4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed53.json": "966108af9c680eb0385a61f1b2152bc079a0f4a6de96b1b5d318e9ac3e670a4a"
+  }
+}

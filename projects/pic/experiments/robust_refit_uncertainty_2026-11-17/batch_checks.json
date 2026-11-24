@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "matrix_pairs": 120,
+  "ks_common_draws": 32,
+  "single_seconds": 7.042428000015207,
+  "batch_seconds": 4.870463599974755,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\batch_checks.py": "fb1b8c5c201c6992993a67d4b27d1f40b7f9d91148344f4e30ecd4ce7af9b506",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\batch_moments.py": "a7c7e26abbeb0e91723d992a206c81a9f78a575f952d102b79816b4ed4ee5f58"
+  }
+}

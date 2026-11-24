@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "records": 3,
+  "skipped": 0,
+  "operator_scores": 1536,
+  "matrix_replays": 12,
+  "hash_links": 30,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\audit_attribution.py": "50c66b3fcaf64d1f3fcda7ca678c7dab0380d8ce87c364c297bd009b078c9f99"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\compound_attribution_summary.json": "c2f49a22c27112d9e89efb08823212eabbd8631e3c8ec2bc58cf22932fd0b02c"
+  }
+}

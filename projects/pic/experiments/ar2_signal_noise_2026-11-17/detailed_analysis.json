@@ -1,0 +1,2448 @@
+{
+  "status": "COMPLETE",
+  "summary": {
+    "raw_screen_status_before": {
+      "ok": 27,
+      "boundary": 1,
+      "optimizer_failure": 0
+    },
+    "raw_screen_status_after": {
+      "ok": 28,
+      "boundary": 0,
+      "optimizer_failure": 0
+    },
+    "primary_variable_fits": 84,
+    "projected_gradient_quantiles": [
+      1.62491524680064e-08,
+      9.704860570280971e-06,
+      0.0025254993131229144,
+      0.07944505614651574,
+      0.1510976400447035
+    ],
+    "primary_projected_gradient_above_1e_minus3": 14,
+    "primary_selected_gap_above_1e_minus5": 6
+  },
+  "pure_noise": [
+    {
+      "method": "ar1",
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9928015183329224,
+      "rho_rmse": 0.060663885549503756
+    },
+    {
+      "method": "ar1",
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9915155232447429,
+      "rho_rmse": 0.04997846919887502
+    },
+    {
+      "method": "ar1",
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9904576525006579,
+      "rho_rmse": 0.049742735839815574
+    },
+    {
+      "method": "ar1",
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 1.0019732076614893,
+      "rho_rmse": 0.05059616231845133
+    },
+    {
+      "method": "ar1",
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9888900612928869,
+      "rho_rmse": 0.048775622556231905
+    },
+    {
+      "method": "ar1",
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9866285227893453,
+      "rho_rmse": 0.054288531700087024
+    },
+    {
+      "method": "ar1",
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 1.0023533857851579,
+      "rho_rmse": 0.03327286375852669
+    },
+    {
+      "method": "ar1",
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9993564329305576,
+      "rho_rmse": 0.0280051574968667
+    },
+    {
+      "method": "ar1",
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 63,
+      "incomplete": 1,
+      "sigma_ratio_median": 0.9968716021714192,
+      "rho_rmse": 0.028772215606694056
+    },
+    {
+      "method": "ar2_fd",
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.986434091021117,
+      "rho_rmse": 0.06056256474752805
+    },
+    {
+      "method": "ar2_fd",
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9905592570473802,
+      "rho_rmse": 0.0494837364176788
+    },
+    {
+      "method": "ar2_fd",
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9904477846143305,
+      "rho_rmse": 0.04965531446016827
+    },
+    {
+      "method": "ar2_fd",
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 1.0019778104393793,
+      "rho_rmse": 0.052106030108719885
+    },
+    {
+      "method": "ar2_fd",
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9880323738756368,
+      "rho_rmse": 0.0496002726294467
+    },
+    {
+      "method": "ar2_fd",
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.986627486828346,
+      "rho_rmse": 0.05450226640371584
+    },
+    {
+      "method": "ar2_fd",
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 1.0035540227613584,
+      "rho_rmse": 0.032761151787929904
+    },
+    {
+      "method": "ar2_fd",
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9980723561068947,
+      "rho_rmse": 0.028196048648756907
+    },
+    {
+      "method": "ar2_fd",
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9972680877152342,
+      "rho_rmse": 0.028593539848182706
+    },
+    {
+      "method": "ar2_score",
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9864412447669985,
+      "rho_rmse": 0.06075188837622638
+    },
+    {
+      "method": "ar2_score",
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9905659371164606,
+      "rho_rmse": 0.04956210653219532
+    },
+    {
+      "method": "ar2_score",
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.990404345986315,
+      "rho_rmse": 0.04997870146702483
+    },
+    {
+      "method": "ar2_score",
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 1.0019711017143835,
+      "rho_rmse": 0.05341753304507153
+    },
+    {
+      "method": "ar2_score",
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9870329241216371,
+      "rho_rmse": 0.04877230538552929
+    },
+    {
+      "method": "ar2_score",
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.986634994784431,
+      "rho_rmse": 0.05403642196695798
+    },
+    {
+      "method": "ar2_score",
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 1.0035538092868448,
+      "rho_rmse": 0.03210776186438596
+    },
+    {
+      "method": "ar2_score",
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9987596813564877,
+      "rho_rmse": 0.02778748525448934
+    },
+    {
+      "method": "ar2_score",
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "available": 64,
+      "incomplete": 0,
+      "sigma_ratio_median": 0.9972851044200057,
+      "rho_rmse": 0.028876343613268726
+    }
+  ],
+  "screen_numeric": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.7525061672860749,
+      "new_objective": -0.7525061673268105,
+      "old_sigma": 0.033473601263590017,
+      "new_sigma": 0.03347363819304167,
+      "old_rhos": [
+        0.03444684842570049,
+        -0.0018037946757421556
+      ],
+      "new_rhos": [
+        0.03444802899329131,
+        -0.0018011892440705007
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.5705622766641243,
+      "new_objective": -1.570066232927188,
+      "old_sigma": 0.03294295432280308,
+      "new_sigma": 0.03300061394035551,
+      "old_rhos": [
+        0.031959077691207274,
+        0.003697607508317098
+      ],
+      "new_rhos": [
+        0.03242008823820821,
+        0.009230343836460752
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.1374784041888835,
+      "new_objective": -1.1374784042252377,
+      "old_sigma": 0.03449498863269546,
+      "new_sigma": 0.03449493371382597,
+      "old_rhos": [
+        -0.39635878994574525,
+        -0.34526048130364173
+      ],
+      "new_rhos": [
+        -0.3963566027131407,
+        -0.3452614104208981
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -2.200081132175464,
+      "new_objective": -2.200081132175464,
+      "old_sigma": 0.033649671993911875,
+      "new_sigma": 0.033649671993911875,
+      "old_rhos": [
+        -0.3918134767910616,
+        -0.4036965456143195
+      ],
+      "new_rhos": [
+        -0.3918134767910616,
+        -0.4036965456143195
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.5326392851527332,
+      "new_objective": -0.5326392851689058,
+      "old_sigma": 0.03355032888593231,
+      "new_sigma": 0.033550351961172835,
+      "old_rhos": [
+        0.3563456652590972,
+        0.33928305882908666
+      ],
+      "new_rhos": [
+        0.35634649217444886,
+        0.3392830291086467
+      ]
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.1708134718762064,
+      "new_objective": -1.1708134707392974,
+      "old_sigma": 0.033251360518502714,
+      "new_sigma": 0.03325137874318652,
+      "old_rhos": [
+        0.35945191011236033,
+        0.390636218045766
+      ],
+      "new_rhos": [
+        0.3594526042183761,
+        0.39063735919970033
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.110713126732045,
+      "new_objective": -1.1107131267398787,
+      "old_sigma": 0.00910037153549057,
+      "new_sigma": 0.009100373321411179,
+      "old_rhos": [
+        0.0297404266025835,
+        0.009118317010081069
+      ],
+      "new_rhos": [
+        0.02973876089805434,
+        0.0091189742768733
+      ]
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.6695748149126381,
+      "new_objective": -1.6694898080179545,
+      "old_sigma": 0.009002779167998217,
+      "new_sigma": 0.009009573330691837,
+      "old_rhos": [
+        0.002605714823530639,
+        0.0039810986311338715
+      ],
+      "new_rhos": [
+        0.004878956379176972,
+        0.004885715783573065
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.5856187283934222,
+      "new_objective": -1.5856187485360906,
+      "old_sigma": 10.747202873474201,
+      "new_sigma": 10.747207801030116,
+      "old_rhos": [
+        0.008481730840091963,
+        0.008428871699139908
+      ],
+      "new_rhos": [
+        0.008491344989781874,
+        0.008426240138676794
+      ]
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.6244810310733184,
+      "new_objective": -1.6243437230398583,
+      "old_sigma": 10.730048909552762,
+      "new_sigma": 10.740332005969279,
+      "old_rhos": [
+        0.002478351953436914,
+        0.008340422489182925
+      ],
+      "new_rhos": [
+        0.006817698946738078,
+        0.008388985322767595
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.6211617489873325,
+      "new_objective": -1.6343501875095203,
+      "old_sigma": 0.022683793670581383,
+      "new_sigma": 0.02264841525534342,
+      "old_rhos": [
+        -0.05390278020886887
+      ],
+      "new_rhos": [
+        -0.04332295939411652
+      ]
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.8080829450338205,
+      "new_objective": -1.808074528017777,
+      "old_sigma": 0.022856401000709837,
+      "new_sigma": 0.02285679250508562,
+      "old_rhos": [
+        -0.0378030981122852
+      ],
+      "new_rhos": [
+        -0.037825120445859395
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.2677388920970012,
+      "new_objective": -1.2834055453536295,
+      "old_sigma": 0.0017496920945554693,
+      "new_sigma": 0.001760885134470109,
+      "old_rhos": [
+        -0.003479484378053105,
+        0.006038276929378646
+      ],
+      "new_rhos": [
+        0.016819159684603718,
+        0.009685245560788328
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.5970700473293062,
+      "new_objective": -1.59707005707275,
+      "old_sigma": 0.001753028338907124,
+      "new_sigma": 0.0017530407711534577,
+      "old_rhos": [
+        0.004099976465377374,
+        0.013075345302487154
+      ],
+      "new_rhos": [
+        0.004126711964540127,
+        0.01306511940917926
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.8806546028973399,
+      "new_objective": -1.8921913551653935,
+      "old_sigma": 0.0018199269533738177,
+      "new_sigma": 0.0018225130880668986,
+      "old_rhos": [
+        -0.42275896993666195,
+        -0.4182294087607683
+      ],
+      "new_rhos": [
+        -0.42353626931092075,
+        -0.41117386582927007
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -2.2514323981589293,
+      "new_objective": -2.2517403011496846,
+      "old_sigma": 0.0018211617458969518,
+      "new_sigma": 0.0018198705498788262,
+      "old_rhos": [
+        -0.4259636564040463,
+        -0.4090128991411728
+      ],
+      "new_rhos": [
+        -0.42564831584463797,
+        -0.41311400530394404
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.8554625329012737,
+      "new_objective": -0.8837716200802832,
+      "old_sigma": 0.001872435595037498,
+      "new_sigma": 0.001798824332330609,
+      "old_rhos": [
+        0.40793668478838574,
+        0.44221599429476016
+      ],
+      "new_rhos": [
+        0.383388157926981,
+        0.39153065375348894
+      ]
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.1579297559169992,
+      "new_objective": -1.1582558800836196,
+      "old_sigma": 0.0017886047220491113,
+      "new_sigma": 0.001786063348403139,
+      "old_rhos": [
+        0.3793272141297467,
+        0.38913995107080585
+      ],
+      "new_rhos": [
+        0.38091656226928355,
+        0.3882001117505179
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.2160615911109511,
+      "new_objective": -1.2160615914808783,
+      "old_sigma": 0.005398658365243936,
+      "new_sigma": 0.005398662085644414,
+      "old_rhos": [
+        -0.0003825323054908377,
+        -0.009230631130836277
+      ],
+      "new_rhos": [
+        -0.0003803867358758898,
+        -0.009229435460595282
+      ]
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.7211741871134132,
+      "new_objective": -1.7211742093244766,
+      "old_sigma": 0.005415352967409016,
+      "new_sigma": 0.005415354856506598,
+      "old_rhos": [
+        0.005023866773606807,
+        -0.002585559884743867
+      ],
+      "new_rhos": [
+        0.005024694596192241,
+        -0.0025868616750852266
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.9348524863209454,
+      "new_objective": -0.9348524869424353,
+      "old_sigma": 0.05327623246332549,
+      "new_sigma": 0.0532763119629351,
+      "old_rhos": [
+        0.0020684718015696944,
+        -0.007428534333981373
+      ],
+      "new_rhos": [
+        0.0020744021784407235,
+        -0.007424081663191724
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.7418822110833068,
+      "new_objective": -1.7418822078221323,
+      "old_sigma": 0.05331525049211057,
+      "new_sigma": 0.05331525288298703,
+      "old_rhos": [
+        -0.002071998203049067,
+        0.0001090202742314535
+      ],
+      "new_rhos": [
+        -0.0020725189195946905,
+        0.00011078105591184511
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.4474224792050827,
+      "new_objective": -1.447422479968277,
+      "old_sigma": 0.053541591564593434,
+      "new_sigma": 0.05354160569702124,
+      "old_rhos": [
+        -0.3995657010426741,
+        -0.4136745655736935
+      ],
+      "new_rhos": [
+        -0.39956506019812593,
+        -0.4136734635464366
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -2.3790864986395435,
+      "new_objective": -2.379090680702155,
+      "old_sigma": 0.05360884227319991,
+      "new_sigma": 0.05360790251097299,
+      "old_rhos": [
+        -0.40264807697306493,
+        -0.4049214615462023
+      ],
+      "new_rhos": [
+        -0.4026378780600355,
+        -0.4050203476726673
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.5763072558342909,
+      "new_objective": -0.5763072563665639,
+      "old_sigma": 0.05324097690880811,
+      "new_sigma": 0.05324103052623314,
+      "old_rhos": [
+        0.39841100719558153,
+        0.39342425041497825
+      ],
+      "new_rhos": [
+        0.39841216305470806,
+        0.39342642399150757
+      ]
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.2678196658152197,
+      "new_objective": -1.2678199776016394,
+      "old_sigma": 0.05337957110130401,
+      "new_sigma": 0.05337916442876344,
+      "old_rhos": [
+        0.39914948628478203,
+        0.39950261511471635
+      ],
+      "new_rhos": [
+        0.3991911320604497,
+        0.3994982600197742
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.4508676579613426,
+      "new_objective": -1.450867663932545,
+      "old_sigma": 0.36284699964256595,
+      "new_sigma": 0.3628474335654178,
+      "old_rhos": [
+        -0.05793286594970945
+      ],
+      "new_rhos": [
+        -0.05793083114478738
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.2885521816184207,
+      "new_objective": -1.2885521823779267,
+      "old_sigma": 0.4272295673526233,
+      "new_sigma": 0.42722966074152574,
+      "old_rhos": [
+        0.013336327758639471
+      ],
+      "new_rhos": [
+        0.013334466097759956
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "w",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.2649003564112595,
+      "new_objective": -1.2649003581673823,
+      "old_sigma": 0.44282490837720473,
+      "new_sigma": 0.4428271012908697,
+      "old_rhos": [
+        0.012801912521611686
+      ],
+      "new_rhos": [
+        0.01280917110890033
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.8165747911401093,
+      "new_objective": -1.8165747911365913,
+      "old_sigma": 0.3655161039666057,
+      "new_sigma": 0.36551609787294015,
+      "old_rhos": [
+        -0.0412227204554722
+      ],
+      "new_rhos": [
+        -0.04122229895622108
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.7771130044200738,
+      "new_objective": -1.781901396274142,
+      "old_sigma": 0.42195738074662764,
+      "new_sigma": 0.41973701553834214,
+      "old_rhos": [
+        -0.010795585547569509
+      ],
+      "new_rhos": [
+        -0.000254300060488144
+      ]
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "variable": "w",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.730977214403885,
+      "new_objective": -1.7309772144357325,
+      "old_sigma": 0.4430494394242272,
+      "new_sigma": 0.443049423868819,
+      "old_rhos": [
+        0.01322562814542344
+      ],
+      "new_rhos": [
+        0.013223305016039176
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.7415634867741316,
+      "new_objective": -0.7415634867746816,
+      "old_sigma": 0.05749389726148515,
+      "new_sigma": 0.05749389538029109,
+      "old_rhos": [
+        -0.03324197409159605
+      ],
+      "new_rhos": [
+        -0.03324176840990317
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.7782927170552523,
+      "new_objective": -0.778292717055928,
+      "old_sigma": 0.07093264934651677,
+      "new_sigma": 0.07093265882680887,
+      "old_rhos": [
+        0.0027096788359029346
+      ],
+      "new_rhos": [
+        0.002709992573111924
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.7939645701460398,
+      "new_objective": -1.793964735613528,
+      "old_sigma": 0.056204481132460064,
+      "new_sigma": 0.05620448513487599,
+      "old_rhos": [
+        -0.07025342188350599
+      ],
+      "new_rhos": [
+        -0.07024586050010771
+      ]
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.77897119217476,
+      "new_objective": -1.7789704328893559,
+      "old_sigma": 0.06904687026183043,
+      "new_sigma": 0.06904625754115533,
+      "old_rhos": [
+        -0.045237078519590995
+      ],
+      "new_rhos": [
+        -0.045016904761939494
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.623858209157867,
+      "new_objective": -0.6238582091595515,
+      "old_sigma": 0.017274534763288017,
+      "new_sigma": 0.017274532541547306,
+      "old_rhos": [
+        0.017523256722847318,
+        0.029041374185314488,
+        0.0410779099784949
+      ],
+      "new_rhos": [
+        0.01752490960008786,
+        0.029041709143299673,
+        0.04107683190968496
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.36640073120718597,
+      "new_objective": -0.3664007312071267,
+      "old_sigma": 0.015485181819541083,
+      "new_sigma": 0.015485188451378532,
+      "old_rhos": [
+        0.011821733167525515,
+        0.09148606202201655,
+        0.06967173621279162
+      ],
+      "new_rhos": [
+        0.011821432147398834,
+        0.0914870800896396,
+        0.069673114364431
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "p",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.475849981482946,
+      "new_objective": -0.4758499814823345,
+      "old_sigma": 0.00601005334616422,
+      "new_sigma": 0.006010045626614395,
+      "old_rhos": [
+        0.017617018506028512,
+        0.030196569688151965,
+        0.01570554892133762
+      ],
+      "new_rhos": [
+        0.017616559088199417,
+        0.03019273473358901,
+        0.01570176989257577
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.4074510551689956,
+      "new_objective": -1.4074453747236442,
+      "old_sigma": 0.01682803525040575,
+      "new_sigma": 0.016824146547849084,
+      "old_rhos": [
+        0.0031033157771281164,
+        0.0097810319204624,
+        0.003585506561052531
+      ],
+      "new_rhos": [
+        0.002808915013010715,
+        0.008579798979886002,
+        0.003033614677135252
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "v",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.4191885703087217,
+      "new_objective": -1.4191824835637916,
+      "old_sigma": 0.014655883089431845,
+      "new_sigma": 0.014662990953958743,
+      "old_rhos": [
+        -0.011133279110818801,
+        -0.007956010043906721,
+        -0.0029405991773558855
+      ],
+      "new_rhos": [
+        -0.01116408494040041,
+        -0.00575698475665917,
+        -0.0027083334832918556
+      ]
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "variable": "p",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.41544640522768,
+      "new_objective": -1.4153702267578991,
+      "old_sigma": 0.00590219782762331,
+      "new_sigma": 0.005908114558738193,
+      "old_rhos": [
+        0.003667636224918949,
+        -0.003032963745508329,
+        -0.005940291386695198
+      ],
+      "new_rhos": [
+        0.0013686931082227422,
+        -0.004460574737407734,
+        -0.008952085342187648
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.2100560654484753,
+      "new_objective": -1.210056065989027,
+      "old_sigma": 0.0942660054117424,
+      "new_sigma": 0.09426607760944476,
+      "old_rhos": [
+        -0.05731218185130276
+      ],
+      "new_rhos": [
+        -0.057309168776186956
+      ]
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.7865155957118655,
+      "new_objective": -1.786515660433284,
+      "old_sigma": 0.09354644962933584,
+      "new_sigma": 0.09354649610498472,
+      "old_rhos": [
+        -0.07070341713839215
+      ],
+      "new_rhos": [
+        -0.07070345105906199
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.1137438440220602,
+      "new_objective": -1.1137446333091623,
+      "old_sigma": 0.009515613607317093,
+      "new_sigma": 0.00951546942572062,
+      "old_rhos": [
+        0.02892470341348528,
+        0.02043710168277677
+      ],
+      "new_rhos": [
+        0.028796826024082577,
+        0.020503417846409765
+      ]
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.6746795731601631,
+      "new_objective": -1.6746795731601631,
+      "old_sigma": 0.008776353234238435,
+      "new_sigma": 0.008776353234238435,
+      "old_rhos": [
+        -0.011527843966844298,
+        0.007557066730958889
+      ],
+      "new_rhos": [
+        -0.011527843966844298,
+        0.007557066730958889
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.4961332363845343,
+      "new_objective": -1.5129284505277678,
+      "old_sigma": 0.010669520542287286,
+      "new_sigma": 0.010718459019554875,
+      "old_rhos": [
+        -0.007689360034627615,
+        -0.0002615650684177498
+      ],
+      "new_rhos": [
+        -0.0070479746101543405,
+        0.015918995261863522
+      ]
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.6746795149484828,
+      "new_objective": -1.674680060639585,
+      "old_sigma": 0.010674149468848232,
+      "new_sigma": 0.010674475239272289,
+      "old_rhos": [
+        -0.011527902916679456,
+        0.007556609765737172
+      ],
+      "new_rhos": [
+        -0.01151705255337296,
+        0.007676267728630995
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "boundary",
+      "new_status": "ok",
+      "old_objective": -0.7029467307209512,
+      "new_objective": -1.50999168682006,
+      "old_sigma": 44.93739067227145,
+      "new_sigma": 0.050591925231798555,
+      "old_rhos": [
+        -0.999999
+      ],
+      "new_rhos": [
+        0.019496108031546083
+      ]
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.7865203385827118,
+      "new_objective": -1.786517253640868,
+      "old_sigma": 0.04883281468614027,
+      "new_sigma": 0.048832692105581,
+      "old_rhos": [
+        -0.07163947807293931
+      ],
+      "new_rhos": [
+        -0.07163947807293838
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.3208796339188082,
+      "new_objective": -1.3208943794469783,
+      "old_sigma": 0.09546104448832005,
+      "new_sigma": 0.09544495102687967,
+      "old_rhos": [
+        0.0031172698210654506,
+        0.030646749009599024
+      ],
+      "new_rhos": [
+        0.0003913887256556752,
+        0.0323581472596515
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.5970542719319492,
+      "new_objective": -1.5970544697385847,
+      "old_sigma": 0.09477762748215109,
+      "new_sigma": 0.09478017947845838,
+      "old_rhos": [
+        0.003042388223341062,
+        0.013135197158357313
+      ],
+      "new_rhos": [
+        0.0030502595936236845,
+        0.013039680914384193
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.9238304372332524,
+      "new_objective": -1.9251804764705125,
+      "old_sigma": 0.0980352586234379,
+      "new_sigma": 0.09849000062173138,
+      "old_rhos": [
+        -0.4274924814020999,
+        -0.4146985925178451
+      ],
+      "new_rhos": [
+        -0.4284929280820125,
+        -0.4071520990898815
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -2.252726721753198,
+      "new_objective": -2.25143099654444,
+      "old_sigma": 0.09825370315626963,
+      "new_sigma": 0.09844007558055487,
+      "old_rhos": [
+        -0.4329155579078363,
+        -0.4124589371364118
+      ],
+      "new_rhos": [
+        -0.42606518414524946,
+        -0.40892276302920355
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "raw",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -0.9344105979323483,
+      "new_objective": -0.9344096210497171,
+      "old_sigma": 0.0977379658400241,
+      "new_sigma": 0.09773700316216023,
+      "old_rhos": [
+        0.38426172469911324,
+        0.4050086683171727
+      ],
+      "new_rhos": [
+        0.38424469152103213,
+        0.4049973325435039
+      ]
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "variable": "u",
+      "mode": "noise_only",
+      "old_status": "ok",
+      "new_status": "ok",
+      "old_objective": -1.1579296411921929,
+      "new_objective": -1.157905965924438,
+      "old_sigma": 0.0966797277604538,
+      "new_sigma": 0.09667235432786936,
+      "old_rhos": [
+        0.3793336443096851,
+        0.3891407072424925
+      ],
+      "new_rhos": [
+        0.37928433120456245,
+        0.38895843668334723
+      ]
+    }
+  ],
+  "primary_optimizer": [
+    {
+      "record": "ac_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.7655639588110006e-06,
+      "selected_objective": -0.774224048028312,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.07692218432235176
+    },
+    {
+      "record": "ac_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.5386986735865804e-06,
+      "selected_objective": -0.7709920673298651,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.012573282184970225
+    },
+    {
+      "record": "ac_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.859602188709509e-06,
+      "selected_objective": -0.7738971160233294,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.00835836788124733
+    },
+    {
+      "record": "ac_negative_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.6151916212292505e-06,
+      "selected_objective": -1.151591082696021,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.009223029826382456
+    },
+    {
+      "record": "ac_negative_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 8.07802936220181e-06,
+      "selected_objective": -1.1105002876015886,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.012281057643862336
+    },
+    {
+      "record": "ac_negative_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 4.150184713891392e-06,
+      "selected_objective": -1.1361110895534794,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.008678937291171751
+    },
+    {
+      "record": "ac_positive_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.2507909519454685e-05,
+      "selected_objective": -0.5292994530286731,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.32380191966629934
+    },
+    {
+      "record": "ac_positive_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 8.215506994702082e-07,
+      "selected_objective": -0.5104531990685746,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.5967493447769576
+    },
+    {
+      "record": "ac_positive_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.9036660657278937e-05,
+      "selected_objective": -0.5283296178572804,
+      "selected_minus_best_including_failed": 1.857136666671977e-11,
+      "successful_objective_spread": 0.23922091209977214
+    },
+    {
+      "record": "burgers_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.4581305718408544e-07,
+      "selected_objective": -1.1119314438146344,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.3277290035428697
+    },
+    {
+      "record": "burgers_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.3464016393682776e-05,
+      "selected_objective": -1.1177452033056579,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.23482867214619385
+    },
+    {
+      "record": "burgers_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 3.1539560074733686e-06,
+      "selected_objective": -1.1113206455938491,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 4.4155790135391726e-12
+    },
+    {
+      "record": "burgers_inviscid_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0025191784861320343,
+      "selected_objective": -1.6004923041222883,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.09856969240214064
+    },
+    {
+      "record": "burgers_inviscid_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.2895937071488728e-05,
+      "selected_objective": -1.5835089482911417,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.07874347792971292
+    },
+    {
+      "record": "burgers_inviscid_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.5280550356711053e-05,
+      "selected_objective": -1.5887881963942148,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.1146766429945485
+    },
+    {
+      "record": "duffing_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.007163979865738912,
+      "selected_objective": -1.545126858812095,
+      "selected_minus_best_including_failed": 2.0992808934749974e-05,
+      "successful_objective_spread": 0.03342626860110487
+    },
+    {
+      "record": "duffing_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.1510976400447035,
+      "selected_objective": -1.5352041587390857,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.038479399171953865
+    },
+    {
+      "record": "duffing_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.00722704034348709,
+      "selected_objective": -1.546455509569342,
+      "selected_minus_best_including_failed": 5.0330517874064284e-05,
+      "successful_objective_spread": 0.03690772914980189
+    },
+    {
+      "record": "kdv_cossin_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.010566380507974316,
+      "selected_objective": -1.2994363627186107,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.01171237965259575
+    },
+    {
+      "record": "kdv_cossin_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0033640892591648708,
+      "selected_objective": -1.2845164666365319,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.007637234873910881
+    },
+    {
+      "record": "kdv_cossin_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.00014037270050082373,
+      "selected_objective": -1.28946331088883,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.016873318433856088
+    },
+    {
+      "record": "kdv_cossin_negative_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0049428823710684355,
+      "selected_objective": -1.8681782731498726,
+      "selected_minus_best_including_failed": 2.529557230346313e-09,
+      "successful_objective_spread": 0.0122490611224777
+    },
+    {
+      "record": "kdv_cossin_negative_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0012152124218663962,
+      "selected_objective": -1.871222717957534,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.015737666878679946
+    },
+    {
+      "record": "kdv_cossin_negative_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0004220873370996969,
+      "selected_objective": -1.8352122484928046,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 7.009360530751962e-05
+    },
+    {
+      "record": "kdv_cossin_positive_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.00018173033838186914,
+      "selected_objective": -0.8497583392726354,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.00021377493991836527
+    },
+    {
+      "record": "kdv_cossin_positive_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.008175063189916898,
+      "selected_objective": -0.8804444570355403,
+      "selected_minus_best_including_failed": 0.000261058420580218,
+      "successful_objective_spread": 0.0
+    },
+    {
+      "record": "kdv_cossin_positive_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0015826956193656372,
+      "selected_objective": -0.8820870288389046,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 9.134168323310377e-05
+    },
+    {
+      "record": "kdv_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 5.054195705955777e-06,
+      "selected_objective": -1.2197238883576786,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.018401300153910505
+    },
+    {
+      "record": "kdv_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 9.702244495812806e-06,
+      "selected_objective": -1.2158160953927977,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 3.117173186240052e-11
+    },
+    {
+      "record": "kdv_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.615262849836597e-06,
+      "selected_objective": -1.2175394643750517,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.019710333413764936
+    },
+    {
+      "record": "ks_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 8.276756271952124e-05,
+      "selected_objective": -0.9364566305887183,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.39932482486773724
+    },
+    {
+      "record": "ks_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.764439950258101e-06,
+      "selected_objective": -0.935980907915153,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.050886066629873494
+    },
+    {
+      "record": "ks_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 9.947134787857692e-06,
+      "selected_objective": -0.9345269450398956,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.5590293480481265
+    },
+    {
+      "record": "ks_negative_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 2.677332036071789e-07,
+      "selected_objective": -1.4393897135243967,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.06369010294034982
+    },
+    {
+      "record": "ks_negative_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.5453276680131864e-05,
+      "selected_objective": -1.4385232641168249,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.3055778680381991e-11
+    },
+    {
+      "record": "ks_negative_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.707149614922244e-06,
+      "selected_objective": -1.4386191623162732,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.06348336355566553
+    },
+    {
+      "record": "ks_positive_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.0873131164768068e-05,
+      "selected_objective": -0.5720297369995735,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.9190228770190267
+    },
+    {
+      "record": "ks_positive_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 9.54015975995759e-07,
+      "selected_objective": -0.5730965382315077,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.9420095367350311
+    },
+    {
+      "record": "ks_positive_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 5.21552181109719e-07,
+      "selected_objective": -0.5738715363602539,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.4418466420806908e-12
+    },
+    {
+      "record": "lorenz_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.5536147116866914e-06,
+      "selected_objective": -1.3381548807686996,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.023265965758970886
+    },
+    {
+      "record": "lorenz_iid_ar2_seed39",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.1265073318611485e-07,
+      "selected_objective": -1.3248023410666223,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.4368070358217848
+    },
+    {
+      "record": "lorenz_iid_ar2_seed39",
+      "variable": "w",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 5.017303341681156e-06,
+      "selected_objective": -1.3305133850483157,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.13904361481195382
+    },
+    {
+      "record": "lorenz_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 4.661507017722499e-06,
+      "selected_objective": -1.336949161957128,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.05239507622503203
+    },
+    {
+      "record": "lorenz_iid_ar2_seed40",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 4.941536379199363e-06,
+      "selected_objective": -1.3162774645012858,
+      "selected_minus_best_including_failed": 9.491740726730313e-12,
+      "successful_objective_spread": 0.0
+    },
+    {
+      "record": "lorenz_iid_ar2_seed40",
+      "variable": "w",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.5330714179538916e-05,
+      "selected_objective": -1.3296262324391928,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.0019495147251828993
+    },
+    {
+      "record": "lorenz_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 9.707476644749136e-06,
+      "selected_objective": -1.3361240840415705,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.0590031003845648
+    },
+    {
+      "record": "lorenz_iid_ar2_seed41",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.06476922570953736,
+      "selected_objective": -1.2583891193880112,
+      "selected_minus_best_including_failed": 0.0012791633978401773,
+      "successful_objective_spread": 0.6707946855629783
+    },
+    {
+      "record": "lorenz_iid_ar2_seed41",
+      "variable": "w",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.365442671603546e-05,
+      "selected_objective": -1.3402368215896905,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.02004074136944789
+    },
+    {
+      "record": "lv_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 5.66663100221021e-07,
+      "selected_objective": -0.7597154161916952,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.15947478976197438
+    },
+    {
+      "record": "lv_iid_ar2_seed39",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 7.630517586676433e-07,
+      "selected_objective": -0.7180713846808033,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.15081335240213045
+    },
+    {
+      "record": "lv_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.6945940428669815e-08,
+      "selected_objective": -0.8135055327106229,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.02238711541113947
+    },
+    {
+      "record": "lv_iid_ar2_seed40",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.62491524680064e-08,
+      "selected_objective": -0.7107765140881959,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.16865197744049154
+    },
+    {
+      "record": "lv_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 7.288387640080884e-07,
+      "selected_objective": -0.7056581390444043,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.11666117980202473
+    },
+    {
+      "record": "lv_iid_ar2_seed41",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 6.139934360938071e-08,
+      "selected_objective": -0.7065439248573739,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.15630062369835085
+    },
+    {
+      "record": "ns_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 8.165367563206516e-07,
+      "selected_objective": -0.6189374079314252,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 7.033928994815142e-12
+    },
+    {
+      "record": "ns_iid_ar2_seed39",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.8652679463215804e-06,
+      "selected_objective": -0.36585793828059776,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.3990808511721298e-11
+    },
+    {
+      "record": "ns_iid_ar2_seed39",
+      "variable": "p",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.5441765930379603e-06,
+      "selected_objective": -0.4751944652963467,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 4.618860849348039e-11
+    },
+    {
+      "record": "ns_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.4658443002746324e-06,
+      "selected_objective": -0.6165450897374583,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.5809431259485467
+    },
+    {
+      "record": "ns_iid_ar2_seed40",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.1367075646306901e-06,
+      "selected_objective": -0.36746607059900227,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.3638617545298375
+    },
+    {
+      "record": "ns_iid_ar2_seed40",
+      "variable": "p",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.9397215681449254e-06,
+      "selected_objective": -0.4767987878860809,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.846811592542963e-11
+    },
+    {
+      "record": "ns_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.7614576411917326e-06,
+      "selected_objective": -0.6192226580718683,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.8626357345879838
+    },
+    {
+      "record": "ns_iid_ar2_seed41",
+      "variable": "v",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 8.600008838399731e-07,
+      "selected_objective": -0.3658204980717439,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.4633405598374338e-11
+    },
+    {
+      "record": "ns_iid_ar2_seed41",
+      "variable": "p",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.0761726403352156e-06,
+      "selected_objective": -0.4728595063002683,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 2.3426816042615428e-11
+    },
+    {
+      "record": "ode_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.871674548947766e-05,
+      "selected_objective": -1.1671027826341107,
+      "selected_minus_best_including_failed": 3.4225955403144326e-12,
+      "successful_objective_spread": 0.356068436378042
+    },
+    {
+      "record": "ode_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 1.1105714841974645e-05,
+      "selected_objective": -1.2476287413529863,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.2438418705518739
+    },
+    {
+      "record": "ode_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 7.767552540549616e-05,
+      "selected_objective": -1.1371694280064577,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.10946629901264937
+    },
+    {
+      "record": "pde_compound_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0016948577144209054,
+      "selected_objective": -1.1137086047711473,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 3.4385310154760873e-07
+    },
+    {
+      "record": "pde_compound_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.4098476409651894e-06,
+      "selected_objective": -1.1153278091539307,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.562228842111324e-05
+    },
+    {
+      "record": "pde_compound_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0009696508440482088,
+      "selected_objective": -1.1033271401783253,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 1.7121931716879146e-07
+    },
+    {
+      "record": "pde_divide_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.00012997645187340368,
+      "selected_objective": -1.5108741933624612,
+      "selected_minus_best_including_failed": 0.0007298251519511911,
+      "successful_objective_spread": 0.017161917558740303
+    },
+    {
+      "record": "pde_divide_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0025282082389761484,
+      "selected_objective": -1.5149788641854365,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.04609399124938851
+    },
+    {
+      "record": "pde_divide_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0005094655456613362,
+      "selected_objective": -1.5010282431446451,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.04554343326858823
+    },
+    {
+      "record": "vdp_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.002272309475499945,
+      "selected_objective": -1.4144997932715337,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.07060665299912983
+    },
+    {
+      "record": "vdp_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0004274734149563031,
+      "selected_objective": -1.4830068623714374,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.19648703976476067
+    },
+    {
+      "record": "vdp_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.0004937907798918673,
+      "selected_objective": -1.4384505173853055,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.14496550379540185
+    },
+    {
+      "record": "wave_iid_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 8.451377756291123e-06,
+      "selected_objective": -1.3385059092948088,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.001209017537328494
+    },
+    {
+      "record": "wave_iid_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 0.00013854279822744786,
+      "selected_objective": -1.3232287601814252,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.0001709963226179667
+    },
+    {
+      "record": "wave_iid_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 4.5243128885985584e-05,
+      "selected_objective": -1.3277172209148311,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 6.284570639114584e-05
+    },
+    {
+      "record": "wave_negative_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 5.559453532777425e-05,
+      "selected_objective": -1.8842900673459666,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.00028296687992956926
+    },
+    {
+      "record": "wave_negative_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 3.2239047524917908e-06,
+      "selected_objective": -1.8943921859480606,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.014527665375039245
+    },
+    {
+      "record": "wave_negative_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 8.449812304078819e-05,
+      "selected_objective": -1.8550091631011705,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.057795717675958036
+    },
+    {
+      "record": "wave_positive_ar2_seed39",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_2",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 2.6785576663357347e-06,
+      "selected_objective": -0.8985636615738188,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.0031221799392584515
+    },
+    {
+      "record": "wave_positive_ar2_seed40",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "nested_ar1",
+      "termination": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+      "projected_gradient_mapping": 1.5548665504017123e-06,
+      "selected_objective": -0.9202348494008576,
+      "selected_minus_best_including_failed": 3.613795248191831e-05,
+      "successful_objective_spread": 0.025291550880519154
+    },
+    {
+      "record": "wave_positive_ar2_seed41",
+      "variable": "u",
+      "status": "ok",
+      "selected_start": "fixed_0",
+      "termination": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+      "projected_gradient_mapping": 6.464146899065604e-05,
+      "selected_objective": -0.9192023021634452,
+      "selected_minus_best_including_failed": 0.0,
+      "successful_objective_spread": 0.002112377951546285
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\analyze_details.py": "262a68b22bae362a63c01ab4312a18f7e83433fb4f0aea2d073c42d4880ea4d8"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\noise_trials_correlated.json": "2ed1cb25eaef0240b97100494bcb6449ee448206e66a6052c9b69dfd7749164b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\noise_trials.json": "9c1420f28cd4edd0ec0b688dde89decdb9ec9ee0d018654bffbbf73d4380e8bb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\noise_trials_score.json": "cf348f754c574c7e2e5bc40532d773f3d1972bbb8b320c966f1a751bffd40294",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ac_iid_seed36.json": "d820777903e5b7f20c0fc885c4c6fb5ca50312cc0f06f9ef67a20fcf78299ef0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ac_iid_seed36.json": "112f00b3b2eb8ed6c320cb2ef026adb559492be832af8d6e0b3e1682f8f16dac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ac_negative_seed36.json": "b0fb6198cf559d6f4db5c216818eb5c0474e3f38a3acc5c7a25cc8d9f5d3de58",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ac_negative_seed36.json": "3dc606759c3cd16e910234ff234c20f8207f9d62d7891e0d27c0997aca3eddf5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ac_positive_seed36.json": "99a58535a94ae3ae7382fa5b08c051562b7e973804b26803a9b45403a33cbc27",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ac_positive_seed36.json": "f4a6b34525a6e30ae510aca31edc1c86863aff0db2fc3e820511e846748ac348",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\burgers_iid_seed36.json": "ed865365b5dcf541ba5117d4630f00cd5ba1a2f803b04bb1fdd98d3e9235065f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\burgers_iid_seed36.json": "6f08c9c85082fedabc4a0f207cf275ff913c2de96e30046a5a1224d30a63ed96",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\burgers_inviscid_iid_seed36.json": "fdb07ba170017c429191389e0abcfa5aa18ae56a67cf6eac605f35a6025d9873",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\burgers_inviscid_iid_seed36.json": "1b7ca9f5b03cc102b6e45a9b7d24491f81ac9dbe25b4819f072b4215cacbdc1b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\duffing_iid_seed36.json": "02806207197df3fe8cd52dbb80a0c40c0bb0937f6931031edd3d7a69a7702966",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\duffing_iid_seed36.json": "c20006e9d557a3ce97af893aeee5fd842911764e0fd361c46021cc4de5528b62",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\kdv_cossin_iid_seed36.json": "dee787f706c2c088e62b250a2feb8c2e2fba825ae4482a070e8abbe13aefa4b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\kdv_cossin_iid_seed36.json": "1ffd65766e4da42d0ca59dd2c1dd41daf32ce05dd92e3fd0b90757feda7513c3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\kdv_cossin_negative_seed36.json": "00d098f27997b25d792776901aa578334f5e0de7d0ba032da46ef4e48545f71d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\kdv_cossin_negative_seed36.json": "261bbf7d52749c13a74a644bbc4d06cd61f2a08ed0003ae32b48fdcd6f4e554d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\kdv_cossin_positive_seed36.json": "054144e49024faa2ddfc89c42ed0353be540bc31959bee6769cb32b0f6881cd5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\kdv_cossin_positive_seed36.json": "387d73e619f99632a9aba6b7992788c4594e9167ee5c8eae1d0ac3ee5a9f27eb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\kdv_iid_seed36.json": "981345b55d8a76d60e3e2b2f48fa77b067e431f381614218060d1e6f4e131a22",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\kdv_iid_seed36.json": "34906e46cc16b4170872e879eca92d2ff5cfda75bbc3f6dfc3c04d51fe06db7c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ks_iid_seed36.json": "e6f0ff3a4a210980a6de934a11cadf74fed83e9fb99a74b40f21c1461b34d76b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ks_iid_seed36.json": "e34f00645fdd641d096dfc7e1ab2790dbaaacfedb23f50d6111b60a29161cf16",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ks_negative_seed36.json": "5fde4923f7c63caac745eae12c31331be30ae7dff87870644fb64916fceeff0d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ks_negative_seed36.json": "cbe0d035c2cc98c9450911cf87b28dc354b131318b6ca8de3ee8dd8eeddc6779",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ks_positive_seed36.json": "6824228aa5d3a98a9894de6089e843f76d64597030bff689f5d7e38f367f0e93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ks_positive_seed36.json": "b7da5a575b370ced95bb8ae67abc518666ae8c969728d5f0e8369f76fff95bf8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\lorenz_iid_seed36.json": "0138cf9d95fbd23e0f466f8525237512167fc3d0a0f4da7965baa26e7697a1fa",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\lorenz_iid_seed36.json": "f9d45db3ec85152d1d9fe20a9d23484dcb7e01b4b56b1a965150aa35482728da",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\lv_iid_seed36.json": "b1f87ead97a7dba0571aef1fe8591cabd0152ccdd946e174f924ad8670475bfc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\lv_iid_seed36.json": "79aa193de1d9d14fe49899fc4f461162d2e1062a22f0791bdd68a3a18dc9b03a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ns_iid_seed36.json": "bac6c05e188371bdf2e7b9669e4a041238a26a6dcafa75b05ec050e7890e79dc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ns_iid_seed36.json": "bead89da640b813cfa80c8e8a54541e8a3fe56fc0ff8abad2789d8e892ea8a27",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\ode_iid_seed36.json": "3b232e5ef16520ed2a40b5e0948d6dc1c94f42e1ad672d7548dba38fb38cecb4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ode_iid_seed36.json": "8e9df94106c812e239f8a3f67da85d0d66628ce185b04988c0247e2d80b8bd64",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\pde_compound_iid_seed36.json": "63eea58a8eed434de99735a27cee29ab83172f72a7e01a973a992a6950ee6205",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\pde_compound_iid_seed36.json": "7165f7882aa833af060cefe8c03b5e1ef1771c70b1ea05f952371f711a370541",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\pde_divide_iid_seed36.json": "c6335646290591ab694c0d03a8168bdbdef851a118609934ed6372855bcf1026",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\pde_divide_iid_seed36.json": "86be4b34200065334168331f4afd1fd63cc5449b4d42469e951840189c109d65",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\vdp_iid_seed36.json": "c5e3cd42a5a9d8d51f3722681c8a5552a8d205f380eb7979e67acee0a77404af",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\vdp_iid_seed36.json": "a863c74fe791e63184db1440a4b9a57e5b3c5a4131bdcbfe962c62accf6013ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\wave_iid_seed36.json": "dc1e436eec36a87b59e40596fc74c3bc86099060d3ad2082f3cf9ddc37cb5cc6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\wave_iid_seed36.json": "e8635119874633f1fcef653a96f7f81aee2a5468b71d63237f6bb39d542ea169",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\wave_negative_seed36.json": "832d5df243baaba0c7f8eb8d5ee2590a5a5e6b9242e2888fac95ffc0453cfe64",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\wave_negative_seed36.json": "cff22e9fc0b53f636c505c206d232cb7215ee93467373fea42e4e37c04b8a81d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\screen\\wave_positive_seed36.json": "374abcc5536a24ecf3703a93891ca950d0c9bf9d8bdcf261390d20622850ea86",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\wave_positive_seed36.json": "63af5a0039e29396b1517e5aba94bb4f6184318f5b2f5b9d0a7c56f6cf747242",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_iid_ar2_seed39.json": "86f05333a1d61633fc17cd580ea49193f6436a16bbdc61fe73bcf1c84ae4da1b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_iid_ar2_seed40.json": "127ee1de7d21c4ad9d357d1b5d0ff5dc64934b1b42bd212bf81a84e9d47db1e2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_iid_ar2_seed41.json": "d2973a21bd2bea9a35b001f36d0ac4b2bab811d9ab0243331c3883c2c39d3b0f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_negative_ar2_seed39.json": "c070164ccf745477ce30aef559e3d850c4f5a126840ad2e14414becea1be4862",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_negative_ar2_seed40.json": "f7e9dd9ac171963905ace9495267a14a63e0cc4ee2abc75d62432a36c045fe4c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_negative_ar2_seed41.json": "41f873c1901ae85fc28b20d771e69df322ba014cbdfca8db6fcce32e01aee083",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_positive_ar2_seed39.json": "48a9de4ef03a1b9e3613d0c9cb551f4d82b81a13d664ebc078829b07cbc24d8f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_positive_ar2_seed40.json": "dc7904e71318a8c897a556560b10fd180ba2dd788ca8aab7736365ab50de0387",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ac_positive_ar2_seed41.json": "69bd6ba325adfde1769acfd89b991ab2b92b966b9bba19c524dfb8aaf4b52aea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\burgers_iid_ar2_seed39.json": "550cf4c6bd0348e4565886ca718eb796b56d135654028f953eddde6bdcf0622f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\burgers_iid_ar2_seed40.json": "0f58ba3808133e3f61fd4ed7f64a73c1d6b05427126a97e96ea19bbfdecbddfe",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\burgers_iid_ar2_seed41.json": "baf10d6507054275476cc548cb5ae6436153ecf91b9299febc465bde34de61c0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_ar2_seed39.json": "c7277622deeab94eaa19066b7f36a3f498f597e2f3ab56c51f393dc8fc9484a7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_ar2_seed40.json": "6130fbac5146d3cfeb76fd4f11091a0560b6beb4ee591be14a8c5ea060f6bb1b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\burgers_inviscid_iid_ar2_seed41.json": "99deb1944af92f8a135ef4f1608d409ef9e527bc8e9c3005be442d20cf832ca8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\duffing_iid_ar2_seed39.json": "f7ed74bc8c728197a6ea4ac2476ca2a685c9ca9e85db45bc9de0ff99dbf3dda2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\duffing_iid_ar2_seed40.json": "b20697299780bfd22568805503c0ebdcd321c59f5f6531f05e7d229b77e1000e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\duffing_iid_ar2_seed41.json": "c4f4caca210066d13ce9f1998dfcfe9a3e3977a43ef8569fcefe45504ff221f0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_iid_ar2_seed39.json": "a5984fac9ca299b0b79245400df89b1f3d742f1d75fb3c531e161d41e2394bbc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_iid_ar2_seed40.json": "9bb08225d2165be8ce701ee0cfbfa8ee4ef2cdd1db16bf37af6deb5118f418e3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_iid_ar2_seed41.json": "6152897c1833ead82745d54ea6512727f64f261f69357bac03f1eabb655b60e0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_negative_ar2_seed39.json": "01264ecdc0e7e7138fba7d48e6f53ab6b2a4e5fbc0d45fb58419b5d2c7e24a2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_negative_ar2_seed40.json": "ebe0635fed3a231e4090f21640bc5ad88b8d8125a3dba87954541a39bd02de2b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_negative_ar2_seed41.json": "4fff0646f583eb374493e3a72869556d5dadc82c8bfa7f5927fe265fc2fdbb4e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_positive_ar2_seed39.json": "4bb9f1507ab02c5cea8754d5f770755644eb6f40110b1df72ac71f91d84351cf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_positive_ar2_seed40.json": "41624185896c5e654b77a9c6a2fd32b72ff9f03beb1a5c2ccee1c3842992ef13",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_cossin_positive_ar2_seed41.json": "e1ee06dc7cdb23c6a577b34688151d85a1ffc01a077e03f91cdf176c3843bde7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_iid_ar2_seed39.json": "a47f8bdf3f436ad470dfc9e7c3aca1f571cebf2285356815dfb5dd59a94c297e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_iid_ar2_seed40.json": "7b701be886402ad5b051d1019b913271d91589bd2ad841c75614f27b5c82a0bd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\kdv_iid_ar2_seed41.json": "bf13ad8c66b5a76ea28047ef43061c5506a5a721be5f3fc71e89c37e42719978",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_iid_ar2_seed39.json": "ac3463b0c91b260644ded1c72299fb5eaf62aa9f0901b5cced6a40f7bd2e40ec",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_iid_ar2_seed40.json": "ff95cc4cc04fcba5587986b97b790d1fdf35753848249a81eef3158271ac7825",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_iid_ar2_seed41.json": "e931a27f383360d481d7a0368f69e24e7ae762119dcf65cf8173991757920f27",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_negative_ar2_seed39.json": "0a6e7f12893c2a7533384f232f297888326e63fae246488766b82f92299663de",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_negative_ar2_seed40.json": "9090cda1b9e28d458ba91b24dd247b9fefb20a633a1417726eab737e49f591ba",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_negative_ar2_seed41.json": "ca4fa62b636945ed5c27dae054356ddfb53a961faac4763594f291deb711348c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_positive_ar2_seed39.json": "657e97b79ce000521d48e50ce6126a4a6ed7322bc23dd1ae97d287f341631257",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_positive_ar2_seed40.json": "35d11f9487059c20eec5d848bf5feec437a69ada16476187ffb40eadf31816de",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ks_positive_ar2_seed41.json": "b17dbcc940120366cdb009326009660e217eda89eb038fae3d6d983f649e2bde",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\lorenz_iid_ar2_seed39.json": "b40915ca217c0e6394a6db326736c750b7f04fc30b884561db87becaee4fb2d0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\lorenz_iid_ar2_seed40.json": "2274d4d69c4ca5c9b0563c4cdfb763ac20d04f5c7c2b04628c1066bb3ae0c3ab",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\lorenz_iid_ar2_seed41.json": "92d59e289e797167ee24cc7d84b3c592edf3f660e1b867572bee0e618f96dae2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\lv_iid_ar2_seed39.json": "c2b3bab170520c5a0c374f041981459c3618a0e1c5cc20b1f202647d6e417101",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\lv_iid_ar2_seed40.json": "2b5cb06604d757f50dc0f8fa0b8d2fba5ced77319e95ef888c2a9d35334ae7f5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\lv_iid_ar2_seed41.json": "10b8f10f5c40ab822cc35f1e2876e433aaeadf009fb4b35175ea2c06f69da534",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ns_iid_ar2_seed39.json": "e506094e2b84aedef4facf8dec677f832637e942a74d587ebf0eecfe63f3f2cf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ns_iid_ar2_seed40.json": "46159a6258408b9681bbdd414dfa2cbfdc0d5d86d30902bfd55ab6dadec8326a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ns_iid_ar2_seed41.json": "c9f8aad975fa420b8c497c365c5388b276988fd68243ae13169c5c616cc7138f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ode_iid_ar2_seed39.json": "f1bedef08389e3b4b1cc162774e96a7e3568fefcdbcd844ebb9034a06e6d7aaf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ode_iid_ar2_seed40.json": "f8b8f1712e42d8688f35002628bb9ec2b04373c9f73a64bcb75d061bda1e23ae",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\ode_iid_ar2_seed41.json": "6b9286d2697f4c3667d2d4b1f37a5d6ea6cce79e70b964bd49dc5a1d8a727e43",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\pde_compound_iid_ar2_seed39.json": "a6133b046e51028f2075a03039f311b80f5217577c517d4db7345c7d25da6ce1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\pde_compound_iid_ar2_seed40.json": "d1f27de7c0fe66df04ec359295e4252e085a939f280d79ca552deba50309b4fb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\pde_compound_iid_ar2_seed41.json": "45f1292820c6788d289edc60c6885bf99ebf9ae13010471c1c1bf039f1540aea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\pde_divide_iid_ar2_seed39.json": "669e52b85349a77ceaa97393a22edff21ba83dc54a9d55a08d10cb31432e1781",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\pde_divide_iid_ar2_seed40.json": "616f2f448adeafbcdf6a58961a86246b20da6217788862aba8e1acc8c69939f5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\pde_divide_iid_ar2_seed41.json": "fb86950988935e39eaf5e2ba3e307c50c82f06c5f538a7e366b7067c20ed2dd3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\vdp_iid_ar2_seed39.json": "fa160600658dda70e5c8d34b85811e2a06eed884bde7447642303dccac99e98c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\vdp_iid_ar2_seed40.json": "d63f2ea91a91a33549c01a69cd75700a71bcad222cb4501379b1959529034adf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\vdp_iid_ar2_seed41.json": "963e0e12d9b24af777b6d69cbf23b9aa6f43744099a871cd1aa13340e22761c9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_iid_ar2_seed39.json": "c6724ea69f51a7d28913d1acb7e25980566afa5f6a9bab7bf9258f3a64e54911",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_iid_ar2_seed40.json": "f45a42591916e4b9c4553b42da2efd18675281395093f2dfd6efd2f7b01ffd4c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_iid_ar2_seed41.json": "81d1cbfd50dd78a768ec86f6db7d27c1657666e6bc7307d7669db4075c7f191e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_negative_ar2_seed39.json": "6f0cf670816af1afbf69446d794616cd42a318461dbd0440eddc14548057bc2b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_negative_ar2_seed40.json": "d6f92b47dcf9fb9970efdd48946b179bbb058d1d9960f824e55411c09af32d89",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_negative_ar2_seed41.json": "9f4945da282d5647cb70f330e9ce85a68c4775d1b1eeae2c524ef4ffb6939a3d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_positive_ar2_seed39.json": "1d8f52eb5fecab3d16524c7c2f4104e026960de8095caa3c2e42d4f35dc2a450",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_positive_ar2_seed40.json": "2903caa2a2e657069a6a2c3ed19ced1a980d2f089aeb0665095d54cfb483f212",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\results\\wave_positive_ar2_seed41.json": "39798250da859877a30c019c1f1a9f2f0fafa3931b8c1e6f2fce9f13e0d1c055"
+  }
+}

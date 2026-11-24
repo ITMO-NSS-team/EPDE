@@ -1,0 +1,36 @@
+Navier–Stokes viscosity under repeat measurements
+
+Retain the 0.01 second derivative of u along x2 in the first momentum equation on this benchmark. Across 128 new 5%-noise realizations on the same trajectory, the complete solver-free fit gave a smaller held-out discrepancy to the full law every time. All other coefficients, including the second viscosity coefficient along x1, were free in both fits. Each field contributes one margin after averaging three shared-data fitting rotations.
+
+Fresh benchmark evidence
+
+The refitted median difference D(reduced) − D(full) was +6.76e−5, with an empirical central repeat range from +1.36e−5 to +1.19e−4. The two-sided exact binomial 95% interval for the fraction of future wins on this trajectory is 97.2% to 100%. With the physical coefficients fixed in both models and only the tested viscosity removed, the median difference was +2.07e−4, also positive in 128/128. Allowing other coefficients to adjust absorbed about two thirds of the median difference. The median fitted viscosity was 0.00994 against 0.01000 in the benchmark.
+
+In the earlier Allen–Cahn test, diffusion was favored in 41/128 fresh fields and none of the six observation-specific ranges excluded zero. In Navier–Stokes, all six original ranges excluded zero in favor of retention. These fixed-pair results provide contrasting examples of the same rule at the same noise percentage. They do not quantify general discovery or pruning accuracy.
+
+Calibration of the original bootstrap
+
+All 768 bootstrap margins were positive. Each of the six forecasts overstated the typical difference, with bootstrap medians from 1.44e−4 to 2.52e−4. On the first prospective cohort the six nominal 95% ranges covered 37, 0, 29, 6, 9 and 23 of the same 128 fields. Every miss was below the corresponding lower endpoint. A correct sign decision can coexist with poor numerical coverage.
+
+Crossed measurements
+
+With coefficients from one half of the fresh Navier–Stokes fields and validation from the other half, 99.4% to 99.5% of the crossed margins favored the full law. Swapping coefficient and validation donors in the same way on Allen–Cahn gave 24.6% to 46.2%. Each combination reuses inputs, so these cross-products do not increase the number of independent fields.
+
+An exploratory swap examined why the generated margins were too large. Using fresh coefficient and validation donors gave a mean Navier–Stokes difference of 6.64e−5. With the same fresh coefficient donors, bootstrap validation raised that mean to 1.37e−4 through 1.93e−4 across the six anchors. With the original fresh validation and bootstrap coefficients, all six means instead fell below 6.64e−5. For this contrast the upward shift followed the generated validation matrices and their scaling. These swaps aggregate the effects of the assumed signal, measurement noise, observation correction, whitening and normalization; they cannot attribute the shift to one of those ingredients in isolation.
+
+Prospective test of a location correction
+
+After observing the first cohort's poor coverage, translate each bootstrap interval so its median equals that anchor's observed margin. Freeze these six intervals before scoring seeds 770001–770128. All 128 new fields are independent of the earlier runs and use the same signal and 5% noise level. The full equation won 126/128 times (95% exact binomial interval 94.5%–99.8%). Its median margin was +6.93e−5 and its empirical central repeat range was [+1.04e−5, +1.17e−4].
+
+Seed                 73001      73002      73003      73004      73005      73006
+Original coverage    42/128      0/128     36/128      8/128     15/128     26/128
+Shifted coverage    125/128    128/128    128/128    126/128    125/128    126/128
+Shifted decision    unresolved unresolved unresolved retain     unresolved retain
+
+The six ranges covered substantially more second-cohort outcomes after recentering, with empirical coverage from 97.7% to 100%. Translating them also moved four lower endpoints below zero. This tradeoff matters for search: strong aggregate evidence for retaining the term across repeated measurements can coexist with an unresolved forecast from a single field. This one-trajectory confirmation does not establish nominal calibration on other trajectories or justify automatic pruning.
+
+Numerical checks
+
+The first experiment comprised 896 distinct multivariable fields. Independent coefficient and validation calculations verified all 10,752 fold scores. The largest absolute discrepancy change in cross-product replay was below 9.2e−16, and the largest coefficient-direction change with a different eigensolver was below 8.5e−15 radians. All six original fields reproduced the previous panel. Rebuilding the first and last prospective fields through the original full-panel code agreed to within 3.6e−17. No candidate dynamics were integrated.
+
+The confirmation added 128 distinct fields and 1,536 verified fold scores. Its stored range definition was hashed before any confirmation field was scored. Run ns_pair.py replay, ns_pair.py run and summarize_pair.py for the primary test, followed by full_panel_check.py prepare and check. The two crossed diagnostics use crossed.py and forecast_shift.py. Run recenter.py run and report for the prospective follow-up, then plot_pair.py to reproduce the comparison figure. The primary summaries are in summary.json and forecast_check.csv; the follow-up is in confirmation/summary.json and confirmation/per_anchor.csv.

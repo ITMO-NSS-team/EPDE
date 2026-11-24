@@ -1,0 +1,7 @@
+Posthoc mechanism check after fresh compound broad undercoverage appeared.
+Seeds39..41, all3 primary compound AR2 records. Change only the covariance used
+for Gaussian correction on the identical256 actual fields to the generating
+covariance. Keep pilot, calibration metric, cutoff and candidate library frozen.
+Install saved AR2 estimates instead of repeating optimization; primary audit
+independently refits them. Preserve complete moment Grams, means and scores.
+This is oracle attribution, not a deployable correction or per-system selection.

@@ -1,0 +1,171 @@
+Fresh-seed weak errors-in-variables coefficient experiment
+Completed 2026-11-16. Solver-free, known-support fitting test.
+
+The proposed raw weak residual-covariance IRLS estimator is a partial
+improvement, not a general replacement. Broad windows improve AC, forced KdV
+and wave median residual accuracy relative to the recomputed local CLSM
+baseline, but seriously damage KS. Local windows preserve KS and fail to
+deliver the wave/forced-KdV improvement. The scale tradeoff remains.
+
+Twelve system runs completed: AC, forced KdV, wave and KS at 5% noise, fresh
+seeds 3/4/5. These are new noise realizations on the existing four trajectories.
+Geometry was fixed from the independent earlier seed-0 study. There are 12
+reference-equation/seed cases; including four registered wave equivalents,
+there are 24 registered-equation/seed cases, each with three training folds.
+No candidate structure was selected, no dyad rule was changed, and no new
+structural-retention or evolutionary-search result is claimed.
+
+Method and controls
+
+One interleaved raw group trains the coefficients, its noise model and its
+covariance pilot; the other two groups provide final signed cross validation.
+All three rotations are evaluated. No clean or held-out result selects a fit.
+Raw fitting uses fixed natural-cubic interpolation and the existing analytic
+Gaussian contraction correction for degree<=3 terms. Each constant keeps its
+actual modulated weak column. Derivatives that remain on the data use the
+fourth-order stencil; integration by parts and continuous weak quadrature
+are otherwise used as in the earlier study.
+
+For each training group, 512 joint operator draws model target/predictor and
+row correlations. IRLS starts at corrected-raw OLS, computes the covariance
+of delta_b-delta_A*c, then solves weighted least squares and repeats. The
+pilot/noise model is fixed through iteration. Full covariance and design rank
+are required at the frozen numerical tolerance; no ridge or null-direction
+deletion is introduced. Convergence uses relative prediction change <=1e-8,
+with a 100-iteration cap. Nonconverged fits are preserved as diagnostics and
+excluded from complete three-fold averages.
+
+Three geometries are reported: existing dense local windows, a local subset
+with centers spaced at least one window radius, and minimum-q broad moments.
+The local subset is determined only by radius/stride. For KS it equals the
+original rows, so its identical results are not independent evidence.
+Within each geometry compare uncorrected raw OLS, corrected raw OLS, raw
+IRLS, reconstructed OLS and reconstructed CLSM. Reconstructed CLSM is refitted
+on fresh data using the old system's 32/128 correction budget. The baseline
+below is dense-local reconstructed CLSM, not the earlier joint selector.
+
+Final validation uses the preceding common broad raw score: one pooled
+training-only covariance from 128 operator draws is shared by every fitted
+model. This final scoring covariance differs from the coefficient-dependent
+covariance used inside IRLS. Clean fields enter only after fits/weights freeze.
+
+Reference accuracy on the SAME frozen clean spectral bank, lower is better.
+Each cell is median across three seeds of the three-fold average residual
+energy. These are residual-energy measures, not relative coefficient errors:
+
+System       Local CLSM baseline    Broad corrected OLS   Broad IRLS
+AC                1.59176e-4            1.52843e-4         1.11998e-4
+Forced KdV        1.70166e-1            7.71531e-2         4.85344e-2
+Wave              6.10893e-2            7.93613e-4         7.80097e-4
+KS                5.98780e-5            5.51803            1.39030
+
+Broad IRLS improves versus the baseline in 8/12 reference cases and worsens
+in 4/12: AC improves 2/3, forced KdV 3/3, wave 3/3, and KS 0/3.
+The four broad-IRLS medians alone must not be combined with local KS results
+as though a validated data-driven selector had produced that combination.
+
+Forced KdV improves beyond the broad corrected-OLS control on all three
+seeds. Its broad-IRLS energies are 0.05958, 0.04853 and 0.01827, versus local
+CLSM 0.20673, 0.16564 and 0.17017. Its median energy improves about 71.5%
+relative to baseline and 37.1% relative to broad corrected OLS.
+However, coefficients remain inaccurate: across nine folds, the medians for
+[u*u_x, u_xxx, cos(t)sin(x)] are [-4.0959,-0.5199,0.4395], versus [-6,-1,1].
+The nonlinear coefficient spans -9.3975 to +1.6829. This is partial recovery,
+not a solved coefficient-identification problem.
+
+For wave the large gain is mostly due to broad raw moments: corrected OLS
+already has median energy 0.000794. IRLS gives 0.000780, improving on OLS in
+two seeds but worsening in the third. Its coefficient range is 0.03852 to
+0.04259 versus truth 0.04. Attributing the full baseline-to-IRLS gain to the
+new iterative estimator would be incorrect.
+
+AC broad IRLS improves median energy about 29.6%, but the diffusion estimate
+is still unstable. Across nine folds it ranges from -0.0003261 to 0.0004832,
+with median 0.00005735 versus truth 0.0001. Negative estimates are retained,
+not clipped. The fit has not reliably recovered the small diffusion term.
+
+Local IRLS is not a universal alternative. Dense-local median energies are
+0.0002582 for AC and 0.3564 for wave, worse than baseline in all three seeds.
+For forced KdV, each seed has at least one nonconverged dense-local fold;
+we therefore do not report a median over only the successful folds. The
+spaced-local variant also fails to converge in two forced-KdV folds.
+KS local IRLS is accurate: median energy 4.86279e-5, improving versus baseline
+in two seeds. But corrected raw local OLS is already 4.39112e-5 on median.
+That evidence does not justify making IRLS mandatory for KS.
+
+Newly isolated KS interpolation/representation problem
+
+Clean fitting controls keep geometry and raw sampling fixed and replace the
+noisy field by saved clean values, after all experimental fits are frozen.
+Broad OLS on the full clean field has frozen residual energy 1.04687e-10.
+Broad OLS after sampling the clean field at each group's time points and
+applying the fixed interpolation has energy 0.212411. The corresponding
+local interpolated-clean fit is 5.42760e-8. These are deterministic controls,
+repeated identically across seeds, not extra independent observations.
+
+The broad interpolated-clean KS coefficients are approximately
+[-0.99974,-0.99612,-0.90226], [-0.99975,-0.99580,-0.89545], and
+[-0.99975,-0.99591,-0.89724], versus [-1,-1,-1]. Small moment approximation
+errors are amplified into a roughly 10% error in the fourth-derivative
+coefficient. The actual broad-IRLS fourth-derivative estimates range from
+-1.5134 to -0.6043 across noisy folds, while local fits remain accurate.
+
+This isolates a weakness of the broad low-frequency fitting representation
+under subsampling/interpolation. Noise-covariance reweighting alone does not
+remove it. It is not evidence that the fourth-order stencil was accidentally
+disabled. For forced KdV, broad interpolated-clean OLS energy is only
+2.89772e-7; its large noisy-fit error has a different origin.
+
+The common broad validation metric also has limits. For KS seed 3, broad
+IRLS scores 3.598e-6 versus local IRLS 7.351e-6, even though their frozen
+clean energies are 0.2440 versus 9.971e-5. On full clean data evaluated in
+the broad validation representation, broad IRLS still wins (4.255e-6 versus
+8.071e-6). Thus this particular ranking failure is not merely stochastic
+validation noise. A few broad moments can miss an error exposed by the
+richer frozen clean bank. Do not select fits with that score alone.
+
+Convergence and controls
+
+There are 216 IRLS fits including registered wave equivalents: 210 converge,
+six do not meet the frozen 100-step criterion. Five failures are forced KdV
+(three dense, two spaced); one is a spaced-local wave equivalent. Four of
+the KdV failures show an alternating two-cycle: the two-step coefficient
+change is tiny while the one-step change remains substantial. One KdV fit
+just misses tolerance (1.0454e-8 versus 1e-8); the wave equivalent is still
+changing. All broad IRLS fits converge. No covariance-rank failure occurs.
+This distinguishes optimizer convergence from coefficient accuracy.
+
+Known-covariance GLS, joint covariance algebra including target/predictor
+cross terms, feature-unit scaling, constant preservation and explicit
+zero-covariance rejection pass. The ODE_simple energy and phase identities
+are preserved by clean-fit controls with noise-derived IRLS weights. Their
+constants are 2.68999715, 0.99999947 and -1.29999931 in the existing equation
+orientations; differences from 2.69, 1, -1.3 are the source stencil error.
+The identities require derivative order at most one, and are not removed.
+
+All source and input hashes, fresh raw records, finite scored fits, iteration
+criteria and aggregate means are checked by audit.py. See completion_audit.json.
+The first invocation of the reporting-only diagnose.py hit an import-name
+collision with an older summarize.py. Its CSV helper was made local and the
+report rerun. No fitting code, result, criterion or seed was changed or rerun.
+
+Interpretation and next experiment
+
+The estimator helps on broad moments, particularly forced KdV, but cannot
+serve as a universal coefficient fitter. The clean KS control makes the
+next issue concrete: address approximation-error amplification and retain
+informative local moments during both fitting and validation. A focused
+next test should compare native-sample weak quadrature and mixed local/broad
+constraints, including their cross covariance, against the present controls.
+That test has NOT been performed here. Native sampling alone is not assumed
+to recover information lost by subsampling. Damping could address observed
+IRLS cycles, but convergence would not by itself fix the inaccurate fits.
+
+Code/artifacts: protocol.txt; estimator.py; run_eiv.py; results/*.json;
+summary.json/.csv; per_case.csv; per_fold.csv; coefficient_errors.csv;
+coefficient_summary.csv; clean_fit_floors.csv; iteration_trace.csv;
+nonconvergence.csv; diagnosis.json; accuracy.png/.svg; completion_audit.json.
+The statistical inspiration is WENDy (https://arxiv.org/abs/2302.13271), but
+this is our conditional raw-operator covariance experiment, not a faithful
+WENDy reproduction or a calibrated inference procedure. No equation solves,
+PINNs, clean-field regeneration, production changes or commits were made.

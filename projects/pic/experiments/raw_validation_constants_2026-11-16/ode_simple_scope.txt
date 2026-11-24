@@ -1,0 +1,34 @@
+Dataset and search-scope correction from the user's clarification
+
+The requested example is ODE_simple_discovery in projects/pic/data/ode/ode.py:
+  t = linspace(0,4*pi,200), u = sin(t)+1.3*cos(t), max_deriv_order=1.
+It is distinct from epde_bench.datasets.load('ode'), the forced oscillator
+used by the earlier core-15 experiment. The robot loader also uses the alias
+'ode' for this simple analytic example; the alias alone is ambiguous.
+
+The user confirmed that the first-derivative phase identities are relevant,
+and then asked to retain the energy identity as another correct identity.
+We therefore keep all three controls without conflating search availability:
+  u' cos(t) + u sin(t) = 1
+  u cos(t) - u' sin(t) = 1.3
+  (u')^2 + u^2 = 2.69
+
+The first two use only the first power of the first derivative. The third
+uses a squared FIRST derivative, not a second derivative. If derivative powers
+are disabled it is a mathematical control outside that restricted library.
+No u'' candidate was tested. The energy and phase targets in this diagnostic
+are decorated derivatives. A separate plain-target-only policy could forbid
+those target forms; this study does not override production target policies.
+
+For the general oscillator trajectory u=A*sin(t)+B*cos(t), the right-hand
+constants are A, B and A^2+B^2. Here A=1 and B=1.3. They encode initial
+conditions/invariants, not additive external forcing in u''+u=0.
+We keep them as valid trajectory identities rather than false discoveries.
+This classification is distinct from claiming a complete, generally valid
+evolution equation was recovered by a full search.
+
+The source function itself does not apply its noise_level argument to x.
+Its noiseless FD4/10-point-boundary setup is checked directly. The additional
+5% experiments explicitly add noise with seeds 0/1/2 and use known iid
+Gaussian covariance as a controlled diagnostic. They are not a reproduction
+of an evolutionary search or unknown-noise estimation.

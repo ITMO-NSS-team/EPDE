@@ -1,0 +1,11 @@
+{
+  "known_covariance_gls": true,
+  "gls_coefficients": [
+    2.9934205901365027,
+    1.9653853503360463
+  ],
+  "joint_feature_units_invariant": true,
+  "constant_preserved": 2.999999999999999,
+  "zero_covariance_explicitly_infeasible": true,
+  "joint_covariance_algebra": true
+}

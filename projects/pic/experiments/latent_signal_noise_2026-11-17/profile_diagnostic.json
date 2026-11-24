@@ -1,0 +1,1283 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "system": "ac",
+      "seed": 33,
+      "profile": "negative",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.034284436953232474,
+        "rhos": [
+          -0.4122373747109259,
+          0.34407019308082415
+        ],
+        "kappas": [
+          0.002225761023652922,
+          7.574745433406726
+        ],
+        "phis": [
+          0.8518824685392749,
+          -0.5860342404310557
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 12698,
+        "shape": [
+          51,
+          128
+        ],
+        "objective": -1.1159491015653977,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.1159491015653977,
+            "theta": [
+              -0.4122373747109259,
+              0.34407019308082415,
+              -6.107656388741484,
+              2.024819744679806,
+              0.8518824685392749,
+              -0.5860342404310557
+            ],
+            "iterations": 31,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -1.115949101555632,
+            "theta": [
+              -0.41223626431410776,
+              0.3440609050280029,
+              -6.107672962229249,
+              2.0248190043456575,
+              0.8518838089422306,
+              -0.5860341577684305
+            ],
+            "iterations": 45,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.8323278825760587,
+            "theta": [
+              -0.9997672176967007,
+              0.9986492339704383,
+              -11.917491441472206,
+              -9.453221754719499,
+              -0.19401859635681198,
+              0.9386993909848971
+            ],
+            "iterations": 15,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.283621218989339,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -1.1076697423744146,
+          "theta": [
+            -6.044042536073058,
+            1.320724322649814,
+            0.8503498285562954,
+            -0.1981123756814476
+          ],
+          "iterations": 14,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.107669742374721,
+          "theta": [
+            -6.044038859570759,
+            1.320727453024301,
+            0.8503491082011366,
+            -0.1981137944227055
+          ],
+          "iterations": 43,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.1076697423747608,
+          "theta": [
+            -6.044037259857695,
+            1.3207268144724997,
+            0.8503494709875179,
+            -0.19811331531390233
+          ],
+          "iterations": 22,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -1.1076697423747608,
+      "fixed_sigma": 0.03331829530895861,
+      "free_restart": {
+        "success": true,
+        "value": -1.1159491015486191,
+        "theta": [
+          -0.41223733833311926,
+          0.34408401395611027,
+          -6.1076419240363435,
+          2.024823487625118,
+          0.8518807913491551,
+          -0.5860352205781603
+        ],
+        "iterations": 29,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.008279359190636937,
+      "restart_minus_original": 1.6778578526555066e-11,
+      "contrast_count": 12698
+    },
+    {
+      "system": "ac",
+      "seed": 34,
+      "profile": "negative",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.03373204230098812,
+        "rhos": [
+          -0.41635719895128426,
+          0.42842617065680755
+        ],
+        "kappas": [
+          0.0023501948193229844,
+          8.41014326201798
+        ],
+        "phis": [
+          0.8509623930594546,
+          -0.6107163254182236
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 12698,
+        "shape": [
+          51,
+          128
+        ],
+        "objective": -1.1259561258544195,
+        "fits": [
+          {
+            "success": true,
+            "value": -0.873633310980673,
+            "theta": [
+              0.22628798335619685,
+              0.4305931902973984,
+              -6.920905167654029,
+              -0.827767939433141,
+              0.8119889136887938,
+              0.4922068414511799
+            ],
+            "iterations": 11,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.1259561258544195,
+            "theta": [
+              -0.41635719895128426,
+              0.42842617065680755,
+              -6.053257052422669,
+              2.129438508562476,
+              0.8509623930594546,
+              -0.6107163254182236
+            ],
+            "iterations": 49,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.8288505746368351,
+            "theta": [
+              -0.9997551673931173,
+              0.9986622229958918,
+              -12.044333167619133,
+              -9.303736822578038,
+              -0.20285600973677026,
+              0.9330997528002587
+            ],
+            "iterations": 18,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.2971055512175844,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -1.1176989666189983,
+          "theta": [
+            -5.99186437109515,
+            1.3047323856213735,
+            0.8499409916174248,
+            -0.17911800562079244
+          ],
+          "iterations": 15,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.1176989666257429,
+          "theta": [
+            -5.991866899686195,
+            1.304750449356326,
+            0.8499417455992004,
+            -0.1791247831899725
+          ],
+          "iterations": 44,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.117698966624744,
+          "theta": [
+            -5.991867674632826,
+            1.3047437648832048,
+            0.8499424640394866,
+            -0.17912112597267893
+          ],
+          "iterations": 31,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -1.1176989666257429,
+      "fixed_sigma": 0.032781986630482575,
+      "free_restart": {
+        "success": true,
+        "value": -1.1187494927643664,
+        "theta": [
+          -0.40763203034112866,
+          -0.2829408302752305,
+          -6.014602398593288,
+          1.3087627028301454,
+          0.850168849022819,
+          -0.21785216727349552
+        ],
+        "iterations": 16,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.008257159228676647,
+      "restart_minus_original": 0.007206633090053094,
+      "contrast_count": 12698
+    },
+    {
+      "system": "ac",
+      "seed": 35,
+      "profile": "negative",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.033878809264916154,
+        "rhos": [
+          -0.4152408860636645,
+          0.45127600003987717
+        ],
+        "kappas": [
+          0.0022755492634197825,
+          8.570170447869431
+        ],
+        "phis": [
+          0.854067737343398,
+          -0.6124542654927113
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 12698,
+        "shape": [
+          51,
+          128
+        ],
+        "objective": -1.126268061710588,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.117757116432997,
+            "theta": [
+              -0.4060496045778783,
+              -0.28998283259522994,
+              -6.044657302517659,
+              1.3034881358983483,
+              0.853192192738167,
+              -0.20400427175314276
+            ],
+            "iterations": 27,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -1.126268061710588,
+            "theta": [
+              -0.4152408860636645,
+              0.45127600003987717,
+              -6.085533821249601,
+              2.1482876213114905,
+              0.854067737343398,
+              -0.6124542654927113
+            ],
+            "iterations": 44,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.8769508569950206,
+            "theta": [
+              -0.9996970010598356,
+              0.9983678170991914,
+              -12.127832219835064,
+              -9.097709349526166,
+              0.16552762568058077,
+              0.40884279222044956
+            ],
+            "iterations": 27,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.2493172047155674,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -1.1168337507607886,
+          "theta": [
+            -6.022349074305011,
+            1.307251119649519,
+            0.8528002642363065,
+            -0.17141398329069096
+          ],
+          "iterations": 15,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.116833750766049,
+          "theta": [
+            -6.022347494388499,
+            1.3072671057503276,
+            0.8527990957074416,
+            -0.17142319245171891
+          ],
+          "iterations": 48,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.1168337507650559,
+          "theta": [
+            -6.022342900836717,
+            1.30726222458218,
+            0.8527998596172396,
+            -0.17141934366862474
+          ],
+          "iterations": 25,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -1.116833750766049,
+      "fixed_sigma": 0.032907397909733765,
+      "free_restart": {
+        "success": true,
+        "value": -1.1177571164303923,
+        "theta": [
+          -0.40605004942945994,
+          -0.28998371838944387,
+          -6.044652829444559,
+          1.303494504591093,
+          0.8531921604490241,
+          -0.20400915566650044
+        ],
+        "iterations": 16,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.009434310944538948,
+      "restart_minus_original": 0.008510945280195692,
+      "contrast_count": 12698
+    },
+    {
+      "system": "pde_compound",
+      "seed": 33,
+      "profile": "iid",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.009575327662160755,
+        "rhos": [
+          0.04814901105611249,
+          0.01504691471758603
+        ],
+        "kappas": [
+          0.00016965324518241847,
+          0.09371557834407006
+        ],
+        "phis": [
+          0.9811130336629582,
+          0.9684275733738462
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 49498,
+        "shape": [
+          251,
+          100
+        ],
+        "objective": -1.107595701460924,
+        "fits": [
+          {
+            "success": false,
+            "value": -1.1017265457972027,
+            "theta": [
+              0.04357493094317718,
+              0.015562185552374458,
+              -5.088672049212938,
+              -2.348094114612996,
+              0.999596859868624,
+              0.9685220392192093
+            ],
+            "iterations": 42,
+            "message": "ABNORMAL: "
+          },
+          {
+            "success": true,
+            "value": -1.078103688651258,
+            "theta": [
+              0.07967084077438848,
+              -0.04264012959670829,
+              -3.0238339846492033,
+              -2.9957458803200505,
+              0.9999654586823027,
+              0.5618687761418156
+            ],
+            "iterations": 8,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.107595701460924,
+            "theta": [
+              0.04814901105611249,
+              0.01504691471758603,
+              -8.681753938226043,
+              -2.3674908458828625,
+              0.9811130336629582,
+              0.9684275733738462
+            ],
+            "iterations": 64,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.029492012809665846,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -1.106831477353177,
+          "theta": [
+            -8.620334794953552,
+            -2.349942690303325,
+            0.9805211218113796,
+            0.9677018482190981
+          ],
+          "iterations": 21,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.082542575640741,
+          "theta": [
+            -3.0126455322738384,
+            -2.9912939954483564,
+            0.9999662763740099,
+            0.6704108215370127
+          ],
+          "iterations": 5,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.1068314773581394,
+          "theta": [
+            -8.620333518645,
+            -2.349941736082918,
+            0.9805211330507534,
+            0.9677018648756409
+          ],
+          "iterations": 33,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -1.1068314773581394,
+      "fixed_sigma": 0.00953108491777472,
+      "free_restart": {
+        "success": true,
+        "value": -1.1075957014652897,
+        "theta": [
+          0.04815084596212127,
+          0.015046091443681742,
+          -8.681727311226094,
+          -2.3674823526732056,
+          0.981112904917885,
+          0.9684279716146513
+        ],
+        "iterations": 28,
+        "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+      },
+      "fixed_minus_original": 0.0007642241027845387,
+      "restart_minus_original": -4.3658410220359656e-12,
+      "contrast_count": 49498
+    },
+    {
+      "system": "pde_compound",
+      "seed": 34,
+      "profile": "iid",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.009627951658646198,
+        "rhos": [
+          0.05048344780368616,
+          0.005686245111399611
+        ],
+        "kappas": [
+          0.00017060783116941593,
+          0.09479568854026547
+        ],
+        "phis": [
+          0.9798811858303363,
+          0.9679670776801905
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 49498,
+        "shape": [
+          251,
+          100
+        ],
+        "objective": -1.1082939677737578,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.1082939677737578,
+            "theta": [
+              0.05048344780368616,
+              0.005686245111399611,
+              -8.676143020270812,
+              -2.356031350288451,
+              0.9798811858303363,
+              0.9679670776801905
+            ],
+            "iterations": 61,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -1.0956256387919687,
+            "theta": [
+              0.035783487031447424,
+              -0.003929372438449375,
+              -3.007890917467804,
+              -2.9935668142998737,
+              0.999960680309622,
+              0.9508880320015832
+            ],
+            "iterations": 20,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": false,
+            "value": -1.080884801867942,
+            "theta": [
+              0.04013393318566953,
+              0.007197176699107694,
+              7.85908804570799,
+              -2.341032893573114,
+              -0.999999,
+              0.9680470913118385
+            ],
+            "iterations": 300,
+            "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.012668328981789045,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -1.107509774842769,
+          "theta": [
+            -8.616105842648555,
+            -2.342025792041783,
+            0.9791756466316158,
+            0.9675738908992801
+          ],
+          "iterations": 25,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.0832745446803713,
+          "theta": [
+            -3.0125639288102555,
+            -2.991198532109137,
+            0.999961392485416,
+            0.6692427514310869
+          ],
+          "iterations": 5,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.1075097748411395,
+          "theta": [
+            -8.616122615119496,
+            -2.3420185071446307,
+            0.9791752229096201,
+            0.9675739655767963
+          ],
+          "iterations": 31,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -1.107509774842769,
+      "fixed_sigma": 0.009592973228020643,
+      "free_restart": {
+        "success": true,
+        "value": -1.108293967765336,
+        "theta": [
+          0.05048186677410872,
+          0.005686343743154922,
+          -8.676143810832173,
+          -2.35602625775901,
+          0.9798809993251667,
+          0.9679672438928016
+        ],
+        "iterations": 29,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.0007841929309888584,
+      "restart_minus_original": 8.421707775596587e-12,
+      "contrast_count": 49498
+    },
+    {
+      "system": "pde_compound",
+      "seed": 35,
+      "profile": "iid",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.00957031386301145,
+        "rhos": [
+          0.043444566480976256,
+          0.011346700612474413
+        ],
+        "kappas": [
+          0.0001673315657680504,
+          0.09568065348712039
+        ],
+        "phis": [
+          0.9815080594881472,
+          0.9668360722134639
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 49498,
+        "shape": [
+          251,
+          100
+        ],
+        "objective": -1.1083670256721843,
+        "fits": [
+          {
+            "success": true,
+            "value": -1.1083670256721843,
+            "theta": [
+              0.043444566480976256,
+              0.011346700612474413,
+              -8.695533290135586,
+              -2.346739158879222,
+              0.9815080594881472,
+              0.9668360722134639
+            ],
+            "iterations": 66,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.0940811471383276,
+            "theta": [
+              0.01818637169529123,
+              0.05042335499460521,
+              -3.039488835332482,
+              -2.996637695877829,
+              0.9999713878790812,
+              0.9234800161100046
+            ],
+            "iterations": 13,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -1.0564688316164224,
+            "theta": [
+              -0.033971225722700484,
+              -0.06857528614366408,
+              6.961341193038039,
+              2.7178581708333542,
+              -0.9999980328027209,
+              0.999737198054802
+            ],
+            "iterations": 64,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.051898194055761904,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -1.1077588585737148,
+          "theta": [
+            -8.638850675306172,
+            -2.332188701889237,
+            0.9808998286376407,
+            0.9661616016058877
+          ],
+          "iterations": 28,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -1.0836303766979882,
+          "theta": [
+            -3.012745555263239,
+            -2.9910453328476105,
+            0.9999694318128909,
+            0.6697956382006891
+          ],
+          "iterations": 6,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        },
+        {
+          "success": true,
+          "value": -1.1077588585770775,
+          "theta": [
+            -8.638847363789742,
+            -2.332190773465826,
+            0.980899815366032,
+            0.9661614147328329
+          ],
+          "iterations": 26,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -1.1077588585770775,
+      "fixed_sigma": 0.009532278284688077,
+      "free_restart": {
+        "success": true,
+        "value": -1.1083670256625517,
+        "theta": [
+          0.04344241453590377,
+          0.011349021429620635,
+          -8.695548070221326,
+          -2.3467455895587754,
+          0.981507195748772,
+          0.9668356028795088
+        ],
+        "iterations": 30,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.0006081670951068041,
+      "restart_minus_original": 9.632517006252783e-12,
+      "contrast_count": 49498
+    },
+    {
+      "system": "ns",
+      "seed": 33,
+      "profile": "iid",
+      "variable": "u",
+      "original": {
+        "status": "ok",
+        "sigma": 0.016089590980915447,
+        "rhos": [
+          -0.05724016781845145,
+          0.3346525516992405,
+          -0.06339568457418462
+        ],
+        "kappas": [
+          0.08026687417379917,
+          16.972255751655773,
+          0.8320167838700503
+        ],
+        "phis": [
+          0.6811564498316797,
+          0.4424661174854138,
+          0.5696974317860859
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 100960,
+        "shape": [
+          50,
+          20,
+          36
+        ],
+        "objective": -0.590465090190412,
+        "fits": [
+          {
+            "success": true,
+            "value": -0.590465090190412,
+            "theta": [
+              -0.05724016781845145,
+              0.3346525516992405,
+              -0.06339568457418462,
+              -2.522398268997172,
+              2.8315799962611736,
+              -0.18390266544366551,
+              0.6811564498316797,
+              0.4424661174854138,
+              0.5696974317860859
+            ],
+            "iterations": 132,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.4720652431792245,
+            "theta": [
+              0.9895256681157378,
+              0.9927914016144795,
+              0.9977077749709061,
+              -2.955996658815343,
+              -1.9987662449099595,
+              -3.079914132623486,
+              0.9996486602487714,
+              0.43168425459851323,
+              -0.5216201465949014
+            ],
+            "iterations": 41,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": false,
+            "value": -0.3313597554665577,
+            "theta": [
+              -0.999999,
+              0.999999,
+              0.999999,
+              -8.985006173668435,
+              -9.721040159989583,
+              -11.089718048208947,
+              -0.9791123458291903,
+              0.3331719034905055,
+              -0.4343725444222411
+            ],
+            "iterations": 300,
+            "message": "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.11839984701118755,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -0.5843513413679549,
+          "theta": [
+            -2.552138833673083,
+            2.773889136081014,
+            -0.18937131519637568,
+            0.6943659506947177,
+            0.5019674301166518,
+            0.5715422834598032
+          ],
+          "iterations": 13,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -0.5843513413659844,
+          "theta": [
+            -2.552141108351803,
+            2.773884202000365,
+            -0.18937231512582234,
+            0.6943655090536014,
+            0.5019663873210524,
+            0.5715377986817575
+          ],
+          "iterations": 33,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -0.033729741611641995,
+          "theta": [
+            8.976032401115575,
+            15.756719403696705,
+            9.779739968255742,
+            0.999999,
+            0.999999,
+            0.9999897250138755
+          ],
+          "iterations": 109,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        }
+      ],
+      "fixed_objective": -0.5843513413679549,
+      "fixed_sigma": 0.016084904996011923,
+      "free_restart": {
+        "success": true,
+        "value": -0.5904650901889084,
+        "theta": [
+          -0.05724005205480578,
+          0.33465329313756836,
+          -0.06339816836948026,
+          -2.5223958022944104,
+          2.831582209259503,
+          -0.18390077242732122,
+          0.6811558579139204,
+          0.44246934335557536,
+          0.5696972767241326
+        ],
+        "iterations": 15,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.006113748822457188,
+      "restart_minus_original": 1.503686064552312e-12,
+      "contrast_count": 100960
+    },
+    {
+      "system": "ns",
+      "seed": 33,
+      "profile": "iid",
+      "variable": "v",
+      "original": {
+        "status": "ok",
+        "sigma": 0.013441082929670493,
+        "rhos": [
+          -0.0971769547790031,
+          -0.03743439744037022,
+          -0.1070537023601286
+        ],
+        "kappas": [
+          0.2703298134963932,
+          3.303381941588223,
+          3.0458743535034776
+        ],
+        "phis": [
+          0.7227276535193847,
+          0.4188779811321384,
+          0.6287210588364011
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 100960,
+        "shape": [
+          50,
+          20,
+          36
+        ],
+        "objective": -0.31897770102625866,
+        "fits": [
+          {
+            "success": true,
+            "value": -0.31897770102625866,
+            "theta": [
+              -0.0971769547790031,
+              -0.03743439744037022,
+              -0.1070537023601286,
+              -1.3081125339781943,
+              1.1949467744761866,
+              1.1137880039516201,
+              0.7227276535193847,
+              0.4188779811321384,
+              0.6287210588364011
+            ],
+            "iterations": 172,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.25271936127635364,
+            "theta": [
+              0.9876934643852379,
+              0.9728726844610656,
+              0.9731431047836104,
+              -2.6456116097517732,
+              -3.074623244955146,
+              -3.081630269753634,
+              -0.662881321730123,
+              0.4534691312825539,
+              0.6527534625318255
+            ],
+            "iterations": 67,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          },
+          {
+            "success": true,
+            "value": -0.17197304222380438,
+            "theta": [
+              0.999999,
+              0.999999,
+              0.999999,
+              -11.65183292333558,
+              -12.865022655608016,
+              -12.934728264491541,
+              0.9987059411311269,
+              0.6360809108688947,
+              0.20461842847486444
+            ],
+            "iterations": 36,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.14700465880245428,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -0.3166226520269919,
+          "theta": [
+            -1.419336575866454,
+            1.0998335216827366,
+            1.0304196379061905,
+            0.7404975344036231,
+            0.4311248388219319,
+            0.6322319065588243
+          ],
+          "iterations": 11,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -0.31662265201459605,
+          "theta": [
+            -1.4193318987303607,
+            1.0998488050142115,
+            1.030419898466859,
+            0.7404956022735435,
+            0.43112221474645895,
+            0.6322340636575334
+          ],
+          "iterations": 21,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -0.22693185006125294,
+          "theta": [
+            4.746781524910605,
+            0.9326092344145165,
+            0.41283370276909215,
+            0.9997359247163191,
+            0.5602774239689524,
+            0.6086526415897368
+          ],
+          "iterations": 25,
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+        }
+      ],
+      "fixed_objective": -0.3166226520269919,
+      "fixed_sigma": 0.01395355561374544,
+      "free_restart": {
+        "success": true,
+        "value": -0.31897770102124623,
+        "theta": [
+          -0.09718217881952265,
+          -0.037437866558061965,
+          -0.10705695154748868,
+          -1.3081076229639301,
+          1.1949511068795742,
+          1.1137904694695508,
+          0.72272752590945,
+          0.4188782731070262,
+          0.6287207064054042
+        ],
+        "iterations": 13,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.002355048999266751,
+      "restart_minus_original": 5.012434911577657e-12,
+      "contrast_count": 100960
+    },
+    {
+      "system": "ns",
+      "seed": 33,
+      "profile": "iid",
+      "variable": "p",
+      "original": {
+        "status": "ok",
+        "sigma": 0.005460699926852372,
+        "rhos": [
+          -0.07729301578607964,
+          0.008186826908938892,
+          -0.11628259612533497
+        ],
+        "kappas": [
+          0.11054656281695442,
+          6.745080299806978,
+          2.2276643649699386
+        ],
+        "phis": [
+          0.7474805504153889,
+          0.5214556632516144,
+          0.6127351939452226
+        ],
+        "signal_phi_boundary": false,
+        "contrast_count": 100960,
+        "shape": [
+          50,
+          20,
+          36
+        ],
+        "objective": -0.3921154787952186,
+        "fits": [
+          {
+            "success": true,
+            "value": -0.39211547878875197,
+            "theta": [
+              -0.07728938362633767,
+              0.00818169696198096,
+              -0.11628547890862848,
+              -2.202317963387683,
+              1.9088085740782923,
+              0.8009481128845984,
+              0.7474769028319992,
+              0.5214586812527418,
+              0.6127321072087453
+            ],
+            "iterations": 35,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.3921154787952186,
+            "theta": [
+              -0.07729301578607964,
+              0.008186826908938892,
+              -0.11628259612533497,
+              -2.202318463822332,
+              1.908813394675137,
+              0.8009536666281807,
+              0.7474805504153889,
+              0.5214556632516144,
+              0.6127351939452226
+            ],
+            "iterations": 41,
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+          },
+          {
+            "success": true,
+            "value": -0.037489279511317974,
+            "theta": [
+              0.999999,
+              0.999999,
+              0.999999,
+              -9.920440542458076,
+              -10.988769202500219,
+              -10.893328590500195,
+              0.9997877996865817,
+              0.0221597596421832,
+              0.21230318729422842
+            ],
+            "iterations": 9,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH"
+          }
+        ],
+        "failed_evaluations": 0,
+        "successful_objective_spread": 0.3546261992839006,
+        "likelihood": "axis_composite"
+      },
+      "fixed_rho_fits": [
+        {
+          "success": true,
+          "value": -0.38962125383577706,
+          "theta": [
+            -2.2969907559986154,
+            1.8451777239808378,
+            0.7390044544316204,
+            0.7649186336922119,
+            0.5283474431373998,
+            0.6144266445226383
+          ],
+          "iterations": 10,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -0.38962125383753254,
+          "theta": [
+            -2.296996219805839,
+            1.8451793789813546,
+            0.7390018317412957,
+            0.7649181369183242,
+            0.5283496049332672,
+            0.6144272930048987
+          ],
+          "iterations": 28,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        },
+        {
+          "success": true,
+          "value": -0.3896212538367272,
+          "theta": [
+            -2.2969912621007915,
+            1.8451807296159495,
+            0.7390049273396162,
+            0.7649194584842589,
+            0.5283487557738851,
+            0.6144273736078267
+          ],
+          "iterations": 50,
+          "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+        }
+      ],
+      "fixed_objective": -0.38962125383753254,
+      "fixed_sigma": 0.005613967201231135,
+      "free_restart": {
+        "success": true,
+        "value": -0.39211547878632436,
+        "theta": [
+          -0.07728942340175114,
+          0.008188497573787111,
+          -0.11628427219137782,
+          -2.2023147663846303,
+          1.9088073737967124,
+          0.8009597460005736,
+          0.7474741949075117,
+          0.5214549821210995,
+          0.6127356625317901
+        ],
+        "iterations": 12,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL"
+      },
+      "fixed_minus_original": 0.002494224957686031,
+      "restart_minus_original": 8.894218694877054e-12,
+      "contrast_count": 100960
+    }
+  ],
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\ac_negative_seed33.json": "11dca53a9cb38118040526d50647a6506b345e81b3b5f278574825d22af1439b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\ac_negative_seed34.json": "7b73744a0958c6274b36ffec0155b02a77af8a24cea7622ad2b2058c70ab427a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\ac_negative_seed35.json": "585dc71d3c115a7abf5b2cc10ed238f0d9380b0c165e11ea88721e4a4b0e6497",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\pde_compound_iid_seed33.json": "86135a8a619f7874be973a12a3a0055484721fbe1ee49645e2fb206a996d3587",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\pde_compound_iid_seed34.json": "e2337391121bb2df80709b93af55b4f55bc225366fb4a20568f46164955c955d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\pde_compound_iid_seed35.json": "796ecac22dace0abe93d287ec86c9ee90e6100e321b47c06ea2cc812d19256b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_explore\\ns_iid_seed33.json": "a6f33fedda76cf712ddcb38f800a9dd589e6e7d6d683ad6a8b7e62841849e83f"
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\profile_diagnostic.py": "5372fc4ecac50cec1b275dd6c09822b3007d23f1302a35d8679227e55b0ebc84",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\profile_diagnostic_protocol.txt": "f06b6c74c2946484d71968191d108062fef91124822d0e4428bcd551e941ab77",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\correlated_fit.py": "485b11c45108b921fc5a46dda07997a45c4ad788ef24de1852d84c33cb9e3b14",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\latent_fit.py": "84e33329e5f57c3b73f2151154e0341ad9071ea145696ccf2bb58b5a48a7fe9a"
+  }
+}

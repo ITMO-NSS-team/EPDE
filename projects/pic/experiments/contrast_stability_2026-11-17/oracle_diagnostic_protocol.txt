@@ -1,0 +1,16 @@
+Post-hoc attribution diagnostic, frozen before diagnostic outcomes.
+2026-11-17. Motivated by severe forced-KdV contrast-noise miscalibration.
+
+Use AC, forced KdV, KS and wave, anchor21 only. Reuse the saved independent
+benchmark contrasts and candidate panel. Compare standard estimated-pilot
+calibration with two ORACLE controls: known clean field plus the same
+estimated AR noise; known clean field plus the actual iid5% noise model.
+Each control uses256 calibration and128 independent calibration-check
+fields. Match innovations to the original standard-pilot RNG streams so
+changes are paired. Keep the same weak matrix, slabs, fits and Q formula.
+
+This isolates the effect of pilot versus noise-model misspecification.
+Clean data do not choose a deployed method, filter, metric or threshold.
+No oracle result is a solver-free deployable fix or independent structural
+confirmation. Save arrays, per-candidate coverage and point scores, and
+input/source hashes. Report all four systems, including counterexamples.

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "hash_links": 1400,
+  "exploration_records": 138,
+  "likelihood_replays": 1487,
+  "field_replays": 912,
+  "noise_trials": 576,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\latent_signal_noise_2026-11-17\\audit_followups.py": "f89290c7be3b67da2a0d161618538e098e88c9b55c65eee9f0006515ad020c1d"
+  }
+}

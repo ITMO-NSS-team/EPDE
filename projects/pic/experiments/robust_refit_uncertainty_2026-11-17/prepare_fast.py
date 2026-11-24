@@ -1,0 +1,16 @@
+from common import *
+def save(n,t):assert not (ROOT/n).exists();(ROOT/n).write_text(t,encoding='utf-8')
+def main():
+    t=(ROOT/'paired_study.py').read_text().replace('import local6_fit as F','import local6_fit as F\nfrom fast_covariance import Geometry,Covariance')
+    t=t.replace("'paired_study.py','run_case.py'","'paired_study_fast.py','run_case_fast.py','fast_covariance.py','runtime_repair.txt'")
+    t=t.replace("self.active=[", "self.geometry=Geometry(self.axes)\n        self.active=[")
+    t=t.replace('O.Covariance(self.axes,np.eye(len(self.axes[0])),model or self.model)','Covariance(self.geometry,model or self.model)');save('paired_study_fast.py',t)
+    t=(ROOT/'run_case.py').read_text().replace('import paired_study as E','import paired_study_fast as E').replace("MODES=('fixed','refit')","DRAWS=256\nMODES=('fixed','refit')")
+    t=t.replace('range(256)','range(DRAWS)').replace('(0,255)','(0,DRAWS-1)').replace('profile=profile,model=e.model','profile=profile,draws=DRAWS,model=e.model').replace("ROOT/'frozen'","ROOT/'frozen_fast'")
+    t=t.replace("z=np.einsum('i,bij,j->b',v,g)","z=np.einsum('i,bij,j->b',v,g,v)").replace("noise=np.einsum('i,bij,j->b',v,err)","noise=np.einsum('i,bij,j->b',v,err,v)");save('run_case_fast.py',t)
+    t=(ROOT/'run_suite.py').read_text().replace("ROOT/'logs'","ROOT/'logs_fast'").replace("ROOT/'run_case.py'","ROOT/'run_case_fast.py'").replace("ROOT/'processes.json'","ROOT/'processes_fast.json'").replace("hashes('run_suite.py')","hashes('run_suite_fast.py')");save('run_suite_fast.py',t)
+    t=(ROOT/'audit_primary.py').read_text().replace("ROOT/'frozen'","ROOT/'frozen_fast'").replace("ROOT/'audit_records'","ROOT/'audit_records_fast'").replace("ROOT/'audit_primary.json'","ROOT/'audit_fast.json'").replace("hashes('audit_primary.py')","hashes('audit_fast.py')")
+    t=t.replace('def checklinks(d):',"def close(x,y):\n    scale=max(float(np.max(np.abs(y))),np.finfo(float).tiny);np.testing.assert_allclose(x,y,rtol=5e-10,atol=5e-12*scale)\ndef checklinks(d):")
+    t=t.replace("np.testing.assert_array_equal(m,a[b+'_'+tag])","close(m,a[b+'_'+tag])").replace('np.testing.assert_array_equal(S.gram(matrix-target),','close(S.gram(matrix-target),').replace('np.testing.assert_array_equal(S.gram(matrix),','close(S.gram(matrix),');save('audit_fast.py',t)
+    dump(ROOT/'fast_provenance.json',dict(source_sha256=hashes('prepare_fast.py','paired_study.py','run_case.py','run_suite.py','audit_primary.py','runtime_repair.txt'),generated_sha256=hashes('paired_study_fast.py','run_case_fast.py','run_suite_fast.py','audit_fast.py')))
+if __name__=='__main__':main()

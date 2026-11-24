@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "exploratory_records": 69,
+  "noise_fit_replays": 912,
+  "fresh_field_replays": 1344,
+  "oracle_operator_scores": 1536,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\audit_followups.py": "58160c8b941fc8586477d85568782cdb421a47cc4396c482119e6385191d7dd1"
+  }
+}

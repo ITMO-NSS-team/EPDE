@@ -1,0 +1,102 @@
+{
+  "legacy_fixed_local_clsm": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 53
+  },
+  "legacy_fixed_local_ols": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 54
+  },
+  "legacy_joint_all_full": {
+    "cross": 54,
+    "ordinary": 47,
+    "oracle": 55
+  },
+  "legacy_joint_all_half": {
+    "cross": 53,
+    "ordinary": 46,
+    "oracle": 55
+  },
+  "legacy_joint_clsm_full": {
+    "cross": 54,
+    "ordinary": 47,
+    "oracle": 55
+  },
+  "legacy_joint_clsm_half": {
+    "cross": 53,
+    "ordinary": 47,
+    "oracle": 54
+  },
+  "legacy_joint_ols_full": {
+    "cross": 53,
+    "ordinary": 49,
+    "oracle": 51
+  },
+  "legacy_joint_ols_half": {
+    "cross": 53,
+    "ordinary": 49,
+    "oracle": 52
+  },
+  "legacy_spread_all_full": {
+    "cross": 53,
+    "ordinary": 46,
+    "oracle": 56
+  },
+  "legacy_spread_all_half": {
+    "cross": 52,
+    "ordinary": 46,
+    "oracle": 56
+  },
+  "local_fixed_local_clsm": {
+    "cross": 54,
+    "ordinary": 53,
+    "oracle": 55
+  },
+  "local_fixed_local_ols": {
+    "cross": 53,
+    "ordinary": 54,
+    "oracle": 55
+  },
+  "local_joint_all_full": {
+    "cross": 54,
+    "ordinary": 54,
+    "oracle": 55
+  },
+  "local_joint_all_half": {
+    "cross": 54,
+    "ordinary": 54,
+    "oracle": 56
+  },
+  "local_joint_clsm_full": {
+    "cross": 54,
+    "ordinary": 54,
+    "oracle": 55
+  },
+  "local_joint_clsm_half": {
+    "cross": 54,
+    "ordinary": 54,
+    "oracle": 56
+  },
+  "local_joint_ols_full": {
+    "cross": 53,
+    "ordinary": 54,
+    "oracle": 54
+  },
+  "local_joint_ols_half": {
+    "cross": 53,
+    "ordinary": 54,
+    "oracle": 54
+  },
+  "local_spread_all_full": {
+    "cross": 53,
+    "ordinary": 53,
+    "oracle": 55
+  },
+  "local_spread_all_half": {
+    "cross": 53,
+    "ordinary": 53,
+    "oracle": 55
+  }
+}

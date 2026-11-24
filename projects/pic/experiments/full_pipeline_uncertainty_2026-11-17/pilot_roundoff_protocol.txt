@@ -1,0 +1,23 @@
+Reconstruction replay and archival correction, before primary coverage
+=====================================================================
+Cold-process recomputation of the correlation-aware pilot produced two close
+floating-point outputs on each KS anchor. Across12 fresh processes, maximum
+absolute difference was2.22e-10, maximum relative difference7.43e-11. Ordinary
+pilots remained bitwise identical. The specific low-level source is not pinned
+down; this is observed numerical reconstruction variation, not a demonstrated
+change in the statistical method. Initial exact-hash audit failures are retained.
+
+Every original correlated pilot hash was reproduced, and matching arrays are
+saved in pilot_replays. Factorial audit uses these exact arrays for replaying
+bootstrap noise and fits, while independently comparing reconstruction output
+against them with a maximum-absolute bound1e-9 times maximum field magnitude.
+Original draw and pilot hashes remain exact; no statistical test cutoff changes.
+
+Primary source variant *_saved adds archival arrays: the anchor pilot and first/
+last refitted bootstrap pilots. All other fields are reproducible from stored
+anchor model, pilot and random seed. Original source/preflight/checks remain.
+The estimator, reconstruction, weak moments, covariance metric, MC16, bootstrap
+128, streams and coverage decisions are unchanged. This is not an estimator
+selection based on coverage. Preflight and numerical comparisons precede fresh
+anchors51..53. Recomputed pilots are tested numerically; saved inputs and draws
+are always checked by exact hashes.

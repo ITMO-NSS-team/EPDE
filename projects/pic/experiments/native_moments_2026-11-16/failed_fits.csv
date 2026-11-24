@@ -1,0 +1,7 @@
+system,seed,training,bank,candidate,status,iterations,last_prediction_change,covariance_eigen_ratio
+kdv_cossin,3,0,native_local,e0:reference,nonconverged,100,0.08268905460452743,0.20028246990722084
+kdv_cossin,3,0,interpolated_local,e0:reference,nonconverged,100,0.09493411167424884,0.14214353749596545
+kdv_cossin,3,1,native_local,e0:reference,nonconverged,100,0.2814169005828763,0.009646326150831788
+kdv_cossin,3,1,interpolated_local,e0:reference,nonconverged,100,0.1922655713795331,0.020103650794857857
+wave,3,2,native_mixed,e0:equivalent_3,nonconverged,100,2.2333881673009716e-06,1.892876516955597e-05
+wave,4,1,interpolated_local,e0:equivalent_3,nonconverged,100,0.00041761987048701574,0.01277582942895291

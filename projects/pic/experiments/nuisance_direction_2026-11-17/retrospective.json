@@ -1,0 +1,2735 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9860247914244983,
+        "broad": 1.0106943478049981,
+        "joint": 1.0106943478049981
+      },
+      "cuts": {
+        "local": 1.704962650672648,
+        "broad": 4.516659055679217,
+        "joint": 4.516659055679217
+      },
+      "original_cuts": {
+        "local": 1.7291275691045342,
+        "broad": 4.46886743305569,
+        "joint": 4.46886743305569
+      },
+      "actual_scores": {
+        "local": 1.2380359765604807,
+        "broad": 3.114786616569444,
+        "joint": 3.114786616569444
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0104700849728978,
+        "broad": 0.9900973134896756,
+        "joint": 0.9900973134896756
+      },
+      "cuts": {
+        "local": 1.767945201809462,
+        "broad": 4.217190782688603,
+        "joint": 4.217190782688603
+      },
+      "original_cuts": {
+        "local": 1.7496264640599237,
+        "broad": 4.259369988415365,
+        "joint": 4.259369988415365
+      },
+      "actual_scores": {
+        "local": 1.3710885351790092,
+        "broad": 1.9612526634589178,
+        "joint": 1.9612526634589178
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9603551707477979,
+        "broad": 0.9897332122446741,
+        "joint": 0.9897332122446741
+      },
+      "cuts": {
+        "local": 1.730218447388314,
+        "broad": 4.1604855347109,
+        "joint": 4.1604855347109
+      },
+      "original_cuts": {
+        "local": 1.8016443291923427,
+        "broad": 4.203643449809157,
+        "joint": 4.203643449809157
+      },
+      "actual_scores": {
+        "local": 1.003408909865088,
+        "broad": 1.3710568666707936,
+        "joint": 1.3710568666707936
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9856983333043065,
+        "broad": 0.9790700612780153,
+        "joint": 0.9790700612780153
+      },
+      "cuts": {
+        "local": 1.5108480950638492,
+        "broad": 3.5007896251111585,
+        "joint": 3.5007896251111585
+      },
+      "original_cuts": {
+        "local": 1.5327692499987393,
+        "broad": 3.575627285080551,
+        "joint": 3.575627285080551
+      },
+      "actual_scores": {
+        "local": 1.0274544198399462,
+        "broad": 3.2724371754196264,
+        "joint": 3.2724371754196264
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9685692092623077,
+        "broad": 1.0049504444382968,
+        "joint": 1.0049504444382968
+      },
+      "cuts": {
+        "local": 1.5174227017434956,
+        "broad": 3.38144611086574,
+        "joint": 3.38144611086574
+      },
+      "original_cuts": {
+        "local": 1.5666641962521313,
+        "broad": 3.36478891031861,
+        "joint": 3.36478891031861
+      },
+      "actual_scores": {
+        "local": 1.0358185343178181,
+        "broad": 1.3790960579996143,
+        "joint": 1.3790960579996143
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0107922910858753,
+        "broad": 1.00866028432676,
+        "joint": 1.00866028432676
+      },
+      "cuts": {
+        "local": 1.5149262298803448,
+        "broad": 3.462171466263043,
+        "joint": 3.462171466263043
+      },
+      "original_cuts": {
+        "local": 1.4987512699101493,
+        "broad": 3.4324455121913546,
+        "joint": 3.4324455121913546
+      },
+      "actual_scores": {
+        "local": 1.4416856042099555,
+        "broad": 2.2042009337496817,
+        "joint": 2.2042009337496817
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9717113649792989,
+        "broad": 1.0004236614996909,
+        "joint": 1.0004236614996909
+      },
+      "cuts": {
+        "local": 1.6664376527528861,
+        "broad": 3.100057221912035,
+        "joint": 3.100057221912035
+      },
+      "original_cuts": {
+        "local": 1.7149512836956349,
+        "broad": 3.098744403211012,
+        "joint": 3.098744403211012
+      },
+      "actual_scores": {
+        "local": 1.6603345004622625,
+        "broad": 2.1882733544163795,
+        "joint": 2.1882733544163795
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0524546606695493,
+        "broad": 1.0168651710480752,
+        "joint": 1.0168651710480752
+      },
+      "cuts": {
+        "local": 1.6183143552060923,
+        "broad": 3.035341488555734,
+        "joint": 3.035341488555734
+      },
+      "original_cuts": {
+        "local": 1.5376570751053116,
+        "broad": 2.984998970342578,
+        "joint": 2.984998970342578
+      },
+      "actual_scores": {
+        "local": 1.3898720846297472,
+        "broad": 1.6479379262303835,
+        "joint": 1.6479379262303835
+      }
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9615625903222489,
+        "broad": 1.0409761965215825,
+        "joint": 1.0409761965215825
+      },
+      "cuts": {
+        "local": 1.6035901641415153,
+        "broad": 2.970025343080948,
+        "joint": 2.970025343080948
+      },
+      "original_cuts": {
+        "local": 1.6676919217542598,
+        "broad": 2.853115520801796,
+        "joint": 2.853115520801796
+      },
+      "actual_scores": {
+        "local": 1.2235746512598495,
+        "broad": 1.979164953380918,
+        "joint": 1.979164953380918
+      }
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0078219371248636,
+        "broad": 1.0376564506975954,
+        "joint": 1.0376564506975954
+      },
+      "cuts": {
+        "local": 1.9968618250530725,
+        "broad": 5.425509784955476,
+        "joint": 5.425509784955476
+      },
+      "original_cuts": {
+        "local": 1.981363722593461,
+        "broad": 5.228618567646368,
+        "joint": 5.228618567646368
+      },
+      "actual_scores": {
+        "local": 1.113002378695755,
+        "broad": 2.3594617841867453,
+        "joint": 2.3594617841867453
+      }
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0364088534061557,
+        "broad": 1.0475275046765053,
+        "joint": 1.0475275046765053
+      },
+      "cuts": {
+        "local": 1.729034897368853,
+        "broad": 6.471786871407122,
+        "joint": 6.471786871407122
+      },
+      "original_cuts": {
+        "local": 1.668294217756229,
+        "broad": 6.178154599774182,
+        "joint": 6.178154599774182
+      },
+      "actual_scores": {
+        "local": 1.2172643896382227,
+        "broad": 2.1387868945442423,
+        "joint": 2.1387868945442423
+      }
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0633347462348222,
+        "broad": 1.045888483182742,
+        "joint": 1.045888483182742
+      },
+      "cuts": {
+        "local": 2.1575526687749034,
+        "broad": 5.2692512958987425,
+        "joint": 5.2692512958987425
+      },
+      "original_cuts": {
+        "local": 2.029043700880286,
+        "broad": 5.038062260580488,
+        "joint": 5.038062260580488
+      },
+      "actual_scores": {
+        "local": 1.0846845250157886,
+        "broad": 1.6957848483313251,
+        "joint": 1.6957848483313251
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9746124911599214,
+        "broad": 1.0145882762450886,
+        "joint": 1.0145882762450886
+      },
+      "cuts": {
+        "local": 1.9721800593471117,
+        "broad": 5.188817076957633,
+        "joint": 5.188817076957633
+      },
+      "original_cuts": {
+        "local": 2.0235530297789937,
+        "broad": 5.114209574903661,
+        "joint": 5.114209574903661
+      },
+      "actual_scores": {
+        "local": 1.7036346562744573,
+        "broad": 2.1452188193699735,
+        "joint": 2.1452188193699735
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9594554738603985,
+        "broad": 0.9726122697821394,
+        "joint": 0.9726122697821394
+      },
+      "cuts": {
+        "local": 2.1606296819140445,
+        "broad": 5.267803119472913,
+        "joint": 5.267803119472913
+      },
+      "original_cuts": {
+        "local": 2.251933248367102,
+        "broad": 5.416138869657563,
+        "joint": 5.416138869657563
+      },
+      "actual_scores": {
+        "local": 1.4801102103480737,
+        "broad": 2.8761938351744103,
+        "joint": 2.8761938351744103
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0270330164979145,
+        "broad": 0.9853514505064552,
+        "joint": 0.9853514505064552
+      },
+      "cuts": {
+        "local": 2.165328428027113,
+        "broad": 5.246093087035343,
+        "joint": 5.246093087035343
+      },
+      "original_cuts": {
+        "local": 2.1083338054804495,
+        "broad": 5.32408318305,
+        "joint": 5.32408318305
+      },
+      "actual_scores": {
+        "local": 1.4012061629502832,
+        "broad": 2.0286338850878383,
+        "joint": 2.0286338850878383
+      }
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0210058699243378,
+        "broad": 0.923165432048635,
+        "joint": 0.923165432048635
+      },
+      "cuts": {
+        "local": 2.11248547714381,
+        "broad": 9.268702726555905,
+        "joint": 9.268702726555905
+      },
+      "original_cuts": {
+        "local": 2.06902383166549,
+        "broad": 10.040131925203632,
+        "joint": 10.040131925203632
+      },
+      "actual_scores": {
+        "local": 1.307545259870105,
+        "broad": 5.5756759608949285,
+        "joint": 5.5756759608949285
+      }
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.997924977578351,
+        "broad": 1.1317953407659753,
+        "joint": 1.1317953407659753
+      },
+      "cuts": {
+        "local": 1.930257977982719,
+        "broad": 10.57896941728384,
+        "joint": 10.57896941728384
+      },
+      "original_cuts": {
+        "local": 1.934271634994893,
+        "broad": 9.347069241444496,
+        "joint": 9.347069241444496
+      },
+      "actual_scores": {
+        "local": 1.1300711503859715,
+        "broad": 5.06880419972219,
+        "joint": 5.06880419972219
+      }
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9606117790462186,
+        "broad": 0.9994250452881412,
+        "joint": 0.9994250452881412
+      },
+      "cuts": {
+        "local": 2.097848578024128,
+        "broad": 9.481420401830231,
+        "joint": 9.481420401830231
+      },
+      "original_cuts": {
+        "local": 2.1838672227266045,
+        "broad": 9.48687492526933,
+        "joint": 9.48687492526933
+      },
+      "actual_scores": {
+        "local": 0.9700888535717435,
+        "broad": 2.153188651830503,
+        "joint": 2.153188651830503
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0039917281000446,
+        "broad": 1.0470710779500205,
+        "joint": 1.0470710779500205
+      },
+      "cuts": {
+        "local": 1.7537091187197098,
+        "broad": 4.9403033226685205,
+        "joint": 4.9403033226685205
+      },
+      "original_cuts": {
+        "local": 1.7467366210660238,
+        "broad": 4.71821199792927,
+        "joint": 4.71821199792927
+      },
+      "actual_scores": {
+        "local": 1.467940706845197,
+        "broad": 2.4392106682481582,
+        "joint": 2.4392106682481582
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0377482528674138,
+        "broad": 1.076602188553605,
+        "joint": 1.076602188553605
+      },
+      "cuts": {
+        "local": 1.7050798370585514,
+        "broad": 4.867190012202702,
+        "joint": 4.867190012202702
+      },
+      "original_cuts": {
+        "local": 1.6430572948181086,
+        "broad": 4.520880659495669,
+        "joint": 4.520880659495669
+      },
+      "actual_scores": {
+        "local": 1.2445672078040126,
+        "broad": 2.7309621062951224,
+        "joint": 2.7309621062951224
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0477593274869184,
+        "broad": 1.063553334131635,
+        "joint": 1.063553334131635
+      },
+      "cuts": {
+        "local": 1.6858431324003973,
+        "broad": 5.429214635699837,
+        "joint": 5.429214635699837
+      },
+      "original_cuts": {
+        "local": 1.6089984485692355,
+        "broad": 5.104788318051447,
+        "joint": 5.104788318051447
+      },
+      "actual_scores": {
+        "local": 1.1886694215163123,
+        "broad": 1.6473507216245766,
+        "joint": 1.6473507216245766
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.988919673141604,
+        "broad": 1.0386918246805432,
+        "joint": 1.0386918246805432
+      },
+      "cuts": {
+        "local": 1.5752035228361312,
+        "broad": 3.839887043591105,
+        "joint": 3.839887043591105
+      },
+      "original_cuts": {
+        "local": 1.5928528530856487,
+        "broad": 3.69684920238213,
+        "joint": 3.69684920238213
+      },
+      "actual_scores": {
+        "local": 1.2155775824638777,
+        "broad": 2.1064336616288992,
+        "joint": 2.1064336616288992
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9834139397754104,
+        "broad": 0.9912655452787063,
+        "joint": 0.9912655452787063
+      },
+      "cuts": {
+        "local": 1.5586782413971756,
+        "broad": 4.2997625674133255,
+        "joint": 4.2997625674133255
+      },
+      "original_cuts": {
+        "local": 1.584966592758633,
+        "broad": 4.337649571189721,
+        "joint": 4.337649571189721
+      },
+      "actual_scores": {
+        "local": 0.9702561309388607,
+        "broad": 1.3758728692118916,
+        "joint": 1.3758728692118916
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9525854394526839,
+        "broad": 1.0086475363130554,
+        "joint": 1.0086475363130554
+      },
+      "cuts": {
+        "local": 1.6384671585690864,
+        "broad": 4.737891456738326,
+        "joint": 4.737891456738326
+      },
+      "original_cuts": {
+        "local": 1.720021208292331,
+        "broad": 4.697271629747797,
+        "joint": 4.697271629747797
+      },
+      "actual_scores": {
+        "local": 1.239034496439288,
+        "broad": 3.737251504850875,
+        "joint": 3.737251504850875
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.001778478698155,
+        "broad": 1.0491359760984678,
+        "joint": 1.0491359760984678
+      },
+      "cuts": {
+        "local": 1.6224508109875104,
+        "broad": 3.9446233659515144,
+        "joint": 3.9446233659515144
+      },
+      "original_cuts": {
+        "local": 1.6195704394607682,
+        "broad": 3.7598780861760166,
+        "joint": 3.7598780861760166
+      },
+      "actual_scores": {
+        "local": 1.1095624795817132,
+        "broad": 1.5371113243276393,
+        "joint": 1.5371113243276393
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0992826383615044,
+        "broad": 1.2075613037120392,
+        "joint": 1.2075613037120392
+      },
+      "cuts": {
+        "local": 1.6703008348610449,
+        "broad": 4.7106004880687795,
+        "joint": 4.7106004880687795
+      },
+      "original_cuts": {
+        "local": 1.5194462066194832,
+        "broad": 3.9009203703268813,
+        "joint": 3.9009203703268813
+      },
+      "actual_scores": {
+        "local": 1.3395342471097407,
+        "broad": 1.6559340168191996,
+        "joint": 1.6559340168191996
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0715601570675308,
+        "broad": 1.119468177569797,
+        "joint": 1.119468177569797
+      },
+      "cuts": {
+        "local": 1.6620080111321807,
+        "broad": 4.269304410859214,
+        "joint": 4.269304410859214
+      },
+      "original_cuts": {
+        "local": 1.5510169915989505,
+        "broad": 3.8136898362999965,
+        "joint": 3.8136898362999965
+      },
+      "actual_scores": {
+        "local": 1.3509095541224414,
+        "broad": 3.025242578901315,
+        "joint": 3.025242578901315
+      }
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9741275190051923,
+        "broad": 0.9981258871786725,
+        "joint": 0.9981258871786725
+      },
+      "cuts": {
+        "local": 1.8196618536873155,
+        "broad": 10.169932276262253,
+        "joint": 10.169932276262253
+      },
+      "original_cuts": {
+        "local": 1.8679914263643917,
+        "broad": 10.189027663643548,
+        "joint": 10.189027663643548
+      },
+      "actual_scores": {
+        "local": 1.422010811657674,
+        "broad": 9.43034779205999,
+        "joint": 9.43034779205999
+      }
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9826868605726,
+        "broad": 1.0003043043054602,
+        "joint": 1.0003043043054602
+      },
+      "cuts": {
+        "local": 1.8206714097022365,
+        "broad": 9.813824840651078,
+        "joint": 9.813824840651078
+      },
+      "original_cuts": {
+        "local": 1.8527482993324575,
+        "broad": 9.810839359993652,
+        "joint": 9.810839359993652
+      },
+      "actual_scores": {
+        "local": 1.3855465594032623,
+        "broad": 7.478754529222604,
+        "joint": 7.478754529222604
+      }
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": false,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": false,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9713197578651047,
+        "broad": 1.0018972776795605,
+        "joint": 1.0018972776795605
+      },
+      "cuts": {
+        "local": 1.6852239726206766,
+        "broad": 8.653777858491036,
+        "joint": 8.653777858491036
+      },
+      "original_cuts": {
+        "local": 1.7349837259819414,
+        "broad": 8.637390330607124,
+        "joint": 8.637390330607124
+      },
+      "actual_scores": {
+        "local": 1.8253942117260271,
+        "broad": 7.819853316799332,
+        "joint": 7.819853316799332
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0004995676617932,
+        "broad": 1.0142892781370823,
+        "joint": 1.0142892781370823
+      },
+      "cuts": {
+        "local": 1.138889816348917,
+        "broad": 5.343954010690939,
+        "joint": 5.343954010690939
+      },
+      "original_cuts": {
+        "local": 1.1383211479146835,
+        "broad": 5.268668540503588,
+        "joint": 5.268668540503588
+      },
+      "actual_scores": {
+        "local": 1.05499942452157,
+        "broad": 3.5449702060144794,
+        "joint": 3.5449702060144794
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9908024512799575,
+        "broad": 1.0089264857921716,
+        "joint": 1.0089264857921716
+      },
+      "cuts": {
+        "local": 1.1385871302614408,
+        "broad": 5.703618651603082,
+        "joint": 5.703618651603082
+      },
+      "original_cuts": {
+        "local": 1.1491565536505983,
+        "broad": 5.653155836348981,
+        "joint": 5.653155836348981
+      },
+      "actual_scores": {
+        "local": 1.0226582271521962,
+        "broad": 3.803907863944424,
+        "joint": 3.803907863944424
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0042479960481343,
+        "broad": 1.0040577708637115,
+        "joint": 1.0040577708637115
+      },
+      "cuts": {
+        "local": 1.1335358393529382,
+        "broad": 5.54055276447599,
+        "joint": 5.54055276447599
+      },
+      "original_cuts": {
+        "local": 1.1287409522484195,
+        "broad": 5.518161330209008,
+        "joint": 5.518161330209008
+      },
+      "actual_scores": {
+        "local": 1.0968768689014954,
+        "broad": 1.2649643534687174,
+        "joint": 1.2649643534687174
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9838404027941832,
+        "broad": 0.9764162347190211,
+        "joint": 0.9764162347190211
+      },
+      "cuts": {
+        "local": 1.119550875476139,
+        "broad": 5.720939453352652,
+        "joint": 5.720939453352652
+      },
+      "original_cuts": {
+        "local": 1.137939519760042,
+        "broad": 5.859119553659348,
+        "joint": 5.859119553659348
+      },
+      "actual_scores": {
+        "local": 1.0642490576669306,
+        "broad": 4.754906863080626,
+        "joint": 4.754906863080626
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9889823579508423,
+        "broad": 0.9831132520058644,
+        "joint": 0.9831132520058644
+      },
+      "cuts": {
+        "local": 1.1268378573047442,
+        "broad": 5.400762084995829,
+        "joint": 5.400762084995829
+      },
+      "original_cuts": {
+        "local": 1.1393912623876694,
+        "broad": 5.4935299407027145,
+        "joint": 5.4935299407027145
+      },
+      "actual_scores": {
+        "local": 1.0351181798213749,
+        "broad": 2.6628842208350743,
+        "joint": 2.6628842208350743
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.988475752087455,
+        "broad": 0.9807439299491579,
+        "joint": 0.9807439299491579
+      },
+      "cuts": {
+        "local": 1.1270241537403576,
+        "broad": 5.747458493443684,
+        "joint": 5.747458493443684
+      },
+      "original_cuts": {
+        "local": 1.1401636826804473,
+        "broad": 5.860304935806877,
+        "joint": 5.860304935806877
+      },
+      "actual_scores": {
+        "local": 1.086618527077433,
+        "broad": 3.395049367316725,
+        "joint": 3.395049367316725
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": false,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.110946801218588,
+        "broad": 1.1025537337613969,
+        "joint": 1.1025537337613969
+      },
+      "cuts": {
+        "local": 1.1369936081219898,
+        "broad": 4.974935321254032,
+        "joint": 4.974935321254032
+      },
+      "original_cuts": {
+        "local": 1.0234455933216886,
+        "broad": 4.512193074057155,
+        "joint": 4.512193074057155
+      },
+      "actual_scores": {
+        "local": 1.052902409921059,
+        "broad": 3.4776989676812726,
+        "joint": 3.4776989676812726
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.1156282395160892,
+        "broad": 1.1664630293022629,
+        "joint": 1.1664630293022629
+      },
+      "cuts": {
+        "local": 1.1340119529490202,
+        "broad": 5.9216996672674584,
+        "joint": 5.9216996672674584
+      },
+      "original_cuts": {
+        "local": 1.016478350746038,
+        "broad": 5.0766286787585635,
+        "joint": 5.0766286787585635
+      },
+      "actual_scores": {
+        "local": 0.9574535995513732,
+        "broad": 2.1030944384349457,
+        "joint": 2.1030944384349457
+      }
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.129106579923718,
+        "broad": 1.1794538289429206,
+        "joint": 1.1794538289429206
+      },
+      "cuts": {
+        "local": 1.137190294564825,
+        "broad": 5.012535781265474,
+        "joint": 5.012535781265474
+      },
+      "original_cuts": {
+        "local": 1.0071593902514082,
+        "broad": 4.249878764442974,
+        "joint": 4.249878764442974
+      },
+      "actual_scores": {
+        "local": 0.9567895932408088,
+        "broad": 2.060119084453882,
+        "joint": 2.060119084453882
+      }
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0326342782575817,
+        "broad": 1.0428244739807868,
+        "joint": 1.0428244739807868
+      },
+      "cuts": {
+        "local": 3.3976936015199146,
+        "broad": 24.57285561253881,
+        "joint": 24.57285561253881
+      },
+      "original_cuts": {
+        "local": 3.290316497388623,
+        "broad": 23.563750396782062,
+        "joint": 23.563750396782062
+      },
+      "actual_scores": {
+        "local": 2.0202088349819016,
+        "broad": 7.956869023765808,
+        "joint": 7.956869023765808
+      }
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0119990443531153,
+        "broad": 1.029423657341125,
+        "joint": 1.029423657341125
+      },
+      "cuts": {
+        "local": 3.267928456677269,
+        "broad": 30.057996563906116,
+        "joint": 30.057996563906116
+      },
+      "original_cuts": {
+        "local": 3.2291813662395077,
+        "broad": 29.198859332164787,
+        "joint": 29.198859332164787
+      },
+      "actual_scores": {
+        "local": 2.189241713982403,
+        "broad": 17.602971981193114,
+        "joint": 17.602971981193114
+      }
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0114247222557666,
+        "broad": 0.9947274146672966,
+        "joint": 0.9947274146672966
+      },
+      "cuts": {
+        "local": 3.1416320371895377,
+        "broad": 27.82252395183461,
+        "joint": 27.82252395183461
+      },
+      "original_cuts": {
+        "local": 3.10614519109519,
+        "broad": 27.969998153856373,
+        "joint": 27.969998153856373
+      },
+      "actual_scores": {
+        "local": 2.0083946247352698,
+        "broad": 12.331097342345254,
+        "joint": 12.331097342345254
+      }
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9093243765515687,
+        "broad": 0.8812425846856385,
+        "joint": 0.8812425846856385
+      },
+      "cuts": {
+        "local": 2.961803317698224,
+        "broad": 17.77598230583895,
+        "joint": 17.77598230583895
+      },
+      "original_cuts": {
+        "local": 3.257147167801959,
+        "broad": 20.171497173142278,
+        "joint": 20.171497173142278
+      },
+      "actual_scores": {
+        "local": 1.6212102666742418,
+        "broad": 9.022927661051456,
+        "joint": 9.022927661051456
+      }
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9565928444875764,
+        "broad": 1.038112338447479,
+        "joint": 1.038112338447479
+      },
+      "cuts": {
+        "local": 2.899141703456861,
+        "broad": 28.63487402017165,
+        "joint": 28.63487402017165
+      },
+      "original_cuts": {
+        "local": 3.030695577709303,
+        "broad": 27.583598575656815,
+        "joint": 27.583598575656815
+      },
+      "actual_scores": {
+        "local": 1.49209525596787,
+        "broad": 4.04728403354491,
+        "joint": 4.04728403354491
+      }
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9683283130357061,
+        "broad": 0.957609393687793,
+        "joint": 0.957609393687793
+      },
+      "cuts": {
+        "local": 2.808328478182206,
+        "broad": 20.689969019171876,
+        "joint": 20.689969019171876
+      },
+      "original_cuts": {
+        "local": 2.900182139028968,
+        "broad": 21.60585428208255,
+        "joint": 21.60585428208255
+      },
+      "actual_scores": {
+        "local": 1.833598569645392,
+        "broad": 6.163954606599141,
+        "joint": 6.163954606599141
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0013105644193048,
+        "broad": 1.0293453862396131,
+        "joint": 1.0293453862396131
+      },
+      "cuts": {
+        "local": 2.3603156697563366,
+        "broad": 6.39647391979947,
+        "joint": 6.39647391979947
+      },
+      "original_cuts": {
+        "local": 2.3572263727439715,
+        "broad": 6.214118220480842,
+        "joint": 6.214118220480842
+      },
+      "actual_scores": {
+        "local": 1.8185450565838954,
+        "broad": 3.5142524576579874,
+        "joint": 3.5142524576579874
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9486809714139174,
+        "broad": 0.9848105096215677,
+        "joint": 0.9848105096215677
+      },
+      "cuts": {
+        "local": 2.4059001941997487,
+        "broad": 6.063578096324596,
+        "joint": 6.063578096324596
+      },
+      "original_cuts": {
+        "local": 2.5360476985366183,
+        "broad": 6.157101327700739,
+        "joint": 6.157101327700739
+      },
+      "actual_scores": {
+        "local": 1.8843958462539934,
+        "broad": 4.9218104182932185,
+        "joint": 4.9218104182932185
+      }
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0318606059122895,
+        "broad": 0.9735325024279868,
+        "joint": 0.9735325024279868
+      },
+      "cuts": {
+        "local": 2.362514376813614,
+        "broad": 6.789054452468653,
+        "joint": 6.789054452468653
+      },
+      "original_cuts": {
+        "local": 2.2895673730318116,
+        "broad": 6.973628960036541,
+        "joint": 6.973628960036541
+      },
+      "actual_scores": {
+        "local": 1.8157858758277423,
+        "broad": 5.1263831891445415,
+        "joint": 5.1263831891445415
+      }
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0870150766073428,
+        "broad": 1.039031859769969,
+        "joint": 1.039031859769969
+      },
+      "cuts": {
+        "local": 3.230700488905208,
+        "broad": 7.211244886637035,
+        "joint": 7.211244886637035
+      },
+      "original_cuts": {
+        "local": 2.9720843421863763,
+        "broad": 6.940350114224149,
+        "joint": 6.940350114224149
+      },
+      "actual_scores": {
+        "local": 1.6499577354110313,
+        "broad": 1.0377812003330869,
+        "joint": 1.6499577354110313
+      }
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.6433601087698733,
+        "broad": 1.7927988621932707,
+        "joint": 1.7927988621932707
+      },
+      "cuts": {
+        "local": 3.216176417831021,
+        "broad": 7.388521027737639,
+        "joint": 7.388521027737639
+      },
+      "original_cuts": {
+        "local": 1.9570734379322796,
+        "broad": 4.1212213949637855,
+        "joint": 4.1212213949637855
+      },
+      "actual_scores": {
+        "local": 0.3167538294840641,
+        "broad": 0.4768388128450742,
+        "joint": 0.4768388128450742
+      }
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0664132305011393,
+        "broad": 0.9553135096737997,
+        "joint": 0.9553135096737997
+      },
+      "cuts": {
+        "local": 2.7259899038220006,
+        "broad": 6.023493107782802,
+        "joint": 6.023493107782802
+      },
+      "original_cuts": {
+        "local": 2.5562228842012553,
+        "broad": 6.3052527225743695,
+        "joint": 6.3052527225743695
+      },
+      "actual_scores": {
+        "local": 1.5527564158932008,
+        "broad": 5.462100818901958,
+        "joint": 5.462100818901958
+      }
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0482490755971137,
+        "broad": 1.0392805372688487,
+        "joint": 1.0392805372688487
+      },
+      "cuts": {
+        "local": 1.5709653620707396,
+        "broad": 5.376026506852916,
+        "joint": 5.376026506852916
+      },
+      "original_cuts": {
+        "local": 1.498656568025945,
+        "broad": 5.172834777586338,
+        "joint": 5.172834777586338
+      },
+      "actual_scores": {
+        "local": 1.3286503882410905,
+        "broad": 3.149867068909351,
+        "joint": 3.149867068909351
+      }
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": false,
+        "joint": false
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": false,
+        "joint": false
+      },
+      "cutoff_ratios": {
+        "local": 1.0288211573628736,
+        "broad": 1.0317784612726788,
+        "joint": 1.0317784612726788
+      },
+      "cuts": {
+        "local": 1.640247716111683,
+        "broad": 4.543678680024772,
+        "joint": 4.543678680024772
+      },
+      "original_cuts": {
+        "local": 1.5942981968956091,
+        "broad": 4.403734765329596,
+        "joint": 4.403734765329596
+      },
+      "actual_scores": {
+        "local": 1.1360155639566618,
+        "broad": 6.044617919476046,
+        "joint": 6.044617919476046
+      }
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.039561354986231,
+        "broad": 1.0268363199802082,
+        "joint": 1.0268363199802082
+      },
+      "cuts": {
+        "local": 1.6526469568513704,
+        "broad": 5.518355805736509,
+        "joint": 5.518355805736509
+      },
+      "original_cuts": {
+        "local": 1.5897541293974513,
+        "broad": 5.374133830640966,
+        "joint": 5.374133830640966
+      },
+      "actual_scores": {
+        "local": 1.1767895332738498,
+        "broad": 1.5626761721765554,
+        "joint": 1.5626761721765554
+      }
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0037559302156596,
+        "broad": 0.9969214230942789,
+        "joint": 0.9969214230942789
+      },
+      "cuts": {
+        "local": 1.7385789776515508,
+        "broad": 5.605991185215644,
+        "joint": 5.605991185215644
+      },
+      "original_cuts": {
+        "local": 1.7320734307173782,
+        "broad": 5.623302955829334,
+        "joint": 5.623302955829334
+      },
+      "actual_scores": {
+        "local": 1.4649509688039508,
+        "broad": 2.3878016442500574,
+        "joint": 2.3878016442500574
+      }
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0083821058955702,
+        "broad": 1.0063800157565805,
+        "joint": 1.0063800157565805
+      },
+      "cuts": {
+        "local": 1.7658756429312017,
+        "broad": 5.659704329154339,
+        "joint": 5.659704329154339
+      },
+      "original_cuts": {
+        "local": 1.7511969248630033,
+        "broad": 5.6238242418789115,
+        "joint": 5.6238242418789115
+      },
+      "actual_scores": {
+        "local": 1.2051672972085297,
+        "broad": 4.590529536479263,
+        "joint": 4.590529536479263
+      }
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.030629685551717,
+        "broad": 0.964110299825363,
+        "joint": 0.964110299825363
+      },
+      "cuts": {
+        "local": 1.8022381900808748,
+        "broad": 5.715881779637746,
+        "joint": 5.715881779637746
+      },
+      "original_cuts": {
+        "local": 1.748676770469793,
+        "broad": 5.928659594937539,
+        "joint": 5.928659594937539
+      },
+      "actual_scores": {
+        "local": 1.2432713731607166,
+        "broad": 1.7472040366055588,
+        "joint": 1.7472040366055588
+      }
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.1236117472344656,
+        "broad": 1.1210853950221178,
+        "joint": 1.1210853950221178
+      },
+      "cuts": {
+        "local": 2.5559937015365795,
+        "broad": 6.482509179186643,
+        "joint": 6.482509179186643
+      },
+      "original_cuts": {
+        "local": 2.274801512023723,
+        "broad": 5.782350932382586,
+        "joint": 5.782350932382586
+      },
+      "actual_scores": {
+        "local": 1.195505682774474,
+        "broad": 0.7669634997808483,
+        "joint": 1.195505682774474
+      }
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.127685116584633,
+        "broad": 1.1561189130309906,
+        "joint": 1.1561189130309906
+      },
+      "cuts": {
+        "local": 2.5216158523167387,
+        "broad": 8.185938638666666,
+        "joint": 8.185938638666666
+      },
+      "original_cuts": {
+        "local": 2.2360992578795735,
+        "broad": 7.080533452398626,
+        "joint": 7.080533452398626
+      },
+      "actual_scores": {
+        "local": 0.9911965525314477,
+        "broad": 2.6869645747607547,
+        "joint": 2.6869645747607547
+      }
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.240215526617183,
+        "broad": 1.3990446704888027,
+        "joint": 1.3990446704888027
+      },
+      "cuts": {
+        "local": 2.439482273340867,
+        "broad": 9.427248424310191,
+        "joint": 9.427248424310191
+      },
+      "original_cuts": {
+        "local": 1.9669825292340992,
+        "broad": 6.738346975737715,
+        "joint": 6.738346975737715
+      },
+      "actual_scores": {
+        "local": 1.0040289498488273,
+        "broad": 0.7496975302414901,
+        "joint": 1.0040289498488273
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9983636888440302,
+        "broad": 0.9812694677304888,
+        "joint": 0.9812694677304888
+      },
+      "cuts": {
+        "local": 3.1103021112709976,
+        "broad": 8.209355001639848,
+        "joint": 8.209355001639848
+      },
+      "original_cuts": {
+        "local": 3.1153998748415077,
+        "broad": 8.366055677475327,
+        "joint": 8.366055677475327
+      },
+      "actual_scores": {
+        "local": 2.8297908109045875,
+        "broad": 6.170879548283574,
+        "joint": 6.170879548283574
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.00226167043171,
+        "broad": 1.0346181207718954,
+        "joint": 1.0346181207718954
+      },
+      "cuts": {
+        "local": 2.961192107209653,
+        "broad": 9.107106653610474,
+        "joint": 9.107106653610474
+      },
+      "original_cuts": {
+        "local": 2.954509979349167,
+        "broad": 8.802384639093653,
+        "joint": 8.802384639093653
+      },
+      "actual_scores": {
+        "local": 2.3841303018538746,
+        "broad": 4.443241326837634,
+        "joint": 4.443241326837634
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0032391667943914,
+        "broad": 0.9895368225784613,
+        "joint": 0.9895368225784613
+      },
+      "cuts": {
+        "local": 2.84183419949885,
+        "broad": 8.046594817411107,
+        "joint": 8.046594817411107
+      },
+      "original_cuts": {
+        "local": 2.8326587453510665,
+        "broad": 8.13167800713458,
+        "joint": 8.13167800713458
+      },
+      "actual_scores": {
+        "local": 2.2680903700679758,
+        "broad": 6.681212737102017,
+        "joint": 6.681212737102017
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9163433577187667,
+        "broad": 0.9109723981817973,
+        "joint": 0.9109723981817973
+      },
+      "cuts": {
+        "local": 2.8541684092602875,
+        "broad": 9.242065706623764,
+        "joint": 9.242065706623764
+      },
+      "original_cuts": {
+        "local": 3.114736834417318,
+        "broad": 10.145275230149597,
+        "joint": 10.145275230149597
+      },
+      "actual_scores": {
+        "local": 2.08636826812689,
+        "broad": 5.399797804004292,
+        "joint": 5.399797804004292
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.969799803686062,
+        "broad": 0.9905141640317393,
+        "joint": 0.9905141640317393
+      },
+      "cuts": {
+        "local": 3.0235712269428,
+        "broad": 9.322412278740956,
+        "joint": 9.322412278740956
+      },
+      "original_cuts": {
+        "local": 3.1177272004496848,
+        "broad": 9.411690026516608,
+        "joint": 9.411690026516608
+      },
+      "actual_scores": {
+        "local": 2.2345215590594987,
+        "broad": 4.616315964483257,
+        "joint": 4.616315964483257
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.0342954957049595,
+        "broad": 1.0015111545262927,
+        "joint": 1.0015111545262927
+      },
+      "cuts": {
+        "local": 3.2229321143142933,
+        "broad": 10.520135506309309,
+        "joint": 10.520135506309309
+      },
+      "original_cuts": {
+        "local": 3.116065116495159,
+        "broad": 10.504261943328284,
+        "joint": 10.504261943328284
+      },
+      "actual_scores": {
+        "local": 2.791685266175623,
+        "broad": 5.790653281894125,
+        "joint": 5.790653281894125
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 51,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9897085993317448,
+        "broad": 1.0119806549955073,
+        "joint": 1.0119806549955073
+      },
+      "cuts": {
+        "local": 3.085111919821191,
+        "broad": 8.44046390850911,
+        "joint": 8.44046390850911
+      },
+      "original_cuts": {
+        "local": 3.117192193645959,
+        "broad": 8.340538790780128,
+        "joint": 8.340538790780128
+      },
+      "actual_scores": {
+        "local": 1.6209717242979087,
+        "broad": 2.6701717836919263,
+        "joint": 2.6701717836919263
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 52,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9664493238216353,
+        "broad": 0.9699847263531977,
+        "joint": 0.9699847263531977
+      },
+      "cuts": {
+        "local": 3.1675642798015327,
+        "broad": 8.484677834870558,
+        "joint": 8.484677834870558
+      },
+      "original_cuts": {
+        "local": 3.277527545133994,
+        "broad": 8.747228285511227,
+        "joint": 8.747228285511227
+      },
+      "actual_scores": {
+        "local": 1.724147844592191,
+        "broad": 4.810732067256458,
+        "joint": 4.810732067256458
+      }
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "seed": 53,
+      "cohort": "historical_default",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9332913896291809,
+        "broad": 1.0382957706207168,
+        "joint": 1.0382957706207168
+      },
+      "cuts": {
+        "local": 2.9816268541854454,
+        "broad": 9.79183258767481,
+        "joint": 9.79183258767481
+      },
+      "original_cuts": {
+        "local": 3.1947437716854084,
+        "broad": 9.430677524402348,
+        "joint": 9.430677524402348
+      },
+      "actual_scores": {
+        "local": 1.9889494680609607,
+        "broad": 3.4098433388674927,
+        "joint": 3.4098433388674927
+      }
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 54,
+      "cohort": "repaired_ode",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9564650593260677,
+        "broad": 1.0472988383951836,
+        "joint": 1.0472988383951836
+      },
+      "cuts": {
+        "local": 2.583598818382738,
+        "broad": 7.63031731896022,
+        "joint": 7.63031731896022
+      },
+      "original_cuts": {
+        "local": 2.7011951907612395,
+        "broad": 7.285711622341194,
+        "joint": 7.285711622341194
+      },
+      "actual_scores": {
+        "local": 1.5282690819239428,
+        "broad": 1.5846951639676061,
+        "joint": 1.5846951639676061
+      }
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 55,
+      "cohort": "repaired_ode",
+      "studentized": {
+        "local": false,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 1.181709547092224,
+        "broad": 1.0636138625200764,
+        "joint": 1.0636138625200764
+      },
+      "cuts": {
+        "local": 3.175042163662689,
+        "broad": 7.291622442156974,
+        "joint": 7.291622442156974
+      },
+      "original_cuts": {
+        "local": 2.6868211156247006,
+        "broad": 6.85551655455162,
+        "joint": 6.85551655455162
+      },
+      "actual_scores": {
+        "local": 2.986787041663484,
+        "broad": 2.065208954207777,
+        "joint": 2.986787041663484
+      }
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "seed": 56,
+      "cohort": "repaired_ode",
+      "studentized": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "fixed_metric": {
+        "local": true,
+        "broad": true,
+        "joint": true
+      },
+      "cutoff_ratios": {
+        "local": 0.9886332628729968,
+        "broad": 0.956264664934561,
+        "joint": 0.956264664934561
+      },
+      "cuts": {
+        "local": 2.984053417502108,
+        "broad": 6.162192458804865,
+        "joint": 6.162192458804865
+      },
+      "original_cuts": {
+        "local": 3.018362348875823,
+        "broad": 6.444024007962854,
+        "joint": 6.444024007962854
+      },
+      "actual_scores": {
+        "local": 1.6151979112062276,
+        "broad": 5.0513707054171695,
+        "joint": 5.0513707054171695
+      }
+    }
+  ],
+  "summary": {
+    "historical_default": {
+      "studentized": {
+        "local": 67,
+        "broad": 68,
+        "joint": 68
+      },
+      "fixed_metric": {
+        "local": 68,
+        "broad": 68,
+        "joint": 68
+      }
+    },
+    "repaired_ode": {
+      "studentized": {
+        "local": 2,
+        "broad": 3,
+        "joint": 3
+      },
+      "fixed_metric": {
+        "local": 3,
+        "broad": 3,
+        "joint": 3
+      }
+    }
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_engine.py": "af312ffe431c428f6dae6f20aebb550aa731b445561281f1004b4d8aa4ad7c8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_metric.py": "a372ae02a7d55602930befa0c1fd02774973850e060e32537540b59d159d0ffd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\run_repair.py": "839f17f417ed29c2e4cb52e6e1470f63dc6cc169e5c9edad6c40a484d4a6d8f4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\context.py": "77f7ef2c9e6e4737475adf4669e868a4edd5b3fbfe3113b61e88e94980146ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\protocol.txt": "5d38aca706ae1716a33308027e8377e34d84434c9c21281fdafbd953b665742c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\retrospective.py": "2f71ba2ca552b3a94d8afaa92b49176d1119ff991efd52f15cb677d8db3354d4"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed51.json": "498d47fe0086a5711cfa4f071eec1e0e3f50f5b5334811bc832b6297cfaeb57f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed52.json": "a3bff4ed390266e9f6717de4ece5b0dc3e8cb5d341e4a327a65f46f06fab8ec3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_iid_seed53.json": "8977ed39ac9c80d9d4ad4873df184af11de7f9734b77e8f161d66d875c371d67",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed51.json": "3192f0b3f598bfdc3471123b4d984104e761afa19f23d54335d6423b4bfacbb8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed52.json": "13753641da5d09a553e703823ec4b02d1dd863903dedaa8ae9f25f387769dabc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_negative_seed53.json": "fac17cda922a85faf8e0484248901c1b45c93b1287702e2099fdf53ece51f32a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed51.json": "380bf8ed3bc7cd8452f6d00e82b377311e551e68f28b25aafd773c42ffde21b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed52.json": "db159ebcb2da2de7b9798c4c7c89500040e89ec7c9d0adf505248e25524b21fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ac_positive_seed53.json": "34115e19e43648496ee5f9fa4ba7ca9c2476bf2a51da798d408f98007a0e7965",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed51.json": "1426ad5d984acde57ea065f2a4212b5c2341ef23307d6856ade540874514837f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed52.json": "2b51f04a6dd564d4c983ef4cf9961712d9a8ad7d6538abafd99cfe56d1d2b9fd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_iid_seed53.json": "4ccf319497e345a6373189432df327605da96986058139ef135bdf0631e03a86",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed51.json": "ab702352b379d85e8bdd423655db6166d5545d1823a378e86f6bbac075412764",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed52.json": "469fa8677f476be2e536a517ba745e5f04f22653ca10b45053a76ba5f44b8170",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed53.json": "ba812feea38bf75e8973b8d4a01767b8b16ff62e99b0cda9966d76da095a4755",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed51.json": "d3478440b9dec1483d747be4a66d47192160af2e75a27bcce21801959950c09c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed52.json": "c457b906e32f92380610fd05b7ba6d63d94202e8ea75ea9f49e161e2d579b683",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\duffing_iid_seed53.json": "e23b4d418fb370613a9d5a76479696d4042691d3c9d439ffb6e0cb9324b1935a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed51.json": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed52.json": "57ce7c9c6c94e0f5441c18368a4ebc273a85a0fd64b8d35bc4e530e386072bbf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed53.json": "3d975ec93a803a4e31ab0627921d33766618159e15feb4c63fb959a10b6bda4a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed51.json": "bc35585f99dbda3601ebe7f04770404b9804c44aa9e16973ee1a0a1b0996079b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed52.json": "1ce0a8863b2d950920a548ca1a7cb6cf10f28e9a5bd6c6a8e6effa312c9fd3ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed53.json": "ed52ae894be43bf8f7add3c140c129f3220110e984f25a65cb98ca9ceb08022d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed51.json": "06202e5695e7dc179d6464fc34b8e34421f29fb9978d3bb1e77a21e177a31b1e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed52.json": "423b300266d5b01a32756916271eaf4f8ddfcfae43c1704c707a33b7a4ccf04c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed53.json": "19928a50e8e533bc03d08deb5b8a49a4a0e09829b6d765c10699185c1d251a3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed51.json": "f3be35e3ab286c3a63f94dea22dda9b6a863208cb7fcc7db52df1b23917e4447",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed52.json": "49a31bb1aef3d22a901cc5fcec3dc783158edd3ec6d831e76a5849bddacf8cb6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_iid_seed53.json": "6f7c25f5492015157c24ccc44acf0a6f682ecd3249f1866af3ce47d3f3331557",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed51.json": "ce950e421600688676628916ff8838fb0d81bd4dad6ec0f858ea5548edfeac4d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed52.json": "d27af38a2d9eafa35e38f8013907013309925017dd529646ca0e14f13c0013c9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_iid_seed53.json": "a876f605d09d6a13cff9bb2d09223f5d5e9e92a7c6b08da9abc1823cb41dcb60",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed51.json": "ab166cd34475da4ab53a8029aa1b185579529242db560a201a9d9813a8340582",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed52.json": "97766fa4d13a50e18feb6188fc5caa89da03daa102500f1aaa6d40690c547bea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_negative_seed53.json": "e7beef92b0a50e2b7da28f37afc32c847516bca3888264e801a786722644ca06",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed51.json": "4161dfaa220b50b483405288f89fbab051b2bcf1f9f2fc159dca4a207f1f207f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed52.json": "6d64de561814b19e1a8d3f1ac4e42977c22733e156dc8ee62521784dac0a70d2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ks_positive_seed53.json": "d3905071a894cbe01efd4e032aa1335ae065b65c072022fb7867b905ff6d0fc3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed51.json": "369ae48a5f92204934d098db9a2f92a68068ae26387a2ee050ae20b4831106f9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed52.json": "47a643645f9da5557a24b9d19e1bc23b3b8dcf5a5738fa5f76b34dd62b639f6a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lorenz_iid_seed53.json": "d7753c4f89600b1af8755b16ba0dc40f7a77e00857b68cad6003e4ee56280e24",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed51.json": "1c45111e5b59d0d79989a547f471465211260a22ef2333346477db05de6f6a76",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed52.json": "32543936f54316f89ca5de94e6dcb73aaa93c2cdb4f04d1773955fb4d3d90b65",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\lv_iid_seed53.json": "cc0c8ca48bbad7b8856bb5216ed2666305e684f4d69c19914635efaa594684fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed51.json": "10ba2a00681a3413ef890a0b91a0a593650fed46846e62c49c1af874e48b2a8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed52.json": "c94efb32df67d18b872cda7fbb6bf96bd1bf636fcd17e0013aac2ac831666425",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ns_iid_seed53.json": "77055ee179c351cdf4eeb0edc69d26d876bb2793cac58708ddbaf34d65c7a019",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed51.json": "1113e2b1033d52dc97995f20e45bb5ce483011f3fca61642aa2b0d25dcb6f80c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed52.json": "29919957cdf0feadc306f5c6adb8a20f3776c82c0b0f64013bb40cbb8c3f492c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\ode_iid_seed53.json": "db79e241a5bae603b4ed507f01d1e1b87ae3b1ff72547af5174aaef1ab791900",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed51.json": "316f54823e14586c2b799ccbc827aac71d714258c3529c8fd3029d89a2a2b52f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed52.json": "b6848933f47920bc9e85edda90137077e90350e5f4f9ac4da9bcff1a361abee9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_compound_iid_seed53.json": "fb0e2cbf5917cc7c9f5bc33cdc8c87283c6f905291e4dc43caeee756b555b581",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed51.json": "34f969508b6b35b233a6198b6593d1f19cb675fc19fe8b2f96d180a4edd4aa63",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed52.json": "c79e640d6d0e4df528ee4012817519fc93d192192bfebb41786b67f4282e45e8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\pde_divide_iid_seed53.json": "36b29d3c3f761152a4727343251fc46eb8be7ce8c12145e2be5b90a2ed7fe92d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed51.json": "6a6cb6fa63dbd83994c7b3c882cacc077607db78402b0db634e4017f5a76d5db",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed52.json": "7615c580c17bfee2cec4f52882dda69c631034c772a1350f422a0fd1857b4216",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\vdp_iid_seed53.json": "841cb0161274a8691d14a4197494a62f9b30b98033cd3f1bf1f5da3860abc76a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed51.json": "d601cf2151ba8b0cb1fd57b08bbafe7b61028ef3833aacace3d236971558e71b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed52.json": "15554982f11afba6f40abcb0cee3bcf98e7691edb3cd59db7e6627b547f6f6ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_iid_seed53.json": "4fd8eb2dbabbb3490f3e453a9202add25b603b6880d4d87e60c1b2cb0582a436",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed51.json": "4901f929cfb54cbc40a5bb849e4707c2030bc91451e2fa39661f1e42689e203b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed52.json": "c8beebbc6a727b330c6fda0541122fb279d584c8c434ebeb1d2e6fd146c69330",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_negative_seed53.json": "e75593f798c551331323536056ee61e9aa198884863c39f9a7e6c87ef01bcb7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed51.json": "8bf9930839ac185a273b0eba6eaf737a4bcbc36b9fb92be9c32c855f39f209f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed52.json": "352fa6edddb50f958bbb05addae4509157cc67ff267b2e2873a09314292e6ef4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\wave_positive_seed53.json": "966108af9c680eb0385a61f1b2152bc079a0f4a6de96b1b5d318e9ac3e670a4a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_results\\ode_iid_seed54.json": "2afb6624de91fedbef230389394b5dfbf0c07b6131973a98563ffd0c7a4ae062",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_results\\ode_iid_seed55.json": "eeb381923fd0ef4a01aa0b991cdfa97ce1601767430ad670ade900e64d360df2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_results\\ode_iid_seed56.json": "b3b3552b9a8d6f4888ab7c633ace4de1987fca4c0a38fd521a24295296b09eb3"
+  }
+}

@@ -1,0 +1,36 @@
+Noise-corrected implicit weak fits across the 15 default EPDE panels
+18 November 2026
+
+Training noise correction improved survival of registered laws or equivalents by two of 120 fresh equation/seed cases on local-plus-time windows and three on broad windows. Both comparisons admitted fewer added-term supports. The existing directional pipeline still retained more registered laws than either invariant method. No default was changed.
+
+The six fresh seeds each contribute 20 equation slots across 15 systems. Each seed adds 5% iid noise to the same benchmark trajectories. The candidates were fixed before fitting. Within either window design, the correction switch changes only the training coefficient fit. All candidates use the same signed held-out weak discrepancy definition and the same median-over-targets dyad in both invariant arms. Production-style directional fitting and scoring are shown as a separate benchmark. A surviving candidate is on the Pareto front of discrepancy and dyad for its slot. Added-term counts refer to unregistered benchmark supports formed by adding a term. Some fitted extra coefficients can be negligible.
+
+Fresh panel
+
+Method                       Registered or    Exact       Slots with    Added supports    Mean front   Median reference
+                             equivalent       reference   an addition   surviving         size         angle (degrees)
+Local plus time, off          104/120          97/120      61/120         96/1128           3.225        0.435
+Local plus time, on           106/120          96/120      56/120         89/1128           3.083        0.284
+Broad, off                    105/120         101/120      62/120         83/1128           3.158        0.540
+Broad, on                     108/120         100/120      55/120         77/1128           3.067        0.466
+Existing directional method   115/120         105/120      73/120        146/1128           3.367        0.320
+
+On the three previously studied seeds, the local-plus-time registered count rose from 53/60 to 55/60, added-term survivors fell from 51/564 to 47/564, and literal reference survival fell from 51/60 to 50/60. For broad windows the corresponding changes were 52 to 54, 55 to 46, and 48 to 48. The directional benchmark retained 57/60. The primary off arm reproduced every earlier held-out score on these seeds. No candidate fit was unresolved in either cohort. The improvement in registered survival includes equivalent equations and coexists with a small decline in literal reference survival on the fresh panel.
+
+Which equations changed
+
+On the primary fresh comparison, seven equation/seed cases gained a registered law and five lost one. The first Navier–Stokes momentum equation rose from 0/6 to 6/6. Allen–Cahn fell from 4/6 to 0/6. The compound PDE gained one case and lost another. Under broad windows the three changes were gains, in Navier–Stokes twice and the compound PDE once. Corrected broad windows missed the registered forced KdV law in six cases, Allen–Cahn in five, and Duffing in one. The directional benchmark missed only forced KdV, on five seeds. This is insufficient evidence to replace the current procedure across all systems.
+
+Diffusion deletion diagnostic
+
+For Allen–Cahn the registered law is u_t = 0.0001 u_xx - 5 u³ + 5 u. In all six fresh cases the reaction-only competitor dominated the corrected local-plus-time reference on both objectives. In the first Navier–Stokes equation the analogous competitor drops the 0.01 second derivative of u along x2. Dyad preferred the reduced support on all six seeds for both systems. After correction the held-out discrepancy preferred retaining diffusion in Navier–Stokes 6/6 and in Allen–Cahn 0/6.
+
+As a retrospective benchmark control, keep the exact physical coefficients in both equations and set only the diffusion coefficient to zero in the competitor. The median increase in symmetric discrepancy from deletion was 8.14e-7 for Allen–Cahn (positive on 5/6 seeds) and 2.06e-4 for Navier–Stokes (positive on 6/6). In the score's normalization, the true diffusion term's amplitude divided by the root sum of squared term amplitudes was 0.064% and 1.39% respectively, using the median of six three-fold means. This measure describes the weak observations and can differ substantially from the pointwise PDE balance.
+
+With local-plus-time correction, the median fitted diffusion coefficient moved toward truth in both systems (Allen–Cahn 0.000185 to 0.000110, Navier–Stokes 0.01807 to 0.01053). Holding the Allen–Cahn full coefficients at truth and allowing the reduced coefficients to refit favored the full model in 5/6. Allowing both supports to refit reversed that comparison to 0/6. The fixed-coefficient comparison uses a known benchmark law and cannot be used as a discovery objective. Together these numbers locate the difficulty in distinguishing an extremely small diffusion contribution after all coefficients adjust. A paired uncertainty calculation for that refitted difference is the next targeted test.
+
+Verification and reproduction
+
+The archived Navier–Stokes pairwise contrasts reproduced the earlier study to 1.7e-17. Alternate eigensolver/SVD drivers, independently formed residual cross-products, and separate Pareto masks verified 47,250 fold scores and 900 fronts. All 37,800 implicit fold fits were also checked under signed changes of units and column permutation. Largest scaled discrepancy change in that check was 6.1e-13. Numerical controls retained the three noiseless first-derivative ode_simple identities, including their constants. Bootstrap covariance arithmetic was checked with real and complex draws and a deterministic constant column.
+
+Run panel.py, train.py, evaluate.py, summarize.py, verify.py and diffusion.py in order in the EPDE environment. Protocol.txt in this folder specifies the primary and secondary comparisons. The per-system counts are in by_system.csv, every per-slot front in slots.json, the fixed- and refitted-coefficient diffusion controls in diffusion_pairs.csv, and the independent numerical checks in verification.json. No candidate equations were integrated. The experiment measures fixed-panel ranking conditional on the existing trajectories and geometry, without a new evolutionary search or a term-count objective.

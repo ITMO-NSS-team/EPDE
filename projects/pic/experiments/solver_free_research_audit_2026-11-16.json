@@ -1,0 +1,22 @@
+{
+  "experiment_cases": {
+    "paired_uncertainty": 45,
+    "local_discrepancy": 45,
+    "replica_fitting": 12,
+    "broad_moments": 12,
+    "information_selection": 12
+  },
+  "total_unique_method_cases": 126,
+  "error_budget_cases": 12,
+  "source_fingerprints_verified": 342,
+  "input_fingerprints_verified": 231,
+  "report_sha256": {
+    "paired_uncertainty_2026-11-16\\findings.txt": "7784de326a9f7483fb39f46eb1685ced9608783e4397e527d64fa07c7b9ac36b",
+    "local_discrepancy_2026-11-16\\findings.txt": "588d98dec2711ac3afe1931eb55e6c7b555e68cc9cacbacd196fa9a0203032d1",
+    "replica_fitting_2026-11-16\\findings.txt": "a80893de02a12ca04e576fdb3d960e438b8b1085312a5fbb7d20145b1e63c7c3",
+    "broad_moments_2026-11-16\\findings.txt": "2a722708bd81957831771be31cca5b6e6c040ebf6646cdcbc7f55474642247fd",
+    "information_selection_2026-11-16\\findings.txt": "f5158d39d767044b51cc9d8df0568b4a783e56cf20d7de064cc300a77513d81b",
+    "solver_free_research_2026-11-16.txt": "ad01a4642bbb08afc75de99d8421c2fa556166ec99e24198c013a207bc9cb418"
+  },
+  "note": "Reused noisy records; these counts are not independent datasets. All computation sessions completed."
+}

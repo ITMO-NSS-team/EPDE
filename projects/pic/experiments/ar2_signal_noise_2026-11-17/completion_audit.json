@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "primary_records": 138,
+  "primary_complete": 138,
+  "counts": {
+    "results": 138,
+    "frozen": 138,
+    "audit_records": 138,
+    "screen": 23,
+    "screen_frozen": 23,
+    "score_screen": 23,
+    "score_frozen": 23,
+    "axis_frozen": 13
+  },
+  "distinct_fitted_anchors": 69,
+  "paired_pure_noise_draws": 576,
+  "aggregation_rates_replayed": 414,
+  "optimizer_diagnostics_replayed": 84,
+  "linked_hashes": 9333,
+  "main_audit": {
+    "hash_links": 10764,
+    "operator_scores": 141312,
+    "registered_scores": 434280,
+    "regions": 5736,
+    "intersection_certificates": 2868,
+    "matrix_replays": 2484
+  },
+  "audit_files": {
+    "checks.json": "d8ba2d93c8cb88dfc3470398d06c1514b4a4026c91c3d338a9c03afbc3d9b415",
+    "checks_score.json": "98f0d9a0df8dc4b8eed1c74ac71b7755d4fd4792f0778c60730ac5704db29c5a",
+    "audit.json": "2ea7f967e887a2959f213f69af7efbd357e4b216b8a2dab9f2cfabf55369bfef",
+    "audit_followups.json": "6b71ec769f5d4cecbb1ade23dfdce520084df50ca85ad5993478435353a67758",
+    "audit_axis.json": "b39975f507e6d82900253efa5dde482e99eccdccf779a72324e2acfb6aeea001",
+    "audit_attribution.json": "f87fa3181c92a2b575af71364ca51af91c3474e905876d843b862a3056db3dd6"
+  },
+  "master_log_sha256": "14be828b1fb61911915ef3c32ee5c46d72de5eea21c4c5a7e8c30b4d7f927764",
+  "findings_sha256": "7aca09cc8152c0f6bf951e48145b0cfe8df6584f84a24371754e094e22f3acd5",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\complete.py": "f1b67113198ea3a02dde613df72a1d5fed6f9b64a0b0f503354520e335aef58d"
+  }
+}

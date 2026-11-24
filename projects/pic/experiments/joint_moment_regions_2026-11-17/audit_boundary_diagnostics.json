@@ -1,0 +1,281 @@
+[
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 3.568611001419143e-07,
+    "natural_backward_error": 3.8580919047322277e-17,
+    "natural_to_residual": 9249678570.492281
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 7.948551738519112e-07,
+    "natural_backward_error": 4.428590295319886e-17,
+    "natural_to_residual": 17948266171.560524
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 2.0370362095939336e-07,
+    "natural_backward_error": 6.35855685538104e-17,
+    "natural_to_residual": 3203614052.5661197
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 6.491250896596779e-07,
+    "natural_backward_error": 7.139375483897287e-17,
+    "natural_to_residual": 9092183078.530693
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 5.676979299676479e-07,
+    "natural_backward_error": 5.933914245026016e-17,
+    "natural_to_residual": 9567005968.168638
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 2.565584475460871e-07,
+    "natural_backward_error": 7.303260488377213e-17,
+    "natural_to_residual": 3512930258.4015384
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 3.953234712085087e-07,
+    "natural_backward_error": 3.970213974690317e-17,
+    "natural_to_residual": 9957233381.592352
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 2.50128495331033e-07,
+    "natural_backward_error": 2.7171556647875198e-17,
+    "natural_to_residual": 9205526888.743525
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 8.57699162553677e-07,
+    "natural_backward_error": 4.8057971444079233e-17,
+    "natural_to_residual": 17847177830.876713
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 2.7980298284049705e-07,
+    "natural_backward_error": 1.5576966125850842e-17,
+    "natural_to_residual": 17962610984.699287
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 4.2989945974624487e-07,
+    "natural_backward_error": 4.638610845962416e-17,
+    "natural_to_residual": 9267849233.794683
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 7.61841261254254e-07,
+    "natural_backward_error": 4.2631757787556033e-17,
+    "natural_to_residual": 17870275606.52522
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 4.0857054972371834e-07,
+    "natural_backward_error": 4.432050786138412e-17,
+    "natural_to_residual": 9218543952.645014
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 1.0751790126821268e-06,
+    "natural_backward_error": 5.988310628916823e-17,
+    "natural_to_residual": 17954629933.360813
+  },
+  {
+    "file": "pde_compound_iid_iid_seed30.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 61983582921.34823,
+    "boundary_ratio": 3.6990771396600473e-07,
+    "natural_backward_error": 3.9976155954925555e-17,
+    "natural_to_residual": 9253208697.281649
+  },
+  {
+    "file": "pde_compound_iid_iid_seed31.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62108177874.90208,
+    "boundary_ratio": 2.6131696031707243e-07,
+    "natural_backward_error": 2.324516728903294e-17,
+    "natural_to_residual": 11241775852.495657
+  },
+  {
+    "file": "pde_compound_iid_iid_seed31.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62108177874.90208,
+    "boundary_ratio": 2.7005385745865937e-07,
+    "natural_backward_error": 3.15335445129335e-17,
+    "natural_to_residual": 8564018464.46081
+  },
+  {
+    "file": "pde_compound_iid_iid_seed31.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62108177874.90208,
+    "boundary_ratio": 3.086894689540574e-07,
+    "natural_backward_error": 1.5664029596051944e-17,
+    "natural_to_residual": 19706900262.232735
+  },
+  {
+    "file": "pde_compound_iid_iid_seed31.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62108177874.90208,
+    "boundary_ratio": 2.620550653146289e-07,
+    "natural_backward_error": 1.3215182172771544e-17,
+    "natural_to_residual": 19829848872.95501
+  },
+  {
+    "file": "pde_compound_iid_iid_seed31.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62108177874.90208,
+    "boundary_ratio": 2.783732877434351e-07,
+    "natural_backward_error": 1.4107984568626654e-17,
+    "natural_to_residual": 19731612718.267483
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 6.583723781183966e-07,
+    "natural_backward_error": 5.649591714906993e-17,
+    "natural_to_residual": 11653450573.803722
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 3.8858569335120274e-07,
+    "natural_backward_error": 2.417079915266678e-17,
+    "natural_to_residual": 16076658901.380585
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 3.093651101783543e-07,
+    "natural_backward_error": 6.849810688368855e-17,
+    "natural_to_residual": 4516403799.358481
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 3.5599961916323135e-07,
+    "natural_backward_error": 7.255658157233721e-17,
+    "natural_to_residual": 4906510359.894893
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 2.7242452886806966e-07,
+    "natural_backward_error": 5.193578429497748e-17,
+    "natural_to_residual": 5245410896.671773
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 6.877378316922415e-07,
+    "natural_backward_error": 5.926316722614591e-17,
+    "natural_to_residual": 11604810608.043627
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 2.406590054148615e-07,
+    "natural_backward_error": 1.506044707474934e-17,
+    "natural_to_residual": 15979539267.353848
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 4.2824465113008193e-07,
+    "natural_backward_error": 3.66817260953452e-17,
+    "natural_to_residual": 11674604679.642511
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 6.44920610529283e-07,
+    "natural_backward_error": 4.0303165334018036e-17,
+    "natural_to_residual": 16001735972.458107
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 5.315822018367436e-07,
+    "natural_backward_error": 4.5749224670880323e-17,
+    "natural_to_residual": 11619480016.56734
+  },
+  {
+    "file": "pde_compound_iid_iid_seed32.json",
+    "bank": "broad",
+    "candidate": "e0:first_order_fit",
+    "condition": 62229156165.46595,
+    "boundary_ratio": 4.1711298818236343e-07,
+    "natural_backward_error": 3.5781085263516965e-17,
+    "natural_to_residual": 11657359890.301018
+  }
+]

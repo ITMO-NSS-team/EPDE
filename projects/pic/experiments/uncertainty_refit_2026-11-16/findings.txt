@@ -1,0 +1,180 @@
+Fresh pilot-correction and main-refit uncertainty study
+Started 2026-11-16; completed 2026-11-17.
+
+Completed all15 systems with three fresh anchor noise seeds18/19/20 at5%:
+45 records,60 equation/seed cases,957 unregistered-competitor/reference
+pairs,17,280 measurement replicates and1,209,600 main candidate/fold refits.
+All work is solver-free. No production edits or commits.
+
+The new result changes the emphasis: refitting main coefficients matters,
+but the proposed pilot bias correction is not a universal fix. Discrepancy
+error ranges remain comparatively well calibrated in aggregate, while
+coefficient errors in forced KdV and dyad errors remain unreliable.
+Fresh structural results tie dyad with the complexity control; they do not
+confirm dyad's one-case advantage from the earlier reused-panel comparison.
+
+DESIGN AND SCOPE
+
+Each system's historical seed0 fixes the full candidate panel, weak geometry,
+validation geometry, and each candidate's joint-risk-selected fitting bank
+and OLS/CLSM estimator. Each new anchor rebuilds its reconstruction, noise
+estimates, coefficient corrections and validation weights using noisy data.
+This is a frozen-design replication, not a fresh evolutionary search or
+reselection of all fitting options. It differs from the earlier three-seed
+screen, whose bank/method choices were made separately on those old records.
+
+The standard pilot is the existing GCV reconstruction. The alternative is
+2*S(y)-S(S(y)), using the same linear smoother S fitted to the anchor. This
+introduces no free smoothing parameter. For a fixed S its deterministic
+bias operator is -(I-S)^2 instead of -(I-S); that algebra does not guarantee
+better finite-sample reconstruction or inference after S was learned.
+The alternative changes only the bootstrap pilot, not the main anchor fit.
+
+For each anchor,128 standard-pilot and128 alternative-pilot measurements
+share the SAME random innovations. Another128 independent measurements use
+the actual clean field and known5% iid Gaussian noise. Clean controls enter
+only after designs, fits, pilots, noise models and corrections are frozen.
+
+Each field produces the existing full-record dyad and two discrepancy
+versions. Fixed D holds main coefficients fixed. Refit D reconstructs all
+three training groups again, including GCV reselection, then refits the main
+coefficients using their frozen bank/method and mean/Gram corrections.
+Noise is shared across rotations and both objectives. Validation weights,
+correction maps, geometry and method choice remain fixed. This is still
+conditional uncertainty, not the full discovery/selection pipeline.
+
+Centers are the corresponding noise-free pilot or clean functional, with
+observation-noise corrections off for noise-free refitting/validation.
+They are not assumed to equal the physical reference equation. Independently
+stored clean residual energies describe coefficient accuracy. A retained
+registered structure is not automatically an accurate coefficient fit.
+
+CALIBRATION
+
+Mean coverage of nominal95% empirical error ranges, standard -> corrected
+pilot (averaged over957 dependent candidate pairs):
+
+  Fixed-coefficient discrepancy       93.94% -> 93.96%
+  Refitted-coefficient discrepancy    93.14% -> 93.64%
+  Dyad                               69.76% -> 70.19%
+
+Giving each of the60 equation/seed cases equal weight yields93.91/93.93%,
+92.90/93.45%, and69.89/69.87%, respectively. The weighting difference does
+not change the conclusion. The discrepancy result is promising as a
+conditional diagnostic, not a simultaneous or post-selection guarantee.
+128 draws offer limited resolution, particularly for rare fit failures.
+
+System-specific changes contradict a universal pilot fix:
+
+  Forced KdV refit-D coverage          67.78% ->79.51%
+  Forced KdV dyad coverage             79.67% ->92.22%
+  KS dyad coverage                    71.81% ->39.44%
+  Wave refit-D coverage               90.18% ->86.72%
+  Wave dyad coverage                  49.06% ->44.65%
+  AC dyad coverage                    87.82% ->93.71%
+
+The correction reduces observed field L2 error in only27/60 variable/anchor
+comparisons. Neither field error nor its improvement is a sufficient
+criterion for derivative-sensitive score calibration. Do not select the
+pilot per system after seeing these clean outcomes.
+
+MAIN COEFFICIENTS CANNOT GENERALLY BE FROZEN IN UNCERTAINTY
+
+The actual repeated-noise SD ratio, refit versus fixed D, has median1.754,
+90th percentile15.36 and99th percentile9752.8 across957 paired differences.
+Some ratios are below1: refitting changes dependence as well as variance.
+Huge ratios can reflect a very small fixed-fit paired SD and rare refit
+outliers; they are not stable universal inflation factors.
+
+For the reference equation alone in forced KdV seed18, SD rises from0.007698
+to0.097333, a12.64-fold change. Across all forced-KdV competitor differences
+the median ratio is770.6, a different and more extreme statistic. Main
+refits should be included rather than approximated by an arbitrary common
+variance multiplier.
+
+Reference coefficient error-range coverage averages88.52% with the standard
+pilot and88.76% with the corrected one (459 fold/coefficient/anchor cases).
+Forced KdV is particularly bad:8.56% ->5.47%. Wave improves70.49% ->83.51%.
+Most other systems lie around88--99%. Good aggregate residual-discrepancy
+coverage does not imply calibrated physical coefficient uncertainty.
+
+The post-hoc fit replay explains part of the forced-KdV tail. For seed18,
+the third training fold's corrected local fit has normalized inverse
+sensitivity8.02 in the median-error replicate, versus2112.2 in the worst.
+The corrected matrix has a negative eigenvalue in both. The worst reference
+clean energy is1.3232, versus median0.1110 and anchor0.1188. These diagnostics
+identify a sensitive corrected fit; they do not establish that every error
+comes from the same mechanism or justify a tuned ridge.
+
+Across each403,200-refit ensemble, indefinite corrected normal equations
+occur3645 times for standard-pilot draws,3263 for corrected-pilot draws,
+and6000 for benchmark draws. Rank-deficient fits occur12,288 times in each
+ensemble, confined to panels for AC, inviscid Burgers, NS and wave. These
+are explicit diagnostics of the historical signed/minimum-norm fitting
+rule, not silently dropped fits. All arrays remain finite and every case
+is retained in the reported summaries. No fallback estimator was introduced.
+
+STRUCTURAL CONTROL: DYAD VERSUS COMPLEXITY
+
+Both retain a registered equation in54/60 fresh anchor cases, with exactly
+the same failures: all three AC and all three forced-KdV anchors. With
+actual repeated noise and refitted main coefficients:
+
+  Criterion       Mean registered retention    Mean Pareto front size
+  Dyad                      92.53%                       3.240
+  Feature count             92.83%                       2.819
+
+With main coefficients fixed, the corresponding figures are90.04%/3.097
+and90.48%/2.743. These dependent repeated-measurement rates are not new
+discovery success rates. Unregistered candidates are not automatically
+false laws. Smaller fronts alone do not prove greater scientific precision.
+
+The earlier56/60 versus55/60 advantage for dyad on reused records therefore
+does not generalize into a clear advantage here. Keep complexity as a
+serious matched baseline. No full-search replacement is justified yet,
+and no calibrated confidence interpretation should be attached to dyad.
+
+FOLLOW-UP AND PRACTICAL DIRECTION
+
+The separately frozen dyad_tail_2026-11-17 follow-up derives and verifies
+a zero-coefficient ratio pathology, then tests monotone transformations on
+these same saved arrays. Raw, log1p and bounded dyad error-range coverages
+are69.76%,65.97% and49.85% with the standard pilot. All candidate orders
+are preserved, so this is not another replacement discovery experiment.
+Tail compression alone does not repair inference. See its findings.txt
+for the exact two-slab derivation and the finite-cap qualification.
+
+The defensible next formulation separates structural preference from
+uncertainty: use dyad and complexity as ranking controls, assess precision
+with paired discrepancy including main refits, and investigate coefficient
+changes against their sampling uncertainty without dividing by an estimated
+coefficient level. Such a criterion must preserve feature-unit invariance,
+account for correlated weak moments, and face a fresh full-panel comparison.
+It has NOT been validated by this study. The current heterogeneity helper's
+ridge and unresolved-level guard are not silently promoted as that fix.
+
+Constants and registered equivalents remain present. The problem concerns
+coefficients near zero, not an additive constant being intrinsically wrong.
+No ban on ODE_simple's valid phase/energy identities is introduced.
+
+VERIFICATION AND ARTIFACTS
+
+All45 fresh runs, four historical replay runs and four fit-diagnostic replays
+complete. Historical coefficients reproduce exactly on the hard systems;
+discrepancy and dyad replay within their predefined tolerances. The frozen
+smoother reproduces the existing reconstruction and preserves constants.
+An initial preflight review found a reused spectrum variable in the new
+multi-variable smoother; it was fixed before ALL fresh runs, covered by a
+multi-variable test, and the four historical replays were repeated. Initial
+preflight artifacts remain in preflight_initial/. No scientific arm changed.
+
+audit.json passes all source/input/array hashes and fresh-data/innovation
+replay,5742 pair/axis/pilot coverage checks,93,120 Pareto checks,1,222,200
+coefficient-support checks and403,200 clean-energy checks. No nonfinite
+scores or coefficients occur. All process sessions finished.
+
+Main artifacts: protocol.txt; results/*.json and*.npz; frozen/*.json;
+summary.json; calibration_summary.csv; pair_calibration.csv; fronts.csv;
+reference_energy.csv; coefficient_calibration.csv; refit_spread.csv;
+numerical_status.csv; pilot_error.csv; calibration.png; refit_spread.png;
+fit_diagnostics/*.json; audit.json. No candidate ODE/PDE integration or PINNs.

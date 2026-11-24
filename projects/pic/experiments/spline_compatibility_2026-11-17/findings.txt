@@ -1,0 +1,341 @@
+Common-contrast compatibility: result and information loss
+=========================================================
+
+The p64 compatibility rule is not a complete repair. It fixed both archived
+development failures, but only one of two boundary failures in1024 fresh
+positive-noise ODE fields. A very flexible mean also makes noise amplitude
+unbounded in many otherwise well-calibrated likelihood regions.
+
+1. What was frozen before fresh validation
+Original conditional-CV estimator, compatible-CV estimator, and fixed-p64
+noise estimator. All candidate noise models are compared on the SAME p64
+error-contrast space. Compatibility means LR<=chi-square2(.975); select the
+best original CV score among compatible models. No parameter is clipped,
+no truth is used for selection, and no field or selected warning is dropped.
+This is separate from the p64 likelihood-region calibration comparison.
+264 fresh signals:192 ODE,48 VDP,24 Duffing; then1024 positive ODE stress
+fields. Controlled calibration1536 fields and independent validation768
+fields span n320/1001 and rho=-.8,-.4,0,.4,.8,.95. Zero-mean Gaussian AR1
+simulation needs no equation solver. Source and RNG details are frozen.
+Calibration takes the maximum of six rank126/128 LR quantiles for each n.
+These are finite-grid cutoffs, NOT uniform-in-rho confidence guarantees:
+{'320': 7.614229484213837, '1001': 11.179821170430273}
+
+2. Fresh results for the compatibility rule
+The rule changed no selection in the264-field primary cohort. In the1024
+positive-noise stress fields it changed five selections. One catastrophic
+boundary fit was repaired(seed1283), another survived(seed1334), and one
+ordinary change worsened amplitude accuracy(seed1055). Median absolute
+amplitude error is essentially unchanged. Complete results retain tails.
+Stress summary:
+{
+  "n": 1024,
+  "selection_changes": 5,
+  "methods": {
+    "cv": {
+      "sigma_ratio": {
+        "n": 1024,
+        "median": 1.0049211259943327,
+        "mean": 2.601382852377662,
+        "min": 0.8376477845114144,
+        "max": 839.6746087177697,
+        "q95": 1.1920808979671937,
+        "q99": 1.3381911960872104
+      },
+      "absolute_sigma_error": {
+        "n": 1024,
+        "median": 0.04535735249029027,
+        "mean": 1.6455906389772883,
+        "min": 3.1261829795958818e-06,
+        "max": 838.6746087177697,
+        "q95": 0.19208089796719363,
+        "q99": 0.33819119608721043
+      },
+      "absolute_rho_error": {
+        "n": 1024,
+        "median": 0.048784093743583584,
+        "mean": 0.06424860639523536,
+        "min": 0.00013543252880382495,
+        "max": 0.599999,
+        "q95": 0.17997705311037562,
+        "q99": 0.2745462454044155
+      },
+      "selected_status": {
+        "ok": 1022,
+        "boundary": 2
+      },
+      "dimensions": {
+        "32": 937,
+        "24": 71,
+        "48": 14,
+        "16": 2
+      }
+    },
+    "compatible": {
+      "sigma_ratio": {
+        "n": 1024,
+        "median": 1.0046608135658084,
+        "mean": 1.7818535984278938,
+        "min": 0.8376477845114144,
+        "max": 784.0420397168077,
+        "q95": 1.184302774953777,
+        "q99": 1.3303027419495213
+      },
+      "absolute_sigma_error": {
+        "n": 1024,
+        "median": 0.04535735249029027,
+        "mean": 0.8263236712880009,
+        "min": 3.1261829795958818e-06,
+        "max": 783.0420397168077,
+        "q95": 0.1843027749537769,
+        "q99": 0.33030274194952125
+      },
+      "absolute_rho_error": {
+        "n": 1024,
+        "median": 0.04858068852170472,
+        "mean": 0.06335501392679718,
+        "min": 0.00013543252880382495,
+        "max": 0.599999,
+        "q95": 0.17842866294937354,
+        "q99": 0.26836924410058927
+      },
+      "selected_status": {
+        "ok": 1023,
+        "boundary": 1
+      },
+      "dimensions": {
+        "32": 939,
+        "24": 68,
+        "48": 16,
+        "16": 1
+      }
+    },
+    "rich": {
+      "sigma_ratio": {
+        "n": 1024,
+        "median": 0.9957481549454845,
+        "mean": 1.4925243934042833,
+        "min": 0.7868733619195215,
+        "max": 489.592478149096,
+        "q95": 1.1971356845102075,
+        "q99": 1.418693039632167
+      },
+      "absolute_sigma_error": {
+        "n": 1024,
+        "median": 0.06177112230289794,
+        "mean": 0.5598909473327613,
+        "min": 4.227497816255976e-06,
+        "max": 488.592478149096,
+        "q95": 0.2023123975914035,
+        "q99": 0.4186930396321671
+      },
+      "absolute_rho_error": {
+        "n": 1024,
+        "median": 0.064994215333671,
+        "mean": 0.08180400544453269,
+        "min": 0.00018827631325712968,
+        "max": 0.5999971905011884,
+        "q95": 0.2087790683623551,
+        "q99": 0.2869407187100866
+      },
+      "selected_status": {
+        "ok": 1023,
+        "boundary": 1
+      },
+      "dimensions": {
+        "64": 1024
+      }
+    }
+  },
+  "rich_region": {
+    "nominal": {
+      "coverage": {
+        "n": 1024,
+        "count": 995,
+        "fraction": 0.9716796875,
+        "binomial95": [
+          0.959579173760646,
+          0.9809531798212371
+        ]
+      },
+      "unbounded": {
+        "n": 1024,
+        "count": 458,
+        "fraction": 0.447265625,
+        "binomial95": [
+          0.4165128217885642,
+          0.4783223901733911
+        ]
+      }
+    },
+    "grid_calibrated": {
+      "coverage": {
+        "n": 1024,
+        "count": 996,
+        "fraction": 0.97265625,
+        "binomial95": [
+          0.9607218459075371,
+          0.9817550598957157
+        ]
+      },
+      "unbounded": {
+        "n": 1024,
+        "count": 473,
+        "fraction": 0.4619140625,
+        "binomial95": [
+          0.43103740583122446,
+          0.4930102352338522
+        ]
+      }
+    }
+  }
+}
+
+Remaining boundary seed1334: original and compatible sigma/truth784.0,
+rho0.999999. Its rich-space limiting LR6.1008 is below cutoff7.3778, so
+this safeguard has insufficient evidence to reject the divergent model.
+Fixed-p64 estimation itself also hit a boundary at seed1456, while the
+ordinary CV p32 estimate stayed finite. More flexible is not always safer.
+
+3. Coverage and finite precision are different requirements
+Nominal p64 region: truth covered 995/1024; amplitude unbounded in 458/1024.
+Grid-calibrated p64 region: truth covered 996/1024; amplitude unbounded in 473/1024.
+In exact controlled data with n320,rho.4, the nominal region was amplitude-
+unbounded27/64 times. This cannot be blamed on the ODE signal, an equation
+solver, or an incorrect simulation noise family. The rich mean removes
+low-frequency information that would otherwise distinguish correlated
+measurement noise from deterministic signal. It is a property of this
+mean/noise model, not a proof that the original data cannot identify noise
+under stronger, justified signal assumptions.
+
+The unboundedness test is analytic: as rho->1 with sigma^2(1-rho)->eta,
+contrast covariance tends to eta*K, K=-Q_perp*|i-j|*Q_perp. Constants are
+in the spline space, so the divergent common offset disappears. Profiling
+eta gives a limiting likelihood. If its LR is strictly below the cutoff,
+there is an escaping sequence with sigma->infinity inside the region.
+This is not extrapolation from a finite rho grid. A failed sufficient
+test is not reported as a certified compact region. Neither does an
+unbounded noise region alone prove every coefficient region unbounded.
+
+4. Posthoc diagnosis of mean complexity (not new-method validation)
+After seeing p64 unboundedness, the SAME frozen fields were compared at
+fixed p32,p48,p64. These comparisons did not alter any primary selection
+or cutoff. They do not validate an adaptive dimension-selection rule.
+{
+  "32": {
+    "coverage": {
+      "n": 1024,
+      "count": 1004,
+      "fraction": 0.98046875,
+      "binomial95": [
+        0.9699961107857573,
+        0.9880299977992089
+      ]
+    },
+    "unbounded": {
+      "n": 1024,
+      "count": 1,
+      "fraction": 0.0009765625,
+      "binomial95": [
+        2.4724116213658914e-05,
+        0.00542892773706297
+      ]
+    },
+    "sigma_absolute_error": {
+      "n": 1024,
+      "median": 0.04304062694673688,
+      "mean": 0.05035020991619425,
+      "min": 3.1261829795958818e-06,
+      "max": 0.28785871896087145,
+      "q95": 0.12181073910137061,
+      "q99": 0.16253442393748518
+    },
+    "selected_status": {
+      "ok": 1024
+    }
+  },
+  "48": {
+    "coverage": {
+      "n": 1024,
+      "count": 997,
+      "fraction": 0.9736328125,
+      "binomial95": [
+        0.9618677460868004,
+        0.982553553747378
+      ]
+    },
+    "unbounded": {
+      "n": 1024,
+      "count": 101,
+      "fraction": 0.0986328125,
+      "binomial95": [
+        0.08105649587965777,
+        0.11855392918487484
+      ]
+    },
+    "sigma_absolute_error": {
+      "n": 1024,
+      "median": 0.052587798575054856,
+      "mean": 0.0629253727869803,
+      "min": 6.0900630153071234e-05,
+      "max": 0.6572294382029389,
+      "q95": 0.1570881811679316,
+      "q99": 0.2323551486034633
+    },
+    "selected_status": {
+      "ok": 1024
+    }
+  },
+  "64": {
+    "coverage": {
+      "n": 1024,
+      "count": 995,
+      "fraction": 0.9716796875,
+      "binomial95": [
+        0.959579173760646,
+        0.9809531798212371
+      ]
+    },
+    "unbounded": {
+      "n": 1024,
+      "count": 458,
+      "fraction": 0.447265625,
+      "binomial95": [
+        0.4165128217885642,
+        0.4783223901733911
+      ]
+    },
+    "sigma_absolute_error": {
+      "n": 1024,
+      "median": 0.06177112230289794,
+      "mean": 0.5598909473327615,
+      "min": 4.227497816255976e-06,
+      "max": 488.592478149096,
+      "q95": 0.2023123975914035,
+      "q99": 0.4186930396321671
+    },
+    "selected_status": {
+      "ok": 1023,
+      "boundary": 1
+    }
+  }
+}
+Controlled and all-signal dimension comparisons are in summary.json.
+A useful next rule must check both signal adequacy and retained noise
+information. Always using the largest spline is not a sufficient repair.
+Fixed p32 is a diagnostic benchmark here; selecting it because these ODE
+results look good would require independent validation on other signals.
+
+5. Audit and scope
+Every raw field was regenerated. Every spline selection was replayed.
+All true-parameter likelihoods were checked by dense orthogonal contrasts;
+selected likelihoods also use independent whitened QR and dense checks.
+All rich fits were stress-tested with129 rho grid points. The analytic
+boundary limit was checked independently through first differences and
+a singular-value decomposition of the differentiated spline design.
+Fine-grid improvements beyond tolerance: 0
+Numerical checks passing does not imply statistical validity. Boundary
+warnings remain in the results. All earlier artifact manifests are checked.
+No production edits, solver calls, removed constants, or lost identities.
+This round studies nuisance inference; it does not rerun weak coefficient
+propagation, validate adaptive equation search, or settle the dyad/KdV issue.

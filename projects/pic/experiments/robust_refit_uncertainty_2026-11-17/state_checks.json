@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "dense_checks": 8,
+  "max_absolute_gradient_error": 9.395787268928757e-05,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_checks.py": "41b7d98acb7222b8add5b444cee990f6839f45c7d47e92240bb9772fbc2e9fac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c"
+  }
+}

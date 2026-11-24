@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "complementary_indefinite_constraints_bound_joint_set": true,
+  "empty_certificate": true,
+  "common_negative_ray": true,
+  "column_units": true,
+  "mixture_implication_feasible_draws": 1350,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\checks_intersection.py": "52ef60055f8d6121c5addbde987bc1275f083584c0b2765451cec39f1fdf39de",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\intersect_banks.py": "84b20f551351ebac5b40a1749e2316dde287d329b5dafc19683ada988d449d79",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5"
+  }
+}

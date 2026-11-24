@@ -1,0 +1,19 @@
+{
+  "verified_fold_scores": 47250,
+  "unresolved_folds": 0,
+  "verified_fronts": 900,
+  "max_scaled_score_difference": 4.3252049337916265e-10,
+  "max_projective_angle": 1.8626227060485683e-08,
+  "max_ns_replay_error": 1.6263032587282567e-17,
+  "noiseless_constant_identities": 9,
+  "sha256": {
+    "protocol.txt": "1ef32d1d8557b9bb41e68ea891d5b0a6bc2f736e9e1efb8c24ebbd5647d8fa7b",
+    "panel.py": "4e8d8f8ccdc654b02f695d1e98973097695fbca36cec56528511c37cadfbccd3",
+    "train.py": "8dae9c6f63644d84fc2812bee80c89c3f43d1d5966abbc24986dfd0a6c323188",
+    "evaluate.py": "671387975bb9c3156119e8098860a985acd46721381f2b97c23eb5ab5b47ecf8",
+    "summarize.py": "01a5016e8fe2edb3b2f9574e4fc107b0f3dbc5708358b13c0120f843c5830b83",
+    "verify.py": "27f69d2a3132b2436f112014b155ed849a6db133dc075d5927fa0c1ab7419078",
+    "summary.json": "c78a9bab7088053aeef86351be4454783b1da67bba70a9f0aa2f5af463716281",
+    "slots.json": "5e5b78385e3c36f158a96948ad95943326488ec82f4d15d58e6ea4946206638d"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "cases": 45,
+  "equation_seed_trials": 60,
+  "source_and_input_hashes_verified": true,
+  "finite_scores": true,
+  "baselines_reproduced": true,
+  "max_frozen_score_scaled_error": 0.0,
+  "calculation_seconds": 293.7448741000844,
+  "source_sha256": {
+    "run_local.py": "585a1310d8da843e7cf4a18889122927d4d52bf6f76e0a0e62ad01072071b776",
+    "summarize.py": "be578645b1e7d21e3b994faaaaa9b8c5f680260518aa2ed2e6e219f56b74ddca"
+  }
+}

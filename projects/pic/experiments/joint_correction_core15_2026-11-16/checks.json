@@ -1,0 +1,12 @@
+{
+  "joint_normal_correction_algebra": true,
+  "constant_noise_zero": true,
+  "feature_units_invariant": true,
+  "zero_noise_exact_fit": true,
+  "indefinite_design_rejected": true,
+  "transfer_recovers_coefficient_effect": true,
+  "transfer_units_invariant": true,
+  "rank_failure_explicit": true,
+  "selection_isolated": true,
+  "source_sha256": "1c77d127ef2f7c2b300968f9a8b583d450686a58b052a08e8312ec4effb1075c"
+}

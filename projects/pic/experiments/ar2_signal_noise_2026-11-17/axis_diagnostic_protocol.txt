@@ -1,0 +1,11 @@
+Post-screening diagnostic, before per-axis refits. Compound still shows biased
+noise amplitude; KS/NS estimates improved with AR2. Test whether the shared
+amplitude fit hides incompatible axis estimates. Old anchor36, iid only,
+systems compound/KS/NS, all variables and axes:13 separate axis fits.
+Same AR2 covariance family and analytic gradient. Four starts: three fixed
+plus the corresponding axis parameters from the saved global AR1 fit (an
+initialization, not a separately optimized AR1 likelihood). No truth-based
+choice of an axis, minimum, weights or per-system model is used for coverage.
+Fit and freeze from observed fields first. Then compare amplitudes/correlations
+to injected noise and inspect clean curvature mean/energy concentration and
+lag correlations. These are mechanism diagnostics, not validation or a repair.

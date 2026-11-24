@@ -1,0 +1,24 @@
+Frozen after complete 69-anchor correlated-curvature screening and before
+creating any fresh anchor36/37/38 or observing its coverage outcomes.
+
+Run the specified 138-record paired comparison with correlated_fit.py as the
+single global candidate. The original white-curvature fit is retained as an
+exploratory failure, not selected per dataset. IID raw amplitude median ratio
+improves from0.9553 to0.9855 and the three NS/u noise-rho boundaries disappear.
+All84 raw-variable fits and84 noise-only fits now report status ok. Correlation
+bias is not resolved: a negative-profile raw axis has error0.8513, while its
+noise-only control is accurate. This warrants a coverage stress test, not
+promotion to a default or a claim of identified noise parameters.
+
+All15 IID systems x anchors36/37/38 x(curvature,known-iid family)=90 records;
+core4 AC/forcedKdV/KS/wave x3 anchors x rho(+0.4,-0.4)
+x(curvature,known-rho amplitude control)=48 records. Preserve every incomplete
+fit. Same raw/evaluation fields between paired methods. No fitted per-system
+variant, fallback, extra penalty or arbitrary ridge. Keep prior pilot, banks,
+library and correction/calibration code. Domains960101/2/3/4 as in protocol.
+
+The paired576 pure-noise refinement trials are also running on previously
+fixed draws960105; they do not select a variant. Complete and retain them.
+Do not attempt parameter-uncertainty propagation until raw-field coverage and
+remaining misspecification have been assessed. Confidence intervals around a
+systematically wrong covariance estimate would not address that problem.

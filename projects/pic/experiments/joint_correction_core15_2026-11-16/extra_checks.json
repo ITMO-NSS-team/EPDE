@@ -1,0 +1,40 @@
+{
+  "population_joint_correction_exact": true,
+  "omitted_cross_term_detected": true,
+  "ode_simple_constants_preserved": true,
+  "identity_rows": [
+    {
+      "identity": "energy",
+      "coefficients": [
+        -0.9999989404303247,
+        2.689997149757284
+      ],
+      "constant": 2.689997149757284,
+      "energy": 1.1993320095083865e-28
+    },
+    {
+      "identity": "phase_sin",
+      "coefficients": [
+        -0.999999470214918,
+        0.9999994702149163
+      ],
+      "constant": 0.9999994702149163,
+      "energy": 1.791366470441716e-31
+    },
+    {
+      "identity": "phase_cos",
+      "coefficients": [
+        0.999999470215012,
+        -1.2999993112794523
+      ],
+      "constant": -1.2999993112794523,
+      "energy": 6.138100786314735e-29
+    }
+  ],
+  "zero_noise_control_only": true,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_correction_core15_2026-11-16\\methods.py": "1c77d127ef2f7c2b300968f9a8b583d450686a58b052a08e8312ec4effb1075c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_correction_core15_2026-11-16\\extra_checks.py": "5403aea932638e22a96073fbc89baa6975462072471d6119ace14d6d9be75a80",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\ode_simple_constants.py": "73146ec4c7d67505ab9b4593f56df021a8fb6f234ed105b4a03468c4d2c4f3da"
+  }
+}

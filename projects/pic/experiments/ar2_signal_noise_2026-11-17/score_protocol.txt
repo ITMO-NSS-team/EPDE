@@ -1,0 +1,17 @@
+Numerical follow-up, before its outcomes. The first AR2 screen exposes an
+optimizer problem: VDP has good interior-noise nonconverged starts near a signal
+oscillation boundary, yet only a poor noise-boundary start reports convergence.
+Forced KdV positive also returns a worse converged objective than the nested
+AR1 fit. Preserve all initial code and results. Do not call this evidence of
+statistical inadequacy before checking numerical optimization.
+
+Implement the exact profile-likelihood score. Banded selected inverse entries
+give tr(B^-1 dB), and solved contrasts give dq=2 dz'B^-1z-z'B^-1 dB B^-1z.
+Compute polynomial band derivatives by complex-step (no Cholesky differentiation)
+and exact filter derivatives. Same covariance family, parameter bounds and four
+starts (three fixed plus the previous AR1 nested fit). L-BFGS-B gets the analytic
+score, same gtol2e-6/ftol1e-12; allow500 instead of300 iterations. Preserve every
+start and gradient. Check selected inverse against dense inversion, gradients
+against dense covariance derivatives and finite differences, synthetic recovery
+and unchanged unit/trend invariance tolerance. Repeat old-anchor screening with
+this numerical implementation only after checks pass. No fresh data yet.

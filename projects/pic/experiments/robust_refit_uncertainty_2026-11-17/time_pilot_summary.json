@@ -1,0 +1,403 @@
+{
+  "status": "COMPLETE",
+  "anchors": 3,
+  "paired_records": 6,
+  "summary": [
+    {
+      "mode": "fixed",
+      "bank": "local",
+      "coverage": 0.9622395833333334,
+      "counts": [
+        247,
+        240,
+        252
+      ]
+    },
+    {
+      "mode": "fixed",
+      "bank": "broad",
+      "coverage": 0.9544270833333334,
+      "counts": [
+        245,
+        245,
+        243
+      ]
+    },
+    {
+      "mode": "fixed",
+      "bank": "both",
+      "coverage": 0.9544270833333334,
+      "counts": [
+        245,
+        245,
+        243
+      ]
+    },
+    {
+      "mode": "refit",
+      "bank": "local",
+      "coverage": 0.9622395833333334,
+      "counts": [
+        247,
+        240,
+        252
+      ]
+    },
+    {
+      "mode": "refit",
+      "bank": "broad",
+      "coverage": 0.9557291666666666,
+      "counts": [
+        245,
+        246,
+        243
+      ]
+    },
+    {
+      "mode": "refit",
+      "bank": "both",
+      "coverage": 0.9557291666666666,
+      "counts": [
+        245,
+        246,
+        243
+      ]
+    },
+    {
+      "mode": "studentized",
+      "bank": "local",
+      "coverage": 0.9427083333333334,
+      "counts": [
+        243,
+        234,
+        247
+      ]
+    },
+    {
+      "mode": "studentized",
+      "bank": "broad",
+      "coverage": 0.9453125,
+      "counts": [
+        242,
+        245,
+        239
+      ]
+    },
+    {
+      "mode": "studentized",
+      "bank": "both",
+      "coverage": 0.9453125,
+      "counts": [
+        242,
+        245,
+        239
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "seed": 48,
+      "mode": "fixed",
+      "bank": "local",
+      "count": 247,
+      "coverage": 0.96484375
+    },
+    {
+      "seed": 48,
+      "mode": "fixed",
+      "bank": "broad",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 48,
+      "mode": "refit",
+      "bank": "local",
+      "count": 247,
+      "coverage": 0.96484375
+    },
+    {
+      "seed": 48,
+      "mode": "refit",
+      "bank": "broad",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 48,
+      "mode": "studentized",
+      "bank": "local",
+      "count": 243,
+      "coverage": 0.94921875
+    },
+    {
+      "seed": 48,
+      "mode": "studentized",
+      "bank": "broad",
+      "count": 242,
+      "coverage": 0.9453125
+    },
+    {
+      "seed": 48,
+      "mode": "studentized",
+      "bank": "both",
+      "count": 242,
+      "coverage": 0.9453125
+    },
+    {
+      "seed": 48,
+      "mode": "fixed",
+      "bank": "both",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 48,
+      "mode": "refit",
+      "bank": "both",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 49,
+      "mode": "fixed",
+      "bank": "local",
+      "count": 240,
+      "coverage": 0.9375
+    },
+    {
+      "seed": 49,
+      "mode": "fixed",
+      "bank": "broad",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 49,
+      "mode": "refit",
+      "bank": "local",
+      "count": 240,
+      "coverage": 0.9375
+    },
+    {
+      "seed": 49,
+      "mode": "refit",
+      "bank": "broad",
+      "count": 246,
+      "coverage": 0.9609375
+    },
+    {
+      "seed": 49,
+      "mode": "studentized",
+      "bank": "local",
+      "count": 234,
+      "coverage": 0.9140625
+    },
+    {
+      "seed": 49,
+      "mode": "studentized",
+      "bank": "broad",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 49,
+      "mode": "studentized",
+      "bank": "both",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 49,
+      "mode": "fixed",
+      "bank": "both",
+      "count": 245,
+      "coverage": 0.95703125
+    },
+    {
+      "seed": 49,
+      "mode": "refit",
+      "bank": "both",
+      "count": 246,
+      "coverage": 0.9609375
+    },
+    {
+      "seed": 50,
+      "mode": "fixed",
+      "bank": "local",
+      "count": 252,
+      "coverage": 0.984375
+    },
+    {
+      "seed": 50,
+      "mode": "fixed",
+      "bank": "broad",
+      "count": 243,
+      "coverage": 0.94921875
+    },
+    {
+      "seed": 50,
+      "mode": "refit",
+      "bank": "local",
+      "count": 252,
+      "coverage": 0.984375
+    },
+    {
+      "seed": 50,
+      "mode": "refit",
+      "bank": "broad",
+      "count": 243,
+      "coverage": 0.94921875
+    },
+    {
+      "seed": 50,
+      "mode": "studentized",
+      "bank": "local",
+      "count": 247,
+      "coverage": 0.96484375
+    },
+    {
+      "seed": 50,
+      "mode": "studentized",
+      "bank": "broad",
+      "count": 239,
+      "coverage": 0.93359375
+    },
+    {
+      "seed": 50,
+      "mode": "studentized",
+      "bank": "both",
+      "count": 239,
+      "coverage": 0.93359375
+    },
+    {
+      "seed": 50,
+      "mode": "fixed",
+      "bank": "both",
+      "count": 243,
+      "coverage": 0.94921875
+    },
+    {
+      "seed": 50,
+      "mode": "refit",
+      "bank": "both",
+      "count": 243,
+      "coverage": 0.94921875
+    }
+  ],
+  "parameter_distributions": [
+    {
+      "seed": 48,
+      "stream": "calibration",
+      "variable": "u",
+      "sigma_ratio_min": 0.9616584316133111,
+      "sigma_ratio_median": 1.0063956771526317,
+      "sigma_ratio_max": 1.0487068926023067,
+      "max_abs_rho": 0.498936078615383
+    },
+    {
+      "seed": 48,
+      "stream": "check",
+      "variable": "u",
+      "sigma_ratio_min": 0.9698435277884923,
+      "sigma_ratio_median": 1.0068393864844354,
+      "sigma_ratio_max": 1.0544913312193398,
+      "max_abs_rho": 0.5089372164788466
+    },
+    {
+      "seed": 48,
+      "stream": "actual",
+      "variable": "u",
+      "sigma_ratio_min": 0.9570157853226317,
+      "sigma_ratio_median": 1.0038725756221165,
+      "sigma_ratio_max": 1.0633395543030608,
+      "max_abs_rho": 0.4624523652263499
+    },
+    {
+      "seed": 49,
+      "stream": "calibration",
+      "variable": "u",
+      "sigma_ratio_min": 0.9606402624240139,
+      "sigma_ratio_median": 1.0151366097716654,
+      "sigma_ratio_max": 1.0692070844852952,
+      "max_abs_rho": 0.48380936853924
+    },
+    {
+      "seed": 49,
+      "stream": "check",
+      "variable": "u",
+      "sigma_ratio_min": 0.9676184413966947,
+      "sigma_ratio_median": 1.0151886332127305,
+      "sigma_ratio_max": 1.0709398243019632,
+      "max_abs_rho": 0.47919649287137533
+    },
+    {
+      "seed": 49,
+      "stream": "actual",
+      "variable": "u",
+      "sigma_ratio_min": 0.952353068534266,
+      "sigma_ratio_median": 1.0023327735174457,
+      "sigma_ratio_max": 1.0555627690945377,
+      "max_abs_rho": 0.4721160617125248
+    },
+    {
+      "seed": 50,
+      "stream": "calibration",
+      "variable": "u",
+      "sigma_ratio_min": 0.957518075810086,
+      "sigma_ratio_median": 1.0078414622834537,
+      "sigma_ratio_max": 1.0620804665089687,
+      "max_abs_rho": 0.48611078859220497
+    },
+    {
+      "seed": 50,
+      "stream": "check",
+      "variable": "u",
+      "sigma_ratio_min": 0.9652832170544035,
+      "sigma_ratio_median": 1.007552260006959,
+      "sigma_ratio_max": 1.051218120134214,
+      "max_abs_rho": 0.47688506920185825
+    },
+    {
+      "seed": 50,
+      "stream": "actual",
+      "variable": "u",
+      "sigma_ratio_min": 0.9492023080791323,
+      "sigma_ratio_median": 0.9937920592677782,
+      "sigma_ratio_max": 1.0618868828655386,
+      "max_abs_rho": 0.4615475965871378
+    }
+  ],
+  "warnings": [],
+  "studentized_reference_geometry": [
+    {
+      "seed": 48,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "accepted": true
+    },
+    {
+      "seed": 49,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "accepted": true
+    },
+    {
+      "seed": 50,
+      "candidate": "e0:reference",
+      "geometry": "bounded_outer",
+      "accepted": true
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\analyze_time_pilot.py": "5964a69dc5ccf0e92633c4a47a47122514ac5893823e067839264719c710e30b"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_results\\ac_positive_seed48.json": "e36399097a55c0621a852116604e69ffaa72eea7a2d644389114de0c76bf1ea0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_results\\ac_positive_seed49.json": "b58b8a619ebaf9f68debb87b047905a050347c246ea14fe022a125c94224ecec",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_results\\ac_positive_seed50.json": "09967c75363177ebfcd720c46f6afa5383c092db443d2c11b4031b0a63b56736",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_studentized\\ac_positive_seed48.json": "49424f41def3550360bb7122fc4319798a0fc17dfff84d88ff0c32c32eae3a20",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_studentized\\ac_positive_seed49.json": "039e546412d8ddf9ddad6de569638bf1804f2fd1ac23e65d4288792590e356ee",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_pilot_studentized\\ac_positive_seed50.json": "a4409e3708d01d8aa157643b792a461cc70564a26e757807319f7fc2fdac5a51"
+  }
+}

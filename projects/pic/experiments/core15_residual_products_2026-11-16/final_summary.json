@@ -1,0 +1,30 @@
+{
+  "primary32": {
+    "gcv": {
+      "cross": 51,
+      "ordinary": 46,
+      "oracle": 52,
+      "uncorrected_cross": 45
+    },
+    "loo": {
+      "cross": 51,
+      "ordinary": 46,
+      "oracle": 52,
+      "uncorrected_cross": 45
+    }
+  },
+  "with_selected128": {
+    "gcv": {
+      "cross": 50,
+      "ordinary": 46,
+      "oracle": 52,
+      "uncorrected_cross": 45
+    },
+    "loo": {
+      "cross": 50,
+      "ordinary": 46,
+      "oracle": 52,
+      "uncorrected_cross": 45
+    }
+  }
+}

@@ -1,0 +1,2199 @@
+[
+  {
+    "system": "ac",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ac",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ac",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_3",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_3",
+      "e0:add_7",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_6"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_6"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_6"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "gain",
+    "candidate_ids": [
+      "e0:reference",
+      "e0:drop_2",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "gain",
+    "candidate_ids": [
+      "e0:reference",
+      "e0:drop_2",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias_complexity",
+    "change": "gain",
+    "candidate_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_2",
+      "e0:add_4",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 22,
+    "slot": 0,
+    "arm": "complexity",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_1",
+      "e0:time_poly",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_2",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_2",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 23,
+    "slot": 0,
+    "arm": "complexity",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_1",
+      "e0:time_poly",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_2",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_2",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_2",
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_2",
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7",
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_7",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7",
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_7",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7",
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_7",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7",
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_7",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_7",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_0",
+      "e1:drop_2",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 2,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5",
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 2,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5",
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 2,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5",
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 2,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5",
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 21,
+    "slot": 2,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_4"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_0",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 1,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 1,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 1,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 1,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 22,
+    "slot": 2,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_3"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 1,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_1",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 1,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1",
+      "e1:add_2",
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_1",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 23,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_1"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_1",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 21,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_6",
+      "e1:add_9",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 22,
+    "slot": 1,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_0",
+      "e1:add_4",
+      "e1:add_5",
+      "e1:add_9",
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_7",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 22,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_7",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2",
+      "e0:add_7",
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 23,
+    "slot": 1,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_2",
+      "e1:add_5",
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_2",
+      "e1:add_9",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 23,
+    "slot": 1,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_2",
+      "e1:add_5",
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_2",
+      "e1:add_9",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 23,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_2",
+      "e1:add_9",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 21,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_9"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_9"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 21,
+    "slot": 2,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:drop_0",
+      "e2:add_0",
+      "e2:add_1",
+      "e2:add_2",
+      "e2:add_9"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_0",
+      "e2:add_3",
+      "e2:add_9"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 21,
+    "slot": 2,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_9"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_0",
+      "e2:add_3",
+      "e2:add_9"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 22,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0",
+      "e0:add_4",
+      "e0:add_5",
+      "e0:add_9"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0",
+      "e0:add_4",
+      "e0:add_5",
+      "e0:add_8",
+      "e0:add_9"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 1,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_3",
+      "e1:add_11"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_3",
+      "e1:add_11"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 1,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_3",
+      "e1:add_11"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_3",
+      "e1:add_11"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 1,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_3",
+      "e1:add_11"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 2,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:drop_0",
+      "e2:add_2",
+      "e2:add_8"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_2",
+      "e2:add_8"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 2,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:drop_0",
+      "e2:add_2",
+      "e2:add_8"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_2",
+      "e2:add_8"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 23,
+    "slot": 2,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e2:add_2"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_2",
+      "e2:add_8"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 21,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 22,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 22,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_2",
+      "e0:add_4",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 21,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_1"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0",
+      "e0:add_3",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:field_harmonic"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_0",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_7",
+      "e0:field_harmonic"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_bias_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 23,
+    "slot": 0,
+    "arm": "Q_raw_sum",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 23,
+    "slot": 0,
+    "arm": "D_only",
+    "change": "loss",
+    "candidate_ids": [
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  }
+]

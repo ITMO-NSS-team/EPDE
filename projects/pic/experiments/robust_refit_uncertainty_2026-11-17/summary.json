@@ -1,0 +1,3052 @@
+{
+  "status": "COMPLETE",
+  "anchors": 69,
+  "paired_records": 138,
+  "result_statuses": {
+    "COMPLETE": 67,
+    "COMPLETE_WITH_FIT_WARNINGS": 2
+  },
+  "summary": [
+    {
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 45,
+      "coverage": 0.9408854166666667,
+      "anchor_min": 0.6796875,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 45,
+      "coverage": 0.9408854166666667,
+      "anchor_min": 0.68359375,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 45,
+      "coverage": 0.90703125,
+      "anchor_min": 0.4765625,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 45,
+      "coverage": 0.940625,
+      "anchor_min": 0.671875,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 45,
+      "coverage": 0.9407118055555556,
+      "anchor_min": 0.67578125,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 45,
+      "coverage": 0.9059895833333333,
+      "anchor_min": 0.46875,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9381510416666666,
+      "anchor_min": 0.875,
+      "anchor_max": 0.9765625
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9381510416666666,
+      "anchor_min": 0.875,
+      "anchor_max": 0.9765625
+    },
+    {
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.927734375,
+      "anchor_min": 0.78515625,
+      "anchor_max": 0.98046875
+    },
+    {
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9446614583333334,
+      "anchor_min": 0.8984375,
+      "anchor_max": 0.98046875
+    },
+    {
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9446614583333334,
+      "anchor_min": 0.8984375,
+      "anchor_max": 0.98046875
+    },
+    {
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.9319661458333334,
+      "anchor_min": 0.78515625,
+      "anchor_max": 0.9765625
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9423828125,
+      "anchor_min": 0.8359375,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9423828125,
+      "anchor_min": 0.8359375,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.8717447916666666,
+      "anchor_min": 0.48046875,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 12,
+      "coverage": 0.9554036458333334,
+      "anchor_min": 0.875,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 12,
+      "coverage": 0.9554036458333334,
+      "anchor_min": 0.875,
+      "anchor_max": 1.0
+    },
+    {
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 12,
+      "coverage": 0.8896484375,
+      "anchor_min": 0.4921875,
+      "anchor_max": 1.0
+    }
+  ],
+  "systems": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9635416666666666
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9635416666666666
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9622395833333334
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9622395833333334
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9908854166666666
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9908854166666666
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9752604166666666
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9921875
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9921875
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.98046875
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.953125
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.953125
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9192708333333334
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9231770833333334
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.90625
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.90625
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.7799479166666666
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.77734375
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9544270833333334
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9296875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.953125
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.953125
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9296875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.94140625
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.94140625
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8932291666666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9427083333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.89453125
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9049479166666666
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8098958333333334
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.91796875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.91796875
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8072916666666666
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.95703125
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.95703125
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.86328125
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9557291666666666
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8645833333333334
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9322916666666666
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9322916666666666
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.93359375
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.93359375
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9348958333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9466145833333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9466145833333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8255208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8294270833333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.93359375
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.93359375
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9010416666666666
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8997395833333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9309895833333334
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.83984375
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9088541666666666
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9088541666666666
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8059895833333334
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 1.0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 1.0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.8736979166666666
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.8736979166666666
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8645833333333334
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.87109375
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.8723958333333334
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8671875
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9583333333333334
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9583333333333334
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9817708333333334
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.98046875
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.98046875
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.98046875
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9505208333333334
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.93359375
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.94921875
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.93359375
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8203125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.89453125
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8229166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9388020833333334
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9388020833333334
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9127604166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9296875
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9296875
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9479166666666666
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.9440104166666666
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9270833333333334
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "fixed",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.8763020833333334
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "both",
+      "anchors": 3,
+      "coverage": 0.9609375
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "broad",
+      "anchors": 3,
+      "coverage": 0.9609375
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "mode": "refit",
+      "bank": "local",
+      "anchors": 3,
+      "coverage": 0.94140625
+    }
+  ],
+  "reference_geometry": [
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "burgers_inviscid",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "duffing",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv_cossin",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "kdv",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ks",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "lorenz",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 2
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 2
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 2
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 2
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 2
+      }
+    },
+    {
+      "system": "lv",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 2
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "ns",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 3
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "ode",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_compound",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "pde_divide",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "vdp",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "unbounded_certified": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "iid",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "negative",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 42,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 43,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "fixed",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    },
+    {
+      "system": "wave",
+      "seed": 44,
+      "profile": "positive",
+      "mode": "refit",
+      "geometry": {
+        "bounded_outer": 1
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 120,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 145,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 148,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 152,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 157,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 177,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 195,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 217,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 230,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 8,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 35,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 47,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 54,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 82,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 88,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 109,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 116,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 146,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 185,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 198,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 211,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 43,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 248,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 4,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 12,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 25,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 31,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 63,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 124,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 169,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 177,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 221,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "calibration",
+      "draw": 255,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 0,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 43,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 152,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 157,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 179,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 183,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 202,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 205,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 245,
+      "variable": "u",
+      "status": "boundary"
+    },
+    {
+      "system": "ac",
+      "seed": 44,
+      "profile": "positive",
+      "stream": "check",
+      "draw": 250,
+      "variable": "u",
+      "status": "boundary"
+    }
+  ],
+  "pure_noise_summary": [
+    {
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "rho_gt_095": 0,
+      "sigma_gt_twice_true": 0,
+      "rho_rmse": 0.15420537685828412
+    },
+    {
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "rho_gt_095": 13,
+      "sigma_gt_twice_true": 13,
+      "rho_rmse": 0.34061085900203136
+    },
+    {
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "rho_gt_095": 0,
+      "sigma_gt_twice_true": 0,
+      "rho_rmse": 0.09084117480051064
+    },
+    {
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "rho_gt_095": 1,
+      "sigma_gt_twice_true": 2,
+      "rho_rmse": 0.23699003845496863
+    },
+    {
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "rho_gt_095": 13,
+      "sigma_gt_twice_true": 15,
+      "rho_rmse": 0.3274716131860809
+    },
+    {
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "rho_gt_095": 0,
+      "sigma_gt_twice_true": 0,
+      "rho_rmse": 0.0893347354042555
+    },
+    {
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "rho_gt_095": 0,
+      "sigma_gt_twice_true": 0,
+      "rho_rmse": 0.0907028218293266
+    },
+    {
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "rho_gt_095": 4,
+      "sigma_gt_twice_true": 4,
+      "rho_rmse": 0.21790906422632084
+    },
+    {
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "rho_gt_095": 0,
+      "sigma_gt_twice_true": 0,
+      "rho_rmse": 0.047578929115742616
+    }
+  ],
+  "max_fast_slow_cutoff_relative_change": 1.2870038368362202e-11,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\analyze.py": "7f8c33b7add62406a038b928d60679101de0dd35826106c8a2c3506821249565"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_iid_seed42.json": "285644f37e2dfe742bd1771ce93288b76f0c0c1d741a2505b1ef1d662ed4eb72",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_iid_seed43.json": "eb94ce85f1994ef567af3a0a74badd3f4f174473dc745142de2fa9edf1898338",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_iid_seed44.json": "057eeb5a4520af97b1567e40bfdb99f4c9fad1a87d40c1a6eae66a1389a4b912",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_negative_seed42.json": "4ce4cacd851fb2fbeb38ac0bb937f43ec157f55b149706adae655e750da00851",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_negative_seed43.json": "1141e86633cd96cbdd241644091437a762b50f582426fc064a4ba2de4f1eba7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_negative_seed44.json": "551c4a3fd151543e4f1ec96907c9c38038eef686df41d6d17ab576b89f2f4bb5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_positive_seed42.json": "e9109a70d06cded34130248a6cc77876fe6667103c37ed9e897aa61863fbb029",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_positive_seed43.json": "fde63195c127161f35df3256bd198dffafc7da87de2802928c5a9788e4959683",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ac_positive_seed44.json": "6d44f4b4f0830feb75e5734de627cdc4d985c3c70c7754549c69c3be3e81620a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\burgers_iid_seed42.json": "4a2fd3d2ffeff3882e75948f92b05f2601f82115d0000204ace3401828edd5b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\burgers_iid_seed43.json": "55fe7685baadc0afa6ec198978e6c37e1964a3b8ca49adbf06b611392e90d729",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\burgers_iid_seed44.json": "deee4bd090459ab8a35940bc998327e2cc3b22cff35ee5b682cfc2b4602fee03",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed42.json": "ada07e0fe601f83af58c2bedbb1968f625e2b00119f8afb8aaa7b701c3a1e665",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed43.json": "43b3cf992aaaedba9c1eef6984f83ed2c97056eb55bf8d9e39c65e7ae4b5d141",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\burgers_inviscid_iid_seed44.json": "45d59566215f02b071b055e3a68bf419619f7edaeaad9597cf80a33ef4e4c8be",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\duffing_iid_seed42.json": "0f0c7305a43c76b379cbe5c7e17129d81925050232c8475217e6f2473540d17f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\duffing_iid_seed43.json": "14d8d1e33d72577272dc0cc5f99fcea18cb70b302293287b74e48096572e514a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\duffing_iid_seed44.json": "51e4a0f252ce9a167f83aec2d01373d95e8f1d4616443d47017c7eff13466664",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed42.json": "24969254037c85dfc5d41c575d87205fecc131ca4c1dd3d7533b654edc0c12ef",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed43.json": "d6bb8f393ca3b5cb608df8c5e919435a7486b2634df3b4b15d1a302ee87cc5db",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed44.json": "c4f35091da81549a27c7011d67166ecf5c9ba7b1e58f0e3aa6f3734800963ebd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed42.json": "5ad07daf8f3aa3d3d9bf047605afced2c652e527dcd00fd2504236f96b661b70",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed43.json": "86f4ddd813d89dd0bf15331be3352b9fc0058967dde75f62845b7639db1d7b76",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_negative_seed44.json": "91630cdf2141fd821889e5160ed91f1a2ea82f4e8cda09983822e5f40d8f9ff2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed42.json": "f1999754595cbbb701ef0ebebd59959c3ccacd3b970849575b84f3056dbd5c19",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed43.json": "2315bbda755b2463d4b244cc64c0ce90cfca0b75412df81fc9bf5a6732d95554",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_cossin_positive_seed44.json": "ce9283be7488d5c10bea7de49e4f103702f19092226bf87e51f0aaa92f69b86c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_iid_seed42.json": "4f2e04dfd59d97a9976805436bbecfaf1205a06bc327dded6387533fce24c581",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_iid_seed43.json": "2d5c02d6bccdfb3889230e0e7689f9af27a1210160d317f68c08dfc9b737ba7f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\kdv_iid_seed44.json": "8759887f751588bdd9ba56d5e75be110b15d0914d99392cd3a1dafe33d79c68a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_iid_seed42.json": "f6e43c86c344dd56593dfe665563d328d065d22eaa21ab1f5e9c5ad54867edce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_iid_seed43.json": "212126615733b45fab2cdee92cd479e3be4afa3670492f453e0b124e27c73106",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_iid_seed44.json": "84c0cf286a81993e28ab6f6eed8d1d763c3fec0eba1316dd0ccc6fe11cfb8e98",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_negative_seed42.json": "43b64701bc8e806d4cb77fee73ca8afb556453b84c50995c332b43596cc53431",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_negative_seed43.json": "b94980432fdefb036d7db77fdaf8c83430bf16e602aca1b8a9276a6c216984ea",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_negative_seed44.json": "0450547a00616bd9bf85406dafb6771cffa3f48a61667efe1ce5e7c5c5efb962",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_positive_seed42.json": "4f88fbac76255118852a330670838108b08d331c07c163e8851792419cb3ac1f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_positive_seed43.json": "daf26bffa26c8e10885159492bd8aa4e1d42e197f004397dd58d786d5a2be9c1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ks_positive_seed44.json": "a53519a1ff4a624cf2bbbd0b685d3abf2334b7413f0420312736c94efdd9aff4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\lorenz_iid_seed42.json": "76fbc766d743e2b839c0cd9d1136985a7ad01768809c5025a520195eb44e18ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\lorenz_iid_seed43.json": "6c238cf3f05a4705617bcb2b055493fa7eb30ebb8b612c00cf040fdb64e0d629",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\lorenz_iid_seed44.json": "9d1f5e99787490895576eeb5277c5bdbec561760d024254bc7de39b7cf61d53f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\lv_iid_seed42.json": "22475dd23144d097e4b0f30d120728193c887b37e9f89d48f2cebb03ecd4fab9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\lv_iid_seed43.json": "cf5813973f42a90e4c8f2bfe8ae88e95e4483a25951a611d04f30145b92e041a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\lv_iid_seed44.json": "4198ff7ffe6989d2e50b9fa524d34f850fc94027a57176116081a5dd8396679f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ns_iid_seed42.json": "44954501b60eab6e0191e9898c568af5a9986b3ca6050ca0bb448b41bab850c7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ns_iid_seed43.json": "b93c37a89142d8e41089ba839e48f1f48a8f988aebd2c4cbb4adf0a930ab637c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ns_iid_seed44.json": "158d5e847f8dec88373b6a9ed6cdd9e88dff41684523083fe7611f2227804fb7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ode_iid_seed42.json": "3ac3c7780b8ba5a200c9a4192a1b5ede6c8920c0ebac229593660c8cf477b844",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ode_iid_seed43.json": "16d550c7fc89c4e2862f55223c74f479c93436f323107d0116ba150131536dc7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\ode_iid_seed44.json": "ca803aa09102ce23cf55df28850f02df05c7267e3860b0ca9d73f68e3984f450",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\pde_compound_iid_seed42.json": "ad162eb9529c7abc7e7ccc60e748ea4dcb35981e08ce091a9d29aa13c3b6155e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\pde_compound_iid_seed43.json": "655c5af0fb3ef8afa4e9f557f207692253cc47540f2eb73a3286065c96b39342",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\pde_compound_iid_seed44.json": "3adb897c7bff53a5400e558e45c6e6f9ed9a6584162ab7bf7df2cf5b47221e2a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\pde_divide_iid_seed42.json": "1d7bfd99a017a0b7873ac10877971f96eef93b77e65827b769bd620e1a2423f5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\pde_divide_iid_seed43.json": "becab059024769030bc5d7c5324d6cfb7f3ccc4ef177d27064cc0ec0baa45d09",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\pde_divide_iid_seed44.json": "c26f90bd5a1c989f0edff44a349fa84ec86232ee7456055775c321c5434f1d76",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\vdp_iid_seed42.json": "b11178349d6d85d8ad74f0e637e4259d88533b8737ef29d32fa8a532948fdebf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\vdp_iid_seed43.json": "2a47a4560a4d1e8b8f78835790236b296ee7c16dd778adb1e091c49e746ae258",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\vdp_iid_seed44.json": "39cf77734bc606433d299f0f6d23353e85dfd34ac5dd440e94dedf12504d1f64",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_iid_seed42.json": "d8267617186606f396cc91d0168940260d183a68dfdd7d9337f30d12ca9a06a6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_iid_seed43.json": "cb16f1d273676ea0abd375e95406dab45c3da955c794c657585cbe9d5ac5426a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_iid_seed44.json": "e1408495307ff44294ca47dc9e22042493dca8b6727916f30d51892d024305b9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_negative_seed42.json": "df70dfe02b4db29ea32a978b734d727a30c80616b46231b81b3c86c2738a0b6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_negative_seed43.json": "4d80fed58a6434fdc765c20490044d0113426c9f44e6fb230e8ce40f2876c69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_negative_seed44.json": "0d06d62db689cdc7c183d5bf73e3ae9d6606d3edb8b040758b0126f1334ae77c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_positive_seed42.json": "332eb9b09d25d940acd5667bdec8a2503722160f61e8fc218aef16897d0f3eb7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_positive_seed43.json": "25130325865fb77135855554fd276ed35e010310d3d1dcbab2c75c9751c3bc6a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\results\\wave_positive_seed44.json": "4d6d9fe9a5be0f19f308a5726b3d8f0da8037750ce38ed7e7ab0bd156e7109ef"
+  }
+}

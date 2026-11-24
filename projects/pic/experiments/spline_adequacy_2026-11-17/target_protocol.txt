@@ -1,0 +1,19 @@
+Targeted independent check of the remaining p24 failure stratum
+=============================================================
+Declared after inspecting observed dimensions (not true-noise coverage) in
+the48-field follow-up: all48 selected p32. That cohort cannot directly test
+whether calibration repairs the known p24 bias. Preserve it unchanged.
+
+Fit the unchanged primary rule on256 NEW positive-noise ODE fields,
+seeds3200..3455, existing raw RNG domain984101. Freeze all observed fits.
+Take the first up to8 fields in ascending seed order whose observed primary
+selection is p24. This uses the raw-data selection only, never true noise or
+coverage. Record every scanned field and the selection list before bootstrap.
+Apply exactly the existing128-refit bootstrap LR calibration to those fields.
+No thresholds, pilots or cutoff rules change. Retain abstention mass as before.
+
+Report this as a conditional p24 stress test, NOT an independent random sample
+from the overall operating distribution and NOT unconditional coverage. The
+48-field general cohort remains the primary fresh calibration comparison.
+If fewer than8 p24 fields occur, use all of them and report the actual count.
+Audit selected fields, draws, likelihood scores and selection-list ordering.

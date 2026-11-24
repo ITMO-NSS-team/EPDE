@@ -1,0 +1,8 @@
+Runtime probe, separate from the frozen primary experiment
+=========================================================
+The live 69-dataset experiment is unchanged. Implement the existing selected
+banded inverse recurrence in C, with strict floating-point compilation and no
+approximation or changed likelihood. Check the inverse, objective, gradient,
+and complete noise fits against Python before drawing runtime conclusions.
+No primary coverage outcome is replaced by this probe. This is a prospective
+performance option for later independent replications, not a statistical fix.

@@ -1,0 +1,109 @@
+{
+  "method": "Fix third coefficient at zero or +1; minimize broad-bank quadratic in other two coefficients, then directly test both original constraints.",
+  "rows": [
+    {
+      "system": "ks",
+      "seed": 30,
+      "coefficient": 2,
+      "fixed_value": 0.0,
+      "beta": [
+        -0.9965220735562309,
+        -0.9579472773073997,
+        0.0
+      ],
+      "margins": [
+        7900.462895481841,
+        -8.965334715354471e-08
+      ],
+      "accepted_both": false
+    },
+    {
+      "system": "ks",
+      "seed": 30,
+      "coefficient": 2,
+      "fixed_value": 1.0,
+      "beta": [
+        -0.9959743291415362,
+        -0.940748634421821,
+        1.0
+      ],
+      "margins": [
+        -222955.3790095759,
+        -8.210036863534577e-08
+      ],
+      "accepted_both": true
+    },
+    {
+      "system": "ks",
+      "seed": 31,
+      "coefficient": 2,
+      "fixed_value": 0.0,
+      "beta": [
+        -0.9971182164893514,
+        -0.9644464917472382,
+        0.0
+      ],
+      "margins": [
+        7949.787908546488,
+        -9.353105857047481e-08
+      ],
+      "accepted_both": false
+    },
+    {
+      "system": "ks",
+      "seed": 31,
+      "coefficient": 2,
+      "fixed_value": 1.0,
+      "beta": [
+        -0.9965659315145841,
+        -0.9472323744892646,
+        1.0
+      ],
+      "margins": [
+        -241664.78566047584,
+        -7.664858744920357e-08
+      ],
+      "accepted_both": true
+    },
+    {
+      "system": "ks",
+      "seed": 32,
+      "coefficient": 2,
+      "fixed_value": 0.0,
+      "beta": [
+        -1.0007908309143085,
+        -0.9925754479289305,
+        0.0
+      ],
+      "margins": [
+        8219.088500625585,
+        -6.102948629544947e-08
+      ],
+      "accepted_both": false
+    },
+    {
+      "system": "ks",
+      "seed": 32,
+      "coefficient": 2,
+      "fixed_value": 1.0,
+      "beta": [
+        -1.0002324518725982,
+        -0.9753512507126323,
+        1.0
+      ],
+      "margins": [
+        -214952.53473153416,
+        -3.223897077384459e-08
+      ],
+      "accepted_both": true
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\summarize_joint.py": "a8891b3433999e3ee709f1e43eb1b645931ebdcb73b646267427a7f23f113092"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\intersection\\ks_iid_iid_seed30.json": "fad4d367f8ecbe6831f33ee57f9f82fd6c770bb345b9ff7ace2f18b83546f1a5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\intersection\\ks_iid_iid_seed31.json": "75836b210a50ca3065e9da4ae9fb5a8eba8ef5fac2bc4e6efca19706db86ae61",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\intersection\\ks_iid_iid_seed32.json": "630fc8846ccf96c2d29cb943524443cdff4d99ec65f84a36cd797f7277ace9a9"
+  }
+}

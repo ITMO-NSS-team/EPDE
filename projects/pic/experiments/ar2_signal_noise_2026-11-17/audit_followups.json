@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "hash_links": 962,
+  "screen_records": 46,
+  "likelihood_replays": 1264,
+  "gradient_replays": 632,
+  "field_replays": 688,
+  "paired_noise_draws": 576,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\audit_followups.py": "2f8bab183969b7ecedeec441912cf15f89a9afe495dbef6e823189aabdd5d1b6"
+  }
+}

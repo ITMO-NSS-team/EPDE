@@ -1,0 +1,44 @@
+2026-11-17, frozen before new model outcomes.
+Target: retain low-frequency noise information while accounting for nuisance
+signal curvature, then assess solver-free weak-moment uncertainty.
+
+Per variable, model each axis curve as signal with independent Gaussian second
+differences (intrinsic random walk of order2) plus stationary AR(1) observation
+noise. The constant and linear signal components are unrestricted nuisance
+means, annihilated exactly by second differences. On axis a the contrast
+covariance is sigma^2*(D2*R(rho_a)*D2^T+kappa_a*I). The signal-to-noise
+curvature ratio kappa_a is estimated, not a tuned penalty on discovered laws.
+For multiple axes, sum exact axis likelihoods and share sigma across axes.
+This is a composite likelihood: correlated replicate curves are not claimed
+independent for uncertainty inference. Calibration generates the full
+separable AR fields, not independent curves. No covariance-parameter confidence
+claim based solely on composite likelihood curvature.
+
+AR filtering turns each contrast covariance into an exact bandwidth-two
+matrix, allowing banded Cholesky/solves. Profile sigma^2=sum(q)/sum(count).
+Jointly optimize per-axis rho and log(kappa), three starts. Numerical ranges:
+rho inside(-1+1e-6,1-1e-6), log(kappa) in[-40,20]. The lower curvature edge is
+allowed as the no-curvature limit; rho edges or upper-curvature edges are
+explicit incomplete fits, with no fallback. Record every start/convergence.
+Do not choose a different model/order/cutoff for each dataset using truth.
+
+Check banded/dense covariance/logdet identities, constant/linear-trend/unit
+invariance, pure-noise recovery and synthetic random-walk signal recovery.
+Explore on prior anchors33..35: all15 iid and core4 positive/negative rho,
+with raw versus true-noise-only controls. Freeze raw fits before diagnostics.
+If checks justify further testing, freeze a coverage decision before new
+anchors36..38. Keep the prior GCV pilot/native banks/candidate libraries,
+Gaussian corrections and matrix-region tests to isolate the noise model.
+No candidate differential equation integration, PINNs or production edits.
+
+Default fresh coverage target: all15 iid x3 anchors x(new model,iid-family),
+and core4 colored x3 anchors x2 signs x(new model,known-rho amplitude control).
+138 paired model records,256 calibration/check/actual fields per record.
+Parameter uncertainty is initially held fixed; test propagation separately
+only if the noise-model behavior supports it, and label the stage explicitly.
+Preserve constants and valid ODE_simple identities.
+
+RNG domains: synthetic960100; fresh anchor960101, calibration960102,
+check960103, actual960104, noise-only diagnostic960105. Profile ids0/1/2
+for iid/+0.4/-0.4; fresh keys include profile and anchor. Seven one-thread
+workers. All sources/inputs/results and unsuccessful attempts retained.

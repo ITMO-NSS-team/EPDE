@@ -1,0 +1,54 @@
+Latent-signal/noise research, 2026-11-17
+
+For an axis curve, let D be the second-difference matrix. Model
+  D y = D epsilon + curvature,
+  Cov(epsilon) = sigma^2 R(rho),
+  Cov(curvature) = sigma^2 kappa R(phi).
+R(r) is the finite stationary correlation matrix r^abs(i-j). The original
+white-curvature model replaces R(phi) with I. Constant and linear signal
+trends disappear under D. Neither a candidate differential equation nor its
+solution is used. Constants in the weak candidate library remain intact.
+
+The AR filters A(rho)=I-rho L and A(phi)=I-phi L have determinant one.
+Their product converts the contrast covariance to bandwidth three. Exact
+finite-boundary corrections are included; stationary interior formulas alone
+would be incorrect. Banded Cholesky gives q=z' B^-1 z and logdet(B).
+With multiple axes/curves, q and logdet are summed and sigma^2=q/count is
+profiled. The normalized objective is log(q/count)+logdet/count. This is an
+axis composite likelihood on a multidimensional field. Axis/curve dependence
+means its naive Hessian is NOT a justified covariance-parameter confidence
+matrix. Calibration uses full separable AR fields with the fitted parameters.
+
+The signal prior is a working model. A deterministic oscillating PDE field
+need not have stationary AR curvature, and amplitude/correlation estimates can
+remain biased. Pure-noise recovery tests identify lost information or numerical
+problems; they do not validate performance in the presence of an unknown signal.
+The exact zero-signal AR fit is an oracle diagnostic only, never a raw-field
+production estimator. Three starts and reported convergence do not establish
+a global optimum or statistically identified signal/noise decomposition.
+
+Numerical development record
+----------------------------
+Initial correlated_fit_initial.py used forward finite differences for the
+optimizer. A unit/trend check found about 0.31% amplitude disagreement caused
+by sensitivity of the ill-conditioned band likelihood to small differences.
+The frozen correlated_fit.py uses three-point central differences with relative
+step 1e-4. The original invariance tolerance was retained (8e-4), not loosened.
+Both implementations are retained. All correlated screening and fresh coverage
+use the corrected version; original RW2 results use latent_fit.py unchanged.
+Dense covariance/quadratic/logdet checks cover both versions of the model.
+
+Fresh coverage design and interpretation
+---------------------------------------
+All noise estimates, reconstructed pilot fields, 256 calibration fields,
+256 check fields, matrix metrics and confidence-region certificates are frozen
+before inspecting the noiseless field or the 256 independent evaluation fields.
+The pilot, native local/broad banks, moment corrections, candidate libraries and
+region geometry code are inherited without changes to isolate the noise model.
+Nominal 95% operator coverage is simultaneous over coefficient directions within
+the fixed term library. It is not a probability of structural correctness.
+An accepted true coefficient vector does not establish narrow identification;
+unbounded sets and same-target zero-extended supersets must be reported.
+Coverage with fixed fitted noise parameters is conditional on the anchor fit;
+three anchors do not establish general unconditional 95% validity. The many
+evaluation fields are not additional independent fitted anchors.

@@ -1,0 +1,160 @@
+Constants are necessary in ODE_simple's invariants; raw weak validation is
+too noisy to replace the existing score in the targeted failures.
+2026-11-16
+
+The user's ODE_simple_discovery is u=sin(t)+1.3*cos(t), sampled at 200 points
+over [0,4*pi], with first derivatives allowed. It is NOT the forced-oscillator
+'ode' in the earlier core-15 registry. Those earlier counts did not include
+this simple example. See ode_simple_scope.txt for the source/alias correction.
+
+Three valid identities are:
+  u' cos(t) + u sin(t) = 1
+  u cos(t) - u' sin(t) = 1.3
+  (u')^2 + u^2 = 2.69.
+The first two require no power of the derivative. The third is retained as
+a valid identity as requested, but needs a squared first derivative if it
+is to be a search candidate. None requires u'' in the search. For a general
+u=A*sin(t)+B*cos(t), these constants are A, B and A^2+B^2: integration
+constants determined by the trajectory. They are not additive forcing in
+the universal oscillator equation. Their low discrepancy and low dyad are
+correct behavior and must not be counted as failures of the objective.
+
+The three identities agree with analytical values to maximum errors
+3.33e-16, 2.22e-16 and 8.88e-16, respectively. Using the source's FD4 and
+10-point edge exclusion, ordinary least squares gives:
+  u' cos(t) = -0.9999994702 u sin(t) + 0.9999994702
+  u' sin(t) =  0.9999994702 u cos(t) - 1.2999993113
+  (u')^2   = -0.9999989404 u^2       + 2.6899971498.
+The tiny coefficient shifts are the finite-difference response to sinusoids.
+Their normalized residual energies are about 3.30e-29, 3.38e-29 and 1.34e-28.
+Refitting after deleting the constants raises these to 0.9771, 0.9861 and
+0.8963. Thus the constants do substantive work even without observation noise.
+
+Independent-group continuous weak fits confirm the same conclusion. At 5%
+added noise, median clean residual energies over seeds 0/1/2 are:
+  Identity       With constant       Without constant
+  Phase sin      1.9397e-4           0.99521
+  Phase cos      1.6707e-4           0.94887
+  Energy         8.0782e-4           0.81049
+The energy offsets across seeds are 2.6112, 2.6925 and 2.6477. Phase-sin
+offsets are 1.0071, 0.9947 and 1.0005; phase-cos offsets are -1.2860,
+-1.3066 and -1.2988 in the fitted target orientation above. This is a
+controlled known-Gaussian-noise, fixed-panel test, not new evolutionary
+discovery. All coefficients are trained on one raw group and evaluated on
+the other two. The source function itself currently ignores its noise_level
+argument; this experiment explicitly adds the 5% perturbations.
+
+The constant's dyad contribution is essentially zero for the noiseless valid
+identities: 0, 6.66e-16 and 4.27e-16 for energy/phase-sin/phase-cos. Stable
+nonzero constants are not automatically penalized. A different behavior
+appears for a redundant intercept: u'=cos(t)-1.3*sin(t) already needs no
+offset. Adding one produces an FD coefficient 1.18e-16 with no meaningful
+residual improvement, yet the weak dyad's constant contribution is 0.7333.
+Its MAD/abs(median) normalization is ill-conditioned near zero; an order-one
+relative score need not imply a large absolute error. At 5% noise, adding
+this redundant intercept increases median clean energy from 4.6625e-5 to
+5.9076e-5. A cubic autonomous u'=f(u)+constant remains inaccurate (clean
+energy about 0.96-0.99), so an offset cannot replace the missing state/phase.
+
+The separate audit of the existing core-15 panel covers all 45 system runs,
+60 equation/seed cases. None of that catalog's registered references or
+equivalents contains an additive constant; this says nothing against the
+ODE_simple identities outside the catalog. The experimental fitting code
+has no hidden intercept: constants are explicit columns, and dyad uses
+fit_intercept=False. Every original dyad value reproduces exactly.
+
+Among the six existing failed cases, constant-containing models dominate
+in only two (forced KdV seeds 0 and 1). All six also have a dominating model
+without a constant. Deleting constant candidates would therefore not remove
+any of these six reference failures. Reference-plus-constant dominates its
+reference in just one case (forced KdV seed 0). Adding a jointly fitted
+constant improves clean reference-fit energy in 10/60 cases and worsens it
+in the other 50; fitting an offset can sometimes compensate coefficient bias,
+but this does not establish a physical forcing term.
+
+As a diagnostic, omitting only the explicit constant's dyad contribution
+while leaving fitted coefficients/discrepancy fixed reduces retained
+registered structures from 54/60 to 53/60, losing Burgers seed 2. This models
+one effect of an unscored intercept, not a fully rerun hidden-intercept search.
+It gives no support for making offsets free in the instability objective.
+Per-candidate and reference-plus-constant comparisons are saved in
+constant_candidates.csv, constant_pairs.csv and constant_cases.csv.
+
+Raw weak validation experiment:
+Existing coefficients were frozen. Raw groups were mapped to the original
+fine grid with fixed natural-cubic interpolation, without time smoothing or
+spatial filtering. The weak quadrature was unchanged on retained rows.
+Gaussian pair contractions correct degree-2/3 monomials analytically, using
+propagated within-field covariance. Independent held-out residual cross
+products remove the within-group squared-noise floor. This correction is
+exact only for the assumed known Gaussian covariance; the main experiment
+uses the earlier estimated per-group covariance.
+
+Completed wave, KS and forced KdV x seeds 0/1/2: nine system/equation cases.
+AC was checked for feasibility: each seed has at least one training fold
+whose full-span weak windows leave no common interior support for the other
+raw groups. We do not extrapolate or silently substitute a new window. These
+three AC cases are explicitly unscored. Initial wave runs before the support
+guard adjustment are archived and excluded from the nine final cases.
+The primary wave/KS test failed to establish reliable improvement, so this
+raw-validation method was not expanded to all 15 systems.
+
+KS and forced-KdV edge rows that would require extrapolation were excluded
+from raw AND smooth/clean controls. The original full-bank normalization is
+fixed. Unmasked smooth scores reproduce the stored baseline to maximum
+scaled error 5.86e-11. Original and matched-interior smooth retention are
+both 5/9 for baseline coefficients; raw validation also retains 5/9.
+For the previously tested joint-risk coefficients the counts are 5/9 smooth
+and 6/9 raw, but this secondary count is not sufficient evidence of a fix.
+All frozen fits and all registered equivalents remain in the panel.
+
+Across six fixed reference-fitting options, raw validation selects the most
+accurate local KS option in all three seeds, but ranks the best clean option
+incorrectly in all three wave seeds. Selecting from these validation scores
+would require another evaluation split; these rankings are diagnostics only.
+Wave seed 0: the clean-best broad OLS fit scores 0.0423 WORSE than baseline
+under raw validation, with paired conditional SD 0.3796. Noise prevents this
+raw score from reliably resolving the relevant difference.
+
+Exact-coefficient controls show the scale of this problem. Wave seed 0 raw
+score is 3.7019 with conditional SD 4.1402, whereas the clean control is
+1.4329e-4. Wave seed 1 SD is 22.74 and seed 2 SD is 14.36. Forced-KdV seed 2
+has exact-coefficient raw score -27625.8 and SD 60414.3, versus clean energy
+6.80e-7. Negative cross scores are kept signed, as specified. Removing the
+noise-floor bias does not remove variance or guarantee useful finite-sample
+rankings. KS exact scores are much quieter, about 2.45e-5 to 3.16e-5 with SD
+about 4.92e-5 to 5.86e-5, consistent with retaining the good local fits.
+
+Clean subsample controls isolate deterministic interpolation/finite-difference
+error. Wave seed 0 clean exact score changes only 1.4329066e-4 -> 1.4328532e-4.
+KS's near-zero full-grid exact score rises to about 5.24e-7 on interpolated
+subsamples; this error is reported, not treated as noise. These controls do
+not explain the enormous raw wave/forced-KdV dispersion.
+
+Uncertainty uses 128 corrected operator draws and 512 shared empirical
+perturbations, preserving paired-candidate and shared-group dependence.
+The noisy-data reconstruction is used only as a variance proxy, never in
+the raw point score. Fits and covariance estimates are held fixed; reported
+SDs are conditional diagnostics, not calibrated confidence intervals. The
+64/128 comparison is saved in raw_controls.csv, not independent replication.
+
+Verification: Gaussian polynomial expectations by exact Gauss-Hermite
+quadrature; covariance propagation checked against an independent dense
+small-grid calculation; constants integrate to one; a constant's derivative
+vanishes; independent cross-products have no squared-noise floor; original
+dyad/smooth scores reproduce; source/input hashes and finite outputs pass.
+No candidate ODE/PDE integration, PINNs, production edits or commits.
+All experiment processes have finished.
+
+Implication: keep constants in the search and score them explicitly. Credit
+the valid ODE_simple invariants under the actual derivative/token restriction.
+The six core failures require more than an intercept rule. Raw validation on
+the present compact supports is too variable; a future test should reduce
+moment variance while preserving identifiable derivative information, with
+quadrature and noise estimates checked together. No new weight, threshold,
+automatic intercept deletion or production objective has been introduced.
+
+Background only: Messenger and Bortz's WSINDy consistency analysis documents
+noise-induced spurious polynomial terms: https://arxiv.org/abs/2211.16000 .
+Our identities and finite-sample outcomes above are derived/tested locally;
+the paper does not validate this proposed raw-moment score.

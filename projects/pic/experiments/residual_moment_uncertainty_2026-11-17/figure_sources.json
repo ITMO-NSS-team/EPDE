@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\render_figures.py": "b2c126fd6c134477ac3b4353606068e7b15fc27596bdf18897c05313ac1f7d3b"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\summary.csv": "1ac42a0efb7dad88c35f7ff60df40749d19478da02f98e9ff0fb56a97e2d9a12",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_summary.csv": "deb3efdfb3e3f6d3145599ff36125ce650234b854c3e5e6b905b5471d09b9fc5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\wave_inversion.json": "b41da7efbf020666f3dc81fb16b5af487266307d0a398402e73049538b3ad751"
+  }
+}

@@ -1,0 +1,21 @@
+Exploratory fixed-panel calibration from saved primary draws
+===========================================================
+Proposed after inspecting the initial primary coverage/geometry results.
+This is a post hoc method-development comparison, not fresh confirmation.
+Do not alter or replace any primary result or select cutoffs using truth.
+
+Keep the observed field, pilot, noise fits, bootstrap fields, centering and
+covariance matrices exactly as archived. For each bootstrap error Gram and
+covariance, restrict the generalized operator maximum to each distinct
+stochastic support (target plus predictors) in the pre-existing candidate
+panel. Take the maximum over ALL those supports and BOTH weak banks. Use the
+same 123rd-of-128 cutoff rule. Both fixed- and refitted-pilot modes are kept.
+This gives a uniform-error target over the union of the fixed candidate
+subspaces, not all coefficient combinations in the full library. Constants
+are excluded only from stochastic whitening and remain in every candidate.
+
+Freeze the panel cutoff/regions before evaluating its observed error statistic.
+Report coverage on the same 69 observed datasets as an exploratory comparison,
+including any losses, geometry and width changes. It does not account for an
+adaptive search outside this fixed panel. Independent outer replication is
+required before treating an apparent improvement as confirmed.

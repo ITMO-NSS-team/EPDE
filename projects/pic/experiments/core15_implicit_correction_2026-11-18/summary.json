@@ -1,0 +1,422 @@
+{
+  "cohorts": {
+    "replay": {
+      "local_time_off": {
+        "slots": 60,
+        "registered": [
+          53,
+          53
+        ],
+        "reference": [
+          51,
+          51
+        ],
+        "add": [
+          33,
+          33
+        ],
+        "add_count": [
+          51,
+          51
+        ],
+        "front": [
+          202,
+          202
+        ],
+        "add_trials": 564,
+        "unresolved": 0,
+        "angle_folds": 180,
+        "median_reference_angle": 0.3951710003420602
+      },
+      "local_time_on": {
+        "slots": 60,
+        "registered": [
+          55,
+          55
+        ],
+        "reference": [
+          50,
+          50
+        ],
+        "add": [
+          30,
+          30
+        ],
+        "add_count": [
+          47,
+          47
+        ],
+        "front": [
+          193,
+          193
+        ],
+        "add_trials": 564,
+        "unresolved": 0,
+        "angle_folds": 180,
+        "median_reference_angle": 0.25011033084880296
+      },
+      "broad_off": {
+        "slots": 60,
+        "registered": [
+          52,
+          52
+        ],
+        "reference": [
+          48,
+          48
+        ],
+        "add": [
+          33,
+          33
+        ],
+        "add_count": [
+          55,
+          55
+        ],
+        "front": [
+          199,
+          199
+        ],
+        "add_trials": 564,
+        "unresolved": 0,
+        "angle_folds": 180,
+        "median_reference_angle": 0.5584413038312859
+      },
+      "broad_on": {
+        "slots": 60,
+        "registered": [
+          54,
+          54
+        ],
+        "reference": [
+          48,
+          48
+        ],
+        "add": [
+          28,
+          28
+        ],
+        "add_count": [
+          46,
+          46
+        ],
+        "front": [
+          185,
+          185
+        ],
+        "add_trials": 564,
+        "unresolved": 0,
+        "angle_folds": 180,
+        "median_reference_angle": 0.42066943783386435
+      },
+      "legacy": {
+        "slots": 60,
+        "registered": [
+          57,
+          57
+        ],
+        "reference": [
+          52,
+          52
+        ],
+        "add": [
+          36,
+          36
+        ],
+        "add_count": [
+          79,
+          79
+        ],
+        "front": [
+          207,
+          207
+        ],
+        "add_trials": 564,
+        "unresolved": 0,
+        "angle_folds": 180,
+        "median_reference_angle": 0.2908820725547151
+      }
+    },
+    "fresh": {
+      "local_time_off": {
+        "slots": 120,
+        "registered": [
+          104,
+          104
+        ],
+        "reference": [
+          97,
+          97
+        ],
+        "add": [
+          61,
+          61
+        ],
+        "add_count": [
+          96,
+          96
+        ],
+        "front": [
+          387,
+          387
+        ],
+        "add_trials": 1128,
+        "unresolved": 0,
+        "angle_folds": 360,
+        "median_reference_angle": 0.43496960260348194
+      },
+      "local_time_on": {
+        "slots": 120,
+        "registered": [
+          106,
+          106
+        ],
+        "reference": [
+          96,
+          96
+        ],
+        "add": [
+          56,
+          56
+        ],
+        "add_count": [
+          89,
+          89
+        ],
+        "front": [
+          370,
+          370
+        ],
+        "add_trials": 1128,
+        "unresolved": 0,
+        "angle_folds": 360,
+        "median_reference_angle": 0.2840854758974903
+      },
+      "broad_off": {
+        "slots": 120,
+        "registered": [
+          105,
+          105
+        ],
+        "reference": [
+          101,
+          101
+        ],
+        "add": [
+          62,
+          62
+        ],
+        "add_count": [
+          83,
+          83
+        ],
+        "front": [
+          379,
+          379
+        ],
+        "add_trials": 1128,
+        "unresolved": 0,
+        "angle_folds": 360,
+        "median_reference_angle": 0.5398340403034075
+      },
+      "broad_on": {
+        "slots": 120,
+        "registered": [
+          108,
+          108
+        ],
+        "reference": [
+          100,
+          100
+        ],
+        "add": [
+          55,
+          55
+        ],
+        "add_count": [
+          77,
+          77
+        ],
+        "front": [
+          368,
+          368
+        ],
+        "add_trials": 1128,
+        "unresolved": 0,
+        "angle_folds": 360,
+        "median_reference_angle": 0.4656674432455034
+      },
+      "legacy": {
+        "slots": 120,
+        "registered": [
+          115,
+          115
+        ],
+        "reference": [
+          105,
+          105
+        ],
+        "add": [
+          73,
+          73
+        ],
+        "add_count": [
+          146,
+          146
+        ],
+        "front": [
+          404,
+          404
+        ],
+        "add_trials": 1128,
+        "unresolved": 0,
+        "angle_folds": 360,
+        "median_reference_angle": 0.320182349183785
+      }
+    }
+  },
+  "audits": {
+    "checks": 37800,
+    "max_angle": 2.7834738288703633e-08,
+    "max_score_delta": 6.042758160454495e-13,
+    "max_replay_delta": 0
+  },
+  "invalid_folds": {},
+  "results_sha256": {
+    "ac_6111.json": "199ceadc6b8cc5e82e983a166d855d5ef7e40761e5ab48b8ada0447bef0d58d2",
+    "burgers_6111.json": "1154e9c6d0d9439ad7ef3fbab0c3e72cfbbe2c8f9a0e2b8cbe80f24ff5811751",
+    "burgers_inviscid_6111.json": "8512c633f32e8a9bc90182a4dc26e1a77787ea59bde199a0ed7f2378d4c06fc6",
+    "duffing_6111.json": "ef32019b5e2660518d70d7f5d79bc0a0f944cd38007ad44e1b91448d5fc2c9f8",
+    "kdv_6111.json": "06f36d1b76798f371d8a4a5063644be58cce5bab7c52c17447b6a7f318224c10",
+    "kdv_cossin_6111.json": "0e1e252cd2b2ad980773a9cfc45b6a59b43c31f217150d7f6c05ecc84a715026",
+    "ks_6111.json": "077a50547f58f932fc6f0cf4e5642dccf7cc6a3b131cd9d898ed71aa2fcc312f",
+    "lorenz_6111.json": "c2715d5176f866b6a450176f49534d9058d14027dfcd188b5963acda60513323",
+    "lv_6111.json": "973a1a2aae3bf6e58e17192acd70a5228ea8c6d13283ef3938a49a0152ba6a5e",
+    "ns_6111.json": "02a9af210679d8d632bdf4f4380b1294730da3be550c0f9511caef799d026c11",
+    "ode_6111.json": "75e99dcd69400df414d1eea81fc7a712a6047aa675415119d415ced3c1991cd0",
+    "pde_compound_6111.json": "e8f057463a79de4400d497428221d331664218ae5aae49e9650cdddb5cf1db73",
+    "pde_divide_6111.json": "129353c5baba9f2bd8ab99695019f6eae7ca561700ab151dec1fc2009368a783",
+    "vdp_6111.json": "a63deac473611b8ec816f03ac91fe645ed909302c606140659a37f57620a180c",
+    "wave_6111.json": "37cfa109bdd8243f6cd40b2dcb6cbc84c0e319abf205daccb89dc94f817d52b1",
+    "ac_6112.json": "f1fd8aa68221d1b93ecfe7e2ff4714e8593f0c40266bec8edc65adc92c55bb7d",
+    "burgers_6112.json": "df40d3a422c11441a5e99ecfe2739544b9d7fa0180c488b7543a9088ae72f4ee",
+    "burgers_inviscid_6112.json": "ae623a0ac70324b2d46ca34fa4b993ed74140cc7d87427bd4d13561e37e6da43",
+    "duffing_6112.json": "62a9122d5dd70d8e61ff9a396b12249108a5ba894f51cbd7cfad39d396ace143",
+    "kdv_6112.json": "ec3697081feca8540c4fe1efb379403a475a9c161711468f0f1ff0305e9ac2e7",
+    "kdv_cossin_6112.json": "14b95d3a4529080c52ae1cac98093af013a6301eacb626b474038dd6b52b6f9c",
+    "ks_6112.json": "63af0aaa385ddcd2c9021429ea6014c1ada67d3f65c5cbbdffb123d86e70a11e",
+    "lorenz_6112.json": "447a7a54c84c98666c9dc9afab2da5516fbfb000fc72c0a8b58604cc7eef0c0a",
+    "lv_6112.json": "f54e5b96cfdf06481ad38f648a809073a777b175b1ed28414575c2afee3724cd",
+    "ns_6112.json": "a8becf437da861396ef984fb08fb10dbe1268cb81226527bcb9b4e1403dac222",
+    "ode_6112.json": "06ebd3b6ee61a7c241ecc30977e9b4b3cc30f7d2dc2519726f7f1f2cfdb68ba2",
+    "pde_compound_6112.json": "dbe6dbdf442d3f71c6c1baec32d23708363cdfc1a271b5c7f67c67bbe64e3931",
+    "pde_divide_6112.json": "6a581823589d4b9fb971914ffbb62e2a5877d02adab8a460f972d76e4107e0c6",
+    "vdp_6112.json": "78c0dcc76d2df6d1cee34d1840ee82b66a9997245624665aeeeae2176eacc53f",
+    "wave_6112.json": "2e5a2d98e8d94475f34b53c26a7a20252d8ed17becca506680b47de19ce7eaf2",
+    "ac_6113.json": "1d0933098314d90a4349630e1e4044576c37c4468dd9898388c6a8af557bf81a",
+    "burgers_6113.json": "64c5594a7881e431898a3dc30d664448378a6ca0b52a345c9781acba1054cc01",
+    "burgers_inviscid_6113.json": "936725ed034045d44b20aa27047cd0433ba904b705264676bb304da4956f5d26",
+    "duffing_6113.json": "40c3a21b4cbb0786a7e1c70a314a0a6df2cf4c373ebdca4ef2945ce7754ca7ec",
+    "kdv_6113.json": "ee5d56f0215bac0243e5200fad72324b206f8efb98aca52070f35e580244648c",
+    "kdv_cossin_6113.json": "8dd0c406baabbceacf8d3d690615a69a79dd85c72d717c9c0f60744c80b30eb8",
+    "ks_6113.json": "ec19c6792677eac30d3f41320e39974ac6049b70f3c13000a54491cf1c1561c0",
+    "lorenz_6113.json": "8ebbde96ab6dc092810940c685d842474474b0e7b98ec182d2b6a80fe3288286",
+    "lv_6113.json": "ad537c0a57f9616079e66ce0e188deb47fb50e55476faf0a1e346abd13a0922e",
+    "ns_6113.json": "1b1570aef3050812c455b75239f8685a310c4c2ce987330a46ad9a04b41f53f6",
+    "ode_6113.json": "755bf729735ed52bea4c9c9179fe90397424e25cccf6a97980e747f847003f07",
+    "pde_compound_6113.json": "bb3abe61c7a1c3ddf8b18969cfe0a20099073588f327722ea3ee4ded1d67882b",
+    "pde_divide_6113.json": "62b84b759f96d3cc30725902e1e9d0fdb0467bca105a83761f71bfa6c71547f9",
+    "vdp_6113.json": "4538dd6462453b2ff0ddec42f84b9764cac13a604fab58342ebcaf3d27166463",
+    "wave_6113.json": "c7c44c5e2d25dda11533827ead069d4175fb38da7875c4f0d9b72a435489ad53",
+    "ac_73001.json": "63a483e527f39b9fbf2834bb31ad9f1c5cdb956b557e8e509719c262c378d0a3",
+    "burgers_73001.json": "a90bb453805052f8a96aabfaa80883e1a61b5e81b25da714389e3552eea3805c",
+    "burgers_inviscid_73001.json": "b8b33334fb2561c6474864efe68b387e8ecb56157248cf5ee25ff2173178c017",
+    "duffing_73001.json": "1cfe58b418875818082a7674cc82efe171cc6b9e94455830d26bfc0bad48c75a",
+    "kdv_73001.json": "e2d251685b94f86bb323405b8b07f87d5eb42482d6a6ac8a54888ae392e19a51",
+    "kdv_cossin_73001.json": "66d5c1864bd5c7e99d3bae2373449eb166aa01358ffb4ff22a6f8e1b06d19008",
+    "ks_73001.json": "a5930a3e633bbb0dd836b1e5b9361f86dc1fb396d5787b00b2c2995beae2c383",
+    "lorenz_73001.json": "0228dd49d9d6a308dece67aa1a6a71e4f3229db47715b13255ca31179fd49ab0",
+    "lv_73001.json": "52cc66f3397428d19e637c8661dd2904355828f2d9b9b7dd5ec5f6f51699318d",
+    "ns_73001.json": "52582b8ca6cb3d600e2cc12321c3c806d38bce042521ad5975608d26daec41de",
+    "ode_73001.json": "67c5b2581ca61e378d5b0cc885d503b749b8a6c3692384777100b2acb6576be6",
+    "pde_compound_73001.json": "73107830716f705fe072501143d15cce224e51fc894c571f20ac620b6c114264",
+    "pde_divide_73001.json": "f8641ca78c4f2e765fc265059ed5fe3c5f7fd8e784571531d8bf048f7995933e",
+    "vdp_73001.json": "c7f056a931abe3694ca79f364b0e6f52da3e8b32c21e9e18448580d27c8220d9",
+    "wave_73001.json": "15786857470fee7644b071148428e127e24ee09a2c88dcc9927941370930f4bc",
+    "ac_73002.json": "32fcf16b5d7bfacec14d07d510d2f600815b02efc62d0afa78c2218a64111096",
+    "burgers_73002.json": "e10e9aadb45a319ce2fa3935001a3fefbb14e8bc6e90440434ed4aa02a68fe64",
+    "burgers_inviscid_73002.json": "b005fa6546eb472326b77394d2d154fd9ce53e854353050b5296b424cafb235e",
+    "duffing_73002.json": "417fcbcd4aab8b979e988a9bf46a6a3bf3594e68aa31f9bb9dd8286620136d1c",
+    "kdv_73002.json": "0e6fa57f210b0906075ab1236ada7b211c3380cb264f874671222a875a9b92e7",
+    "kdv_cossin_73002.json": "0c8ee499371a6b13299f91ed4e0c5a940c33903763242aa061fdf126ec42cc50",
+    "ks_73002.json": "9e5f52cccbef608d62aaccf589d4a8e78af78bdf042eaf410988ffbe0d1f00e8",
+    "lorenz_73002.json": "915a694906038f7a3601c373bb6b7015479ae36a8e396febdf6b14eccd6c50be",
+    "lv_73002.json": "8de509f3ea504db3fc27bb34367fa9b92ccb96db7a05d1e16acd105a838e718c",
+    "ns_73002.json": "f7fe493be07701c30299f9f6f77f66a8bae79863ae8ab6e5fcdbe93d4ac3d9bf",
+    "ode_73002.json": "a28c72e5794ee4d50dd1efdfc14a18498eb932b45f90cfba19387438623b833c",
+    "pde_compound_73002.json": "7dab4c67cdd22d304a3bdc2e483afe6488738190313f35502b5aace690ef9e25",
+    "pde_divide_73002.json": "32efae3a91567feb5c393811deb9699af97627d3271119fcd0f99062f302649b",
+    "vdp_73002.json": "c52e282c35ad992609135a62f3570eed0a8ceab263302dc57cf094492e988ce3",
+    "wave_73002.json": "851fa51decb72a65f2963546ab10a76d211b37140ab260c108b36e3e90cdd7d6",
+    "ac_73003.json": "127f53073da3581e64ec6d6e06486cf9adc90eff31bb05443e91256554143330",
+    "burgers_73003.json": "8f0dc643b5f0b628d45a9dc70977e1ff69711dfeecc8cafedb0ff2349b5792ad",
+    "burgers_inviscid_73003.json": "a2e1ffd136f43fbc853d6f12168cea478bf02e8ba24d60bdd963d91948dcc5ca",
+    "duffing_73003.json": "77fc340eca4a490e6faac0c7fbd5be3cf88b400d86c17052aae0db5fe864e554",
+    "kdv_73003.json": "373da0b2d9763b0bc069ac8cbbc74445eb2cd76d2666772b25087c2b36a63f48",
+    "kdv_cossin_73003.json": "32917da19a787638293b9f087810223d15a31f7b8e9ee5ac578081ad7c6bb44e",
+    "ks_73003.json": "3e0b739229af96c63dd60dcf3dad89f1a51072ccea701c572d4585f021e2c77d",
+    "lorenz_73003.json": "7dfc93644c5b8cfc5fbd1b54bf3f626d7342474be1adc957d5df56332ae7bab9",
+    "lv_73003.json": "572084f5b57c2dffbc6e3cced83f6e1b6e2f44420272313261fba749589561b5",
+    "ns_73003.json": "3bb2120ba61be8e34207d14bae6af13c35102567245febf91aeefd51be5ca355",
+    "ode_73003.json": "f3c6e48704d5e7d04ebe998d710aec4eca6e0be75bbd9f75bbe55978f28d69e6",
+    "pde_compound_73003.json": "0c1ac35f23d972273140ba5b9256b9e134e91ffb5861bb4841e3a61c9a4d26a0",
+    "pde_divide_73003.json": "a77edf7767af246d3ba8bb4e29145198c372448df5e53479dbd3f84bf168b9e9",
+    "vdp_73003.json": "23adda148d627f3e472a1006b7923b9d9bf48a78bdcec32135ba7b5ac4f0f889",
+    "wave_73003.json": "b17e3b08d16fec58f809b7deca21e82a233d29eec6a1816394d4b1a36b031cca",
+    "ac_73004.json": "b4cb8a9fe355551003badd0ef47cde8ee03aff5ba58603bf83a924b11aba7c72",
+    "burgers_73004.json": "26ca4cc897b0416551329bada1d719e565aa551bc4f65dcad779530fe258d42b",
+    "burgers_inviscid_73004.json": "b84cd300f4fc6ff8bdc36963665a398a2505812f7c4f7b6fcf3a1541cdb7abc3",
+    "duffing_73004.json": "8f2780f5530ffde0928307a5d7465dd51a8488589007da0d4129dd35ba04252e",
+    "kdv_73004.json": "8b94f13c75eaa795175c3131d2358edb3bf6e9ea35e668afe98bb51e79be39c8",
+    "kdv_cossin_73004.json": "33c6290441531f943fb182b9909a7345e612f0d99b9aa5a3d408269fdb9d879e",
+    "ks_73004.json": "ff777b650584bf6b3fcd12661b76ebe077602ccb0e72381463e4b364b4cf085a",
+    "lorenz_73004.json": "1c6555de95a51c8e6163f17510c8b891fd40033199ee31900b855a3022613b5d",
+    "lv_73004.json": "73189a4d87ffdc24433edcecf434926f4b8ef24f8ba28222a21ee686f339a376",
+    "ns_73004.json": "cea823cec342818c9f5963e77db5e98ce86dde275ccf31b3bf5ab11cffe34e05",
+    "ode_73004.json": "0b536aab87750f2b3964ada177ecdcbf73669edc5ea92d2d6505b45009733ffe",
+    "pde_compound_73004.json": "e03cf0e7734fdb48114b7422bd3dd75880e92f5455dcb0b5869b7528b325b455",
+    "pde_divide_73004.json": "7482a83376adffc85f98399970dbdaea99a05fd9d165679ced09498141e95c6a",
+    "vdp_73004.json": "c7f645af70b9114dadf718cbf2861a5af6ee1190b80d2824135101b85172f00a",
+    "wave_73004.json": "6938202784269191bef9184b321ee471709171d01aa3a3f4667da50f1ee90ea4",
+    "ac_73005.json": "16b18571bd90ed4be5be705cd9cf9c852e0cbaba6f38decc813398056298649b",
+    "burgers_73005.json": "d6f83fe1f6c6e814ecf9b26a447853ca3e28b40c52324de1a6e1982d94e6dd08",
+    "burgers_inviscid_73005.json": "1ab5e478c13988c1128ef71edd7c8a45cb4cb3e904d2214cf336dcb0fa38597d",
+    "duffing_73005.json": "2335ae4037cf25f4e3d38e2813c555b2c9395a3e6b6258c3e6cdcdc56916803a",
+    "kdv_73005.json": "d5227dcb78f91e8a8543a5414ec1c32d46a92686d2743e94467d97b5afc79b6e",
+    "kdv_cossin_73005.json": "73c8b18cb03b560833fa6366503e2ed9fa680feeff35fc1ba1ae9ac6c94118ea",
+    "ks_73005.json": "e114ab39ee5b31212c4bacf8572bf8187bed2b92fa9e6c86bc1b9cbbd069772d",
+    "lorenz_73005.json": "9072944cfca3f37c38c02b7c510cc48a06a47fc6a217f57a34d1248e134d2054",
+    "lv_73005.json": "2512df456ab2a4310956696e6f1576ee8c01eedd5afcbbfbc0abc0421064ca19",
+    "ns_73005.json": "312d1dbdc08b2952c979a7a83d9d4e722470a4cb94967ca4de4439849fc2ace0",
+    "ode_73005.json": "b20f55e4d0c6fa90b8b5612f60249d9aa9c07bab0043d30bcccbee713abaeec5",
+    "pde_compound_73005.json": "52dc3c9a033578cc2c076f0e5e1a772c6c93402463ed8016cc71b66ce88efaec",
+    "pde_divide_73005.json": "ab73c358d9faeb5183e708c838d486ed659ad4796eb2f831a7dd1bf361013fdc",
+    "vdp_73005.json": "891d9389b778ae2a68933b5da93ad2043687ac686b7a5e77274f6b1d00d86357",
+    "wave_73005.json": "ae461c1447934d9cd690589cb928b1481360d0a662fc85b9501f2e74d64a10dc",
+    "ac_73006.json": "c039373d4f8f454a4ee881148d82396a680aaca7978ed41ceceee6c8920141e2",
+    "burgers_73006.json": "57b0c28a6fe7db854713d07035d08d10641feb6f3d41029429e1d9382ea4ec62",
+    "burgers_inviscid_73006.json": "d03ee8c09fdb5bba4d02948178da6ee37d4a07cf3993ec7aa2b04488bfd2fa59",
+    "duffing_73006.json": "c787d5ce302538242355903b9bdec250e4af933d77195d0a846bd2d4e1b0a454",
+    "kdv_73006.json": "85ea04ee47df653e2fcc92fae3128ae25633870061cb94069c8c2cc9c5f21bf2",
+    "kdv_cossin_73006.json": "31aa38a033617311c98c5267cd5af59f80eb3f5d09daea2e9c4239bf7212baa5",
+    "ks_73006.json": "fc36bf535e5668dd54519fc926ad57dd06e688f9fdc51409e4bbd6dbe98febdf",
+    "lorenz_73006.json": "f81f7c6abcd0780a2fb8546d86b3ae4d1e26b08d0378ccd922cc7247253bb748",
+    "lv_73006.json": "9deb1af24b44223c2ff2f57af6fb690d097ac6e51a9231aca0b31f2dfa3d3091",
+    "ns_73006.json": "34ff8f413933f991c5fee32d381168ff788163cd4b76d08dc9e29b153a56a59a",
+    "ode_73006.json": "82d1f9b0a7901a66f7a0658ca562712b5d3b0717a989b5dab9827b08f973337a",
+    "pde_compound_73006.json": "807ae5a67762937a752c2f8c70132bbd2147885acae3c810f7921ee33a050549",
+    "pde_divide_73006.json": "a925c28e75a015e9501757bc8b1184daf81277da0e511da44a8e99a9799de0d6",
+    "vdp_73006.json": "751e0208dd1af82d6dc9952705c75eafdf1dd4649429bc3a2ce57e864b0df6e9",
+    "wave_73006.json": "c1ec342c1f6427395179e0aad803e7c5f9690434a72f4317d0c6e3c7730da499"
+  }
+}

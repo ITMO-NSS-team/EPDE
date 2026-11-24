@@ -1,0 +1,1493 @@
+{
+  "status": "COMPLETE",
+  "fresh_anchors": 69,
+  "fresh_variable_fits": 252,
+  "bootstrap_fields": 192,
+  "bootstrap_variable_fits": 576,
+  "fresh_statuses": {
+    "time": {
+      "ok": 84
+    },
+    "local6": {
+      "ok": 84
+    },
+    "time_noise_only": {
+      "ok": 84
+    }
+  },
+  "systems": [
+    {
+      "system": "ac",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9990640341465049,
+      "sigma_ratio_min": 0.9858033254988903,
+      "sigma_ratio_max": 1.0142695650336948,
+      "max_rho_error": 0.05654901210965802,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0286544390163284,
+      "sigma_ratio_min": 1.0073483347666523,
+      "sigma_ratio_max": 1.0419127032886248,
+      "max_rho_error": 0.08859546692596156,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9957830407667297,
+      "sigma_ratio_min": 0.9822940396190836,
+      "sigma_ratio_max": 1.0123404745394158,
+      "max_rho_error": 0.05654901210965802,
+      "warnings": 0
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.019252645157685,
+      "sigma_ratio_min": 1.0172823281536414,
+      "sigma_ratio_max": 1.020585234377635,
+      "max_rho_error": 0.03988391942758401,
+      "warnings": 0
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9994587008972937,
+      "sigma_ratio_min": 0.9890037833598154,
+      "sigma_ratio_max": 1.0071037747597356,
+      "max_rho_error": 0.028964169980711836,
+      "warnings": 0
+    },
+    {
+      "system": "burgers",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9976512868011224,
+      "sigma_ratio_min": 0.9968938835775921,
+      "sigma_ratio_max": 0.9991299834240212,
+      "max_rho_error": 0.010666693218982658,
+      "warnings": 0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9982071865133467,
+      "sigma_ratio_min": 0.9918960987664972,
+      "sigma_ratio_max": 1.0101653877545806,
+      "max_rho_error": 0.013019313950890414,
+      "warnings": 0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9934748684777325,
+      "sigma_ratio_min": 0.978902787249641,
+      "sigma_ratio_max": 1.001973483248928,
+      "max_rho_error": 0.025964289070487458,
+      "warnings": 0
+    },
+    {
+      "system": "burgers_inviscid",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9952541244713998,
+      "sigma_ratio_min": 0.990244512147358,
+      "sigma_ratio_max": 1.0052403819765034,
+      "max_rho_error": 0.018041229798580354,
+      "warnings": 0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9977980960837008,
+      "sigma_ratio_min": 0.9804823534690482,
+      "sigma_ratio_max": 1.0086882513063544,
+      "max_rho_error": 0.0531403742006046,
+      "warnings": 0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9847169807848747,
+      "sigma_ratio_min": 0.956622823835322,
+      "sigma_ratio_max": 1.0206119318183475,
+      "max_rho_error": 0.12483490719134666,
+      "warnings": 0
+    },
+    {
+      "system": "duffing",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9932447680301855,
+      "sigma_ratio_min": 0.9798001495852244,
+      "sigma_ratio_max": 1.0039031628761093,
+      "max_rho_error": 0.03761265247755152,
+      "warnings": 0
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9964306025885529,
+      "sigma_ratio_min": 0.9947644718418402,
+      "sigma_ratio_max": 0.9977431889251122,
+      "max_rho_error": 0.012452199340536553,
+      "warnings": 0
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.000523049501965,
+      "sigma_ratio_min": 0.9984623203006947,
+      "sigma_ratio_max": 1.0023603041590199,
+      "max_rho_error": 0.006251880385384534,
+      "warnings": 0
+    },
+    {
+      "system": "kdv",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.999102823020173,
+      "sigma_ratio_min": 0.9974694379526239,
+      "sigma_ratio_max": 1.000184561560482,
+      "max_rho_error": 0.007505398388397872,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0057906091479645,
+      "sigma_ratio_min": 0.9906781045814668,
+      "sigma_ratio_max": 1.019171156767328,
+      "max_rho_error": 0.021278147862683987,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9846347516904786,
+      "sigma_ratio_min": 0.9425138655303761,
+      "sigma_ratio_max": 1.0302553536014072,
+      "max_rho_error": 0.09192114363284552,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9972049091754216,
+      "sigma_ratio_min": 0.9848566347037649,
+      "sigma_ratio_max": 1.012824534017942,
+      "max_rho_error": 0.02573477054505216,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0053259613690775,
+      "sigma_ratio_min": 1.0045260094437307,
+      "sigma_ratio_max": 1.0062101789863747,
+      "max_rho_error": 0.012899601063939637,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.99922223765675,
+      "sigma_ratio_min": 0.9987540156472281,
+      "sigma_ratio_max": 1.000091446498782,
+      "max_rho_error": 0.008706096414336943,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9998934431182631,
+      "sigma_ratio_min": 0.9987553718685287,
+      "sigma_ratio_max": 1.000931303030274,
+      "max_rho_error": 0.00576268154533919,
+      "warnings": 0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 9,
+      "sigma_ratio_mean": 0.984809897736852,
+      "sigma_ratio_min": 0.9437789411346386,
+      "sigma_ratio_max": 1.0094338285069724,
+      "max_rho_error": 0.049593087562787075,
+      "warnings": 0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 9,
+      "sigma_ratio_mean": 0.9859062586845941,
+      "sigma_ratio_min": 0.9371841981115117,
+      "sigma_ratio_max": 1.0244039249162615,
+      "max_rho_error": 0.13250693514228168,
+      "warnings": 0
+    },
+    {
+      "system": "lorenz",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 9,
+      "sigma_ratio_mean": 0.9857045511887187,
+      "sigma_ratio_min": 0.9368778542813739,
+      "sigma_ratio_max": 1.013755373849662,
+      "max_rho_error": 0.03705272731746605,
+      "warnings": 0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 6,
+      "sigma_ratio_mean": 0.976126624615746,
+      "sigma_ratio_min": 0.8762146963847616,
+      "sigma_ratio_max": 1.056065483597919,
+      "max_rho_error": 0.1485623702244471,
+      "warnings": 0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 6,
+      "sigma_ratio_mean": 0.9975099183269115,
+      "sigma_ratio_min": 0.8825926727153526,
+      "sigma_ratio_max": 1.1806839716775421,
+      "max_rho_error": 0.2999021674663808,
+      "warnings": 0
+    },
+    {
+      "system": "lv",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 6,
+      "sigma_ratio_mean": 0.9756831678563488,
+      "sigma_ratio_min": 0.9144500654570742,
+      "sigma_ratio_max": 1.0604900745731944,
+      "max_rho_error": 0.14881660172614317,
+      "warnings": 0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 9,
+      "sigma_ratio_mean": 1.010250275065224,
+      "sigma_ratio_min": 1.0005017632016742,
+      "sigma_ratio_max": 1.0223166935041816,
+      "max_rho_error": 0.03863125556762347,
+      "warnings": 0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 9,
+      "sigma_ratio_mean": 1.0917399266712158,
+      "sigma_ratio_min": 1.0416802703932357,
+      "sigma_ratio_max": 1.1648887739553153,
+      "max_rho_error": 0.18677486923796546,
+      "warnings": 0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 9,
+      "sigma_ratio_mean": 0.9993868530781688,
+      "sigma_ratio_min": 0.991456420304425,
+      "sigma_ratio_max": 1.0050603202451656,
+      "max_rho_error": 0.03823216178233693,
+      "warnings": 0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0994583975327934,
+      "sigma_ratio_min": 0.9024223038211987,
+      "sigma_ratio_max": 1.4033353267876856,
+      "max_rho_error": 0.4951711201337546,
+      "warnings": 0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9889808965666868,
+      "sigma_ratio_min": 0.8953219028682933,
+      "sigma_ratio_max": 1.1676613174631845,
+      "max_rho_error": 0.2941827318403483,
+      "warnings": 0
+    },
+    {
+      "system": "ode",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9929356286821407,
+      "sigma_ratio_min": 0.9099791515223379,
+      "sigma_ratio_max": 1.0795291339960924,
+      "max_rho_error": 0.15428019352213682,
+      "warnings": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0105641830282899,
+      "sigma_ratio_min": 1.0096383069891186,
+      "sigma_ratio_max": 1.0115956643288797,
+      "max_rho_error": 0.024857300356070092,
+      "warnings": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0171014117841206,
+      "sigma_ratio_min": 1.002827866314527,
+      "sigma_ratio_max": 1.032127274488376,
+      "max_rho_error": 0.034891408310302394,
+      "warnings": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9975176512041446,
+      "sigma_ratio_min": 0.9970560936860825,
+      "sigma_ratio_max": 0.998308254037361,
+      "max_rho_error": 0.024857300356070092,
+      "warnings": 0
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0029725661302844,
+      "sigma_ratio_min": 1.002280107631923,
+      "sigma_ratio_max": 1.003541202985842,
+      "max_rho_error": 0.024857300356070092,
+      "warnings": 0
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0006893037136386,
+      "sigma_ratio_min": 0.9883880667951578,
+      "sigma_ratio_max": 1.0142394966267523,
+      "max_rho_error": 0.021157210129523946,
+      "warnings": 0
+    },
+    {
+      "system": "pde_divide",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9975176262745045,
+      "sigma_ratio_min": 0.9970560842859653,
+      "sigma_ratio_max": 0.9983082051797518,
+      "max_rho_error": 0.024857300356070092,
+      "warnings": 0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0156028016490521,
+      "sigma_ratio_min": 0.9382977362418126,
+      "sigma_ratio_max": 1.0952382634298057,
+      "max_rho_error": 0.17317689346077234,
+      "warnings": 0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9889910151119693,
+      "sigma_ratio_min": 0.8953077840471171,
+      "sigma_ratio_max": 1.1677247224152187,
+      "max_rho_error": 0.2942407246883622,
+      "warnings": 0
+    },
+    {
+      "system": "vdp",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9929356554663133,
+      "sigma_ratio_min": 0.9099791627088339,
+      "sigma_ratio_max": 1.0795291795006152,
+      "max_rho_error": 0.15428044910307975,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9983402057410014,
+      "sigma_ratio_min": 0.985715139676655,
+      "sigma_ratio_max": 1.0144161098282574,
+      "max_rho_error": 0.024881279820060914,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9842520149047208,
+      "sigma_ratio_min": 0.941800973937461,
+      "sigma_ratio_max": 1.0304807718876945,
+      "max_rho_error": 0.09267699683807999,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "iid",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.997204909281655,
+      "sigma_ratio_min": 0.9848566347038022,
+      "sigma_ratio_max": 1.0128245346971914,
+      "max_rho_error": 0.025734770542864924,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0246181489705617,
+      "sigma_ratio_min": 1.0114263225002404,
+      "sigma_ratio_max": 1.0407025124610503,
+      "max_rho_error": 0.05344121447289718,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.1077546077039362,
+      "sigma_ratio_min": 1.004960675066276,
+      "sigma_ratio_max": 1.1905617842385225,
+      "max_rho_error": 0.15498106691675284,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0025348799373066,
+      "sigma_ratio_min": 0.9950459603606856,
+      "sigma_ratio_max": 1.0089363184303524,
+      "max_rho_error": 0.04182642533538666,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9986366096366798,
+      "sigma_ratio_min": 0.9914250408946588,
+      "sigma_ratio_max": 1.0056770594838287,
+      "max_rho_error": 0.0441856939681437,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0146443471282458,
+      "sigma_ratio_min": 1.0136181150626329,
+      "sigma_ratio_max": 1.0162607182325492,
+      "max_rho_error": 0.03632819722361447,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "negative",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9993900769387323,
+      "sigma_ratio_min": 0.9937726674246876,
+      "sigma_ratio_max": 1.0070247998802682,
+      "max_rho_error": 0.0441856939681437,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0085112866881767,
+      "sigma_ratio_min": 0.9983113749949875,
+      "sigma_ratio_max": 1.0212761361610272,
+      "max_rho_error": 0.06395878417783407,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9987116494785381,
+      "sigma_ratio_min": 0.9037367923916183,
+      "sigma_ratio_max": 1.1408706355214204,
+      "max_rho_error": 0.12668163254559628,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "positive",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0019024939350372,
+      "sigma_ratio_min": 0.9988880064325518,
+      "sigma_ratio_max": 1.004945158701591,
+      "max_rho_error": 0.06350693795510542,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9999423872826899,
+      "sigma_ratio_min": 0.9972249933820889,
+      "sigma_ratio_max": 1.0017239263452171,
+      "max_rho_error": 0.035292052720135025,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9952576048842251,
+      "sigma_ratio_min": 0.9909853769431531,
+      "sigma_ratio_max": 0.9979011568568225,
+      "max_rho_error": 0.01647525177366116,
+      "warnings": 0
+    },
+    {
+      "system": "kdv_cossin",
+      "profile": "negative",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9938689644573581,
+      "sigma_ratio_min": 0.990399176951599,
+      "sigma_ratio_max": 0.996243550181667,
+      "max_rho_error": 0.035292052720135025,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0388171475999723,
+      "sigma_ratio_min": 1.0334614176415362,
+      "sigma_ratio_max": 1.046840973198325,
+      "max_rho_error": 0.04557940892231699,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9990317876919446,
+      "sigma_ratio_min": 0.9848922677709022,
+      "sigma_ratio_max": 1.0064925263334108,
+      "max_rho_error": 0.019147362945610646,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0010483793601483,
+      "sigma_ratio_min": 0.9994397878409808,
+      "sigma_ratio_max": 1.0022373997585052,
+      "max_rho_error": 0.007982252996788453,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9997671829235903,
+      "sigma_ratio_min": 0.9984460278015239,
+      "sigma_ratio_max": 1.0014063207050925,
+      "max_rho_error": 0.005684134293194754,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9992211064963983,
+      "sigma_ratio_min": 0.9975111815056684,
+      "sigma_ratio_max": 1.0008434445731327,
+      "max_rho_error": 0.007023270552008798,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "negative",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9991224120351383,
+      "sigma_ratio_min": 0.9979261945490119,
+      "sigma_ratio_max": 1.000178119794029,
+      "max_rho_error": 0.0057526892986368705,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0009427656522913,
+      "sigma_ratio_min": 0.9905700288900973,
+      "sigma_ratio_max": 1.008619739142007,
+      "max_rho_error": 0.06350693795510542,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9981641415737368,
+      "sigma_ratio_min": 0.9021994458385381,
+      "sigma_ratio_max": 1.140470957763497,
+      "max_rho_error": 0.1271663578853504,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "positive",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 1.0019024832535341,
+      "sigma_ratio_min": 0.9988879726940467,
+      "sigma_ratio_max": 1.0049451587999103,
+      "max_rho_error": 0.06350693795510542,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "method": "time",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9950193419390151,
+      "sigma_ratio_min": 0.9927376720189117,
+      "sigma_ratio_max": 0.9964425094981424,
+      "max_rho_error": 0.035292052720135025,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "method": "local6",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9951265999934217,
+      "sigma_ratio_min": 0.9909614700496537,
+      "sigma_ratio_max": 0.9977789054288967,
+      "max_rho_error": 0.016475471188053814,
+      "warnings": 0
+    },
+    {
+      "system": "wave",
+      "profile": "negative",
+      "method": "time_noise_only",
+      "variable_fits": 3,
+      "sigma_ratio_mean": 0.9938689367767003,
+      "sigma_ratio_min": 0.9903990750315349,
+      "sigma_ratio_max": 0.9962435501762787,
+      "max_rho_error": 0.035292052720135025,
+      "warnings": 0
+    }
+  ],
+  "bootstrap": [
+    {
+      "system": "ac",
+      "profile": "positive",
+      "method": "time",
+      "fits": 48,
+      "sigma_ratio_min": 1.1885864372602286,
+      "sigma_ratio_median": 1.2565321036247035,
+      "sigma_ratio_max": 1.3384101446073444,
+      "rho_error_median": 0.17743803041120335,
+      "rho_error_max": 0.20583439372831203,
+      "rho_gt_095": 0,
+      "extreme_sigma": 0,
+      "warnings": 0
+    },
+    {
+      "system": "ac",
+      "profile": "positive",
+      "method": "local6",
+      "fits": 48,
+      "sigma_ratio_min": 1.1929253056069864,
+      "sigma_ratio_median": 2.803562514409665,
+      "sigma_ratio_max": 232.80803419081,
+      "rho_error_median": 0.5015105316486433,
+      "rho_error_max": 0.6297806582085888,
+      "rho_gt_095": 23,
+      "extreme_sigma": 34,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "method": "time",
+      "fits": 48,
+      "sigma_ratio_min": 1.2672351156866624,
+      "sigma_ratio_median": 1.348519792991745,
+      "sigma_ratio_max": 5.031173959677864,
+      "rho_error_median": 0.22424696989645032,
+      "rho_error_max": 0.5270675219593131,
+      "rho_gt_095": 6,
+      "extreme_sigma": 6,
+      "warnings": 0
+    },
+    {
+      "system": "ks",
+      "profile": "positive",
+      "method": "local6",
+      "fits": 48,
+      "sigma_ratio_min": 1.0492352897362667,
+      "sigma_ratio_median": 1.0799564801019144,
+      "sigma_ratio_max": 1.1205535123608987,
+      "rho_error_median": 0.06494296895665277,
+      "rho_error_max": 0.1004924618488548,
+      "rho_gt_095": 0,
+      "extreme_sigma": 0,
+      "warnings": 0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "method": "time",
+      "fits": 144,
+      "sigma_ratio_min": 0.9887204300287572,
+      "sigma_ratio_median": 1.0006992896310236,
+      "sigma_ratio_max": 1.0168916360674962,
+      "rho_error_median": 0.014324279159722387,
+      "rho_error_max": 0.03483248560541964,
+      "rho_gt_095": 0,
+      "extreme_sigma": 0,
+      "warnings": 0
+    },
+    {
+      "system": "ns",
+      "profile": "iid",
+      "method": "local6",
+      "fits": 144,
+      "sigma_ratio_min": 1.032649717489532,
+      "sigma_ratio_median": 1.0619465774358328,
+      "sigma_ratio_max": 1.180989739751869,
+      "rho_error_median": 0.0869712930156668,
+      "rho_error_max": 0.19816631210809385,
+      "rho_gt_095": 0,
+      "extreme_sigma": 0,
+      "warnings": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "method": "time",
+      "fits": 48,
+      "sigma_ratio_min": 0.9957650763505332,
+      "sigma_ratio_median": 1.0063313611010822,
+      "sigma_ratio_max": 1.0238174790195078,
+      "rho_error_median": 0.016031672328743266,
+      "rho_error_max": 0.03476220470006451,
+      "rho_gt_095": 0,
+      "extreme_sigma": 0,
+      "warnings": 0
+    },
+    {
+      "system": "pde_compound",
+      "profile": "iid",
+      "method": "local6",
+      "fits": 48,
+      "sigma_ratio_min": 1.02370016591623,
+      "sigma_ratio_median": 1.034180993916936,
+      "sigma_ratio_max": 1.0615548052533388,
+      "rho_error_median": 0.03474409223675302,
+      "rho_error_max": 0.08139750382847424,
+      "rho_gt_095": 0,
+      "extreme_sigma": 0,
+      "warnings": 0
+    }
+  ],
+  "pure_noise": [
+    {
+      "method": "time",
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9012179141938013,
+        0.9480714439618751,
+        0.9888453902001177,
+        1.0503084196160113,
+        1.0836680959324878
+      ],
+      "rho_rmse": 0.061819470129359635,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8864399568003986,
+        0.9269727204812641,
+        0.9904893330176483,
+        1.0533877151961357,
+        1.112729089703716
+      ],
+      "rho_rmse": 0.05060796683547401,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8993292448926238,
+        0.9453599956233069,
+        0.986216104260411,
+        1.0417324504941587,
+        1.0900538463070344
+      ],
+      "rho_rmse": 0.051074174240367386,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.857178240766236,
+        0.9415982544994869,
+        1.0004630503097354,
+        1.039293405014665,
+        1.1252810729456286
+      ],
+      "rho_rmse": 0.05131194004276723,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8783557883897959,
+        0.9303543006830904,
+        0.9895709604019345,
+        1.0467242795354856,
+        1.1303859325151218
+      ],
+      "rho_rmse": 0.049233385626085244,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8758812474410325,
+        0.9471981697062224,
+        0.985431336281246,
+        1.0629594297272063,
+        1.1008297260542756
+      ],
+      "rho_rmse": 0.054869883022350546,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9558081323812387,
+        0.9791685346615872,
+        1.0023565205193143,
+        1.0249781236870505,
+        1.043240541051783
+      ],
+      "rho_rmse": 0.03277057340767628,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9440719839517638,
+        0.9687823428904172,
+        0.9984417564754108,
+        1.0193907992367468,
+        1.0442952249766984
+      ],
+      "rho_rmse": 0.028024648951789115,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "time",
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9404603961670289,
+        0.9715465318749309,
+        0.9972640383836174,
+        1.0281440414322756,
+        1.0550162684586293
+      ],
+      "rho_rmse": 0.02867285096917788,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "local6",
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.7892898771367226,
+        0.8791580538183111,
+        1.0128288184160894,
+        1.1750162546210094,
+        1.353423835480028
+      ],
+      "rho_rmse": 0.15420537685828412,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "local6",
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.5929723289495661,
+        0.7496172477829309,
+        1.012257574110733,
+        49.88705830256438,
+        149.2168422281873
+      ],
+      "rho_rmse": 0.34061085900203136,
+      "extreme_sigma": 13,
+      "rho_gt_095": 13
+    },
+    {
+      "method": "local6",
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8840849511185253,
+        0.9359427313272871,
+        1.006228483369397,
+        1.0612365864302828,
+        1.1134739699047151
+      ],
+      "rho_rmse": 0.09084117480051064,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "local6",
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8214479941052174,
+        0.8849741449205463,
+        1.009945514851205,
+        1.2426768155128511,
+        81.00077401741387
+      ],
+      "rho_rmse": 0.23699003845496863,
+      "extreme_sigma": 2,
+      "rho_gt_095": 1
+    },
+    {
+      "method": "local6",
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.6951019019235563,
+        0.7879031772697435,
+        0.9609662234203882,
+        70.94221082949082,
+        284.29578080586424
+      ],
+      "rho_rmse": 0.3274716131860809,
+      "extreme_sigma": 15,
+      "rho_gt_095": 13
+    },
+    {
+      "method": "local6",
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8895433319500438,
+        0.9160778993151449,
+        0.9898191854884728,
+        1.087630791456499,
+        1.1441868904353332
+      ],
+      "rho_rmse": 0.0893347354042555,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "local6",
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9017556646161476,
+        0.936110730284249,
+        0.9984056600007564,
+        1.0641224904867899,
+        1.1725102933299607
+      ],
+      "rho_rmse": 0.0907028218293266,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "local6",
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.7338538843413772,
+        0.8220439285871017,
+        0.9608151196621887,
+        1.344871394248254,
+        172.4395240802571
+      ],
+      "rho_rmse": 0.21790906422632084,
+      "extreme_sigma": 4,
+      "rho_gt_095": 4
+    },
+    {
+      "method": "local6",
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9347389096202976,
+        0.959877604185907,
+        0.9999640488505881,
+        1.041061454933782,
+        1.0810025667377026
+      ],
+      "rho_rmse": 0.047578929115742616,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 301,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9012174904950746,
+        0.9552859873408,
+        0.9864412447669985,
+        1.055474587702997,
+        1.0836672444518425
+      ],
+      "rho_rmse": 0.06075188837622638,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 301,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8791406456384854,
+        0.9318339518564625,
+        0.9905659371164606,
+        1.063380273884143,
+        1.1097196081887535
+      ],
+      "rho_rmse": 0.04956210653219532,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 301,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8993295247861294,
+        0.9425357504139181,
+        0.990404345986315,
+        1.0428109413092568,
+        1.090053375410111
+      ],
+      "rho_rmse": 0.04997870146702483,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 320,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8627580435537583,
+        0.9419629632707899,
+        1.0019711017143835,
+        1.0417808174070893,
+        1.1252803978420718
+      ],
+      "rho_rmse": 0.05341753304507153,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 320,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.8827209093428309,
+        0.9338261046966028,
+        0.9870329241216371,
+        1.0441105527091354,
+        1.1297069269914055
+      ],
+      "rho_rmse": 0.04877230538552929,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 320,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.875877876738978,
+        0.9492069117858439,
+        0.986634994784431,
+        1.0626084779984935,
+        1.1008406159302915
+      ],
+      "rho_rmse": 0.05403642196695798,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 1001,
+      "rho": 0.0,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9585196338490289,
+        0.9808577086050897,
+        1.0035538092868448,
+        1.0250093593551968,
+        1.042811361664019
+      ],
+      "rho_rmse": 0.03210776186438596,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 1001,
+      "rho": 0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9447666242539915,
+        0.9685487991308435,
+        0.9987596813564877,
+        1.0198443647316928,
+        1.0432659245558777
+      ],
+      "rho_rmse": 0.02778748525448934,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    },
+    {
+      "method": "previous_ar2",
+      "n": 1001,
+      "rho": -0.4,
+      "draws": 64,
+      "statuses": {
+        "ok": 64
+      },
+      "sigma_ratio_quantiles": [
+        0.9405294921348667,
+        0.9692744048218073,
+        0.9972851044200057,
+        1.0281438814653778,
+        1.0562315490775416
+      ],
+      "rho_rmse": 0.028876343613268726,
+      "extreme_sigma": 0,
+      "rho_gt_095": 0
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\analyze_time.py": "a4ae450959f57d1d2db123b498577d0812310f1ddbad88f674e954e0702d3164"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_iid_seed45.json": "52930277c7b25c7b8ad3ab364d6af2d39b2375357468e42835f21ac63daa6ba8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_iid_seed46.json": "f698097e26cc01df27c0cc89e6300fde8b34bd0d867214ce4904932771fad8c3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_iid_seed47.json": "e2ff9d6761d096afcb2e89b6289a859cc3135f3e3a653225dff9bce6e09c252b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_negative_seed45.json": "ef9702b3dfed519319e18131b3d9a79bc895ab4b93d3839af2063fc37db49212",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_negative_seed46.json": "4914197a955d9315dc2e9819830fb1ab9647edc67ad810d18cdcd7dc31310bf2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_negative_seed47.json": "6857f1cf5391d2a3fe999b92297894a7d6d230ce9126e8e322b951b9da859ff1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_positive_seed45.json": "e2d8b76e8d33f831d1524b30d59fa216cb9309ac8150df377da013059c687113",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_positive_seed46.json": "c09b2adeda4e401fa131a9a35942852134438287a992dc1744feb3eecb5ce84a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ac_positive_seed47.json": "0a57f2c21a4c7925ed525ff3caeadda52382d736243370f83c55bb960c56cde3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_iid_seed45.json": "985df18a37172c15462495d2f18e9ac21ea633142a374c3202af107d3c65d8eb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_iid_seed46.json": "2b9b8d938aa48591c9b9fddfb03aa9c2a4238b69705ea3dad91929d9036f0cd8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_iid_seed47.json": "a10ae967a4d68c0712af35fbeb7f4791449b43f3f88994ed8e52579cc73f0b39",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_inviscid_iid_seed45.json": "3a54adca35ecb15659e7feab06b88196fda75fe2760e1c77e831027fe896638e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_inviscid_iid_seed46.json": "0a871fc8fd2aeddb6710e1074f78819036702c368b96d47b02b951e20aa8ac2f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\burgers_inviscid_iid_seed47.json": "206dbbc136aa95f6fdafaeb804039118202c1931f6a787a32a66c00097e9cbdb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\duffing_iid_seed45.json": "9719eb0181e9cb9a28e7b32fe4372f8daab568d6388d2acfecbe0da26509014a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\duffing_iid_seed46.json": "0429c9316b5bda9b5b041c52f8d9631f98cb582b7cbc88732daf32fced8a72ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\duffing_iid_seed47.json": "801762d66be0e791c235478d8869ca747eecb1b743d56c76becf05a5da796ac5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_iid_seed45.json": "74832237ab1c7be7a4ad7d4a4baafe66516ce408cc9742317d17fe0181fbf5e0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_iid_seed46.json": "777ea6fa337c3ab5d395ce40cc76d2e518782bb73a7b0cfbb3e699f36e926bc4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_iid_seed47.json": "ce0418eda8881122d731c784f197f47c9ff267547c10afc0c0cc3c86c5931be6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_negative_seed45.json": "814cfcdb9b0e30720740ece720efaedc7247c5fb9dc252faa3ab9a70b972ac73",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_negative_seed46.json": "baf1a6e7cb39c3a0f288fe06aba8a7065752a7c1f5aade4eebad9da371a16672",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_negative_seed47.json": "b24f2d501ec7dd4b5b6eb73047381ecec3d1241ce2948b7b9bd9c94268548781",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_positive_seed45.json": "8ccb15a79443334d1301d0a95dd73f3e6b5ab307831faee0ad46070341da78ee",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_positive_seed46.json": "487fbd6a2c86d3efead7de5cd476d128b80d5d0a6b7191e672b70ed100ee98b0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_cossin_positive_seed47.json": "e68081b4844b37fb1a7e73f68424bf48a869ff34b329a97dd928872d17e576ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_iid_seed45.json": "98e52b1910d22d6b8bda1f28d6e66d0c627ed76c08c198da8341a0814c9a27c4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_iid_seed46.json": "45bccf1b8acf39be61e4c15a561ca0da9f3b32ac703125bd757976337bb0b619",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\kdv_iid_seed47.json": "0b0b804cc714dbd91b185ae57d56234adcd1a8c433df230b0d69da3314623d79",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_iid_seed45.json": "3149f2b7cca9e387bb6cc3b9f8bfb3909df6fa3049df3581dd78499d80a53747",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_iid_seed46.json": "8da6cde197249966a4b3dd6cf62d85b13d46793eb077e05325bb028b7ff4e57d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_iid_seed47.json": "98cd858b13dab8cc6bfcf81ca7f538f32ac343ad32b94d4db9bd3ef96ccf35b7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_negative_seed45.json": "db392e747ede26554fdc10d0ae8b816a2898047bdb13f6331dd303ee1935e226",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_negative_seed46.json": "691c4467b76499d5c6ba108783ff67ef9ad7c978118f0ec0c2ec7ed29f8f147b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_negative_seed47.json": "9023753bcb41dc2d43c3de4cd9feb25793f8409460d03d3e8ff4bc73f3cc6622",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_positive_seed45.json": "20a980e381d1ab90d42b4278d3970b98117e2f585ec76423dd09609482ff3847",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_positive_seed46.json": "ce8411b269f0fd0b5326c4d50e53dd450c1e2d6a85e97321acddb37fcc823b7f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ks_positive_seed47.json": "27aff54167451f7b2f1928b80afdbb4dc50b078fa83422ede0c1317472ed1702",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lorenz_iid_seed45.json": "f86cbb2e051eda30b830445dff5330c68ef86bb8c08ec01f4af70d48e0299af7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lorenz_iid_seed46.json": "0f419ecee3ae1ff262b5b4ff65c603d71bc8b04a6a52965b1a137cc3fb7114f8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lorenz_iid_seed47.json": "63c9d5102b46e9328c40c063c6a0456db3459e65ad3656e34a6ec5d58354dde1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lv_iid_seed45.json": "13fe3e232f96cda88c72c5178f88e03bffbf0a85e032cac7b12f8c861d4f55d2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lv_iid_seed46.json": "ca51790e77abebd7c3987037cf65616ba3219974e9a7199645afc3a9f43a8e7f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\lv_iid_seed47.json": "d416fd15b972be91e16a3a6576c891a4e393bcd0e70ceffc4268d27173390af4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ns_iid_seed45.json": "a8dacd8b38c86f2846986e924e0897d83f892b7253fdebb101ba0f5172f10075",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ns_iid_seed46.json": "c9d291ea0be2e0bd24a8d983d0f19e389947885d238b246db6c8d58536a86285",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ns_iid_seed47.json": "243a5965d19ffcaa94f092bc546cdd5efe62f94b27b5077bc18261ab9f531e77",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ode_iid_seed45.json": "eab422909ebe79703ee2d7c6a53e0484004d03b8ba0c96708c286c102334e43c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ode_iid_seed46.json": "3d66add811a839723e023dc54fc6f5707349579fc39f26437da4229b0d558d8e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\ode_iid_seed47.json": "daf9498415c5de05b58520fa9a33acc3c8777415263be886cdbf989fc49adc7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_compound_iid_seed45.json": "aa23642d186369eb8775945eaf9144f181560f5472fe4a74d994922c9f56d7f2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_compound_iid_seed46.json": "ebbef8b82f187d3af3352a9da8d9290b68545980aa99d300b03d1de11e09b6b2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_compound_iid_seed47.json": "ca62d84b748bab045ee6253c034d97a3da158bdc5b75fbd5994aa809b82fa37f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_divide_iid_seed45.json": "4142490c2c7399e627163f18fc0a4c320c555c1f4620dd4a9e20700f4d3e7875",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_divide_iid_seed46.json": "457067fe890774781f4baee019c25057cf664e5a2c42189d9fcac29632454a68",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\pde_divide_iid_seed47.json": "6ba7b26b5559d8be6082920276065af3ff2ebe333e98e3dd95b62bd237f6537b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\vdp_iid_seed45.json": "ba86455850d3372ffd8661906bed69f06d436494e1fcf92a6b43216b2f716a04",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\vdp_iid_seed46.json": "e3c471f482bda4c51261a6303d8dbdc1f0d39bc19d33a4e83d20580e7628856e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\vdp_iid_seed47.json": "90188fa2d076671dc05c5b5ce6315068059730f98a0c9e5caaeb49bc99874ef0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_iid_seed45.json": "ecc465d28ac754768d97d7d14226afb202c6244fc35803d3bd830c9b1640463f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_iid_seed46.json": "9bb58f131a1467ce0371334a43134ac52ed2d60a4682461dd49c1293c4e5ed87",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_iid_seed47.json": "6c1fb7ce83753920b33ce9914ee9fba82ba80d37939f1f075b4969f45c10e03a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_negative_seed45.json": "047a53c5e080cb4c6802ce929e2343cee84b3347a3256b91c9a9d9627083b51b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_negative_seed46.json": "401a3744554a598c323734c3ada5ae74e067eef70cdd694c5e4f8bca70c3c53c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_negative_seed47.json": "f05b6424c54d715564f68d7b1ede69ee87a133b16077a9be61ecdcbdc2dd743e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_positive_seed45.json": "b651fc6ad57ef9b777a70befb707ab1d084e9741a6f34f05214a80db849f8b42",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_positive_seed46.json": "8f6802d40df38f941856f02bb7b3b9e36160ba3de4fdc597e86e94dabe077bd2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_validation\\wave_positive_seed47.json": "dbbfd09ee00b13b95f319e6b58f7db547eaec40239323fb4362a9044832abe34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n1001_profile0.json": "e301654b349f458d6d6e97e74aef3f6108c94857c9052d6c4c37cff316b216fe",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n1001_profile1.json": "2e65efe0b532a84bbd623781b484f7631165ee9f748b635d9545eef7a6d64f7d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n1001_profile2.json": "006c4bc4b588398257c8eafc126ebb2306886eb1d85d86b567ba917c361a7924",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n301_profile0.json": "6ddff8d53e45b2f02bc8387f6f84fa22a3174b9749e637cc30b260113624576a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n301_profile1.json": "4a37173fa5e4d02e6f61a6adf2c558abce5d2ee9490de8054741b0ca8899dfbe",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n301_profile2.json": "cdf6808138f57f0bb8faff2bb82b0c846e4f822c93d8aa9541337bf4c468d2df",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n320_profile0.json": "44b73a1282a96c0e80173a5b424a8d832cdf50a5f10342bb868883c96aead379",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n320_profile1.json": "36b519e160245887667be6c0f499913b1c0b5272e8bb63c8eee25661cf37d096",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_noise\\n320_profile2.json": "94e1265e78017031c63ae1c84973404f7fd0e01514ba024b53b2f4d97ef0bf7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\noise_trials.json": "ce86dfdb1658668b887be6325ac650131b01fa0e5a5a4aab33ebb0232f680c0c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\noise_trials_score.json": "cf348f754c574c7e2e5bc40532d773f3d1972bbb8b320c966f1a751bffd40294"
+  }
+}

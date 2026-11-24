@@ -1,0 +1,248 @@
+All-system test: joint noise correction and coefficient-sensitive validation
+2026-11-16
+
+All 45 runs are complete: 15 systems x three fresh noise seeds. Both proposed
+fixes and their combination were tested. Neither is a universal replacement.
+Correction reduces a conditional errors-in-variables bias but increases
+variance and can leave an indefinite normal matrix. Mixed transfer validation
+fixes the large KS selection failure on these records, but substantially
+worsens wave and forced KdV. The full results support separate treatment of
+insufficient coefficient sensitivity and excessive validation noise.
+
+Scope and frozen design
+
+Systems: ac, burgers, burgers_inviscid, duffing, kdv, kdv_cossin, ks, lorenz,
+lv, ns, ode, pde_compound, pde_divide, vdp, wave. Noise: independent additive
+Gaussian at 5%, fitting/inner seeds 12/13/14, outer records 15/16/17. These
+are new observation-noise realizations on the existing benchmark fields,
+not new trajectories. Three interleaved training rotations per record.
+
+The catalog has 20 reference equation slots, giving 60 reference/seed cases;
+including registered equivalents gives 93 equation/seed cases. This is a
+known-support coefficient and fit-selection experiment, NOT 60 successful
+discoveries, a structural survival count, or a new evolutionary search.
+
+Each native local/broad/mixed bank is fitted by OLS, residual-covariance IRLS,
+pooled-covariance GLS, corrected OLS and corrected GLS. Both corrections
+subtract centered predictor/predictor AND predictor/target noise moments.
+Corrected GLS and GLS have identical training-only weights. The correction
+requires a positive full-rank normalized predictor Gram at 1e-12; indefinite
+cases are recorded without a signed inverse, clipping, ridge or fallback.
+
+Three validation rules compare the identical six options: local/broad/mixed
+x IRLS/corrected GLS. Baseline broad_white is the existing pooled-whitened
+native broad score. broad_transfer maps a broad weak residual through the
+training pilot's GLS coefficient left inverse, then measures the implied
+coefficient correction on a richer training spectral bank. mixed_transfer
+does the same with stacked local/broad moments and is the primary new rule.
+There are no tuned bank penalties or clean-data choices. Fitting and all
+score transforms, scales, coefficients and choices are serialized and hashed
+before generating each outer record. No refit follows selection.
+
+Transfer scores are SUPPORT-SPECIFIC. They compare methods for the same
+specified equation, project out residual directions outside its predictor
+span, and are not general-purpose structural-discovery objectives. Their
+training spectral geometry is frozen from old seed 0; the field values used
+to construct the transform are reconstructed from the training group only.
+
+Primary comparisons across reference/seed cases
+
+Accuracy is the three-fold mean residual energy on the same frozen clean
+spectral bank. Lower is better. The table reports paired case outcomes,
+not independent statistical tests; equation slots and rotations share data.
+
+Method compared with control                 Better Worse Same Unpaired
+Mixed corrected GLS vs matched mixed GLS       33     26     0      1
+Mixed corrected OLS vs matched mixed OLS       30     28     0      2
+Mixed corrected GLS vs mixed IRLS              25     30     0      5
+Select broad_white vs mixed IRLS               34     22     0      4
+Select broad_transfer vs mixed IRLS            36     20     0      4
+Select mixed_transfer vs mixed IRLS            37     19     0      4
+Select broad_transfer vs select broad_white    22     13    25      0
+Select mixed_transfer vs select broad_white    28     14    18      0
+
+All three selectors complete all 60 reference cases (and all 93 registered
+cases). The four unpaired selector comparisons arise from an incomplete
+mixed-IRLS baseline: all three KdV records and forced KdV seed 13. No
+incomplete baseline is assigned an artificial error or averaged over only
+successful folds. Mixed corrected GLS has one additional incomplete wave
+reference case. Median paired energy ratios are 0.9764 for correction versus
+matched GLS, 1.0841 for correction versus IRLS, and 0.6779 for mixed-transfer
+selection versus IRLS. These descriptive medians hide large regressions.
+
+Results for every reference equation
+
+Each entry is the median of three complete record-level energies; a dash
+means at least one record is incomplete. Columns use the SAME new seeds.
+NS/lorenz/LV slot numbers follow the dataset catalog.
+
+System/slot       Mixed IRLS  Corrected mixed GLS  Broad selector Mixed transfer
+AC                8.079e-5    3.455e-4              9.173e-5       9.173e-5
+Burgers           1.132e-5    1.018e-5              8.683e-6       8.683e-6
+Inviscid Burgers  1.223e-5    9.926e-6              2.244e-6       2.244e-6
+Duffing           3.244e-5    7.984e-5              4.472e-5       6.730e-5
+KdV               -           7.553e-5              7.680e-5       5.266e-5
+Forced KdV        -           5.487e-2              4.549e-2       6.207e-1
+KS                2.213e-4    5.240e-5              6.697e-2       7.161e-5
+Lorenz 0          1.008e-4    1.562e-4              1.441e-4       1.178e-4
+Lorenz 1          1.253e-4    6.958e-5              1.732e-4       6.101e-5
+Lorenz 2          4.693e-5    3.304e-5              3.180e-5       1.461e-5
+LV 0              3.773e-4    3.811e-4              2.450e-4       2.450e-4
+LV 1              8.049e-4    4.531e-4              2.116e-4       2.108e-4
+NS 0              4.218e-5    5.935e-5              4.337e-5       3.227e-5
+NS 1              1.552e-5    1.653e-5              1.151e-5       1.151e-5
+NS 2              9.743e-6    8.229e-6              5.112e-6       5.112e-6
+ODE               5.723e-4    9.468e-4              3.699e-4       3.271e-4
+PDE compound      9.669e-6    2.188e-4              5.953e-6       4.879e-5
+PDE divide        5.009e-6    5.359e-6              3.270e-6       3.270e-6
+Van der Pol       1.268e-4    1.009e-3              8.963e-5       3.024e-5
+Wave              8.500e-3    -                     6.953e-2       4.226e-1
+
+Compared with broad selection, mixed transfer improves every KS record and
+worsens every forced-KdV record. Its KS median improves about 935-fold;
+wave's median worsens about 6.1-fold and forced KdV's about 13.6-fold. Adding
+local information matters: broad_transfer alone still has severe KS errors.
+No single selector should replace the current research controls universally.
+
+What the independent outer records and clean controls show
+
+Selection is evaluated on independent observation noise after its choices
+are fixed. No outer score is used to rescue a failed choice or select a
+different scoring rule. Negative signed cross scores are retained.
+
+For KS, mixed transfer chooses the most accurate available fit in 4/9
+reference folds, versus 2/9 for broad_white. More significantly, its median
+ratio to the best available fit is 1.135, versus 2.402 for broad_white and
+4566.6 for broad_transfer. Using clean fields with the same frozen score
+transforms, mixed transfer identifies the best option in 8/9 folds, versus
+5/9 for broad_white. This supports improved sensitivity when local moments
+are included; simply amplifying broad moments is not sufficient.
+
+For wave, ALL three scores choose the most accurate option in 9/9 CLEAN
+comparisons. On noisy inner records, mixed transfer does so only 2/9 times,
+and the broad scores 1/9. Independent outer and inner mixed-transfer choices
+agree only 2/9 times. This separates the failure from a clean metric ranking
+problem: the noisy validation moment errors overwhelm useful distinctions.
+Example: wave seed 12, fold 0 selects corrected mixed coefficient 0.092654
+instead of exact 0.04. Its clean energy is 1.73253, while broad IRLS has
+2.26584e-6 and is correctly preferred by clean transfer validation.
+
+For forced KdV, broad_white chooses the most accurate option in 7/9 folds,
+mixed transfer in 4/9. The clean mixed-transfer score succeeds in 7/9; it
+therefore has both noisy-ranking failures and remaining deterministic
+distortion on these fits. In seed 13 fold 1, mixed transfer selects broad
+corrected coefficients (-26.4034,-6.6338,7.6866) with energy 3.68499, although
+mixed corrected GLS has energy 0.079945. The independent outer score also
+prefers that bad broad correction. Fresh noise alone does not ensure that
+an individual conditional score measures the desired equation accuracy.
+
+Detailed per-fold inner/outer/clean disagreement and large errors are in
+selection_diagnostics.csv and large_selection_errors.json. The latter's
+10-times reporting threshold is post-hoc listing only, never a fitting or
+selection threshold. Counts over folds are dependent descriptive counts.
+
+What noise correction fixes, and what it costs
+
+The matched mixed GLS comparison isolates correction from changing weights:
+33 improvements versus 26 regressions, one incomplete case. Forced KdV's
+mixed median improves from GLS 0.099353 to corrected GLS 0.054871. Its
+conditional bias is real and partly removable, but this does not make every
+corrected fit reliable. Corrected Gram eigenvalues can approach zero or turn
+negative, and inverse fitting can then have large variance or fail.
+
+The separate conditional experiment reuses frozen forced-KdV seeds 6/7/8,
+with 64 independent pilot-noise refits per bank/fold. It does not count as
+another fresh-seed replication and does not choose any core15 method.
+All refits use fixed pooled weights. Bias is measured relative to noiseless
+OLS/GLS with the SAME weights, since no noise correction should be subtracted
+from truly noiseless data. Coordinate order is (u*u_x, u_xxx, cos(t)*sin(x)).
+
+For mixed GLS, coordinate-wise median bootstrap drift changes from
+  (0.83430, 0.12084, -0.13986)
+to corrected mixed GLS
+  (0.06949, -0.01965, 0.02295).
+But median bootstrap SD rises from
+  (1.21179, 0.03393, 0.03821)
+to
+  (2.11011, 0.08079, 0.09110).
+Both mixed methods succeed in all 576 refits. This is a clear conditional
+bias/variance tradeoff, not a free improvement. Broad corrected GLS succeeds
+575/576 times, local corrected GLS 526/576. Corrected OLS is less feasible:
+local 500/576, broad 482/576, mixed 509/576. Successful-only bootstrap
+summaries are explicitly conditional on convergence/feasibility.
+
+All conditional refits total 6,912: OLS and GLS each 1,728/1,728 successful;
+corrected GLS 1,677/1,728; corrected OLS 1,491/1,728. These hold the estimated
+noise model, training reconstruction and covariance weights fixed and do not
+calibrate uncertainty in those estimated quantities. The original pilot can
+still represent inaccurate coefficients, as diagnosed in the previous study.
+
+Feasibility, constants and implementation checks
+
+The main 45-run experiment contains 4,185 fits, including equivalents:
+  OLS:            837/837 successful.
+  GLS:            837/837 successful.
+  IRLS:           811/837 successful; 24 singular residual covariances and
+                  two nonconvergences.
+  Corrected OLS:  748/837 successful; 89 indefinite predictor Grams.
+  Corrected GLS:  760/837 successful; 77 indefinite predictor Grams.
+All 837 support/rotation/score combinations are feasible, and all 837
+selection decisions have at least two feasible fit options. No forced
+selection occurs. The selected methods can still be inaccurate despite
+passing numerical rank and positive-definiteness tests.
+
+Most correction infeasibility occurs among wave equivalents: 74/77 corrected
+GLS failures are on wave; two are inviscid Burgers equivalents and one forced
+KdV. All 24 singular IRLS covariances occur in local/mixed KdV fits. The two
+IRLS nonconvergences are local/mixed forced KdV. Failed fits remain in the
+tables and are never averaged away or replaced with tuned regularization.
+
+The initial three Duffing attempts stopped on a geometric bounds assertion.
+Its time coordinates are stored with float32 rounding; extrapolating the
+first native grid spacing places the final group-2 support endpoint 1.71e-6
+beyond the last observed time. The coordinate-only adapter uses actual
+historical window centers and the largest common symmetric radius inside
+their intended native spans. It changes no integer window plan or statistical
+choice, performs no extrapolation and relaxes no tolerance. All three
+repaired Duffing runs completed. Original failed logs and process status
+are retained; completion_audit.json verifies 45 final results, no missing
+cases, and records the separate adapter source hash.
+
+Population-moment tests verify exact removal of joint predictor/target
+noise, and detect intentionally omitting the cross term. Feature-unit
+invariance, planted coefficient-effect recovery by transfer validation,
+indefinite/rank rejection, selection isolation and finite scores all pass.
+ODE_simple's two phase identities and energy identity retain constants
+1, 1.3 and 2.69 in separate zero-noise controls; phase identities use no
+derivative powers, and energy uses a squared first derivative. The catalog's
+ODE benchmark is distinct from ODE_simple. No valid identity is removed.
+
+Audit passes for all new noise records, source/input/result hashes,
+registered supports, 10,845 validation-window support checks, stored score
+transforms, frozen selection replay, unchanged coefficients after outer
+access, and complete-case aggregation. Full weight-derived score transforms
+and scales are saved in frozen/ and results/. The first-stage process log
+says 42/45 because it includes the three original Duffing stops; the final
+completion audit includes their successful repairs and confirms 45/45.
+
+Decision
+
+Keep the new correction and transfer scores as experimental ablations.
+Do not globally replace the estimator or objective based on the average
+improvement count. KS benefits from added local information; wave needs a
+lower-variance validation estimate; forced KdV needs reliable coefficient
+fitting and uncertainty that covers both pilot/model error and correction
+variance. Additional independent measurements or justified moment averaging
+could test the wave variance issue. A statistically identified response to
+weak/indefinite corrected information is still needed for fitting. Those are
+research directions, not tested fixes in this experiment.
+
+Artifacts: protocol.txt; frozen/; results/; logs/; process_results.json;
+conditional_results.json; per_case.csv; per_fold.csv; system_summary.csv;
+paired_comparisons.csv; decisions.csv; failed_fits.csv; summary.json;
+selection_diagnostics.csv; selection_diagnostic_summary.csv;
+large_selection_errors.json; comparison.png/svg; checks.json;
+extra_checks.json; completion_audit.json; report_audit.json.
+
+No candidate ODE/PDE integration, PINNs, production edits or commits.
+Existing unrelated workspace changes remain intact. All processes finished.

@@ -1,0 +1,41 @@
+Independent follow-up: calibrate the complete selection statistic
+================================================================
+Declared after the1832-field study, without changing its estimator, thresholds,
+records or conclusions. The adjacent-noise CV alpha.01 rule eliminated boundary
+outputs on the ODE stress cohort but covered only949/1024 nominal noise pairs.
+Among its42 p24 selections, only5 regions covered truth. Nonrejection of an
+extra-mean test is not evidence that approximation bias is negligible.
+
+Test selection-aware parametric-bootstrap calibration on48 NEW ODE fields:
+positive noise seeds3100..3131(32); iid and negative3100..3107(8 each). Use the
+existing raw RNG domain984101. No selection of fields by observed outcome.
+Observe the frozen primary estimator. If it abstains, retain the case as
+unresolved; do not invent a generating model. Otherwise reconstruct the same
+validated correlated-GCV pilot used in earlier rounds, using estimated noise.
+
+Generate128 bootstrap fields around the observed pilot under observed fitted
+AR1 noise, RNG SeedSequence[991201,system_id,profile_id,seed]. Repeat ALL spline
+fits, CV scoring, adjacent-noise adequacy and boundary screening in every draw.
+For each selected p*, compute the restricted-likelihood statistic at the
+generating noise parameters, relative to the draw's fitted noise parameters.
+This is the same selected-model statistic T(y;theta) used at the observation.
+If a bootstrap draw abstains, define its statistic as +infinity; keep that mass
+in the order statistic. Never drop or redraw it. Record negative LR values as
+optimization warnings, not clipped scores. Significant negative scores make
+the case numerically unresolved pending diagnosis.
+
+Calibrated cutoff is rank126/128, compared with the nominal chi-square2(.975)
+cutoff7.3777589082. A nonfinite empirical cutoff gives a whole-space noise
+region and is reported explicitly, not as precise inference. Include bootstrap
+abstention counts even when the quantile remains finite. Store all fits/draws.
+Freeze every cutoff before true-noise scoring. Recompute analytic positive-
+boundary unboundedness using each actual cutoff: calibration can reintroduce
+unboundedness despite passing the original nominal screening threshold.
+
+Audit every draw/hash, selected dimensions and likelihood statistics, cutoff
+rank, true-parameter membership and boundary limit. Re-run fitting arithmetic
+at selected parameters and repeat full selection for draws0,127 plus every
+abstention; the main1832-field audit already replays every full selection.
+This is approximate bootstrap calibration, not a finite-sample guarantee.
+Eight/32 outer fields per profile cannot establish uniform97.5% coverage.
+No solver, production edits or downstream coefficient-precision claim.

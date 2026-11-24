@@ -1,0 +1,38 @@
+{
+  "gcv_16": {
+    "equation_trials": 60,
+    "cross_reference_not_dominated": 46,
+    "cross_without_unregistered_dominator": 51,
+    "ordinary_without_unregistered_dominator": 47,
+    "cross_valid_on_front": 51,
+    "ordinary_valid_on_front": 47,
+    "oracle_valid_on_front": 51
+  },
+  "gcv_32": {
+    "equation_trials": 60,
+    "cross_reference_not_dominated": 46,
+    "cross_without_unregistered_dominator": 51,
+    "ordinary_without_unregistered_dominator": 46,
+    "cross_valid_on_front": 51,
+    "ordinary_valid_on_front": 46,
+    "oracle_valid_on_front": 52
+  },
+  "loo_16": {
+    "equation_trials": 60,
+    "cross_reference_not_dominated": 46,
+    "cross_without_unregistered_dominator": 51,
+    "ordinary_without_unregistered_dominator": 47,
+    "cross_valid_on_front": 51,
+    "ordinary_valid_on_front": 47,
+    "oracle_valid_on_front": 51
+  },
+  "loo_32": {
+    "equation_trials": 60,
+    "cross_reference_not_dominated": 46,
+    "cross_without_unregistered_dominator": 51,
+    "ordinary_without_unregistered_dominator": 46,
+    "cross_valid_on_front": 51,
+    "ordinary_valid_on_front": 46,
+    "oracle_valid_on_front": 52
+  }
+}

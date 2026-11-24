@@ -1,0 +1,7 @@
+{
+  "fixed_x_optimism": 0.07661333333333273,
+  "expected_optimism": 0.07661333333333334,
+  "fixed_coefficient_optimism": -1.7763568394002505e-15,
+  "feature_rescaling_invariant": true,
+  "established_solve_matches": true
+}

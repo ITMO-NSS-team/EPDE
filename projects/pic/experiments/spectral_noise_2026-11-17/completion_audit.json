@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "records": 162,
+  "exploratory_records": 69,
+  "pure_noise_draws": 576,
+  "linked_hashes": 8558,
+  "main_audit": {
+    "hash_links": 11340,
+    "operator_scores": 165888,
+    "registered_scores": 508200,
+    "regions": 6504,
+    "intersection_certificates": 3252,
+    "matrix_replays": 2916
+  },
+  "followup_audit": {
+    "status": "PASS",
+    "exploratory_records": 69,
+    "noise_fit_replays": 912,
+    "fresh_field_replays": 1344,
+    "oracle_operator_scores": 1536,
+    "source_sha256": {
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\audit_followups.py": "58160c8b941fc8586477d85568782cdb421a47cc4396c482119e6385191d7dd1"
+    }
+  },
+  "master_log_sha256": "68e77213f5fa2aa8629c9c1ee5a4204f7a90532c11e23115e0134efe41544cb0",
+  "findings_sha256": "d532985629eded41826049d1002e18e18bea5ca72943aa6ccb2009021e2e8069",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spectral_noise_2026-11-17\\complete.py": "14bc880120d6f3bd2b1cdd08fa707692b9de973051901abdc5e905dae1ecc20c"
+  }
+}

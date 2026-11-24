@@ -1,0 +1,17 @@
+After3 exploratory KS iid studentized cases: local coverage228/235/235 of256
+(90.89% aggregate) vs192/247/225 with correction-only refits (86.46%). Still
+below95%; no cutoff tuning or promotion. Extend the SAME studentization rule
+to all69 completed primary anchors. These are follow-ups on already observed
+anchors, not new confirmation. Keep32 common fields, step.001, trust radius.05,
+and the1% generalized covariance approximation check.
+
+Computational extension: permit a second local response centered at the median
+check-field noise parameter if it lies outside the anchor response radius.
+Choose the nearest validated response within radius.05; otherwise compute the
+metric directly. Validate each response against a direct32-field covariance
+at its furthest assigned in-radius check parameter. A response with no such
+parameters is disabled, avoiding unvalidated use on actual fields. The anchor
+metric remains its direct model-moment covariance. This only accelerates the
+same function of noise parameters; no model or statistical cutoff changes.
+Save every per-draw covariance for independent score verification. Recheck the
+three original KS outcomes under this extension. Preserve original sources.

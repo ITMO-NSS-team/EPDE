@@ -1,0 +1,283 @@
+{
+  "status": "PASS",
+  "scope": "One-parameter fixed-support numerical test inversion; not post-search confidence.",
+  "rows": [
+    {
+      "seed": 24,
+      "bank": "local",
+      "intervals": [
+        [
+          0.02474158985176815,
+          0.05632084047050178
+        ]
+      ],
+      "angle_roots": [
+        0.024736543214572634,
+        0.05626140295440857
+      ],
+      "ols": 0.03978877285104974,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 238,
+      "actual_draws": 256
+    },
+    {
+      "seed": 24,
+      "bank": "broad",
+      "intervals": [
+        [
+          0.03522925370285138,
+          0.044295922315367955
+        ]
+      ],
+      "angle_roots": [
+        0.03521469020020169,
+        0.044266984941060475
+      ],
+      "ols": 0.039330516276412535,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 247,
+      "actual_draws": 256
+    },
+    {
+      "seed": 25,
+      "bank": "local",
+      "intervals": [
+        [
+          0.024663887169515068,
+          0.05726717032712356
+        ]
+      ],
+      "angle_roots": [
+        0.024658887919583428,
+        0.05720469011310895
+      ],
+      "ols": 0.040351499435709724,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 243,
+      "actual_draws": 256
+    },
+    {
+      "seed": 25,
+      "bank": "broad",
+      "intervals": [
+        [
+          0.03808470478428929,
+          0.045605680934826434
+        ]
+      ],
+      "angle_roots": [
+        0.03806630753892593,
+        0.045574102247181905
+      ],
+      "ols": 0.042387094457580335,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 245,
+      "actual_draws": 256
+    },
+    {
+      "seed": 26,
+      "bank": "local",
+      "intervals": [
+        [
+          0.026207753996940964,
+          0.05675942138635128
+        ]
+      ],
+      "angle_roots": [
+        0.026201756234909244,
+        0.056698586281622484
+      ],
+      "ols": 0.04099823538331476,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 248,
+      "actual_draws": 256
+    },
+    {
+      "seed": 26,
+      "bank": "broad",
+      "intervals": [
+        [
+          0.034717774034381914,
+          0.04409299717720846
+        ]
+      ],
+      "angle_roots": [
+        0.03470383539317217,
+        0.04406445537426907
+      ],
+      "ols": 0.03917346854728877,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 243,
+      "actual_draws": 256
+    },
+    {
+      "seed": 27,
+      "bank": "local",
+      "intervals": [
+        [
+          0.026821557048520062,
+          0.05409908196158747
+        ]
+      ],
+      "angle_roots": [
+        0.0268151280503637,
+        0.05404639699342887
+      ],
+      "ols": 0.03950365395739765,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 242,
+      "actual_draws": 256
+    },
+    {
+      "seed": 27,
+      "bank": "broad",
+      "intervals": [
+        [
+          0.03719575709154062,
+          0.04465889734845954
+        ]
+      ],
+      "angle_roots": [
+        0.03717861757189496,
+        0.04462924333616393
+      ],
+      "ols": 0.04203183936517572,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 244,
+      "actual_draws": 256
+    },
+    {
+      "seed": 28,
+      "bank": "local",
+      "intervals": [
+        [
+          0.027950242510759785,
+          0.05318924456707964
+        ]
+      ],
+      "angle_roots": [
+        0.027942967527712272,
+        0.05313917038340222
+      ],
+      "ols": 0.03989714709274731,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 248,
+      "actual_draws": 256
+    },
+    {
+      "seed": 28,
+      "bank": "broad",
+      "intervals": [
+        [
+          0.035813881430187884,
+          0.04409233954011957
+        ]
+      ],
+      "angle_roots": [
+        0.03579858116801696,
+        0.044063799013253246
+      ],
+      "ols": 0.038974761753686554,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 248,
+      "actual_draws": 256
+    },
+    {
+      "seed": 29,
+      "bank": "local",
+      "intervals": [
+        [
+          0.02677278078949111,
+          0.05155498017957679
+        ]
+      ],
+      "angle_roots": [
+        0.026766386791869986,
+        0.05150937661520224
+      ],
+      "ols": 0.03855760818914222,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 239,
+      "actual_draws": 256
+    },
+    {
+      "seed": 29,
+      "bank": "broad",
+      "intervals": [
+        [
+          0.03502824689225378,
+          0.04344635535276699
+        ]
+      ],
+      "angle_roots": [
+        0.035013931132807444,
+        0.04341905002973925
+      ],
+      "ols": 0.040062671701023636,
+      "infinite_limit_accepted": false,
+      "resolution_agreement": true,
+      "exact": 0.04,
+      "exact_in_region": true,
+      "actual_exact_acceptance_count": 247,
+      "actual_draws": 256
+    }
+  ],
+  "score_replay_max_error": 3.637978807091713e-12,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\invert_wave.py": "1cb4bc0cce36bcbf4a12497152f0cb683b80109856ebf1f3151a82f768c7a30e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\inversion_protocol.txt": "ba790ec1a1549de4cbd5cf83b048db52f8a6ea770801e8ed6028ff1869d0e8f8"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed24.json": "8a79f917b29c412e1725f1d60a75e8a857e254765f65932fd33483bf8be0a41a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed24.npz": "8bcebb615abb2eaaf9289be9ea7c6cfeb4916c111916f4da8ff85cc816594758",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed24_frozen.json": "7bd6b00c159019cc91d6be59c968921fd163c08ec17cab8ef65a9f78d3c4319f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed25.json": "225cc71d6b7da2a5d5c476e49ec38cfce85c243c9385adde47dece2a2d75ea2c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed25.npz": "fc177b68fca0f20b70325e61d14f58416466f1b7a28df421fa2aaf52a5c782aa",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed25_frozen.json": "c3739b577e98358035db45c0684d6a868a791522e766dddfba4995f183d884d0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed26.json": "83a54a0b48b394622ff888884411965d7dfaf610084cf9321243ca02fe43358c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed26.npz": "cda9d42b38cc1279242e5782774ccad32d68d5172759b323100aa7f603ea05a0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed26_frozen.json": "aaa2a4ebd134a4a77bbc7441d4bfca433d9cb5f30d30d28867956537d3f582cc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed27.json": "db6566dd3c93aa2c484cdc9668d4ed2c8ec9271b772dfa99e69fb8d108c36db8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed27.npz": "e1ddc27de3ef5ec3f2ec808bcdf503894f17796b2d86cf2aff0a82285a6f0daa",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed27_frozen.json": "d6c2344e807e2593a9fc1e057f476e4bc57975328bfe035eacac64d18cc0a36d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed28.json": "223672e49a6fe11530d66d316ad47e1c9939b29741d853ef819ae93a7cdc9f2f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed28.npz": "5fb03d37b86607f440a141d548c7f40445ab84f9b4e96f7fb4fa0207ea542bb6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed28_frozen.json": "5e7307628ee79f18403bd32e6fec340991ca5baf23c1cec09d034feed20429c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed29.json": "ca4b6361e32694a6b635ecbc610e3183ce9481c7939d849e87b38214a3ab6581",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed29.npz": "316e821f7a2f89ea061e6b5ff8154eb73e8ec61b4528818264a601c6c8db3ee1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid\\wave_seed29_frozen.json": "efc3b6d99c7f9a511855f09c7a10cb5d0b52e9a2c8c0d74a1455961e96342d87"
+  }
+}

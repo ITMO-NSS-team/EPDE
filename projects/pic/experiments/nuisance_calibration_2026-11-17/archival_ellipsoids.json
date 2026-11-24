@@ -1,0 +1,523 @@
+{
+  "status": "COMPLETE",
+  "cohort": "previously_evaluated_not_fresh",
+  "rows": [
+    {
+      "key": "ode_iid_seed60",
+      "cohort": "fresh",
+      "profile": "iid",
+      "center": [
+        -2.3073543488071633,
+        -0.024040855021128425
+      ],
+      "observed_theta": [
+        -2.2767020675200946,
+        0.017320075539027948
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.0
+      ],
+      "covariance": [
+        [
+          0.007467308745351402,
+          0.009851821272812405
+        ],
+        [
+          0.009851821272812405,
+          0.01896074681068226
+        ]
+      ],
+      "basic_score": 0.23557089454782223,
+      "uncorrected_score": 0.08541957682582543,
+      "empirical_cutoff": 12.073868882309172,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_iid_seed60.json": "10d77a0afd9a08772ea7e55a54b44be5970b49e0370e8db67b19075d27c77fb1",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_iid_seed60.json": "7a561e5eaece6aaf7c893eadd846669758bf727057ee2293bc4b52eda769323f"
+      }
+    },
+    {
+      "key": "ode_iid_seed61",
+      "cohort": "fresh",
+      "profile": "iid",
+      "center": [
+        -2.3170611167499966,
+        -0.04239827140406839
+      ],
+      "observed_theta": [
+        -2.283415324704853,
+        0.011043764491477188
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.0
+      ],
+      "covariance": [
+        [
+          0.007724754319504805,
+          0.010682616957679688
+        ],
+        [
+          0.010682616957679688,
+          0.020796829760006772
+        ]
+      ],
+      "basic_score": 0.31000485087755036,
+      "uncorrected_score": 0.12274224923336108,
+      "empirical_cutoff": 14.932199512846392,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_iid_seed61.json": "847acad3fc715d55b13bb4a4d3a7208bc5330ef20f7dcb4171ac2c2ab3c963c1",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_iid_seed61.json": "2f2bd53db8c6dcf0ad0f90784a0d36b20fba057e26fbf84fecef6ffe2f8b1133"
+      }
+    },
+    {
+      "key": "ode_iid_seed62",
+      "cohort": "fresh",
+      "profile": "iid",
+      "center": [
+        -2.3396653189835903,
+        -0.06099752910182389
+      ],
+      "observed_theta": [
+        -2.281031866359353,
+        0.04296032948930976
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.0
+      ],
+      "covariance": [
+        [
+          0.015180576219270858,
+          0.021786634780855903
+        ],
+        [
+          0.021786634780855903,
+          0.03712495268014894
+        ]
+      ],
+      "basic_score": 0.5002100002882679,
+      "uncorrected_score": 0.5134071025176232,
+      "empirical_cutoff": 6.686056230836195,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_iid_seed62.json": "f016d70f50096f68942247dfab81a7f68fd29aea7e96837e1c227f4f949805b6",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_iid_seed62.json": "e009f37d894c31c471d2a5c174dcfed5c7e4dfcae8c4f5870c545ad969f1fc0d"
+      }
+    },
+    {
+      "key": "ode_negative_seed60",
+      "cohort": "fresh",
+      "profile": "negative",
+      "center": [
+        -2.27656213124158,
+        -0.5501344943015625
+      ],
+      "observed_theta": [
+        -2.287599678450453,
+        -0.531449984064128
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        -0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.00246893608654956,
+          -0.001909628717637192
+        ],
+        [
+          -0.001909628717637192,
+          0.00460785565065335
+        ]
+      ],
+      "basic_score": 5.345751828508554,
+      "uncorrected_score": 4.622392168188583,
+      "empirical_cutoff": 9.668789428150752,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": false,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_negative_seed60.json": "c7030ae9f06e4275d6028738b4a5e56dbdb830812d4d822d620493752eda9100",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_negative_seed60.json": "d7b7ede5180306017d805be4125bcc1d91209bc80bfc6caf3a68331be3f01d5f"
+      }
+    },
+    {
+      "key": "ode_negative_seed61",
+      "cohort": "fresh",
+      "profile": "negative",
+      "center": [
+        -2.2458484703617443,
+        -0.38387798493810676
+      ],
+      "observed_theta": [
+        -2.2477349599072514,
+        -0.35743446703617593
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        -0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.0018635345060740666,
+          -0.0007468375682189309
+        ],
+        [
+          -0.0007468375682189309,
+          0.0037047891474296943
+        ]
+      ],
+      "basic_score": 1.1455758786922519,
+      "uncorrected_score": 2.050077641300354,
+      "empirical_cutoff": 8.401045338873377,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_negative_seed61.json": "73b9a7c0b6fd3fcdc5ef0f6ea05c9ba16abf2d1629c61242add2caa4c8619e72",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_negative_seed61.json": "d82c98c4afbec52f36f3af6d02cb6b08752ebc6ff2d08df68eff646a402c001a"
+      }
+    },
+    {
+      "key": "ode_negative_seed62",
+      "cohort": "fresh",
+      "profile": "negative",
+      "center": [
+        -2.163085894326088,
+        -0.44553872604704575
+      ],
+      "observed_theta": [
+        -2.16489387296411,
+        -0.4323849105088292
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        -0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.001959849497300554,
+          -0.0011457960169252
+        ],
+        [
+          -0.0011457960169252,
+          0.004801921439738213
+        ]
+      ],
+      "basic_score": 6.5884472484688565,
+      "uncorrected_score": 6.670684564844427,
+      "empirical_cutoff": 8.989338517500489,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": false,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_negative_seed62.json": "713272b49b30df81f123d951f551570dac3e78b23aa9d7590cbce7c305dae65b",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_negative_seed62.json": "bfd3a5d4827d69b93c8b2635bd3feb938bac2ed88efd35687972bf280e628c67"
+      }
+    },
+    {
+      "key": "ode_positive_seed57",
+      "cohort": "paired_previous",
+      "profile": "positive",
+      "center": [
+        -2.074776902162298,
+        0.6654061238893862
+      ],
+      "observed_theta": [
+        -1.9028092296998715,
+        0.8508611226663009
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.013898209697442378,
+          0.015027039228420712
+        ],
+        [
+          0.015027039228420712,
+          0.018818665696941322
+        ]
+      ],
+      "basic_score": 3.1194327750444004,
+      "uncorrected_score": 10.140380833474481,
+      "empirical_cutoff": 8.544498251138968,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": false,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_positive_seed57.json": "eb349b1b0a25bf2efa47d3bb3bc61cedc91c1604d7115bea78b85d8c191abc75",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_positive_seed57.json": "6c6e05d9b405069e641975c57fb52d83a1c8265d1cd9d59545b8e3c7d9b76978"
+      }
+    },
+    {
+      "key": "ode_positive_seed58",
+      "cohort": "paired_previous",
+      "profile": "positive",
+      "center": [
+        -2.049618311316031,
+        0.6561914968714098
+      ],
+      "observed_theta": [
+        -1.8815619284819278,
+        0.836533901193503
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.012926432395389032,
+          0.013596387340267208
+        ],
+        [
+          0.013596387340267208,
+          0.01657563850824478
+        ]
+      ],
+      "basic_score": 3.8597720085531404,
+      "uncorrected_score": 11.849172876364818,
+      "empirical_cutoff": 7.152052914191613,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": false,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_positive_seed58.json": "a665034ca5ef95decbf30009a6009251b0b6304cf2805cc46e2d0164d6fc135c",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_positive_seed58.json": "7c03472ef7e5edb67b4a540e4bdcc17d68b271648aa05d6f108796aae63d24e1"
+      }
+    },
+    {
+      "key": "ode_positive_seed59",
+      "cohort": "paired_previous",
+      "profile": "positive",
+      "center": [
+        -2.166452445177875,
+        0.5738182377549719
+      ],
+      "observed_theta": [
+        -2.0077512704397553,
+        0.7540357921014373
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.011550096895957814,
+          0.012435828044890272
+        ],
+        [
+          0.012435828044890272,
+          0.015520283335925072
+        ]
+      ],
+      "basic_score": 1.574144753062451,
+      "uncorrected_score": 7.0332068808224895,
+      "empirical_cutoff": 6.320281743148211,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": true,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_positive_seed59.json": "feb0b3804277f6e06f0bd22545e814ef44c29507bcd41e744178b5619c2fd751",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_positive_seed59.json": "893fffb6af35ce6ce9dadf6fa8e4c139332951d0cf264f3bb698c1a4b56bec03"
+      }
+    },
+    {
+      "key": "ode_positive_seed60",
+      "cohort": "fresh",
+      "profile": "positive",
+      "center": [
+        -2.112024052579881,
+        0.6586621528733807
+      ],
+      "observed_theta": [
+        -1.9379844277534914,
+        0.8551979508013817
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.018574847744915482,
+          0.019124081469317763
+        ],
+        [
+          0.019124081469317763,
+          0.021984480407639107
+        ]
+      ],
+      "basic_score": 3.4900954678886067,
+      "uncorrected_score": 9.315762971408041,
+      "empirical_cutoff": 6.938521066999958,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": false,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_positive_seed60.json": "4ae68cc94301524c3a88d44c36a03499876efffdb73ec03b736afd57c22dab26",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_positive_seed60.json": "aeb7a903bb00cde4dfa3423435de797744519c5a928f1b9228a95e5e2c711fb4"
+      }
+    },
+    {
+      "key": "ode_positive_seed61",
+      "cohort": "fresh",
+      "profile": "positive",
+      "center": [
+        -2.11564440900725,
+        0.6691394201440601
+      ],
+      "observed_theta": [
+        -1.953021793871666,
+        0.842547978308851
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.01674477409867122,
+          0.01885557326333719
+        ],
+        [
+          0.01885557326333719,
+          0.023399962159793376
+        ]
+      ],
+      "basic_score": 3.6351909490115393,
+      "uncorrected_score": 7.69988908605908,
+      "empirical_cutoff": 8.228334726593175,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": false,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_positive_seed61.json": "5b537190c93292451c73c3eaab717df7bca746459f3c34436fb84ed37e317586",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_positive_seed61.json": "4db8eb746603ec73da7e4197ed9d900188bf825a90b319f9142529a50f3fe9c6"
+      }
+    },
+    {
+      "key": "ode_positive_seed62",
+      "cohort": "fresh",
+      "profile": "positive",
+      "center": [
+        -2.0694596335900544,
+        0.6792960568551476
+      ],
+      "observed_theta": [
+        -1.9045214443365635,
+        0.8519931390690095
+      ],
+      "true_theta": [
+        -2.272916880412703,
+        0.42364893019360184
+      ],
+      "covariance": [
+        [
+          0.016690388205553155,
+          0.018581783659701832
+        ],
+        [
+          0.018581783659701832,
+          0.02263611142962921
+        ]
+      ],
+      "basic_score": 2.9157401889664767,
+      "uncorrected_score": 8.301352101541138,
+      "empirical_cutoff": 8.596148628997874,
+      "nominal_cutoff": 7.3777589082278725,
+      "basic_empirical_covered": true,
+      "basic_nominal_covered": true,
+      "uncorrected_nominal_covered": false,
+      "old_hull_covered": true,
+      "input_sha256": {
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\point_frozen\\ode_positive_seed62.json": "feaecb5c877b336f7b35397082845090e8c7385031a889cfd5664af8f0b6f19c",
+        "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\results\\ode_positive_seed62.json": "7b14f43f204374be3369720386f21bd7b285cf5eaaab41aa5a1e3006ef25e1aa"
+      }
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_engine.py": "af312ffe431c428f6dae6f20aebb550aa731b445561281f1004b4d8aa4ad7c8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_metric.py": "a372ae02a7d55602930befa0c1fd02774973850e060e32537540b59d159d0ffd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\run_repair.py": "839f17f417ed29c2e4cb52e6e1470f63dc6cc169e5c9edad6c40a484d4a6d8f4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\context.py": "77f7ef2c9e6e4737475adf4669e868a4edd5b3fbfe3113b61e88e94980146ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\protocol.txt": "5d38aca706ae1716a33308027e8377e34d84434c9c21281fdafbd953b665742c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\profile_guard.py": "dac3d5a9c49a9e8f189267cfabe8476ea0383f018d4615463f9e54490a87aa94",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\guard_protocol.txt": "35217f9a5bc3bc19e1f133e3c356f57efd7b2a2dc055a623a497f37301cb234c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\study_context.py": "981780232e0cae9f0b3d8d8f4f79df75220a2afc339c14107fd8852755a8f9c2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\protocol.txt": "90be887f2f584b58183038284d2ffdfbef3be02328ff2a61e43ffaa595ac3804",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\pipeline.py": "eb9bc78a479e8dcbf2b080680272bff25a38e8f0f2be2612887732aa8e45f755",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\guarded_fit.py": "cb5a85be96ab68205dd216a7634360fd652e59fc9b5b52f77dfe9a5b0fd99e45",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\native_score.py": "1b5f854177876c7fae141874f751cd29bfbfdc11b4f51d6b5630375691eb9245",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\native_score.c": "c2f8e7c255f081c239d2963ff1d02b15b9ac1fd89b85417cd903aa59f46cc5ec",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\native_score.dll": "6fe66fb6d44f9c8ea98b051c44fb49fd862dc84ba8ef540f312b5ace5a397306",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_calibration_2026-11-17\\calibration_context.py": "33a210900f400551819897d4d8fd59ef5081921c3ab262331ea462c6abe74e13",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_calibration_2026-11-17\\archive_regions.py": "f3ef4221be12c2b2bf3bf06f2c235292965cb71bb01918305796239363a8a29e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_calibration_2026-11-17\\protocol.txt": "06cd1864aebac1e0b3457068153c69870f65fc9d0457135083ec71f13608791f"
+  }
+}

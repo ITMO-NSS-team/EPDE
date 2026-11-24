@@ -1,0 +1,10 @@
+{
+  "field": "fc02fb9839ab11026a4bd828399142ac4e56b560c28ae4af2abc976545cc32b6",
+  "initial": "cc7cecd13ec29e3eef2e0ab5f11b6d610adb8637ca897a694fdab0520f22f460",
+  "shape": [
+    51,
+    128
+  ],
+  "noise_sigma": 0.0337989856705539,
+  "protocol": "a0157efdced3a292b74d930650ddc794902ed9259b6c3aca3163bbf86f736b55"
+}

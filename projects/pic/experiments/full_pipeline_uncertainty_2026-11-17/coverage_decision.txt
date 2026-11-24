@@ -1,0 +1,34 @@
+Fresh full-procedure coverage specification, before anchors51..53
+================================================================
+Use the same temporal noise estimator and correlation-aware nuisance pilot
+globally, preserving the weak banks/candidate library. Every outer dataset is
+new:15 iid systems and4 core systems with rho+/-0.4, seeds51,52,53 (69 cases).
+RNG984101 includes system index/profile/seed, so different systems no longer
+share the same raw noise stream. Noise scale remains the benchmark5% clean SD;
+the algorithm is not given that scale or the generating correlation.
+
+For each observed outer dataset fit noise and reconstruct a pilot. Simulate128
+bootstrap fields around that pilot using its fitted noise. Refit noise and
+reconstruct each bootstrap field. Compute16-common-noise-field covariance
+metrics around (a) the anchor pilot, (b) that bootstrap field's reconstructed
+pilot, at its own refitted noise parameters. These paired modes differ only in
+whether reconstruction is repeated for normalization. Observed normalization
+uses the anchor pilot/model in both modes. No response approximation is used.
+MC16 is a fixed computational choice for this new algorithm, not a claim of
+exact population covariance or a choice selected using coverage. Numerical
+checks must compare batched and individual evaluation before fresh runs.
+
+Calibrate each bank with the ceil(.95*(128+1))th sorted bootstrap statistic;
+calibrate the joint statistic with the same rank of the two-bank maximum.
+This finite-Monte-Carlo rank convention does not prove bootstrap exchangeability.
+Freeze fits, metrics, cutoffs and regions before evaluating clean-field moments.
+Evaluate the original observed field's error and reference compatibility ONCE
+per independent outer dataset. Do not count bootstrap fields as coverage trials.
+The full procedure is repeated for every outer dataset, including its cutoff.
+
+Three outer datasets per system/profile provide a preliminary full-set screen,
+not precise per-system95% coverage certification. Report binary counts, numerical
+warnings, incomplete cases, region boundedness and reference-direction results.
+Compare fixed versus refitted pilot modes on identical observed/bootstrap data.
+Keep all finite flagged fits; no truth fallback, rejection/resampling or tuned
+per-system cutoffs. Candidate constants and identities remain.

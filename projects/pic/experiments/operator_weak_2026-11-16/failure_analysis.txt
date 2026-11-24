@@ -1,0 +1,121 @@
+Why the remaining equations lose after continuous weak fitting
+2026-11-16; default core-15 saved systems; 5% noise; seeds 0/1/2
+
+There are seven lost equation-seed cases with the new CLSM fit and old/full
+cross-product bank: ac 0/2, forced KdV 0/2, KS 0, nonlinear diffusion 1/2.
+They do not have a single cause. The dyad values are frozen; all comparisons
+below use a common candidate panel and include registered equivalent laws.
+
+1. Nonlinear diffusion: good coefficients, wrong residual ordering.
+
+The law is u_t = (u_x)^2 + u*u_xx. Continuous weak CLSM reduces median
+clean residual energy from 0.37045 to 0.000809. At seed 1, the three training
+folds estimate coefficient pairs [1.0058,0.9773], [1.0552,1.0225], and
+[1.0139,1.0044], close to [1,1].
+
+Despite this, both drop-one models dominate at seed 1. Dropping (u_x)^2
+improves the noisy cross-product by 2.7734 and lowers the dyad by 1.3119,
+while WORSENING clean residual energy by 0.14815. Dropping u*u_xx improves
+the cross-product by 3.5187 while worsening clean energy by 0.94638.
+At seed 2, dropping (u_x)^2 improves the noisy score by 0.16864 while
+worsening clean energy by 0.13609. This is a clear discrepancy-ranking error
+for these fitted candidates, not evidence that the required term is useless.
+
+The natural-unit bandwidth rule saves seed 2 but not seed 1. Its exact-law
+scores are +0.0569, +0.1901, -1.9456, versus clean energy near 8.2e-9.
+Reducing column reconstruction error does not guarantee correct ordering of
+the cancellation-sensitive residual combination.
+
+2. KS seed 0: very small score gap still removes the correct support.
+
+The fitted coefficients are near [-1,-1,-1]; frozen clean energy is 1.065e-4.
+Adding u^2 lowers the noisy score by 4.548e-6 and lowers the dyad from 31.679
+to 13.989, while worsening clean energy by 1.518e-6. Exact-law full-bank
+cross-products are -0.04359, +0.03342, +0.01325 over the three noise seeds.
+The remaining seed-0 dominance thus combines the dyad's preference for this
+candidate with a tiny discrepancy-ranking reversal. Half/full fitting
+bootstrap agreement does not establish that this gap is statistically real.
+
+Clean-subsample reconstruction itself gives exact-law cross-products around
+4.7e-5 to 5.9e-5, above direct clean energy around 4e-11. This is a real
+reconstruction contribution, but is much smaller than the noisy scores.
+The control does not quantify reconstruction bias under noisy smoothing.
+
+3. Allen-Cahn: small-term estimation and score error both matter.
+
+The diffusion coefficient is 1e-4. At seed 0, the continuous full-model fits
+estimate it as 1.48e-4, 4.26e-4, and -4.67e-6 across folds. The drop-diffusion
+candidate has lower dyad, lower noisy score (by 1.381e-4), AND lower clean
+energy (by 1.231e-4). Improving score precision alone cannot make the present
+full-model coefficients beat that competitor on residual accuracy.
+
+At seed 2, two added-term candidates dominate. One improves both noisy and
+clean residuals, while the other improves the noisy score but worsens clean
+energy. Both estimation error and score-ranking error are present. These
+finite-record comparisons do not establish that every unregistered term is
+a generally false physical law.
+
+4. Forced KdV: structural survival conceals severely biased coefficients.
+
+The known coefficient vector is [-6,-1,1]. Seed 1 survives only with the
+full bank, yet its fitted vectors are approximately [4.01,-0.009,-0.157],
+[3.58,-0.066,-0.059], and [3.13,-0.027,-0.148]. The fold cross-products are
++0.425, -8.332, +2.053. Their negative mean protects this support on the
+Pareto front despite poor coefficients. That is not successful recovery.
+
+Exact known coefficients receive full-bank scores +1996.4, +1458.8, -1337.7.
+Natural-unit risk selection changes these to +617.1, +916.7, +29.2; this
+reduces some large magnitudes but does not yield an accurate discrepancy.
+In seed 0, several competitors also beat the biased reference on clean
+saved-data residual, so fitting and evaluation both need attention.
+
+Post-selection clean controls help localize the issue. The SAME supports,
+reconstruction pipeline, integration and linear solves recover approximately
+[-6.01,-1.00,1.00] from clean training subsamples. Their clean residual
+energies are about 2e-7 to 6e-7; the clean reconstructed exact-law score is
+about 3.6e-7. Thus quadrature or missing physical terms alone do not explain
+the huge noisy errors. Noise-sensitive reconstruction/fitting remains the
+problem. These controls do not distinguish noise-induced smoothing bias
+from variance and limited excitation by themselves.
+
+5. Wave: the retention metric hides a fitting regression.
+
+All three seeds retain catalog-valid equations, but median frozen clean
+energy of the fitted reference increases from 0.001334 to 0.07763.
+The sole coefficient is 0.04. Seed-0 continuous CLSM estimates across folds
+are 0.04817, 0.04366, 0.02290, versus old estimates 0.04198, 0.04032, 0.03962.
+For the third fold, OLS is also biased (0.02818), and covariance correction
+makes it worse. This is not a multicolumn rank-deficiency problem.
+
+With clean fields, continuous fits on these same supports have energies
+2.2e-6 to 1.1e-5. Clean-subsample reconstruction leaves those values almost
+unchanged. This points to noisy fitting and support choice, not unresolved
+integration error, as the principal regression. The supports were selected
+for the earlier raw-grid estimator and then reused for controlled comparison;
+they have not been re-optimized for this continuous estimator. That mismatch
+is a plausible contributor to test next, not a proven complete explanation.
+
+6. Why the operator-risk bank is not enough.
+
+The bank minimizes estimated mean-square error summed over normalized weak
+library columns. For corrected training matrix Z and estimated entrywise
+variance V, the retain-minus-discard risk is 2V-|Z|^2. This is a principled
+projection-risk calculation under the plug-in noise model, and its discrete
+implementation passes finite-noise and brute-force checks.
+
+However, an equation residual is a coefficient-weighted combination of those
+columns. Its error depends on cross-column covariance and cancellation.
+Pairwise candidate score differences add shared-data dependence. Minimizing
+columnwise trace risk is therefore not the same target as minimizing error
+in a residual-score comparison. The current rule also only searches prefixes
+within the old field-selected maximum frequencies and retains DC. It is an
+exploratory bank restriction, not a universal uncertainty-optimal score.
+
+Next diagnostic:
+Estimate uncertainty of paired residual-score differences with operators and
+candidate scores resampled together, keeping splits and dyad comparable.
+Account for common reconstruction bias and dependence across rotations;
+three rotations are not three independent observations. Independently test
+training-only support selection against the continuous estimator in wave and
+small-diffusion cases. Do not select a significance cutoff, complexity
+penalty, or per-system window from these clean diagnostics.

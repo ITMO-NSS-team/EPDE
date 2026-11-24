@@ -1,0 +1,86 @@
+Sampling-normalized dyadic coefficient contrasts
+Frozen before outcomes, 2026-11-17.
+
+All15 default systems, fresh anchor noise seeds21/22/23,5% noise, full
+candidate panels. Reuse the established seed0 geometry and per-candidate
+bank/OLS-or-CLSM choice, rebuilding anchor fits/corrections/validation
+weights as in uncertainty_refit. Preserve constants and all equivalents.
+No production edits, tuned gates/ridge, candidate ODE/PDE solves or PINNs.
+
+Use exactly dyad's raw weak matrix, common widest-candidate slab floor,
+dyadic partitions, all axes and stable minimum-norm slab solves. At every
+partition contrast coefficients in sibling slabs (c0-c1,c2-c3,...). This
+is a multiscale coefficient-change statistic, not an estimate divided by
+the coefficient level. Coefficients are in their original feature units.
+
+Estimate contrast noise from256 full-field bootstrap draws around the
+standard reconstructed anchor, with its estimated AR noise. Shared field
+draws preserve correlated/overlapping weak windows and cross-candidate
+dependence. For each contrast estimate variance V and mean noise shift
+b=mean(bootstrap contrast)-pilot contrast.
+
+Compare primary Q_bias: mean[(observed contrast-b)^2/((1+1/256)*V)] within
+each partition, then mean partitions and axes. The finite-Monte-Carlo factor
+accounts for estimating the shift from256 draws. Control Q_raw omits b
+and uses V. No coefficient-median denominator, no covariance ridge and
+no covariance independence assumption: marginal standardization defines
+the score; its joint distribution is calibrated empirically, not called
+chi-square in general. A zero-variance zero contrast contributes0; a
+nonzero contrast with exactly zero variance is recorded as infinite,
+never clipped. Rank-deficient minimum-norm slab fits are recorded; these
+contrasts do not establish identifiability of physical coefficients.
+
+This standardized statistic is expected to remain noise-scale invariant
+under a constant-coefficient null. Unlike relative MAD at a zero level,
+its simple Gaussian null is finite and the same at zero/nonzero coefficient
+levels. It is a change-versus-noise statistic, not a magnitude that must
+converge to0 as observation noise decreases.
+
+Structural arms with identical main fits/discrepancy:
+  D+dyad; D+complexity; D+Q_bias (primary); D+Q_raw; D alone;
+  D+Q_bias+complexity and D+dyad+complexity (three-objective controls).
+Do not scalarize complexity with a chosen weight. Report registered and
+exact-reference retention, complete front sizes/composition, and each
+gained/lost case. Unregistered is not automatically invalid.
+
+For each anchor, another128 independent pilot draws and128 fresh actual
+benchmark fields (seeds910000+1000*anchor+b) test conditional behavior.
+Reconstruct/refit the main coefficients as in the previous experiment,
+including GCV reselection; keep correction maps, geometry, method choice
+and validation weights fixed. Also report fixed-coefficient discrepancies.
+Use the same field for every objective and candidate.
+
+Noise-calibration diagnostic: form independent-bootstrap errors relative
+to pilot contrasts and benchmark errors relative to clean contrasts.
+Subtract the same estimated b, apply the same Q normalization, and use
+the95th percentile of independent-bootstrap noise scores as a diagnostic
+coverage radius. This checks coverage for the contrast vector, not the
+probability that a candidate law is correct. No such cutoff enters search.
+Also report per-contrast central95% error coverage and SD ratios. Clean
+contrasts/data are accessed only after all calibration/model inputs freeze.
+Separate this noise-calibration diagnostic from stationarity scores:
+wrong candidates may have genuine nonzero clean contrasts.
+
+Checks before real outcomes: reproduce production dyad from extracted slab
+coefficients; target/feature-unit and axis-transposition invariance; zero
+and nonzero constant null behavior; drift response; ODE_simple phase and
+energy identities with additive constants retained. Archive source/data
+hashes, score/contrast arrays, choices, all process statuses and independent
+audit arithmetic. No dropping incomplete cases or averaging away failures.
+Seven case workers with one BLAS thread each. Treat this finite-panel,
+frozen-design experiment as research, not full-search validation.
+
+Implementation preflight addendum, before structural outcomes were summarized:
+the first extractor used a mathematically equivalent reduced QR layout,
+which failed strict production replay on several large relative-MAD values.
+Preserve those attempts in implementation_initial; align the unused QR
+column, median arithmetic and axis reduction with production, add real-field
+replay tests, and rerun ALL45 cases. The tolerance stays unchanged.
+
+Secondary aggregation controls are also frozen before the final full run:
+Q_bias_sum=p*Q_bias and Q_raw_sum=p*Q_raw, where p is the fitted feature
+count including explicit constants. These sum per-feature normalized
+contrast energy rather than averaging it. Their null expectation depends
+on p, so any structural gain may be a complexity preference. They are not
+claimed as better calibrated probabilities. The original primary Q_bias
+and all other arms remain unchanged; no per-system choice or tuned weight.

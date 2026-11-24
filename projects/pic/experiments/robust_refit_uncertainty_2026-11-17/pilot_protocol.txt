@@ -1,0 +1,21 @@
+Correlation-aware nuisance reconstruction, exploratory repair
+============================================================
+AC's time-estimator bootstrap sigma remains inflated although near-unit-root
+fits disappear. The current GCV reconstruction assumes independent errors.
+For correlated errors this can retain noise in the nuisance signal.
+
+Keep the existing temporal cubic-spline and spatial DCT fourth-power penalties,
+but perform GCV in noise-whitened coordinates. For axis covariance R=L L',
+diagonalize B=L' K L=U diag(d) U'. Transform z=U' L^-1 y; use the SAME pooled
+GCV rule and inverse yhat=L U diag(1/(1+lambda*d)) z. Preserve the exact
+penalty nullspaces (affine time, constant spatial) and all candidate constants.
+Use estimated axis rho; sigma cancels from GCV. No clean signal or solver.
+At rho0 the result must agree with the existing reconstruction to numerical
+precision. Treat this as a global rule, not AC-specific parameter tuning.
+
+First use the three fresh AC-positive anchors45..47 already available: change
+only the pilot, retain time_fit anchor model and identical16 bootstrap noise
+fields. Freeze all results before diagnostic access to clean signal. These are
+exploratory paired controls, not new confirmation. If bootstrap sigma bias is
+reduced without numerical failures, freeze a separate coverage decision before
+running any new-seed coverage. Never infer coverage from parameter accuracy.

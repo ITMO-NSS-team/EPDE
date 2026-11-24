@@ -1,0 +1,47 @@
+Noise-region calibration and signal-model stress test (frozen before new fields)
+=============================================================================
+Use the validated guarded fitter from safeguard_envelope, including its original
+banded initialization and original-Python final certification. Two proposed
+faster exact initializers failed archived basin comparisons and are NOT used.
+Keep all old experiments, production code, constants and candidate identities.
+No ODE/PDE solve. Statistical Gaussian/AR draws and likelihoods are permitted.
+
+Target theta=(log sigma,atanh rho), nominal nuisance coverage97.5%.
+Methods: (1) Wald region with full observed likelihood Hessian, marginalizing
+the three curvature nuisance parameters; (2) profile likelihood-ratio region
+with those nuisance parameters reoptimized for each proposed theta. Both use
+the fixed chi-square(2) cutoff -2*log(.025). These are asymptotic candidates,
+not assumed finite-sample confidence guarantees. No truth-based fit tuning.
+Finite Hessian steps2e-4 and1e-4 check numerical stability. A nonpositive or
+ill-conditioned information matrix is unresolved, not regularized into a region.
+Profile starts: fitted nuisance plus the same4 fixed nuisance starts used in
+the original fitter. Optimization tolerances/bounds unchanged. Selected fixed-
+theta likelihood/gradient rechecked with original Python stationary innovations.
+A materially negative LR (<-1e-5) flags a deficient unrestricted fit; preserve
+and report it. Only roundoff-size negative LR may be replaced by zero, with the
+raw value retained. Failed/ill-conditioned cases remain in denominators.
+
+Controlled Gaussian model: n320, AR1 measurement noise plus independent
+stationary Gaussian AR2 second differences of the signal. Curvature parameters
+fixed from previous observed fits iid60,positive57,negative60. True noise rho
+is respectively0,+.4,-.4 and sigma=1; this scale does not affect the likelihood
+statistics. Signal formed by two cumulative sums, with affine part zero.
+The statistical model matches the fitted contrast likelihood exactly; this
+is a controlled likelihood experiment, not a candidate dynamical solver.
+Calibration128 fields/profile, seeds300..427, RNG domain989201.
+Independent validation64 fields/profile, seeds500..563, domain989202.
+Also192 fresh ODE fields: seeds200..263,64 each iid,+.4,-.4, existing raw RNG
+domain984101. No previously tested field used in these validation cohorts.
+
+From controlled calibration only, freeze per-profile rank126/128 cutoffs for
+each statistic, with unresolved values represented as+infinity. Compare the
+nominal and calibrated cutoffs on independent controlled validation. Applying
+these cutoffs to the fixed ODE signal is an explicit model-transfer stress
+test, not a distribution-free guarantee. These cutoffs depend on a specified
+controlled curvature model and are not deployable calibration for arbitrary data.
+Freeze calibration cutoffs before scoring validation true noise parameters.
+Save every fit, raw-field hash, statistic, Hessian status, nuisance profile and
+error. No posthoc cutoff adjustment. Report binomial uncertainty and numerical
+failures separately from noncoverage; distinguish modeled coverage from ODE
+coverage. Existing12-case basic-bootstrap ellipsoids may be inspected only as
+an archival descriptive comparator, never as a fresh validation cohort.

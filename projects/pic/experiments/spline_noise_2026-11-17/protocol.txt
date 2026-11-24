@@ -1,0 +1,59 @@
+Global spline means for solver-free noise estimation
+===================================================
+Preserve every previous experiment and production source. No ODE/PDE solves.
+Replace the random stationary AR2-curvature signal model by an unpenalized
+deterministic cubic B-spline mean in the RAW observations, with stationary
+Gaussian AR1 noise. Candidate mean dimensions8,16,24,32,48,64; uniform knots
+on the observed sample interval, clamped cubic endpoints. Basis contains the
+constant and linear trend. Use the complete AR1 covariance across all samples.
+For each dimension, profile variance in restricted likelihood, df=n-p, and
+search rho using65 equally spaced atanh-rho grid points over±atanh(1-1e-6),
+refining every detected interior minimum and retaining both endpoints. No
+clipping/discarding boundary fits. Re-evaluate the selected point with a direct
+whitened QR calculation; unresolved arithmetic is reported, not regularized.
+Do not compare REML objective values across different mean dimensions.
+
+Select the dimension by4-fold held-out predictive log score. Partition interior
+samples into contiguous8-point blocks; distribute blocks cyclically over4 folds.
+Keep the first/last8 points in training, avoiding unidentifiable endpoint basis
+coefficients. Refit noise and mean on each training fold. Use conditional AR1
+prediction given training observations, GLS mean-estimation covariance and a
+Student-t predictive density with n_train-p degrees of freedom. Rho is plugged
+in, so this is a selection score, not a claimed calibrated predictive density.
+Reference equations, clean signal, true noise and observed validation outcomes
+are excluded from fitting and selection. Keep all candidate dimensions/results.
+One archival positive57 development check motivated no grid/tolerance changes.
+
+Primary fresh point-estimation study: ODE seeds300..363 under iid,+.4,-.4
+(192 fields); VDP seeds300..315(48 fields); Duffing seeds300..307(24 fields).
+Use existing raw RNG domain984101, system identifier and5% signal-standard-
+deviation noise. Compare selected spline estimator, all fixed dimensions and
+the unchanged guarded AR2 fitter on identical raw fields. Total264 fields.
+Freeze all fitted models before truth-based accuracy evaluation. Report noise
+bias, correlation error, boundary/unresolved counts and selected dimensions.
+VDP/Duffing are additional signals, not evidence for the full15-system suite.
+
+Independent full-bootstrap ODE follow-up: seeds400..403 x3 profiles,12 fields.
+Both original guarded and spline/CV procedures receive128 refits, keeping every
+draw and redoing spline dimension selection inside every spline replicate.
+Use the SAME correlated-GCV pilot rule in both procedures, calculated from
+their observed estimated noise. This isolates the noise fitter change, while
+allowing its estimated correlation to affect the pilot. Covariance normalization
+holds that observed pilot fixed. The fitted spline mean is diagnostic only.
+MC16 covariance; compare studentized and observed-fixed covariance scores,
+rank123/128 and two-bank joint regions. Primary observed fields are paired;
+bootstrap fields differ when fitted noise/pilots differ, despite common normals.
+Also construct continuous basic-bootstrap ellipses for log sigma,atanh rho,
+center2theta_hat-mean(theta_star), empirical rank126/128 Mahalanobis radius.
+Selected-fit warnings invalidate nominal numerical status, never remove a draw.
+Freeze all noise regions and weak-error cutoffs before clean-field scoring.
+
+Predeclared finite sensitivity comparison, for both procedures on all12 fields:
+ellipse center, observed estimate,32 angles on half/full radius(66 points).
+Same known-noise conditional128-field/MC16/rank126 protocol as the previous
+round; preserve separate two-bank coefficient sets, include both original
+primary sets. Compare scalar compression. Freeze before clean scoring. This
+finite probe does NOT certify continuous-ellipse coverage or adaptive search.
+Report reference-support geometry, full-library error coverage and outer
+enclosure widths separately. Constants and valid identities remain present.
+No production promotion based on this small bootstrap cohort.

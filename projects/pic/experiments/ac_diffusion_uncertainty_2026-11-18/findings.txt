@@ -1,0 +1,33 @@
+Allen–Cahn diffusion under repeated noisy measurements
+18 November 2026
+
+Keep both the full and reaction-only supports eligible on this trajectory at 5% noise. The reaction-only fit usually has the lower held-out discrepancy, but the preference changes across repeat measurements. All six observation-specific forecasts span zero. The full benchmark equation is u_t = 0.0001 u_xx − 5 u³ + 5 u.
+
+Fresh benchmark repeats
+
+The sampling unit is a whole field. A positive margin D(reaction only) − D(full) favors diffusion. Each of 128 independent noise realizations used the original trajectory and the complete corrected local-plus-time weak fitting procedure. Every rotation re-estimated the group noise model, reconstruction, coefficient corrections, whitening, scale and coefficients. Both candidates shared the same observations and random perturbations.
+
+Comparison                                  Full favored    Median difference     Central repeat range
+Both supports refitted                      41/128           −1.82e-6              [−1.70e-5, +1.33e-5]
+Physical coefficients, diffusion toggled    76/128           +4.44e-7              [−2.37e-6, +3.96e-6]
+Fixed physical full law, reduced refitted  112/128           +8.62e-6              [−1.14e-5, +4.12e-5]
+
+The estimated chance that a new refitted score favors diffusion is 32.0%, with a 95% exact binomial interval of 24.1% to 40.9%. The distribution-free 95% interval for the population median difference is [−3.00e-6, −7.33e-7]. Thus a typical refit favors reaction only even while a substantial fraction of fields favors diffusion. The three-fold-median diffusion estimate, summarized by the median across fields, was 9.43e-5 against the physical value of 1.00e-4. The two fitted scores were strongly correlated across fields (0.948), motivating the paired calculation. The physical-coefficient controls are benchmark diagnostics.
+
+Forecast check
+
+Each of the six original observations supplied its own reconstructed pilot and fitted noise model. A parametric bootstrap with 128 independent full-field refits per observation produced an approximate central 95% repeat range (order statistics 3 and 126). All six original point scores favored the reduced law; every range included both signs. Five ranges contained all 128 independent benchmark margins. The sixth contained 126. The ranges were 1.42 to 4.52 times as wide as the empirical benchmark repeat range. These checks reuse the same 128 fresh fields for each forecast, so coverage counts across forecasts cannot be combined as independent trials.
+
+Generator diagnostic
+
+The fitted spatial AR correlation varied from 0.088 to 0.576 across the six observations; true benchmark noise is iid. For seed 73001, a matched four-cell diagnostic reused 64 identical innovation streams per cell. Around its reconstructed pilot, switching from fitted AR noise to the known benchmark iid noise reduced the interquartile width of the margin from 3.40e-5 to 1.14e-5. Around the clean signal it reduced the width from 2.40e-5 to 6.48e-6. With iid noise, replacing the pilot by the clean signal also changed the number of full-law wins from 39/64 to 22/64. Both noise and pilot choice matter here. These controls used the benchmark signal or noise specification and do not establish a calibrated data-only replacement.
+
+Implication for search
+
+For this pair, report the diffusion deletion as unresolved at the repeat-measurement threshold. Eliminating the full law from the earlier Pareto front would hide a term that the field supports on many repeats. The next discriminating check for an uncertainty-aware comparison is the analogous Navier–Stokes deletion, where the previous point scores favored retaining viscosity. A blanket all-system pruning rule would require calibration beyond this trajectory and support pair.
+
+Audit and reproduction
+
+All 896 primary fields had distinct hashes. The six original fields reproduced the prior fold scores to 2.34e-17. Independent evaluation from stored cross-products verified 10,752 primary fold scores; the largest absolute difference was 8.8e-16. The original full-panel code separately replayed the first and last fresh fields to within 1.0e-17. The generator diagnostic added 192 new paired pipeline runs. No candidate PDE was integrated.
+
+Run paired.py replay, paired.py run, report.py, and plot.py for the primary results. Run check_fresh.py prepare and check_fresh.py check for the two full-panel audits. Run generator.py run and generator.py report for the auxiliary control. The protocols, per-rotation sufficient statistics, coefficients, field hashes, per-replicate contrasts, numerical checks and figure are in this directory.

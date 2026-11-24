@@ -1,0 +1,10 @@
+Exploratory existing-estimator comparison, declared before its results
+====================================================================
+The profile-start guard removes extreme basins but moderate positive-rho fits
+still overestimate amplitude. Compare the unchanged existing local6 robust
+quintic-contrast estimator against repaired temporal estimates on ALL96 survey
+fields. This tests a different signal/noise separation assumption: locally
+quintic signal removal, rather than stochastic curvature AR2 modeling.
+No selection/tuning/oracle starts; fit every field with the historical estimator
+and retain boundary/nonconverged results. This is exploratory attribution, not
+new calibration or proof that local6 should replace the temporal estimator.

@@ -1,0 +1,14 @@
+{
+  "system_runs": 12,
+  "equation_seed_cases": 12,
+  "retention": 6,
+  "baseline_retention": 6,
+  "bank_choices": 576,
+  "half_full_bank_changes": 28,
+  "clean_energy_improved": 2,
+  "half_full_retention_changes": 0,
+  "broad_infeasible_fold_arms": 0,
+  "max_baseline_scaled_error": 0.0,
+  "source_and_input_hashes_verified": true,
+  "calculation_seconds": 213.0361966000055
+}

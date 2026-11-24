@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "shape": [
+        31
+      ],
+      "iid_max_abs_error": 1.3877787807814457e-17
+    },
+    {
+      "shape": [
+        51,
+        32
+      ],
+      "iid_max_abs_error": 1.3010426069826053e-17
+    },
+    {
+      "shape": [
+        41,
+        24,
+        21
+      ],
+      "iid_max_abs_error": 1.3877787807814457e-17
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\pilot_checks.py": "950eead005e020994dc3410c39d7b53e3ee35e97ab6b44385e7f7ef823397f6e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\pilot_protocol.txt": "0e9806b8edfd7f2033940ff95c82004481c52c9e734bff2bc262946a5d8271f6"
+  }
+}

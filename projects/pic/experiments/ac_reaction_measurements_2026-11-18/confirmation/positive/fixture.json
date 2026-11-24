@@ -1,0 +1,10 @@
+{
+  "field": "24001c2dd53e7bf2929e779d5c96a8f40dce072157335a3ba452e70771bbaa67",
+  "initial": "cc7cecd13ec29e3eef2e0ab5f11b6d610adb8637ca897a694fdab0520f22f460",
+  "shape": [
+    51,
+    128
+  ],
+  "noise_sigma": 0.03376843880816432,
+  "protocol": "a0157efdced3a292b74d930650ddc794902ed9259b6c3aca3163bbf86f736b55"
+}

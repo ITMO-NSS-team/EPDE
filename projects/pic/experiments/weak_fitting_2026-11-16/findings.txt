@@ -1,0 +1,113 @@
+Implemented and tested solver-free weak fitting: core 15, 2026-11-16
+
+The adaptive weak fitting step repairs major coefficient errors on KS, KdV,
+nonlinear diffusion and pde_divide, but is not a universal replacement. The
+main raw-CLSM variant retains a catalog-valid equation in 49/60 equation-seed
+cases, versus 50/60 for the previous fit with the SAME residual cross-product
+and dyad objectives. KS improves from 0/3 to 2/3; AC loses one case and the two
+NS momentum slots lose one each. The ODE structural results are unchanged.
+
+Median normalized CLEAN weak residual energy of the noisy-fitted reference
+equation, across three noise seeds (smaller is better):
+
+System               Previous fit       Adaptive raw weak CLSM
+KS                   0.866479           0.000055254
+KdV                  0.00564777         0.000060377
+pde_compound         0.370453           0.00114237
+pde_divide           0.0710132          0.000024528
+forced KdV           0.276567           0.220803
+AC                   0.000113753        0.000213437
+NS momentum u        0.000127601        0.00146676
+NS momentum v        0.000022918        0.000621741
+
+These are residual energies, not coefficient-relative errors or percentages.
+Each equation was scored separately; NS variables were never averaged into
+one objective. The CSV includes all 20 equation slots and all seeds.
+
+Structural survival with the frozen LOO evaluation bank, out of 60:
+  previous CLSM fit                         50
+  adaptive raw weak OLS                     49
+  adaptive reconstructed-field weak OLS     50
+  adaptive raw weak mean correction         49
+  adaptive reconstructed mean correction    48
+  adaptive raw weak CLSM                    49
+  adaptive reconstructed weak CLSM          48
+
+The GCV-band counts are 50, 48, 49, 48, 48, 49, 47 respectively. No method is
+chosen separately per system using clean results. Structural survival means
+a reference/catalog-equivalent candidate remains nondominated in this finite
+panel; it does not mean unique equation identification or correct coefficients.
+Wave illustrates the distinction: catalog-valid survival remains 3/3 even
+though the primary reference's coefficient accuracy deteriorates markedly.
+
+What was implemented:
+- Train-only adaptive windows using the existing PCR criterion: weak feature
+  noise amplification plus sensitivity to doubling the grid spacing.
+- Raw weak regression with integration by parts, mean correction and signed
+  corrected least-squares moments; nested bootstrap counts assess sensitivity.
+- A matched reconstructed-field fitting arm on the identical selected windows
+  to separate the window change from removal of smoothing.
+- Cached held-out quadratic forms so every candidate and fit uses exactly the
+  same discrepancy, normalization, evaluation reconstructions and dyad axis.
+- Clean-field, known-coefficient and same-window quadrature diagnostics.
+- A separate prototype enforcing complete degree-2q quadrature moments on the
+  coarse comparison grid, with infeasibility exposed rather than hidden.
+
+What the failures mean:
+1. Old short supports amplify derivative noise and attenuate coefficients.
+   Broader, operator-aware weak supports solve much of this on KS and KdV.
+2. The new coarse-grid windows can be inaccurate even on clean data, notably
+   for NS. Refining the same physical integrals improves accuracy, so numerical
+   integration needs its own control. The stricter polynomial-moment guard
+   helps partly but is infeasible for the full wave panel on its training grid.
+3. The current noisy evaluation bank can badly mis-score the exact law. Forced
+   KdV's exact-coefficient cross-products are approximately +1997,+1460,-1338
+   across seeds, against a clean energy near 3.7e-7. Fitting alone cannot cure
+   this discrepancy instability. See failure_analysis.txt for the controls.
+
+Decision: retain this as an experimental fitting implementation, with a clear
+KS improvement, rather than replace the production fitter globally. The next
+solver-free revision should combine quadrature-controlled weak fitting with
+evaluation moments selected for operator uncertainty. Keep the old estimator
+as the benchmark until the regressions are resolved across all 15.
+
+Validation and limitations:
+- All 45 system-seed cases completed, 15 default saved systems, 5% noise,
+  3 seeds, 3 reused training/evaluation rotations; 60 equation-seed cases.
+- Bootstrap budgets and evaluation fields match the previous latest baseline:
+  128 draws for ac, kdv_cossin, pde_compound, pde_divide, ns; 32 for the rest.
+  Half/full comparison changes two reconstructed-CLSM cases (three bandwidth
+  entries); no raw-CLSM retained/not-retained outcome changes. This is only
+  computational sensitivity, not a complete uncertainty interval.
+- Frozen scores reproduce the saved baseline with maximum scaled difference
+  6.73e-10. Independent finite-distribution enumeration verifies corrected
+  moment expectations to 1.78e-15; scaled linear regression error is 4.52e-11.
+- The strict quadrature follow-up completed seed 0 for ns, kdv_cossin, ks and
+  ac. Wave seed 0 was infeasible. It is a diagnostic follow-up, not an all-15
+  result, and has not been used to overwrite the main comparison.
+- No candidate equation integration, PINN, numerical PDE solution, new search,
+  or clean-data-based fitting/selection occurred. Production files were not
+  changed. Parallel independent diagnostics ran after the user's permission;
+  numerical processes used one BLAS thread and below-normal priority.
+
+Files:
+  run_fitting.py             main fitting and frozen-score comparison
+  probe.py                   train-only window selection and initial probes
+  protocol.txt               settings and data-flow audit
+  failure_analysis.txt       detailed causal checks and remaining issues
+  fit_results/               all 45 completed comparisons
+  per_equation.csv           full per-equation comparison table
+  summary.json               structural counts and accuracy summaries
+  structural_results.png    main structural figure (also SVG)
+  coefficient_results.png   coefficient-fit diagnostic figure (also SVG)
+  score_diagnostics.json    exact-coefficient and ranking controls
+  quadrature_diagnostics.json  clean/noisy coarse/fine integral controls
+  complete_quadrature.py     strict moment feasibility follow-up
+  complete_results/          four successful seed-0 follow-ups
+  evaluation_cache/          reusable frozen held-out quadratic forms
+  audit.json, numerical_checks.json  reproducibility and numerical checks
+
+results/ and probe_results/ are preliminary probes. Use fit_results/ for the
+complete main experiment. run_fitting_raw_probe.py preserves the initial
+raw-only implementation; the main script includes the matched reconstruction
+ablation. The previous core-15 study remains intact in its own directory.

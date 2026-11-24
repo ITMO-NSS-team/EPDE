@@ -1,0 +1,17 @@
+# Full-resolution coefficient comparison
+
+Compare written-target weighted least squares (WLS, unit weak-row weights) and unit-column homogeneous total least squares (TLS). All fitting and scoring are solver-free. Both methods see identical full-resolution weak rows, candidate supports, held-out observations, normalization, written-target dyad values and constants. The TLS fit uses the unordered columns. Dyad keeps the benchmark orientation in both arms to isolate the coefficient effect.
+
+Use the 15 default fixed candidate panels and all 20 equation slots. Draw 5% independent Gaussian noise from a dedicated stream for each system, seed and recording. Use six anchor indices 0–5 as a screen and six untouched indices 6–11 as confirmation, applying the same procedure to both. Each anchor has one training recording and two independent test recordings of the same clean trajectory. Use a matched zero-diffusion Allen–Cahn field as a separate deletion control. No candidate coefficients use the clean trajectory or the ground truth.
+
+## Splits and endpoints
+
+- **One recording, contiguous blocks (primary single-record test).** Split time into two disjoint halves. Fit on one, score the squared residual on the other half of the same noisy recording, reverse, and average. Construct the derivatives and weak windows separately inside each half. Axes remain at the original spacing.
+- **Independent recordings (primary repeated-record test).** Fit once on the entire anchor. Score the signed cross product of residuals on the two independent test recordings at aligned full-resolution weak windows.
+- **Blocked cross product (control).** Use the same two training-half fits as in the first test. Replace validation by the signed cross product on the opposite half of the two independent test recordings. Compare with the whole-record test and with single-record energy.
+
+Reuse the archived seed-0 full-grid local weak plan for each system. For the fitting and validation bank, cap its time radius at one quarter of the safe span of the shorter half, subject to the original smoothness floor. Cap the time stride at that radius. Apply this same footprint and stride to both halves and the whole-record fits. Preserve the archived spatial geometry, quadrature, fourth-order derivative implementation and explicit constants. Compute native dyad once on the entire anchor with its original, uncapped plan and reuse it across comparisons. Do not use row-count or term-count preferences in the objectives.
+
+Normalize a held-out residual product by the number of validation rows and by the sum of squared coefficient-weighted training column RMS values. Use training scales only. On a common support, check signed unit changes and alternate column order for TLS, and use independent linear algebra to check the fits. Flag zero training columns, nonidentifiable coefficient directions and rank-deficient WLS predictors. Bound Pareto outcomes when unresolved fits would affect membership.
+
+Primary outcome is a registered law or equivalent on the nondominated front. Also count exact references and surviving added-term supports, record paired gains and losses by system, and measure full-refit coefficient angle to the known relation in clean-column RMS units as a diagnostic. Report both cohorts separately. Multiple noise recordings on a single benchmark trajectory do not establish transfer to other initial conditions. Check constant-bearing phase and energy identities of ode_simple separately from the forced oscillator in the 15-system suite.

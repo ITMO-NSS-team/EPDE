@@ -1,0 +1,18 @@
+Exploratory attribution, fixed after seeing early direct-moment results.
+AC/forced KdV/KS/wave, all three fresh anchors24/25/26. Reuse saved local
+native raw/corrected moment arrays; no new measurement data. Keep the
+same calibration/check/actual fields, noise model, pilot and physical
+weak windows as the direct-moment study. Use the full historical candidate
+width for dyadic slab floors. Registered supports and references only.
+
+Apply the previous contrast_stability extractor to these very same moment
+matrices. Compute sibling slab coefficient differences, their estimated
+noise bias and variance from256 calibration draws, and independent256-draw
+noise radii. Evaluate coverage about clean contrasts on the same256 actual
+fields. Compare against direct-moment noise coverage. These regions cover
+different transformed quantities, so compare calibration, not their width
+or informativeness. All extraction/rank/nonfinite failures remain explicit.
+The comparison controls operator sampling and geometry, narrowing the
+attribution of poor contrast coverage to the nonlinear coefficient map.
+It is an exploratory paired diagnostic, not independent replication or a
+new deployable score. Do not change primary method choices from outcomes.

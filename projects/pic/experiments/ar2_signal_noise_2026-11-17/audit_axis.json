@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "fields": 13,
+  "likelihood_replays": 13,
+  "gradient_replays": 13,
+  "hash_links": 65,
+  "boundary": 1,
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\audit_axis.py": "65dfb71f41c964eabc7a51d5533b9178add04c30444b1ddb2bba027f7dc169fb"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\pde_compound_u_axis0.json": "3572b545abe6d5183c2f88b996ed710bc9fa19d63812c0bc07fb840905c32ea8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\pde_compound_iid_seed36.json": "7165f7882aa833af060cefe8c03b5e1ef1771c70b1ea05f952371f711a370541",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\pde_compound_u_axis1.json": "df1ef2979c3e4fc6243afed9906536939c6e74b7471d8aa184bfae41d32f0822",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ks_u_axis0.json": "e230410492e5f40a336487a96bdbe6396e6e132858a19d294cf2fac592d79706",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ks_iid_seed36.json": "e34f00645fdd641d096dfc7e1ab2790dbaaacfedb23f50d6111b60a29161cf16",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ks_u_axis1.json": "52fcce26c75fffe7e481b288dfacd9fcdb95333e071d7ec97c5aa0f1f02740d4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_u_axis0.json": "a75663833c77b0d16823a9cfb503fa0d5ac8053e8308b098cc38958ef796ad6d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\score_screen\\ns_iid_seed36.json": "bead89da640b813cfa80c8e8a54541e8a3fe56fc0ff8abad2789d8e892ea8a27",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_u_axis1.json": "a39fa546c2b5edc0536243fd6aef65c5fe42bd9d433303eb74f1a47f9ea24141",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_u_axis2.json": "33020998e2d9e304a47cce30f58e58fa23daebfb31d68dc11bb232ad6bb50939",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_v_axis0.json": "c3e4cd5bc8cafb759f23209bf5d8455da60058182f3f6712785f77e7ecf1c217",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_v_axis1.json": "a85d6eacfe7515cdb50cf65668055b3d7137418f5de89880a8dd002dac9d8022",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_v_axis2.json": "d65dc23bfd89ad471e2fe2cc44060db9b0d39bd880963ef5e84f3e5e17b48c27",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_p_axis0.json": "427719924ec8aed4150af7e3896381f7aee0de2a8d16d783fe8eb50ee8aa7344",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_p_axis1.json": "7289e0db640440641d78276421df01cf538494f9dc66b850e95218949eb78f3c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_frozen\\ns_p_axis2.json": "a4032d17b8410e08fecde6786582fe5faf4d682b5a45b40fa928b3de066c8dc2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\ar2_signal_noise_2026-11-17\\axis_diagnostic.json": "40b9622bc3b47ecb468096412e05af21c6f512c6b46d54481e406b95eee64f33"
+  }
+}

@@ -1,0 +1,123 @@
+All 15 core systems: residual cross-product screen, 2026-11-16
+
+Result: the improvement extends beyond Kepler, but is not universal. The
+primary 32-draw run retains a catalog-valid equation on the Pareto front in
+51/60 equation-seed cases, versus 46/60 for matched ordinary residual energy.
+GCV and exact-LOO bandwidths give the same aggregate retention in this panel.
+Higher-draw checks on five systems remove the marginal Navier-Stokes gain:
+the combined result is 50/60 versus 46/60, with 128 draws on those five and
+32 draws on the other ten. This is NOT an all-15 128-draw result.
+
+All 45 system-seed cases completed: 15 saved default datasets, 3 independent
+5%-noise seeds, 20 equation slots per seed. Each equation's two objectives
+were evaluated separately. Catalog equivalents were credited; an unregistered
+competitor is not automatically a false law. No equation solver was used.
+
+Where it helps:
+- pde_divide: 3/3 retained, versus 0/3 for ordinary energy, at both 32 and 128
+  draws. The competing time-polynomial and time-harmonic fits have a smaller
+  measurement-noise contribution. Cross-products remove enough of that
+  advantage to preserve the governing structure.
+- pde_compound: 1/3 retained, versus 0/3, at both draw budgets. The other seeds
+  still favor models dropping a physical term. The clean-fit energies of the
+  two dropped-term models in seed 0 are 0.304 and 0.977, versus 6.7e-8 for the
+  full structure; these competitors are not exact clean weak identities.
+- NS momentum slot 1, seed 1: the apparent 32-draw gain disappears at 64 and
+  128 draws. Do not present this as established improvement.
+
+Where it fails:
+- Forced KdV (kdv_cossin) and KS: no catalog-valid candidate survives in any
+  seed. Forced KdV's failures persist at 128 draws; KS was screened at 32.
+- Allen-Cahn: one seed remains dominated. Increasing draws removes the
+  missing-diffusion competitor but leaves an added cos(2t) competitor.
+- Nonlinear diffusion (pde_compound): two of three seeds remain dominated.
+
+Per-equation retention out of three seeds (LOO; GCV totals are identical):
+System             Slot   Energy B32    Product B32    Energy latest Product latest
+ode                   0       3/3          3/3          3/3          3/3
+vdp                   0       3/3          3/3          3/3          3/3
+duffing               0       3/3          3/3          3/3          3/3
+lv                    0       3/3          3/3          3/3          3/3
+lv                    1       3/3          3/3          3/3          3/3
+lorenz                0       3/3          3/3          3/3          3/3
+lorenz                1       3/3          3/3          3/3          3/3
+lorenz                2       3/3          3/3          3/3          3/3
+ac                    0       2/3          2/3          2/3          2/3
+burgers               0       3/3          3/3          3/3          3/3
+burgers_inviscid      0       3/3          3/3          3/3          3/3
+wave                  0       3/3          3/3          3/3          3/3
+kdv                   0       3/3          3/3          3/3          3/3
+kdv_cossin            0       0/3          0/3          0/3          0/3
+ks                    0       0/3          0/3          0/3          0/3
+pde_compound          0       0/3          1/3          0/3          1/3
+pde_divide            0       0/3          3/3          0/3          3/3
+ns                    0       3/3          3/3          3/3          3/3
+ns                    1       2/3          3/3          2/3          2/3
+ns                    2       3/3          3/3          3/3          3/3
+
+Latest uses B128 only for ac, kdv_cossin, pde_compound, pde_divide and ns.
+Catalog-valid survival means at least one reference/registered alternative
+lies on the finite candidate panel's nondominated front. It is not unique
+identification, coefficient accuracy, or successful evolutionary recovery.
+
+Why the hard PDEs still fail:
+Controls fit the reference structure to clean split/reconstructed data, then
+evaluate it on the clean field. The same control evaluates coefficients
+fitted to noisy data by the tested CLSM method. The following are normalized
+clean weak residual energies, averaged over the three rotations of seed 0:
+System             Clean-split fit    Noisy CLSM fit
+kdv_cossin         4.22048e-07    0.273894
+ks                 9.99545e-07    0.859069
+pde_compound       7.43978e-08    0.485548
+pde_divide         3.64791e-10    0.0841009
+The clean-split controls recover the hard PDEs accurately, whereas noisy
+fits remain inaccurate even on clean fields. Thus time splitting alone is
+not the main obstruction in these controls. High-order derivative and
+nonlinear weak features remain sensitive to measurement noise; the current
+bootstrap correction and fitting windows do not resolve their estimation.
+These diagnostics support a fitting/measurement bottleneck as well as a
+discrepancy bottleneck. They do not prove one unique source of the error.
+
+Recommended next experiment: keep dyad fixed and use the same finite panel
+to test a common solver-free weak coefficient estimator/window rule on KS,
+forced KdV and pde_compound. Require the reference's clean-field residual
+with noisy-fit coefficients to improve before judging discrepancy ranking.
+Then compare both discrepancy scores in a fresh search across all 15.
+
+Scope and reproducibility:
+- Fixed diagnostic candidate panel, not a full EPDE evolutionary run. It
+  includes missing/extra terms, registered alternatives, time/trig fits and
+  alternate first-order targets. Trig competitors use the fixed 2t menu plus
+  catalog forcing terms; this is not an exhaustive frequency search.
+- PDE adaptation differs from the original Kepler protocol: pooled temporal
+  splines, spatial DCT shrinkage, and a common spectral-resolution support
+  rule. The instability axis is the full-record raw production dyad, not
+  the earlier Kepler CLSM dyad. See protocol.txt for every choice.
+- The initial harness inherited a width-6 dyad setting while the panel's
+  widest candidate has 8 fitted features. analyze_screen.py recomputed ALL
+  45 instability axes using the common width and refreshed every dominance
+  result. Use audited/, not the initial results/, for B32 conclusions.
+  Discrepancy values and coefficients were unaffected. run_screen.py now
+  sets the common width before fitting. run_screen_initial.py preserves the
+  exact initial experiment source. Smoke outputs are timing/debug only.
+- All raw split index sets are disjoint and exhaustive. Reconstructions,
+  bandwidths and bootstrap fields use only their own training/evaluation
+  group. Nonlinear terms are rebuilt. Signed cross-products are not clipped.
+- Numerical checks: spline max error 6.64e-14 versus SciPy at fixed lambda;
+  2D zero-mode weak integral error 2.04e-14; exact LOO agrees with brute
+  refits; all 15 catalog equations parse; final score arrays are finite.
+- The 16/32 and 64/128 comparisons measure computational sensitivity, not
+  confidence intervals. Three rotations reuse data and are not independent
+  experiments. No full uncertainty interval over training, bandwidth and
+  bias estimation was computed. Marginal nondominance is not strong evidence.
+- One worker, one BLAS thread, below-normal priority. Primary calculation
+  time summed over cases: 298.0s; follow-ups: 160.6s.
+
+Artifacts:
+  audited/per_equation.csv             complete primary table
+  audited/structural_survival.png      primary figure (also SVG)
+  audited/fit_diagnostics.json         clean/noisy coefficient controls
+  followup128/per_equation.csv         five-system sensitivity checks
+  latest_per_equation.csv              mixed-budget table, draw count explicit
+  final_summary.json                  machine-readable primary/latest counts
+  manifest.json                       sources, environment and checks

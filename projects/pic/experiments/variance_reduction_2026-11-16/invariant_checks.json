@@ -1,0 +1,129 @@
+{
+  "rows": [
+    {
+      "q": 0,
+      "method": "plain",
+      "identity": "energy",
+      "constant": 2.69,
+      "clean_energy": 1.1226907303085741e-12,
+      "constant_deleted_energy": 3.9920187335033543,
+      "constant_column_norm": 1.0937718732079542,
+      "k": 2
+    },
+    {
+      "q": 0,
+      "method": "plain",
+      "identity": "phase_sin",
+      "constant": 1.0,
+      "clean_energy": 2.806725338713967e-13,
+      "constant_deleted_energy": 3.9422043110193368,
+      "constant_column_norm": 1.0937718732079542,
+      "k": 2
+    },
+    {
+      "q": 0,
+      "method": "plain",
+      "identity": "phase_cos",
+      "constant": -1.3,
+      "clean_energy": 2.8067253384890425e-13,
+      "constant_deleted_energy": 3.9915613844288904,
+      "constant_column_norm": 1.0937718732079542,
+      "k": 2
+    },
+    {
+      "q": 0,
+      "method": "white128",
+      "identity": "energy",
+      "constant": 2.69,
+      "clean_energy": 1.1226907298956607e-12,
+      "constant_deleted_energy": 3.840914162490483,
+      "constant_column_norm": 73.84022503605858,
+      "k": 2
+    },
+    {
+      "q": 0,
+      "method": "white128",
+      "identity": "phase_sin",
+      "constant": 1.0,
+      "clean_energy": 2.806725340635009e-13,
+      "constant_deleted_energy": 4.304907027405433,
+      "constant_column_norm": 73.84022503605858,
+      "k": 2
+    },
+    {
+      "q": 0,
+      "method": "white128",
+      "identity": "phase_cos",
+      "constant": -1.3,
+      "clean_energy": 2.8067253413597656e-13,
+      "constant_deleted_energy": 3.51320912823554,
+      "constant_column_norm": 73.84022503605858,
+      "k": 2
+    },
+    {
+      "q": 1,
+      "method": "plain",
+      "identity": "energy",
+      "constant": 2.69,
+      "clean_energy": 1.122690733566434e-12,
+      "constant_deleted_energy": 3.999502309844657,
+      "constant_column_norm": 1.1951980568621696,
+      "k": 2
+    },
+    {
+      "q": 1,
+      "method": "plain",
+      "identity": "phase_sin",
+      "constant": 1.0,
+      "clean_energy": 2.806725344214476e-13,
+      "constant_deleted_energy": 4.002442453493341,
+      "constant_column_norm": 1.1951980568621696,
+      "k": 2
+    },
+    {
+      "q": 1,
+      "method": "plain",
+      "identity": "phase_cos",
+      "constant": -1.3,
+      "clean_energy": 2.806725350455228e-13,
+      "constant_deleted_energy": 3.997587171127497,
+      "constant_column_norm": 1.1951980568621696,
+      "k": 2
+    },
+    {
+      "q": 1,
+      "method": "white128",
+      "identity": "energy",
+      "constant": 2.69,
+      "clean_energy": 1.1226907378118093e-12,
+      "constant_deleted_energy": 4.020953577038671,
+      "constant_column_norm": 78.60942284332634,
+      "k": 2
+    },
+    {
+      "q": 1,
+      "method": "white128",
+      "identity": "phase_sin",
+      "constant": 1.0,
+      "clean_energy": 2.806725362015007e-13,
+      "constant_deleted_energy": 3.901254802888844,
+      "constant_column_norm": 78.60942284332634,
+      "k": 2
+    },
+    {
+      "q": 1,
+      "method": "white128",
+      "identity": "phase_cos",
+      "constant": -1.3,
+      "clean_energy": 2.8067253677401447e-13,
+      "constant_deleted_energy": 4.091766698886103,
+      "constant_column_norm": 78.60942284332634,
+      "k": 2
+    }
+  ],
+  "phase_derivative_power": 1,
+  "energy_derivative_power": 2,
+  "maximum_derivative_order": 1,
+  "all_constants_preserved": true,
+  "source_sha256": "183113e53f4680ac6aa076ea45550c0f4386cb45bce60901cf5684d4efce8ba0"
+}

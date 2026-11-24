@@ -1,0 +1,93 @@
+Local weak discrepancy and continuous raw fitting: core-15 results
+2026-11-16; 45 runs, 60 equation-seed cases; 5% noise, seeds 0/1/2.
+Solver-free. All candidates, dyad values and physical supports held fixed.
+
+Local weak evaluation is a useful improvement for nonlinear diffusion and
+reduces high-derivative evaluation noise substantially. It is not a complete
+fix. Fitting directly on raw observations is not a reliable replacement for
+the reconstructed-field fit, especially for wave.
+
+Retained registered structures / 60 (finite-panel Pareto survival):
+  Old fit, old spectral cross-score                 50
+  Continuous reconstructed fit, spectral score     53
+  Continuous reconstructed fit, LOCAL score        54
+  Continuous RAW CLSM fit, spectral score           51
+  Continuous RAW CLSM fit, LOCAL score              54
+  Continuous RAW OLS fit, LOCAL score               54
+
+With the continuous reconstructed fit, ordinary local residual energy retains
+53/60 versus 47/60 with ordinary spectral energy. Mean-corrected and
+uncorrected local cross-products both retain 54/60. Improvement is primarily
+the weak test representation here, not a universally necessary correction.
+
+Score-only comparison, identical fitted coefficients:
+  Nonlinear diffusion: 1/3 -> 3/3.
+  Forced KdV:          1/3 -> 0/3.
+  All other slots retain the same binary outcomes.
+The lost forced-KdV survivor had badly biased coefficients and a favorable
+negative spectral score; its earlier survival was not accurate recovery.
+The local score reveals competitors that truly beat that fit on clean data.
+
+Why nonlinear diffusion improves:
+At seed 1, dropping (u_x)^2 changed the spectral discrepancy by -2.665 with
+paired SD 7.304, although the clean spectral gap was +0.1465. The local bank
+gives gap +0.2164 with SD 0.008422 and clean local gap +0.2023. The required
+term now wins clearly, without changing coefficients or using clean data
+to choose the bank. Seed 2 is also recovered.
+
+Exact-law discrepancy standard deviations, spectral -> local:
+  Nonlinear diffusion seed 0: 10.6723 -> 0.010668
+  Nonlinear diffusion seed 1: 11.0233 -> 0.009000
+  Nonlinear diffusion seed 2: 13.0508 -> 0.007723
+  KS seed 0:                  0.15266 -> 0.00006455
+  KS seed 1:                  0.15001 -> 0.00004904
+  KS seed 2:                  0.16059 -> 0.00005528
+The banks and their training-energy normalizations differ; these are not
+two estimators of exactly the same norm. Clean discrimination between
+candidate equations must be checked alongside the smaller score noise.
+
+Remaining problems:
+- KS seed 0 still loses to small added-term candidates. Added u^2 improves
+  the local score by 7.91e-7 with paired SD 2.14e-6, yet worsens clean local
+  score by 9.97e-7. This remains a very small, unresolved ranking reversal.
+- Allen-Cahn seeds 0/2 still lose small diffusion contributions. Some dropped
+  models also beat the currently fitted reference on clean data, so score
+  precision alone cannot repair those coefficient estimates.
+- All forced-KdV seeds fail with the reconstructed fit. Seed 2's training
+  fold 0 inherited spatial radius 4, q 4 from the earlier selector. Its exact-law
+  local score is 14142, overwhelming the other folds (-4.51 and +10.18).
+  The local bank is only as good as its supports; reusing a tiny support can
+  retain severe derivative noise. No hand-chosen radius was substituted.
+- Wave retains equivalent/reference structures but fitted-reference accuracy
+  remains poor. Continuous raw fitting worsens the median frozen clean energy
+  from 0.07763 to 0.90982 (old fit: 0.001334). Do not interpret its 3/3 retained
+  structures as accurate coefficient estimation.
+
+Raw-fitting tradeoffs:
+Median frozen clean energy improves modestly for KdV and NS continuity but
+worsens for nonlinear diffusion, variable-coefficient PDE and wave. Allen-Cahn
+retention falls from 1/3 to 0/3; forced KdV gains a survivor but still has poor
+coefficients. Its aggregate 54/60 does not justify replacing the current fit.
+Half/full raw CLSM budgets retain 54/60 locally, but individual fit/score
+behavior and global-score counts differ. Full data are retained in the CSVs.
+
+Validation: all 45 input/source hashes verified, all scores finite, old
+50/60 and current 53/60 spectral baselines reproduced. Continuous quadrature
+and paired-noise code use the previously validated implementations. No
+production files were changed. No clean fields enter tuning or fitting.
+
+These tests reuse the same three noisy records per system and finite panel.
+Conditional uncertainty holds coefficients/denominators/bank choices fixed
+and excludes common reconstruction bias. No uncertainty threshold modifies
+dominance. Neither 54/60 nor the apparent error ranges are full-search or
+independent-dataset validation.
+
+Next targeted experiment: use independently reconstructed training replicas
+in weak coefficient regression (symmetric instrumental cross-products),
+comparing uncorrected and mean-corrected operators. Keep outer held-out groups
+and local scoring separate. This tests a mechanism for errors-in-variables
+without candidate integration or choosing windows from known coefficients.
+
+Files: protocol.txt, run_local.py, summarize.py, results/*.json,
+per_equation.csv, paired_comparison.csv, exact_controls.csv,
+structural_results.png/.svg, summary.json, audit.json.

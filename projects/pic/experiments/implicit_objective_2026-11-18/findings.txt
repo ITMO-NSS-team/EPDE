@@ -1,0 +1,43 @@
+Target-invariant fitting and discrepancy on the default EPDE panels
+18 November 2026
+
+An equation can be fitted and scored without specifying a regression target. The implementation does this for a fixed set of weak terms and a fixed measurement design. On the independent confirmation panel it retained 53/60 registered laws or equivalents, compared with 57/60 for the existing method. The symmetry works. The evidence favors retaining the method as a research option while improving coefficient fitting.
+
+Construction
+
+Write the law as sum_j v_j T_j = 0. In one training group, normalize each weak column by its training norm, take the least right singular direction of the normalized real matrix, then undo the column scaling. Complex moments use both real and imaginary rows with a real coefficient vector. An exact zero training column or a numerically nonunique smallest direction is recorded as unresolved. The sign and length of v carry no information. Constants remain columns of the law. Re-anchoring for display is meaningful only at a nonzero coefficient.
+
+In the other two disjoint groups score
+  D(v) = [(L v)' (R v)] / sum_j [(s_j v_j)^2],
+where L and R are the two whitened, noise-corrected held-out weak matrices and s_j is the norm of the corresponding whitened training-pilot column on the validation design. Compute this score in each of the three training rotations and average it. Either scaling the entire equation or changing a term's physical unit with the inverse change in its coefficient preserves the score. The physical training constraint used by the fit also has this invariance. The denominator measures the scale of the participating terms without their signed cancellations. D is a signed cross-product estimator.
+
+The existing dyad uses one written term as the regression target. For the fully symmetric comparison, evaluate the same dyadic-slab score once with each term as target, using a common slab floor. Aggregate their scores by the median without selecting a favored orientation. A canonical ordering of term IDs keeps floating-point evaluations deterministic. This gives one scalar per unordered support. The additional pivot-fits can increase cost. No explicit size preference or term-count objective was used.
+
+Results
+
+The screen and confirmation each cover 15 systems, 45 new 5%-noise fields and 60 equation/seed slots on the existing trajectories. Seed 21 supplied a separate replay across all 15 systems. Every baseline discrepancy and dyad replay matched the archived reference up to floating-point error.
+
+Using only local training windows left 63 candidate instances unresolved on the initial screen, including time polynomials and harmonics that collapsed to indistinguishable columns. A fixed additional training block, containing temporal weak modes 0 through ±4 on the common broad footprint, resolved all candidates across both cohorts and the replay. The augmented method uses one shared physical coefficient direction, while the held-out score uses exactly the same observations and whitening as in the matched baseline. All 7,350 candidate-fold fits were independently recomputed using an alternate SVD driver and the stored validation Gram cross-product. Across 32,928 augmented refits under changes of pivot, column order, units and signs, maximum projective direction change was 4.72e-13 radians and maximum scaled discrepancy difference was 3.28e-13. These are numerical checks on the fit and discrepancy. Median dyad's pivot symmetry follows from taking the same set of chart scores in canonical order.
+
+                                               First 60       Independent 60
+Current method, registered/equivalent           55              57
+Old fit and dyad, symmetric denominator only    55              57
+Augmented implicit fit and symmetric dyad       56              53
+Current method, literal reference               50              52
+Augmented method, literal reference             51              51
+Current mean front size                        3.03            3.45
+Augmented mean front size                      3.22            3.37
+
+The denominator-only control retains a directional coefficient fit. On the confirmation cohort the median energy-weighted angle of the reference coefficient vector from truth went from 0.291 degrees to 0.395 degrees. Small angular errors can still hide large relative errors in weak terms. These are fixed-panel Pareto results and do not measure the success of an evolutionary discovery run.
+
+On confirmation, all four lost equation/seed slots were identifiable in the paired comparison. In Allen–Cahn seed 6111 an added-term competitor dominated the reference. In Navier–Stokes slot 0 at seeds 6111, 6112 and 6113, the same competitor dropped the viscous term 0.01*d²u/dx2². On seed 6111 its discrepancy improved from 1.29e-4 for the full equation to 1.10e-4 for the reduced equation, and its median-pivot dyad was also smaller. Under the original method the corresponding discrepancies favored the full reference (5.47e-5 versus 2.78e-4).
+
+Attribution and limits
+
+On exactly the same augmented training matrices, symmetric score and symmetric dyad, reverting to ordinary least squares with the original written target also retained 53/60 on confirmation and lost the same Navier–Stokes slot in all three seeds. Two further retrospective alternatives, selecting the best-conditioned internal pivot or averaging chart projectors, retained 53/60 and 51/60 respectively. Reintroducing a target by itself did not restore viscous-term sensitivity. The remaining differences from the original fitting pipeline include weak-bank selection and its errors-in-variables correction. This experiment does not isolate which of those choices would restore sensitivity in an implicit fit.
+
+The noiseless analytic ode_simple phase identities were preserved with constants 1 and 1.3, and the first-derivative energy identity with constant 2.69, for all written pivots. Omitting their constant produced a nonzero discrepancy in all nine training rotations. These are separate analytic controls.
+
+Results are conditional on the candidate panels, equation slots, benchmark trajectories and common physical bank designs. Upstream geometry inherited from the earlier benchmark was held fixed. To make a future search invariant end to end, bank selection, candidate generation, deduplication and system-equation independence checks must also operate on the unordered physical support wherever they can otherwise depend on the designated target. Numerical uniqueness is different from statistical identification. Production settings were not changed and no candidate equation was integrated.
+
+Files: implicit.py (fit and held-out score); benchmark.py (dyad and primary comparison); time_followup.py (augmented fit); comparison.json (all slot outcomes and numerical checks); coefficients_by_fold.csv; chart_results.json; identity_checks.json. Protocols and per-field matrices, hashes and results accompany these files.

@@ -1,0 +1,75 @@
+Joint noise correction and coefficient-sensitive validation, core15
+Frozen before new outcomes, 2026-11-16.
+
+Test ALL 15 default systems: ac, burgers, burgers_inviscid, duffing, kdv,
+kdv_cossin, ks, lorenz, lv, ns, ode, pde_compound, pde_divide, vdp, wave.
+Three fresh 5% noise seeds 12/13/14 per system; independent outer measurement
+records 15/16/17 respectively. Same benchmark clean fields, not new trajectories.
+Known registered supports and equivalents only. No structural-search claim.
+Three interleaved rotations: train one group, select on the other two;
+outer evaluation uses matching groups from the independent noise record.
+Generate outer data only after serialized, hashed training/selection freeze.
+
+Geometry: historical seed-0 local plans and minimum-q broad k from existing
+joint_prediction_risk; align broad full supports to each native sample grid.
+Natural-stride local centers. Native common physical validation windows are
+the intersection of all usable group domains, exactly as native_moments.
+Use local, broad, and stacked local+broad fitting with joint covariance.
+No new geometry or bandwidth tuning. Rich reference moments for validation
+use each historical seed-0 spectral loo bank applied to TRAINING pilot only.
+
+Five estimators on each bank:
+  OLS; existing residual-covariance IRLS; pooled common-covariance GLS;
+  corrected OLS; corrected GLS with the identical pooled weight as GLS.
+With centered joint operator draws D and whitening A, corrected normal Gram
+is (A point)^T(A point) - mean[(A D)^T(A D)], using divisor B-1.
+Subtract BOTH predictor/predictor and predictor/target blocks. B=512.
+Mean operator contractions are unchanged. Require a positive full-rank
+normalized predictor Gram at existing numerical cutoff 1e-12; otherwise
+explicitly infeasible. No signed inverse, ridge, clipping or fallback.
+Weights are estimated from the same training pilot/draws and held fixed
+within each corrected regression. This is a conditional correction, not
+a claim of exact unconditional unbiasedness for data-estimated weights.
+
+Three selection scores, with IDENTICAL fit option sets:
+  broad_white: previous native broad pooled-whitened cross residual;
+  broad_transfer: broad residual mapped to implied coefficient correction;
+  mixed_transfer: stacked local+broad residual mapped likewise (primary).
+For a fixed registered support X and training pilot, form the GLS left
+inverse L of its validation predictor matrix using training pooled weights.
+Apply rich training spectral predictor matrix H: score is
+  Re[(H L r_left)^* (H L r_right)] / ||rich pilot target||^2.
+Use a real Gram square root for H when computing. Require identifiable
+predictor directions in both validation and rich pilot matrices; report
+infeasible otherwise. Constants remain actual weak columns.
+This score compares fitting methods for the SAME specified equation support.
+It projects away residual directions outside that predictor span and is NOT
+a general structural-discovery score. This limitation is tested, not hidden.
+
+Fit options: local/broad/mixed x (IRLS, corrected GLS), six fixed options.
+OLS, GLS and corrected OLS are fixed controls. Choose smallest inner score;
+deterministic order breaks exact ties. Exclude failed options explicitly;
+mark forced choice when only one is feasible, failure when none are.
+No selector chooses between scoring rules using clean/outer outcomes.
+Save actual score transforms, normalizations, coefficients and decisions.
+
+Report independent outer signed scores, clean versions of each validation
+metric, common frozen clean spectral residual energy and coefficient errors.
+Keep incomplete cases explicit; medians require all three seed cases.
+Compare fitting-only correction against matched GLS/OLS and mixed IRLS;
+compare score rules on identical fit sets; report combined pipeline separately.
+Repeated folds share records; counts are descriptive, not independent tests.
+
+Conditional ablation: use the already frozen forced-KdV training arrays from
+outer_selection seeds 6/7/8, with their 64 independent pilot-noise draws per
+fold/bank. Apply the same correction and fixed pooled weights to each draw.
+Compare bias from the corresponding noiseless pilot estimator, dispersion
+and feasibility. No conditional result changes the new core15 protocol.
+
+Checks: target/predictor cross-correction algebra, feature-unit invariance,
+exact constants, transfer-map recovery of planted coefficient deviations,
+rank/indefiniteness failures, frozen selection isolation/replay, complete
+45-run coverage, raw seed replay, source/input/result hashes, finite outputs,
+incomplete-case aggregation, and ODE_simple phase/energy identity controls.
+No candidate ODE/PDE solves, PINNs, production changes or commits. Parallel
+processes with one BLAS thread each; use available CPU/memory resources.

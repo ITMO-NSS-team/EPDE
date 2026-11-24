@@ -1,0 +1,765 @@
+{
+  "status": "COMPLETE",
+  "role": "Archived development only; no validation claim.",
+  "rows": [
+    {
+      "key": "stress_ode_positive_seed1283",
+      "old_p": 16,
+      "screens": [
+        {
+          "p": 8,
+          "next_p": 16,
+          "union_rank": 20,
+          "small_quadratic": 3743390.446652613,
+          "large_quadratic": 2115771.9894256094,
+          "improvement": 1627618.4572270038,
+          "df1": 12,
+          "df2": 300,
+          "f_statistic": 19.231969056231698,
+          "pvalue": 7.675592074789901e-31,
+          "limit": {
+            "eta": 0.011998052302349864,
+            "nll": -903.1316821308894,
+            "df": 312
+          },
+          "nll0": -903.1316821188159,
+          "limit_lr": -1.2073542166035622e-08,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 16,
+          "next_p": 24,
+          "union_rank": 36,
+          "small_quadratic": 2274390.888075237,
+          "large_quadratic": 2077716.7300945008,
+          "improvement": 196674.15798073635,
+          "df1": 20,
+          "df2": 284,
+          "f_statistic": 1.3441548613796994,
+          "pvalue": 0.15027799275984868,
+          "limit": {
+            "eta": 0.007481552714978901,
+            "nll": -1059.562092405907,
+            "df": 304
+          },
+          "nll0": -1059.5620924054867,
+          "limit_lr": -4.2018655221909285e-10,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 24,
+          "next_p": 32,
+          "union_rank": 52,
+          "small_quadratic": 6.851879852909174,
+          "large_quadratic": 6.048306758789269,
+          "improvement": 0.8035730941199049,
+          "df1": 28,
+          "df2": 268,
+          "f_statistic": 1.2716521795316722,
+          "pvalue": 0.16922882160322,
+          "limit": {
+            "eta": 0.007208939252436838,
+            "nll": -1071.409205515775,
+            "df": 296
+          },
+          "nll0": -1077.4111268603706,
+          "limit_lr": 6.00192134459553,
+          "boundary_excluded": false,
+          "fit_status": "ok"
+        },
+        {
+          "p": 32,
+          "next_p": 48,
+          "union_rank": 76,
+          "small_quadratic": 3.7377801345159334,
+          "large_quadratic": 3.1420595048697004,
+          "improvement": 0.595720629646233,
+          "df1": 44,
+          "df2": 244,
+          "f_statistic": 1.051393733432729,
+          "pvalue": 0.3932742311160684,
+          "limit": {
+            "eta": 0.007245754546378053,
+            "nll": -1065.0529269935637,
+            "df": 288
+          },
+          "nll0": -1082.3456207613613,
+          "limit_lr": 17.292693767797573,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 48,
+          "next_p": 64,
+          "union_rank": 108,
+          "small_quadratic": 2.729955533710925,
+          "large_quadratic": 2.1045806591791507,
+          "improvement": 0.6253748745317744,
+          "df1": 60,
+          "df2": 212,
+          "f_statistic": 1.049927870606823,
+          "pvalue": 0.39176819664475493,
+          "limit": {
+            "eta": 0.007474563389629779,
+            "nll": -1035.5849472198452,
+            "df": 272
+          },
+          "nll0": -1053.7803933855425,
+          "limit_lr": 18.195446165697376,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 64,
+          "next_p": 96,
+          "union_rank": 156,
+          "small_quadratic": 2.356905065770245,
+          "large_quadratic": 1.4869758970510916,
+          "improvement": 0.8699291687191535,
+          "df1": 92,
+          "df2": 164,
+          "f_statistic": 1.0428839524807358,
+          "pvalue": 0.40314587767446386,
+          "limit": {
+            "eta": 0.00776457325206081,
+            "nll": -994.5460034059194,
+            "df": 256
+          },
+          "nll0": -1007.8921067652923,
+          "limit_lr": 13.346103359372933,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        }
+      ],
+      "choices": {
+        "cv_a01": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.01,
+          "ordering": "cv"
+        },
+        "smallest_a01": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.01,
+          "ordering": "smallest"
+        },
+        "cv_a05": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.05,
+          "ordering": "cv"
+        },
+        "smallest_a05": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.05,
+          "ordering": "smallest"
+        }
+      }
+    },
+    {
+      "key": "stress_ode_positive_seed1334",
+      "old_p": 16,
+      "screens": [
+        {
+          "p": 8,
+          "next_p": 16,
+          "union_rank": 20,
+          "small_quadratic": 3455070.827813487,
+          "large_quadratic": 1822337.3060626127,
+          "improvement": 1632733.5217508744,
+          "df1": 12,
+          "df2": 300,
+          "f_statistic": 22.398892843808905,
+          "pvalue": 3.6180300906307523e-35,
+          "limit": {
+            "eta": 0.011073950497820383,
+            "nll": -928.138101557252,
+            "df": 312
+          },
+          "nll0": -928.1381015437886,
+          "limit_lr": -1.3463363757182378e-08,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 16,
+          "next_p": 24,
+          "union_rank": 36,
+          "small_quadratic": 1982995.6673083778,
+          "large_quadratic": 1801303.4026130983,
+          "improvement": 181692.26469527953,
+          "df1": 20,
+          "df2": 284,
+          "f_statistic": 1.4323129323634178,
+          "pvalue": 0.10602450468463659,
+          "limit": {
+            "eta": 0.006523015325256521,
+            "nll": -1101.24158997692,
+            "df": 304
+          },
+          "nll0": -1101.2415899764214,
+          "limit_lr": -4.986304702470079e-10,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 24,
+          "next_p": 32,
+          "union_rank": 52,
+          "small_quadratic": 5.906254925193005,
+          "large_quadratic": 5.396269644814454,
+          "improvement": 0.5099852803785518,
+          "df1": 28,
+          "df2": 268,
+          "f_statistic": 0.9045670444422577,
+          "pvalue": 0.6083893433046329,
+          "limit": {
+            "eta": 0.006196683473006695,
+            "nll": -1116.196253203305,
+            "df": 296
+          },
+          "nll0": -1122.111246290294,
+          "limit_lr": 5.914993086988943,
+          "boundary_excluded": false,
+          "fit_status": "ok"
+        },
+        {
+          "p": 32,
+          "next_p": 48,
+          "union_rank": 76,
+          "small_quadratic": 3.527387002407603,
+          "large_quadratic": 2.9113280867195175,
+          "improvement": 0.6160589156880856,
+          "df1": 44,
+          "df2": 244,
+          "f_statistic": 1.173459882400203,
+          "pvalue": 0.22501296530676712,
+          "limit": {
+            "eta": 0.006272170689566187,
+            "nll": -1106.6093744470534,
+            "df": 288
+          },
+          "nll0": -1120.2415968425971,
+          "limit_lr": 13.63222239554375,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 48,
+          "next_p": 64,
+          "union_rank": 108,
+          "small_quadratic": 3.7623807269036718,
+          "large_quadratic": 3.0838265027936806,
+          "improvement": 0.6785542241099911,
+          "df1": 60,
+          "df2": 212,
+          "f_statistic": 0.7774621096063568,
+          "pvalue": 0.8743385161228643,
+          "limit": {
+            "eta": 0.006544187173242721,
+            "nll": -1071.741501123091,
+            "df": 272
+          },
+          "nll0": -1075.9982475394222,
+          "limit_lr": 4.256746416331225,
+          "boundary_excluded": false,
+          "fit_status": "ok"
+        },
+        {
+          "p": 64,
+          "next_p": 96,
+          "union_rank": 156,
+          "small_quadratic": 2.5639385614191728,
+          "large_quadratic": 1.6861243036803881,
+          "improvement": 0.8778142577387846,
+          "df1": 92,
+          "df2": 164,
+          "f_statistic": 0.9280450590724835,
+          "pvalue": 0.6501811184201693,
+          "limit": {
+            "eta": 0.006668921401695782,
+            "nll": -1033.4870233739782,
+            "df": 256
+          },
+          "nll0": -1039.5877954756384,
+          "limit_lr": 6.100772101660141,
+          "boundary_excluded": false,
+          "fit_status": "ok"
+        }
+      ],
+      "choices": {
+        "cv_a01": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32
+          ],
+          "alpha": 0.01,
+          "ordering": "cv"
+        },
+        "smallest_a01": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32
+          ],
+          "alpha": 0.01,
+          "ordering": "smallest"
+        },
+        "cv_a05": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32
+          ],
+          "alpha": 0.05,
+          "ordering": "cv"
+        },
+        "smallest_a05": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            32
+          ],
+          "alpha": 0.05,
+          "ordering": "smallest"
+        }
+      }
+    },
+    {
+      "key": "stress_ode_positive_seed1456",
+      "old_p": 32,
+      "screens": [
+        {
+          "p": 8,
+          "next_p": 16,
+          "union_rank": 20,
+          "small_quadratic": 3515275.735386815,
+          "large_quadratic": 1902095.1392076488,
+          "improvement": 1613180.596179166,
+          "df1": 12,
+          "df2": 300,
+          "f_statistic": 21.202680177858568,
+          "pvalue": 1.4483663643310484e-33,
+          "limit": {
+            "eta": 0.011266915041669105,
+            "nll": -922.7482983024568,
+            "df": 312
+          },
+          "nll0": -922.7482982894835,
+          "limit_lr": -1.2973259799764492e-08,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 16,
+          "next_p": 24,
+          "union_rank": 36,
+          "small_quadratic": 2043544.1470804368,
+          "large_quadratic": 1882534.6589335715,
+          "improvement": 161009.48814686527,
+          "df1": 20,
+          "df2": 284,
+          "f_statistic": 1.2144980815283701,
+          "pvalue": 0.24083090341643731,
+          "limit": {
+            "eta": 0.006722188055681588,
+            "nll": -1092.098193275951,
+            "df": 304
+          },
+          "nll0": -1092.0981932755603,
+          "limit_lr": -3.906279744114727e-10,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 24,
+          "next_p": 32,
+          "union_rank": 52,
+          "small_quadratic": 5.2472981437449455,
+          "large_quadratic": 4.813660688355309,
+          "improvement": 0.4336374553896363,
+          "df1": 28,
+          "df2": 268,
+          "f_statistic": 0.8622398209741836,
+          "pvalue": 0.6698854164442916,
+          "limit": {
+            "eta": 0.006444281561758964,
+            "nll": -1104.5992891029132,
+            "df": 296
+          },
+          "nll0": -1113.7975292877272,
+          "limit_lr": 9.19824018481404,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 32,
+          "next_p": 48,
+          "union_rank": 76,
+          "small_quadratic": 4.148957376217203,
+          "large_quadratic": 3.419214106065456,
+          "improvement": 0.7297432701517472,
+          "df1": 44,
+          "df2": 244,
+          "f_statistic": 1.1835345810311189,
+          "pvalue": 0.2137161647435392,
+          "limit": {
+            "eta": 0.006566079167263075,
+            "nll": -1093.4205933106184,
+            "df": 288
+          },
+          "nll0": -1103.3434364032937,
+          "limit_lr": 9.922843092675294,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 48,
+          "next_p": 64,
+          "union_rank": 108,
+          "small_quadratic": 5.743732981271737,
+          "large_quadratic": 4.434898627585275,
+          "improvement": 1.3088343536864624,
+          "df1": 60,
+          "df2": 212,
+          "f_statistic": 1.0427629666498495,
+          "pvalue": 0.4046235516587545,
+          "limit": {
+            "eta": 0.006865538732353947,
+            "nll": -1058.7025527495616,
+            "df": 272
+          },
+          "nll0": -1059.8712005355098,
+          "limit_lr": 1.1686477859482238,
+          "boundary_excluded": false,
+          "fit_status": "ok"
+        },
+        {
+          "p": 64,
+          "next_p": 96,
+          "union_rank": 156,
+          "small_quadratic": 651146.815821369,
+          "large_quadratic": 415124.4463517474,
+          "improvement": 236022.36946962157,
+          "df1": 92,
+          "df2": 164,
+          "f_statistic": 1.013516625875788,
+          "pvalue": 0.46411473522787533,
+          "limit": {
+            "eta": 0.0071460889651517225,
+            "nll": -1015.7956131449693,
+            "df": 256
+          },
+          "nll0": -1015.795613144915,
+          "limit_lr": -5.4228621593210846e-11,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        }
+      ],
+      "choices": {
+        "cv_a01": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            24,
+            32
+          ],
+          "alpha": 0.01,
+          "ordering": "cv"
+        },
+        "smallest_a01": {
+          "selected_p": 24,
+          "status": "ok",
+          "allowed": [
+            24,
+            32
+          ],
+          "alpha": 0.01,
+          "ordering": "smallest"
+        },
+        "cv_a05": {
+          "selected_p": 32,
+          "status": "ok",
+          "allowed": [
+            24,
+            32
+          ],
+          "alpha": 0.05,
+          "ordering": "cv"
+        },
+        "smallest_a05": {
+          "selected_p": 24,
+          "status": "ok",
+          "allowed": [
+            24,
+            32
+          ],
+          "alpha": 0.05,
+          "ordering": "smallest"
+        }
+      }
+    },
+    {
+      "key": "stress_ode_positive_seed1016",
+      "old_p": 24,
+      "screens": [
+        {
+          "p": 8,
+          "next_p": 16,
+          "union_rank": 20,
+          "small_quadratic": 3828772.939057859,
+          "large_quadratic": 2227252.6331381244,
+          "improvement": 1601520.3059197348,
+          "df1": 12,
+          "df2": 300,
+          "f_statistic": 17.9764105123455,
+          "pvalue": 4.7675880237821944e-29,
+          "limit": {
+            "eta": 0.012271714273815125,
+            "nll": -896.0952606023811,
+            "df": 312
+          },
+          "nll0": -896.0952605903899,
+          "limit_lr": -1.1991232895525172e-08,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 16,
+          "next_p": 24,
+          "union_rank": 36,
+          "small_quadratic": 2386222.568480184,
+          "large_quadratic": 2188998.2413492696,
+          "improvement": 197224.3271309142,
+          "df1": 20,
+          "df2": 284,
+          "f_statistic": 1.2793913637558418,
+          "pvalue": 0.19144484806343248,
+          "limit": {
+            "eta": 0.007849420268680938,
+            "nll": -1044.970297519835,
+            "df": 304
+          },
+          "nll0": -1044.970297519485,
+          "limit_lr": -3.4992808650713414e-10,
+          "boundary_excluded": false,
+          "fit_status": "boundary"
+        },
+        {
+          "p": 24,
+          "next_p": 32,
+          "union_rank": 52,
+          "small_quadratic": 4.972491576620709,
+          "large_quadratic": 4.377904626260156,
+          "improvement": 0.5945869503605534,
+          "df1": 28,
+          "df2": 268,
+          "f_statistic": 1.2999475801146414,
+          "pvalue": 0.14898860372458392,
+          "limit": {
+            "eta": 0.0075432463944700295,
+            "nll": -1057.9912807550957,
+            "df": 296
+          },
+          "nll0": -1073.498377081748,
+          "limit_lr": 15.507096326652345,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 32,
+          "next_p": 48,
+          "union_rank": 76,
+          "small_quadratic": 3.6923316057665723,
+          "large_quadratic": 3.027725201783849,
+          "improvement": 0.6646064039827233,
+          "df1": 44,
+          "df2": 244,
+          "f_statistic": 1.2172652266238613,
+          "pvalue": 0.17885198155475496,
+          "limit": {
+            "eta": 0.007650254420454561,
+            "nll": -1049.4078490444408,
+            "df": 288
+          },
+          "nll0": -1070.1112668745823,
+          "limit_lr": 20.70341783014146,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 48,
+          "next_p": 64,
+          "union_rank": 108,
+          "small_quadratic": 2.8492864729817535,
+          "large_quadratic": 2.164524279148716,
+          "improvement": 0.6847621938330377,
+          "df1": 60,
+          "df2": 212,
+          "f_statistic": 1.117794384745037,
+          "pvalue": 0.2804893095033526,
+          "limit": {
+            "eta": 0.007905241575707614,
+            "nll": -1020.347419663174,
+            "df": 272
+          },
+          "nll0": -1039.2629327199593,
+          "limit_lr": 18.915513056785244,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        },
+        {
+          "p": 64,
+          "next_p": 96,
+          "union_rank": 156,
+          "small_quadratic": 2.222592988170091,
+          "large_quadratic": 1.4308421043019142,
+          "improvement": 0.791750883868177,
+          "df1": 92,
+          "df2": 164,
+          "f_statistic": 0.9863995517956179,
+          "pvalue": 0.5226666426039555,
+          "limit": {
+            "eta": 0.008145411887729841,
+            "nll": -982.2878752878865,
+            "df": 256
+          },
+          "nll0": -1001.6548545263227,
+          "limit_lr": 19.3669792384361,
+          "boundary_excluded": true,
+          "fit_status": "ok"
+        }
+      ],
+      "choices": {
+        "cv_a01": {
+          "selected_p": 24,
+          "status": "ok",
+          "allowed": [
+            24,
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.01,
+          "ordering": "cv"
+        },
+        "smallest_a01": {
+          "selected_p": 24,
+          "status": "ok",
+          "allowed": [
+            24,
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.01,
+          "ordering": "smallest"
+        },
+        "cv_a05": {
+          "selected_p": 24,
+          "status": "ok",
+          "allowed": [
+            24,
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.05,
+          "ordering": "cv"
+        },
+        "smallest_a05": {
+          "selected_p": 24,
+          "status": "ok",
+          "allowed": [
+            24,
+            32,
+            48,
+            64
+          ],
+          "alpha": 0.05,
+          "ordering": "smallest"
+        }
+      }
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_engine.py": "af312ffe431c428f6dae6f20aebb550aa731b445561281f1004b4d8aa4ad7c8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_metric.py": "a372ae02a7d55602930befa0c1fd02774973850e060e32537540b59d159d0ffd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\run_repair.py": "839f17f417ed29c2e4cb52e6e1470f63dc6cc169e5c9edad6c40a484d4a6d8f4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\context.py": "77f7ef2c9e6e4737475adf4669e868a4edd5b3fbfe3113b61e88e94980146ad4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\protocol.txt": "5d38aca706ae1716a33308027e8377e34d84434c9c21281fdafbd953b665742c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\profile_guard.py": "dac3d5a9c49a9e8f189267cfabe8476ea0383f018d4615463f9e54490a87aa94",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_direction_2026-11-17\\guard_protocol.txt": "35217f9a5bc3bc19e1f133e3c356f57efd7b2a2dc055a623a497f37301cb234c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\study_context.py": "981780232e0cae9f0b3d8d8f4f79df75220a2afc339c14107fd8852755a8f9c2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\protocol.txt": "90be887f2f584b58183038284d2ffdfbef3be02328ff2a61e43ffaa595ac3804",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\pipeline.py": "eb9bc78a479e8dcbf2b080680272bff25a38e8f0f2be2612887732aa8e45f755",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\guarded_fit.py": "cb5a85be96ab68205dd216a7634360fd652e59fc9b5b52f77dfe9a5b0fd99e45",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\native_score.py": "1b5f854177876c7fae141874f751cd29bfbfdc11b4f51d6b5630375691eb9245",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\native_score.c": "c2f8e7c255f081c239d2963ff1d02b15b9ac1fd89b85417cd903aa59f46cc5ec",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\safeguard_envelope_2026-11-17\\native_score.dll": "6fe66fb6d44f9c8ea98b051c44fb49fd862dc84ba8ef540f312b5ace5a397306",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\nuisance_calibration_2026-11-17\\calibration_context.py": "33a210900f400551819897d4d8fd59ef5081921c3ab262331ea462c6abe74e13",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_noise_2026-11-17\\spline_context.py": "37ca5ecbbe49b4fc2506338cdde751d95e2ec94dfc800cb75214a480b89e0574",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_noise_2026-11-17\\spline_fit.py": "34cb7be193d9c722bdeb81927e52af65512949ab653c3baaad178cc9f9c65957",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_noise_2026-11-17\\point_study.py": "f603b6c8e520908935b4398a90178d570169a67dfdba9c5dcf4664c029630799",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_compatibility_2026-11-17\\compat_context.py": "024a55caaa3d8cffe6140ac80e65cf02e78d14587c732e826d01bc0493a4d72f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_compatibility_2026-11-17\\compat_fit.py": "328808c7ba15fbfc42aaf27b19cee526f001eeafa124dbd75a33f24bf45275af",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_adequacy_2026-11-17\\adequacy_context.py": "248c43d201f2e99009d170ed53473c08f6c0c3c567cc2c0134ecafe74e9433f8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_adequacy_2026-11-17\\adequacy_fit.py": "de6ea81c11fa9fca2e99e2f2551a5828dfa00062c7755a797df7e98f70a86598",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\spline_adequacy_2026-11-17\\development.py": "11c89a6a8190b313a929fd8072465be0558b02695bca8e61a74d7a54989dee6a"
+  }
+}

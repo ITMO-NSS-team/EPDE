@@ -1,0 +1,200 @@
+AR2 signal/noise study: solver-free EPDE, 2026-11-17
+
+Decision
+--------
+The more flexible signal-curvature model substantially improves the previous
+AR1-curvature results, especially KS and NS. It is still not a universal
+replacement for specified-family noise estimation. Compound retains a large
+nonlinear correction bias; KS local coverage remains below nominal; NS is now
+conservative. Keep dyad provisional for structural ranking. This round does
+not run a new dyad ablation and gives no evidence that replacing dyad fixes
+these covariance errors. Explicit constants and valid identities are retained.
+
+What changed
+------------
+The nuisance second-difference signal covariance is stationary AR2, while
+observation noise remains AR1. Exact finite-boundary banded likelihoods retain
+the informative contrasts. Noise amplitude is shared across axes of a variable;
+curvature and noise correlations vary by axis. Axis likelihood sums are
+composite likelihoods. No differential-equation solver or candidate integration
+is used. method_notes.txt gives equations, boundary terms and numerical details.
+
+There were two distinct changes: the AR2 statistical family, and a subsequent
+numerical repair using an analytic likelihood gradient. The original central
+finite-difference implementation and failed attempts remain archived. On the
+23-case screen (28 raw variables), it selected a noise-boundary VDP fit despite
+better unsuccessful starts. The analytic-score version returns usable fits for
+all28 raw and28 noise-only screen variables. This does not establish optimality.
+
+Numerical checks and remaining limitations
+------------------------------------------
+288 dense covariance checks,96 nested AR1 reductions,32 dense-gradient checks,
+selected-inverse checks and synthetic unit/trend invariance all pass. The largest
+gradient discrepancy is4.13e-7 or less. Gradient repair keeps the same bounds,
+four prescribed starts and statistical family. Maximum iterations changes from
+300 to500; no per-system choice is made from coverage or clean truth.
+
+Retrospective primary optimization diagnostics: 84 variable fits;
+14 have projected-gradient mapping above1e-3, and
+6 selected fits have normalized objective above an unsuccessful start
+by more than1e-5. Mapping quantiles(min,median,p90,p99,max):
+[1.62491524680064e-08, 9.704860570280971e-06, 0.0025254993131229144, 0.07944505614651574, 0.1510976400447035].
+The mapping depends on optimizer coordinates. 'status ok' means the frozen
+acceptance rule returned a model, not a certified stationary or global optimum.
+Every result remains in the primary evaluation; no post hoc replacement occurs.
+
+Paired pure-noise comparison
+---------------------------
+576 shared fields: n301/320/1001, rho0/+0.4/-0.4,64 draws per cell, sigma0.2.
+Both AR2 implementations have0/576 incomplete fits. The preceding AR1-curvature
+model has1/576 optimizer failure. Positive-rho correlation RMSE:
+n       AR1 curvature   AR2 finite difference   AR2 analytic score
+301     0.049978        0.049484                0.049562
+320     0.048776        0.049600                0.048772
+1001    0.028005        0.028196                0.027787
+Full nine-cell results, including amplitude medians, are in
+pure_noise_comparison.csv. Exact fields are hash-matched to the prior experiment.
+No oracle signal information is used in the raw estimator. Accurate pure-noise
+point estimates do not establish covariance adequacy in the presence of signal.
+
+Fresh primary test
+------------------
+138/138 records complete; all processes exit0 and independent case audits PASS.
+All15 default systems with iid noise, plus AC/forcedKdV/KS/wave with rho+/-0.4.
+Three fresh anchors per system/profile, seeds39..41:69 distinct fitted anchors,
+paired estimator/control records. Every model has256 calibration,256 check and
+256 evaluation fields. Added noise amplitude is5% of the clean-field SD.
+Pilot, weak candidate libraries, local/broad banks, correction algebra and
+confidence-region machinery are inherited unchanged. Fits, metrics, cutoffs
+and regions are frozen before clean evaluation. Noise-parameter uncertainty
+is held fixed; it has not been propagated in this study.
+
+Nominal95% simultaneous operator coverage, matched pairs:
+profile     bank    pairs   AR2(%)    specified-family control(%)
+iid         local   45      95.89     94.88
+iid         broad   45      89.81     94.37
+iid         both    45      89.80     94.36
+positive    local   12      94.04     95.70
+positive    broad   12      96.13     96.19
+positive    both    12      96.13     96.19
+negative    local   12      92.68     92.45
+negative    broad   12      94.50     93.36
+negative    both    12      94.50     93.36
+The iid control fixes rho=0 and estimates amplitude. The colored control fixes
+rho to its generating value and estimates amplitude. These are specified-family
+controls, not inferred correlations. Means weight anchors equally. Three
+anchors per system do not establish unconditional95% validity; the256 evaluation
+fields share a fitted anchor. Reference-direction coverage is a different,
+less demanding quantity than full-library simultaneous operator coverage.
+
+IID breakdown across all15 systems:
+system             AR2 local(%)  AR2 broad(%)  control local/broad(%)
+ac                 97.27         94.14         97.40/94.27
+burgers            97.66         96.61         95.96/95.31
+burgers_inviscid   96.74         96.09         96.35/95.44
+duffing            97.79         96.88         92.71/92.58
+kdv                89.06         93.23         92.71/94.53
+kdv_cossin         95.70         94.79         95.70/93.88
+ks                 84.38         92.58         93.36/92.97
+lorenz             97.53         96.74         96.35/95.05
+lv                 95.18         96.22         91.15/93.36
+ns                 99.61         99.87         95.31/93.75
+ode                97.27         94.66         97.01/94.53
+pde_compound       100.00        3.65          94.79/94.66
+pde_divide         95.96         95.70         94.66/94.14
+vdp                99.22         98.44         96.48/94.66
+wave               94.92         97.53         93.23/96.35
+KS local coverage is84.38% iid,87.76% positive and83.46% negative; broad coverage
+is92.58%,94.92%,92.71%, respectively. The previous AR1-curvature study had zero
+local coverage on all nine KS anchors. NS now has99.61% local and99.87% broad
+coverage, compared with near2% local coverage for the preceding completed fits.
+These cross-study comparisons use different anchors and are descriptive, not
+a paired statistical effect estimate. The controls within this study are paired.
+The broad iid mean hides compound's severe failure; high average/local coverage
+does not validate every system or direction. NS's higher coverage is conservative,
+not evidence of sharper coefficient estimates.
+
+Compound: correction-bias attribution
+-------------------------------------
+Only the actual-field Gaussian correction is changed to true covariance.
+Pilot, fitted calibration/metric, cutoff and evaluation draws remain fixed.
+This is an oracle diagnostic, not a deployable repair.
+seed bank    original/256  oracle correction/256  bias-score/cutoff
+39   local   256           256                    0.24799
+39   broad   3             252                    1.71571
+40   local   256           256                    0.25117
+40   broad   0             254                    1.96801
+41   local   256           256                    0.17626
+41   broad   25            252                    1.26487
+Broad coverage rises from28/768=3.65% to758/768=98.70%. The analytic correction
+bias alone is1.26..1.97 times the broad cutoff in operator-score units. Thus
+mean correction error remains sufficient to explain the principal failure.
+
+Axis diagnostic: where the shared noise fit is distorted
+--------------------------------------------------------
+Old iid anchor36, all axes of compound/KS/NS (13 fits), using the same AR2 family
+and analytic score. Each axis has a separate amplitude for this diagnostic.
+The fit is frozen before clean curvature and true-noise ratios are evaluated.
+system       variable axis status     sigma/true  shared sigma/true
+pde_compound u        0    ok         1.006608    1.076267
+pde_compound u        1    ok         1.194914    1.076267
+ks           u        0    ok         1.003963    0.998409
+ks           u        1    ok         0.994707    0.998409
+ns           u        0    ok         1.002748    1.021595
+ns           u        1    boundary   837.587181  1.021595
+ns           u        2    ok         1.010349    1.021595
+ns           v        0    ok         1.003911    1.050859
+ns           v        1    ok         1.501836    1.050859
+ns           v        2    ok         0.980333    1.050859
+ns           p        0    ok         1.018446    1.017075
+ns           p        1    ok         1.041860    1.017075
+ns           p        2    ok         1.005823    1.017075
+For compound, the temporal-axis amplitude is within1% of truth; the spatial
+axis is about19.5% high, while the shared estimate is7.6% high. The top1% of
+clean spatial curvature entries contain67.1% of its energy. Spatial curvature
+energy is9.52% of expected injected-noise curvature energy, versus0.0080% in
+time. These diagnostics support signal/noise misallocation by the stationary
+curvature representation. They do not establish whether the localized roughness
+is physical or numerical. A missing constant curvature mean explains only
+about6.6% of spatial curvature energy; no quadratic-mean variant was tested.
+
+Naively selecting an axis is not validated: NS/u axis1 reaches a noise boundary
+with amplitude ratio837.6, while NS/v axis1 estimates ratio1.50. All these
+failures remain visible. Neither clean curvature nor true-sigma ratios are used
+to choose an axis in the primary estimator. A robust or locally varying curvature
+model with observable adequacy diagnostics is a next hypothesis, not a result.
+
+Coefficient compatibility
+-------------------------
+ar2: 60/60 exact anchors accepted; {'bounded_outer': 57, 'unbounded_certified': 3}.
+iid: 60/60 exact anchors accepted; {'bounded_outer': 57, 'unbounded_certified': 3}.
+Exact references remain compatible even where simultaneous operator coverage
+is poor. This does not establish unique support, narrow coefficients or valid
+uncertainty in all library directions. Same-target superset ambiguity remains.
+
+Verification and artifacts
+--------------------------
+Main audit PASS: {'hash_links': 10764, 'operator_scores': 141312, 'registered_scores': 434280, 'regions': 5736, 'intersection_certificates': 2868, 'matrix_replays': 2484}.
+
+Every primary noise fit is independently rerun; paired fields, moment matrices,
+operator scores, registered directions, regions and intersection certificates
+are checked. Follow-up audit PASS:1264 likelihood,632 gradient,688 field replays,
+962 hash links,46 screen records and576 paired pure-noise draws.
+Axis audit PASS:13 fits (including the boundary),65 hash links.
+Attribution audit PASS:3 records,1536 operator scores,12 matrix replays.
+The analysis-only dictionary/list schema mismatch is repaired in a separate
+analyze_final.py; the original hashed harness remains untouched. No estimator
+output or primary statistic was changed by this reporting repair.
+Sources, inputs, failed starts, protocols, frozen models, arrays, CSVs and plots
+are retained. Completion audit and final artifact manifest accompany this report.
+No production source file or prior completed experiment was edited; no commit.
+
+Next research decision
+----------------------
+Keep specified-iid estimation when the noise family is supplied. AR2 is a useful
+research improvement but not ready as a universal default. Before parameter
+uncertainty propagation, address (1) numerical conditioning and convergence,
+(2) localized/nonstationary signal curvature and observable axis disagreement,
+and (3) residual KS local calibration. Evaluate bias correction and covariance
+shape separately on fresh anchors. Preserve dyad, constants and valid identities;
+an extra instability penalty cannot repair biased weak moments by itself.

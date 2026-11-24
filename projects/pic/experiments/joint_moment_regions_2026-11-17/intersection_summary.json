@@ -1,0 +1,214 @@
+{
+  "status": "COMPLETE",
+  "summary": [
+    {
+      "profile": "iid",
+      "model_kind": "iid",
+      "records": 45,
+      "reference_cases": 60,
+      "operator_coverage": 0.9450520833333333,
+      "exact_reference_anchor_accepted": 59,
+      "actual_exact_reference_acceptance": 0.9995442708333333,
+      "reference_geometry": {
+        "bounded_outer": 57,
+        "unbounded_certified": 3
+      },
+      "reference_feasible_witnesses": 47,
+      "all_candidate_geometry": {
+        "bounded_outer": 679,
+        "empty_certified": 307,
+        "unbounded_certified": 62,
+        "unresolved": 2
+      },
+      "all_candidate_feasible_witnesses": 586,
+      "all_candidate_unresolved_nonemptiness": 157
+    },
+    {
+      "profile": "negative",
+      "model_kind": "ar",
+      "records": 12,
+      "reference_cases": 12,
+      "operator_coverage": 0.9560546875,
+      "exact_reference_anchor_accepted": 12,
+      "actual_exact_reference_acceptance": 0.9996744791666666,
+      "reference_geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "reference_feasible_witnesses": 12,
+      "all_candidate_geometry": {
+        "bounded_outer": 87,
+        "empty_certified": 63,
+        "unbounded_certified": 42
+      },
+      "all_candidate_feasible_witnesses": 128,
+      "all_candidate_unresolved_nonemptiness": 1
+    },
+    {
+      "profile": "negative",
+      "model_kind": "iid",
+      "records": 12,
+      "reference_cases": 12,
+      "operator_coverage": 0.75,
+      "exact_reference_anchor_accepted": 12,
+      "actual_exact_reference_acceptance": 1.0,
+      "reference_geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "reference_feasible_witnesses": 12,
+      "all_candidate_geometry": {
+        "bounded_outer": 87,
+        "empty_certified": 51,
+        "unbounded_certified": 51,
+        "point": 3
+      },
+      "all_candidate_feasible_witnesses": 138,
+      "all_candidate_unresolved_nonemptiness": 3
+    },
+    {
+      "profile": "negative",
+      "model_kind": "known_rho",
+      "records": 12,
+      "reference_cases": 12,
+      "operator_coverage": 0.9404296875,
+      "exact_reference_anchor_accepted": 12,
+      "actual_exact_reference_acceptance": 0.998046875,
+      "reference_geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "reference_feasible_witnesses": 12,
+      "all_candidate_geometry": {
+        "bounded_outer": 87,
+        "empty_certified": 63,
+        "unbounded_certified": 42
+      },
+      "all_candidate_feasible_witnesses": 128,
+      "all_candidate_unresolved_nonemptiness": 1
+    },
+    {
+      "profile": "positive",
+      "model_kind": "ar",
+      "records": 12,
+      "reference_cases": 12,
+      "operator_coverage": 0.3645833333333333,
+      "exact_reference_anchor_accepted": 8,
+      "actual_exact_reference_acceptance": 0.6796875,
+      "reference_geometry": {
+        "empty_certified": 4,
+        "unbounded_certified": 2,
+        "bounded_outer": 6
+      },
+      "reference_feasible_witnesses": 8,
+      "all_candidate_geometry": {
+        "empty_certified": 88,
+        "bounded_outer": 68,
+        "unbounded_certified": 35,
+        "point": 1
+      },
+      "all_candidate_feasible_witnesses": 94,
+      "all_candidate_unresolved_nonemptiness": 10
+    },
+    {
+      "profile": "positive",
+      "model_kind": "iid",
+      "records": 12,
+      "reference_cases": 12,
+      "operator_coverage": 0.0,
+      "exact_reference_anchor_accepted": 0,
+      "actual_exact_reference_acceptance": 0.027669270833333332,
+      "reference_geometry": {
+        "empty_certified": 11,
+        "bounded_outer": 1
+      },
+      "reference_feasible_witnesses": 0,
+      "all_candidate_geometry": {
+        "empty_certified": 180,
+        "unbounded_certified": 7,
+        "bounded_outer": 5
+      },
+      "all_candidate_feasible_witnesses": 10,
+      "all_candidate_unresolved_nonemptiness": 2
+    },
+    {
+      "profile": "positive",
+      "model_kind": "known_rho",
+      "records": 12,
+      "reference_cases": 12,
+      "operator_coverage": 0.953125,
+      "exact_reference_anchor_accepted": 12,
+      "actual_exact_reference_acceptance": 0.9990234375,
+      "reference_geometry": {
+        "bounded_outer": 9,
+        "unbounded_certified": 3
+      },
+      "reference_feasible_witnesses": 12,
+      "all_candidate_geometry": {
+        "bounded_outer": 89,
+        "empty_certified": 48,
+        "unbounded_certified": 52,
+        "point": 3
+      },
+      "all_candidate_feasible_witnesses": 139,
+      "all_candidate_unresolved_nonemptiness": 5
+    }
+  ],
+  "compound": [
+    {
+      "seed": 30,
+      "lambda_local": 0.04645879453334072,
+      "lower": [
+        -1.7567993229929528,
+        0.6066742999583821
+      ],
+      "upper": [
+        6.246473274433768,
+        2.8283884332156997
+      ],
+      "feasible": false
+    },
+    {
+      "seed": 31,
+      "lambda_local": 0.04615143264937939,
+      "lower": [
+        -1.8208789452073666,
+        0.603658051666492
+      ],
+      "upper": [
+        5.869677742017451,
+        2.741289600660636
+      ],
+      "feasible": false
+    },
+    {
+      "seed": 32,
+      "lambda_local": 0.044474547984440733,
+      "lower": [
+        -1.8776091342023382,
+        0.5986484405772667
+      ],
+      "upper": [
+        7.017673533544,
+        2.9964346385806904
+      ],
+      "feasible": false
+    }
+  ],
+  "rejected_iid_reference_anchors": [
+    {
+      "system": "ac",
+      "seed": 32,
+      "profile": "iid",
+      "model_kind": "iid",
+      "candidate": "e0:reference",
+      "label": "reference",
+      "joint_exact_anchor_accepted": false,
+      "actual_exact_acceptance_count": 256,
+      "outer_exact_accepted": true
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\summarize_joint.py": "a8891b3433999e3ee709f1e43eb1b645931ebdcb73b646267427a7f23f113092"
+  }
+}

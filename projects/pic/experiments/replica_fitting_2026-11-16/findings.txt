@@ -1,0 +1,45 @@
+Training-replica fitting: targeted mechanism test, 2026-11-16
+Completed ac, wave, forced KdV, KS; three seeds each, 5% noise. Solver-free.
+
+Symmetric cross-replica weak fitting has useful effects but is not a general
+replacement. It improves wave fitting, while sacrificing KS accuracy and
+leaving forced KdV biased. Mean correction helps AC but reverses some of
+the wave gain. Do not pick a different estimator per system using clean data.
+
+Median fitted-reference residual energy on the SAME frozen clean bank:
+  System       Existing fit    Replica OLS    Replica IV     Mean-corrected IV
+  AC           1.3676e-4       1.0444e-3      9.8300e-4      4.9863e-5
+  wave         7.7635e-2       3.3046e-2      4.6576e-3      2.7129e-2
+  forced KdV   1.4693e-1       1.7998e-1      1.8919e-1      1.8114e-1
+  KS           4.9519e-5       6.0323e-4      6.3902e-4      8.8848e-5
+
+The old pre-adaptive wave fit still has smaller energy (0.001334) than the
+best new replica variant (0.004658). Thus the wave improvement is relative
+to the recent continuous adaptive fit, not the best historical wave result.
+
+Registered-support retention among these 12 equation-seed cases:
+                          Existing    Replica OLS    Replica IV    IV mean
+  Frozen spectral score       7            7              9             6
+  Local weak score            6            7              5             6
+The 9/12 spectral outcome is not proof of better coefficients; the fixed
+clean errors above and lower local retention expose this distinction.
+
+Negative cross-Gram eigenvalues occur in some forced-KdV fits. They are
+retained under the existing signed numerical solve; no PSD clipping or
+threshold was chosen to force a preferred equation. Coefficients remain far
+from [-6,-1,1] in these cases.
+
+Clean training-replica controls have median frozen residual energies:
+AC 2.21e-7; wave 4.57e-6; forced KdV 3.24e-6; KS 2.93e-5. The coarser time
+sampling itself therefore contributes to the KS regression. Replica fitting
+trades within-replica error correlation for less information per replica;
+it cannot remove common reconstruction or support-selection bias.
+
+All 12 cases pass frozen-score reproduction; scalar cross-Gram checks show
+the expected removal of within-replica Gram noise bias under independent,
+zero-mean linear operator errors. Real nonlinear reconstruction is not that
+ideal model. Inputs/sources and finite-score coverage are audited separately.
+No clean field was used to tune the method. No production changes were made.
+
+This is a targeted four-system result, not a second core-15 benchmark.
+The mixed mechanism result does not justify expanding it as a replacement.

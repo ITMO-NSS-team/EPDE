@@ -1,0 +1,72 @@
+What is different in this uncertainty experiment
+================================================
+
+The previous study held a nuisance signal estimate fixed while evaluating many
+actual noisy fields. That diagnosed conditional calibration but did not repeat
+the whole procedure on each actual dataset. The present study uses a new noisy
+observed dataset for every coverage trial and recalculates its own noise model,
+nuisance reconstruction, covariance metric and bootstrap cutoff. The weak bank
+and candidate library remain fixed to their previously specified grid design.
+This is not uncertainty accounting for an adaptive structure-search algorithm.
+
+For an observed field Y, write eta(Y) for the estimated noise parameters,
+mu(Y) for the reconstructed signal, and M(Y;eta) for corrected weak moments.
+Let C(mu,eta) be the mean Gram matrix of the moment errors from16 fixed common
+Gaussian noise realizations around mu with covariance eta. The implementation
+evaluates this Monte Carlo function directly; it does not use local responses.
+MC16 specifies the numerical normalization function being tested, not an exact
+population covariance. Numerical validation compares batched and individual
+moment calculations under the same realizations.
+
+Observed covariance in BOTH comparison modes is C(mu(Y),eta(Y)). The candidate
+region is based on M(Y;eta(Y))'M(Y;eta(Y)) minus q times this covariance.
+
+For each of128 bootstrap fields Y*=mu(Y)+epsilon*:
+  1. Estimate eta*=eta(Y*) and reconstruct mu*=mu(Y*).
+  2. Form error E*=M(Y*;eta*)-M(mu(Y);uncorrected).
+  3. Evaluate its largest generalized Gram eigenvalue against either
+       fixed_pilot: C(mu(Y),eta*),
+       refit_pilot: C(mu*,eta*).
+Centering stays at the generating anchor pilot in BOTH modes. Subtracting the
+refitted pilot's moments would instead measure denoising residuals and change
+the target error. Only the covariance normalization pilot changes between modes.
+The paired modes use identical observed fields, bootstrap noise, refitted noise
+parameters and Monte Carlo normalization noise.
+
+Take the123rd ordered statistic of128 (ceil(.95*129)) as each bank's cutoff.
+For the joint region, apply the same rank to the maximum of the two statistics.
+This rank convention accounts for Monte Carlo ordering; it is not a proof of
+exchangeability between bootstrap and observed statistics. Bootstrap nuisance
+misspecification can still invalidate coverage.
+
+Freeze all fits, cutoffs and regions before using clean evaluation moments.
+The observed error M(Y;eta(Y))-M(clean) contributes ONE coverage indicator per
+outer dataset. Reference-direction noise coverage and equation-zero acceptance
+are distinct: the latter includes clean-data weak discretization error. Candidate
+constants have deterministic columns and are excluded only from stochastic
+whitening, not removed from candidate equations or regions.
+
+There are69 independent outer noise datasets:15 iid systems plus4 systems in
+two colored regimes, three datasets per case. Streams include system identifiers
+to avoid shared raw noise across systems. Three datasets give a preliminary
+failure screen, not a precise per-system95% coverage estimate. Reporting3/3 is
+preferable to presenting100% as established coverage. Region boundedness, width
+changes and reference compatibility accompany the coverage counts.
+
+The temporal noise fit retains the previously tested AR2 curvature/AR1 noise
+likelihood and spatial sign-correlation estimation. The correlation-aware GCV
+pilot retains the same roughness penalties and nullspaces. Neither operation
+integrates a candidate ODE or PDE. No data-selected switching between estimators,
+oracle parameters, draw rejection or system-specific coverage threshold is used.
+
+The paired KS diagnostic precedes this fresh test. It changes pilot type while
+holding the generating noise estimate and noise increments fixed, then compares
+both noise estimators on each same field. It identifies procedure sensitivity;
+it does not itself establish coverage. Earlier reported coverage percentages
+used a different experiment and cannot be pooled with this outer-dataset screen.
+
+Floating-point reconstruction replay differs at about1e-10 relative scale on
+some KS cases. Exact matching arrays were recovered for earlier diagnostic draws.
+The primary variant stores anchor pilots and first/last refitted pilots explicitly.
+Saved input hashes remain exact; independent reconstruction is checked numerically.
+See pilot_roundoff_protocol.txt and pilot_reproducibility.json for measurements.

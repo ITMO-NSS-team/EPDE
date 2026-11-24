@@ -1,0 +1,17 @@
+Follow-up before its outcomes: RW2's white-curvature prior biases raw-field
+noise estimates downward and makes NS/u reach a rho boundary on all3 old
+anchors, while its pure-noise controls are accurate. Test a global refinement:
+stationary AR(1) signal curvature with its own per-axis phi, independent of
+AR(1) observation noise rho. Contrast covariance:
+  sigma^2*(D2 R(rho) D2^T + kappa R(phi)).
+The two AR filters produce an exact bandwidth-three covariance, still O(N)
+per likelihood evaluation. Use axis composite likelihood and shared sigma,
+as before. Fit rho,phi,log(kappa) jointly, three starts. Same numeric rho and
+log(kappa) bounds; phi in(-1+1e-6,1-1e-6). A signal-phi edge is reported as
+a smoothness diagnostic, not silently interpreted as identified covariance.
+Noise-rho/upper-kappa edges remain incomplete. No per-system variant choice.
+
+Preserve all original RW2 results. Check dense covariance identities and
+recover synthetic correlated-curvature signal/noise. Screen the same69
+anchors33..35, freezing raw fits before pure-noise diagnostics. Keep failures.
+Decide globally whether this refinement merits fresh coverage before36..38.
