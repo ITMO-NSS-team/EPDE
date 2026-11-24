@@ -14,7 +14,8 @@ script's loader), and every system gets the same settings:
   variables      powers 1..3 (data_fun_pow=3)
   derivatives    time axis up to order 2, every space axis up to order 4; powers 1..2 (deriv_fun_pow=2)
   grid tokens    one per axis (t, x), powers 1..2
-  trig tokens    sin / cos on every axis, the 2 strongest spectral peaks of the data (freq_from_data=2)
+  trig tokens    sin / cos on every axis, fitted with the equation on plain weak derivative targets.
+                 The other modes use the 2 strongest spectral peaks per axis.
   terms          1 or 2 factors, probabilities 0.65 / 0.35
   objectives     assignment mode, WAPE + dyad, no solver
   budget         population 16, 5 epochs
@@ -387,7 +388,10 @@ def main():
                 extra_families.append(CacheStoredTokens(
                     token_type=fam_name, token_labels=list(labs), token_tensors=dict(labs),
                     params_ranges={'power': (1, 1)}, params_equality_ranges=None, meaningful=True))
-        tokens = ([TrigonometricTokens(freq_from_data=2, **dim_kw)] if with_trig else []) + \
+        # Keep the spectral grid when running a historical checkout through EPDE_REPO.
+        fit_tones = getattr(getattr(search, '_config', None), 'supports_frequency_fitting', False)
+        frequency_kw = {} if fit_tones else {'freq_from_data': 2}
+        tokens = ([TrigonometricTokens(**frequency_kw, **dim_kw)] if with_trig else []) + \
                  [GridTokens(labels=labels, max_power=2, **dim_kw)] + extra_families
         search._auto_domain = domain
         fit_kwargs = dict(data=[trajectory], max_deriv_order=orders, data_fun_pow=3, deriv_fun_pow=2,

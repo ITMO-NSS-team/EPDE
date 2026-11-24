@@ -1,0 +1,27 @@
+target,EPDE token,physical quantity,interpretation or hypothesis,origin
+density,Drive,-h div J_drive,Transport by calibrated robot propulsion,https://arxiv.org/abs/1307.4908
+density,Diffusion,h Laplacian(rho),Spatial smoothing of density,https://arxiv.org/abs/1307.4908
+density,Contact,-h div J_push,Outward motion along neighbor contact normals,Existing robot model
+density,Wall,-h div J_wall,Inward transport of robots close to the wall,Existing robot model
+density,Memory,-h div J_previous,Transport from measured velocity over the preceding step,Existing robot model
+density,CrowdedDrive,-h div(rho J_drive),Propulsion changes with local packing. A negative coefficient means crowding slows propulsion,https://arxiv.org/abs/1307.4908
+density,NonlinearDiffusion,h div(rho grad rho),Leading density dependence of collective diffusivity,https://arxiv.org/abs/1307.4908
+density,BlockedPair,-h div J_pairblock,Opposing correction for nearby robots whose drives would close the gap. The same pair contributes equal and opposite velocities,Kinematic hypothesis for these robots
+density,BlockedWall,-h div J_wallblock,Inward correction proportional to the outward component of propulsion near a wall,Kinematic hypothesis for these robots
+density,SpinContact,-h div J_gear,Transverse pair velocity weighted by the two signed spin rates,Spinner-inspired proxy. https://www.nature.com/articles/s41467-018-03154-7
+density,SpinWall,-h div J_edge,Wall-tangent flux weighted by signed spin,https://pmc.ncbi.nlm.nih.gov/articles/PMC5135300/
+density,TurningDrive,-h div J_turn,Perpendicular correction to the calibrated drive weighted by h times spin rate,Finite-step hypothesis for these robots
+polarization,IndividualTurn,sum K_i (R_i-I)p_i,Change from separately rotating each robot at its calibrated signed rate,Previous robot model
+polarization,Damping,-sum K_i R_i p_i,Loss of polarization amplitude over the forecast step,Existing finite-step model. https://link.aps.org/accepted/10.1103/PhysRevE.97.032606
+polarization,GroupTurn,(R_group-I)P_b,Rotation of a whole polarization group at its mean rate,Previous robot model
+polarization,SpinMemory,h sum K_i (recent_rate_i-calibrated_rate_i) J R_i p_i,Directional correction using the last 0.4 seconds of measured turning,Robot-specific test motivated by https://pmc.ncbi.nlm.nih.gov/articles/PMC6279816/
+polarization,DriveTransport,-h div sum K_i (R_i p_i) tensor drive_i,Oriented robots carry polarization as their centers move,Finite-step moment flux inspired by https://link.aps.org/accepted/10.1103/PhysRevE.97.032606
+polarization,ContactTransport,-h div sum K_i (R_i p_i) tensor push_i,Neighbor-driven transport of orientation,Robot-specific extension of the polarization flux
+polarization,WallTransport,-h div sum K_i (R_i p_i) tensor wall_i,Wall-driven transport of orientation,Robot-specific extension of the polarization flux
+polarization,BlockedTransport,-h div sum K_i (R_i p_i) tensor (pairblock_i+wallblock_i),Polarization transport from contacts that obstruct attempted propulsion,Kinematic hypothesis for these robots
+polarization,DensityGradient,-h grad rho_b,Isotropic part of the orientational moment flux,https://link.aps.org/accepted/10.1103/PhysRevE.97.032606
+polarization,NematicTransport,-h div Q_b,Transport from the traceless local second moment of propulsion directions,https://link.aps.org/accepted/10.1103/PhysRevE.97.032606
+polarization,PolarDiffusion,h Laplacian(P_b),Spatial smoothing of polarization,https://link.aps.org/accepted/10.1103/PhysRevE.97.032606
+polarization,CrowdedDamping,-rho sum K_i R_i p_i,Packing-dependent damping of polarization,Robot-specific crowding hypothesis
+polarization,DelayedTurn,h sum K_i (delayed_rate_i-calibrated_rate_i) J R_i p_i,Negative control for a shared angular-measurement endpoint using 0.4 to 0.8 seconds before forecast,Focused timing check
+polarization,SlowTurn,h sum K_i (slow_rate_i-calibrated_rate_i) J R_i p_i,Slowly varying spin offset measured from 12.4 to 0.4 seconds before forecast,Focused timing check
