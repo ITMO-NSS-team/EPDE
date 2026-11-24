@@ -1,0 +1,104 @@
+Actual noise-aware estimator test, 2026-11-16
+
+This is the implemented/tested estimator proposed after the oracle objective
+swap. The earlier clean-data swap was only a diagnostic and was not a test
+of noise-aware fitting. User constraint remains solver-free.
+
+Verdict
+Mean-plus-covariance corrected regression does NOT resolve Kepler. There are
+still 10 reference-dominating archived equations in every noise seed, with
+either ordinary or crossed discrepancy, on both raw and smoothed data.
+Coefficient estimates can improve substantially without fixing structural
+ranking. The method should not become the default on these results.
+
+What was tested
+- Four existing archives (67 structures including references), three noisy
+  records per system, raw and GCV-smoothed preprocessing, 5% measurement noise.
+- 64 parametric-bootstrap draws for each noisy record and each separate clean
+  control. Nine unique noisy records plus three clean controls = 768 draws.
+  Rational archive arms reuse the same generated fields.
+- Noise model estimated from the current observed record. Bootstrap centred
+  on its data-only GCV pilot; all nonlinear tokens/derivatives rebuilt jointly.
+- Production OLS, covariance-only corrected moments (CLS), and mean-plus-
+  covariance corrected moments (CLSM).
+- Every corrected method fits the FULL record AND EVERY dyad slab using the
+  same estimator. Production partitions and MAD/abs(median) aggregation are
+  retained. Each archive has only one admissible two-slab partition.
+- Ordinary, within-reconstruction, and crossed discrepancies are evaluated
+  on the original or split-reconstructed weak columns. Noise variance is
+  never used as a discrepancy denominator.
+- Coefficients and dyad are recomputed; structures, intercept presence, weak
+  windows, frequencies and common comparison rows stay fixed. No pruning,
+  evolutionary search, ODE/PDE solving, or production-code edit.
+
+CLSM construction
+Let F be the weak-column construction and s the GCV pilot. The raw bootstrap
+is F(s+e), the smoothed bootstrap F(GCV(s+e)). Both use F(s) as their pilot
+reference; this includes smoothing bias in the latter mean-shift estimate.
+Estimate mean shift b and row-wise joint covariance C from the draws.
+
+Z = observed weak columns - b
+G = Z_X' Z_X - (1+1/B) sum_rows C_XX
+g = Z_X' Z_y - (1+1/B) sum_rows C_Xy
+Fit G c = g. The intercept column has zero noise correction.
+
+CLS omits the mean shift and uses factor 1 instead of 1+1/B. Signed symmetric
+moment systems are solved with the production dyad numerical rank tolerance
+(1e-12), scaled by observed column norms. Negative eigen-directions are NOT
+clipped, and no ridge, OLS fallback or candidate exclusion is used.
+
+Raw-data fits: dominating-candidate counts, seeds 0/1/2
+Case                         OLS ordinary  CLSM ordinary  OLS crossed  CLSM crossed
+Rational, main               1/0/1         1/1/1          1/0/1        0/0/0
+Kepler                      11/10/10      10/10/10       12/11/11     10/10/10
+Rational capped/no-trig       4/2/0         1/1/1          0/0/0        0/0/0
+Cauchy                       1/1/1         1/1/1          0/0/0        0/0/0
+
+Smoothed-data fits
+Rational and the historical capped/no-trig control are 0/0/0 under OLS and
+CLSM for both discrepancies. Kepler changes from 10/11/10 to 10/10/10 for
+both discrepancies. Cauchy remains 1/1/1 with ordinary discrepancy and 0/0/0
+with crossed discrepancy, regardless of estimator.
+
+Concrete Kepler example
+Seed 1 raw reference coefficients:
+  analytical: [-1, 0.6]
+  OLS:        [-0.99162428, 0.59318550]
+  CLSM:       [-0.99904614, 0.60001208]
+Despite this improvement, 10 archived equations still dominate the reference.
+The correction is applied to coefficient estimation; the observed residual
+columns still contain their measurement and reconstruction errors.
+
+Controls and numerical limitations
+- All clean controls preserve reference nondominance, for every estimator
+  and both discrepancy choices. Noise estimates from clean data are around
+  1e-14 or smaller; clean truth is never supplied to the noisy estimator.
+- Every saved OLS objective is reproduced before comparison.
+- Zero-correction numerical control: maximum absolute D difference 8.51e-13,
+  maximum absolute I difference 1.51e-4; no dominance comparisons change.
+- Exact synthetic population checks recover slope 2 and intercept 1 with
+  correlated noise in both target and feature, and with a known mean shift.
+- Repeating CLSM with each 32-draw half preserves all crossed-discrepancy
+  dominance sets. Kepler's ordinary counts also stay 10/10/10. Rational's
+  ordinary counts vary between zero and one, so those marginal comparisons
+  depend on bootstrap sampling.
+- 507 of 1608 CLSM full/slab systems in the main 64-draw runs are indefinite
+  (the count includes noisy and clean controls). Such roots are stationary
+  moment-equation solutions, not minima of a positive least-squares objective.
+  They are retained and flagged, not silently repaired or dropped. This is
+  an additional reason not to treat the correction as a production solution.
+
+Scope
+This is a conditional-bootstrap, fixed-structure experiment, not independent
+validation. The pilot and original coefficients/frequencies use the same
+record. Finite-bootstrap bias-variance correction is approximate. Shared
+errors across columns are modelled; no independent-weak-row significance
+claim is made. No conclusion here establishes failure of all errors-in-
+variables estimators or identifies an unavoidable one-record information limit.
+
+Artifacts
+corrected_estimator.json/.txt: all objectives, coefficients, slab fits,
+indefiniteness diagnostics, numerical controls and 32-draw sensitivity runs.
+corrected_estimator_counts.png/.svg: raw-fit comparison with ordinary/crossed D.
+cache/*_bootstrap.npz: reproducible input fields, noise draws, GCV outputs,
+data-only noise estimates and source metadata.

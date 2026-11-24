@@ -1,0 +1,814 @@
+{
+  "rows": [
+    {
+      "seed": 51,
+      "setting": "off",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858326
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806910965346
+          ],
+          "scaled_min_eigenvalue": 0.001494078317950052
+        },
+        "drop_nonlinear": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806910965346
+          ],
+          "scaled_min_eigenvalue": 0.001494078317950052
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.4514159858509882,
+            223.30612282474814
+          ],
+          "scaled_min_eigenvalue": 0.0341279304542923
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": false,
+        "bank_pass": [
+          false,
+          false
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed51.json",
+          "json_sha256": "f3be35e3ab286c3a63f94dea22dda9b6a863208cb7fcc7db52df1b23917e4447",
+          "npz_sha256": "4df8ae0f24bbfe55c5e33c10db98a02aa8d7317d7e9a0fc7dcf99249712a10e2",
+          "raw_sha256": {
+            "u": "2d2653118e9f8f29b1d37def69e48991f146a35d105622aca998b7fd7b363f50"
+          },
+          "cutoff": 11.630015539932113
+        },
+        {
+          "file": "kdv_cossin_iid_seed51.json",
+          "json_sha256": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+          "npz_sha256": "6ca57199b95513d92fb99c0aea19416b64d7019d525652370d8d70d6f327bc67",
+          "raw_sha256": {
+            "u": "75d987b0207dee6ef68b43b93ae6eabdc4c32e49f6b1a3390f93e875c31caffc"
+          },
+          "cutoff": 5.634165475464224
+        }
+      ]
+    },
+    {
+      "seed": 51,
+      "setting": "on",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -52.24489393441003,
+            -1.7009805241215323,
+            1.5815174948499038
+          ],
+          "bank_ratios": [
+            0.19229129335780962,
+            0.33477047391071646
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1276190273034775
+          ],
+          "bank_ratios": [
+            0.19253930446424522,
+            0.6759510814531765
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -2.1169014514450972,
+            2.0641602230702953
+          ],
+          "bank_ratios": [
+            0.1921748875753239,
+            0.34067013543226204
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.39722926788103363,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.21404385120147654
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.2519953141806852,
+            -0.1282986457213578
+          ],
+          "bank_ratios": [
+            0.19257281709266588,
+            0.6680491049765673
+          ]
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed51.json",
+          "json_sha256": "f3be35e3ab286c3a63f94dea22dda9b6a863208cb7fcc7db52df1b23917e4447",
+          "npz_sha256": "4df8ae0f24bbfe55c5e33c10db98a02aa8d7317d7e9a0fc7dcf99249712a10e2",
+          "raw_sha256": {
+            "u": "2d2653118e9f8f29b1d37def69e48991f146a35d105622aca998b7fd7b363f50"
+          },
+          "cutoff": 11.630015539932113
+        },
+        {
+          "file": "kdv_cossin_iid_seed51.json",
+          "json_sha256": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+          "npz_sha256": "6ca57199b95513d92fb99c0aea19416b64d7019d525652370d8d70d6f327bc67",
+          "raw_sha256": {
+            "u": "75d987b0207dee6ef68b43b93ae6eabdc4c32e49f6b1a3390f93e875c31caffc"
+          },
+          "cutoff": 5.634165475464224
+        }
+      ]
+    },
+    {
+      "seed": 51,
+      "setting": "pair",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858264,
+            0.19243391708473215,
+            0.6166243091762423
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806910965346,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.5940573236452076e-09
+        },
+        "drop_nonlinear": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806765784484,
+            0.0,
+            2.6683651895595926e-07
+          ],
+          "scaled_min_eigenvalue": 2.593493604849028e-09
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.09364265419335155,
+            0.0,
+            0.32701661687397077,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.09701859424350012
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858326,
+            0.19243391708473215,
+            0.6166243091762423
+          ]
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": false,
+        "bank_pass": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed51.json",
+          "json_sha256": "f3be35e3ab286c3a63f94dea22dda9b6a863208cb7fcc7db52df1b23917e4447",
+          "npz_sha256": "4df8ae0f24bbfe55c5e33c10db98a02aa8d7317d7e9a0fc7dcf99249712a10e2",
+          "raw_sha256": {
+            "u": "2d2653118e9f8f29b1d37def69e48991f146a35d105622aca998b7fd7b363f50"
+          },
+          "cutoff": 11.630015539932113
+        },
+        {
+          "file": "kdv_cossin_iid_seed51.json",
+          "json_sha256": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+          "npz_sha256": "6ca57199b95513d92fb99c0aea19416b64d7019d525652370d8d70d6f327bc67",
+          "raw_sha256": {
+            "u": "75d987b0207dee6ef68b43b93ae6eabdc4c32e49f6b1a3390f93e875c31caffc"
+          },
+          "cutoff": 5.634165475464224
+        }
+      ]
+    },
+    {
+      "seed": 52,
+      "setting": "off",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606
+          ],
+          "bank_ratios": [
+            0.0974826911559717,
+            0.21308461152247993
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.049635607887581965,
+            1367.6440906262112
+          ],
+          "scaled_min_eigenvalue": 0.0032182812815647645
+        },
+        "drop_nonlinear": {
+          "status": "excluded",
+          "weights": [
+            0.049635607887581965,
+            1367.6440906262112
+          ],
+          "scaled_min_eigenvalue": 0.0032182812815647645
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.4536958918833463,
+            217.50104701617397
+          ],
+          "scaled_min_eigenvalue": 0.03423584082279718
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": false,
+        "bank_pass": [
+          false,
+          false
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed52.json",
+          "json_sha256": "49a31bb1aef3d22a901cc5fcec3dc783158edd3ec6d831e76a5849bddacf8cb6",
+          "npz_sha256": "4c32303d6eb1178440e8929286dfae62de4eaa95efd7184323531006d451d70f",
+          "raw_sha256": {
+            "u": "bae793e3e3983c68c7875acc151c4b7dd5f140c6f4c2beb6213981e9a1b6836a"
+          },
+          "cutoff": 10.605095119705064
+        },
+        {
+          "file": "kdv_cossin_iid_seed52.json",
+          "json_sha256": "57ce7c9c6c94e0f5441c18368a4ebc273a85a0fd64b8d35bc4e530e386072bbf",
+          "npz_sha256": "00d09d4b4dcfb7eabbdcc1c6dc2675e928b4090b50ea33ec79d8497674893db3",
+          "raw_sha256": {
+            "u": "60ba3f89db665b076af265146a7d2ef2f5eedcf2c87a2aff2d03cc996e26d54d"
+          },
+          "cutoff": 4.803639999353899
+        }
+      ]
+    },
+    {
+      "seed": 52,
+      "setting": "on",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.520380967010862,
+            0.19885870497651853,
+            -0.48618980038853665
+          ],
+          "bank_ratios": [
+            0.2062716785687633,
+            0.27078952665314293
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.12126153642788863
+          ],
+          "bank_ratios": [
+            0.20435576458043303,
+            0.8476421501433121
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.20462990048683918,
+            -0.4901674043812166
+          ],
+          "bank_ratios": [
+            0.20593390065330966,
+            0.27708787848752203
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3977000115485068,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.21841739057065568
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            4.3520797027930564,
+            -0.12070972425218415
+          ],
+          "bank_ratios": [
+            0.20474312019612512,
+            0.846011790239123
+          ]
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed52.json",
+          "json_sha256": "49a31bb1aef3d22a901cc5fcec3dc783158edd3ec6d831e76a5849bddacf8cb6",
+          "npz_sha256": "4c32303d6eb1178440e8929286dfae62de4eaa95efd7184323531006d451d70f",
+          "raw_sha256": {
+            "u": "bae793e3e3983c68c7875acc151c4b7dd5f140c6f4c2beb6213981e9a1b6836a"
+          },
+          "cutoff": 10.605095119705064
+        },
+        {
+          "file": "kdv_cossin_iid_seed52.json",
+          "json_sha256": "57ce7c9c6c94e0f5441c18368a4ebc273a85a0fd64b8d35bc4e530e386072bbf",
+          "npz_sha256": "00d09d4b4dcfb7eabbdcc1c6dc2675e928b4090b50ea33ec79d8497674893db3",
+          "raw_sha256": {
+            "u": "60ba3f89db665b076af265146a7d2ef2f5eedcf2c87a2aff2d03cc996e26d54d"
+          },
+          "cutoff": 4.803639999353899
+        }
+      ]
+    },
+    {
+      "seed": 52,
+      "setting": "pair",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09748269115597168,
+            0.21308461152248018,
+            0.20473657922457883,
+            0.7610012426751376
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.47680203247565905,
+            0.0,
+            0.0,
+            2.8063639674528984
+          ],
+          "scaled_min_eigenvalue": 4.434798264417087e-08
+        },
+        "drop_nonlinear": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1508.93004317224,
+            0.0,
+            3.2119648616958923e-07
+          ],
+          "scaled_min_eigenvalue": 2.8856085850787676e-09
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.09645948504566279,
+            0.0,
+            0.3253335855448075,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.09765204428078832
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606
+          ],
+          "bank_ratios": [
+            0.0974826911559717,
+            0.21308461152247993,
+            0.20473657922457883,
+            0.7610012426751376
+          ]
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": false,
+        "bank_pass": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed52.json",
+          "json_sha256": "49a31bb1aef3d22a901cc5fcec3dc783158edd3ec6d831e76a5849bddacf8cb6",
+          "npz_sha256": "4c32303d6eb1178440e8929286dfae62de4eaa95efd7184323531006d451d70f",
+          "raw_sha256": {
+            "u": "bae793e3e3983c68c7875acc151c4b7dd5f140c6f4c2beb6213981e9a1b6836a"
+          },
+          "cutoff": 10.605095119705064
+        },
+        {
+          "file": "kdv_cossin_iid_seed52.json",
+          "json_sha256": "57ce7c9c6c94e0f5441c18368a4ebc273a85a0fd64b8d35bc4e530e386072bbf",
+          "npz_sha256": "00d09d4b4dcfb7eabbdcc1c6dc2675e928b4090b50ea33ec79d8497674893db3",
+          "raw_sha256": {
+            "u": "60ba3f89db665b076af265146a7d2ef2f5eedcf2c87a2aff2d03cc996e26d54d"
+          },
+          "cutoff": 4.803639999353899
+        }
+      ]
+    },
+    {
+      "seed": 53,
+      "setting": "off",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.02792254191668196
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.07543218363004628,
+            1294.1303854607447
+          ],
+          "scaled_min_eigenvalue": 0.005576466576088141
+        },
+        "drop_nonlinear": {
+          "status": "excluded",
+          "weights": [
+            0.07543218363004628,
+            1294.1303854607447
+          ],
+          "scaled_min_eigenvalue": 0.005576466576088141
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.4548566337338626,
+            212.36807686601165
+          ],
+          "scaled_min_eigenvalue": 0.03434698420826415
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": false,
+        "bank_pass": [
+          false,
+          false
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed53.json",
+          "json_sha256": "6f7c25f5492015157c24ccc44acf0a6f682ecd3249f1866af3ce47d3f3331557",
+          "npz_sha256": "2e216c0058bc27505ccf6c0444a0581b20b40e72e722726605e811f2b081feff",
+          "raw_sha256": {
+            "u": "3fa6617204e6d2745e1a628003b6251a1aadb9cff7671e5ef9ce0b8546b493b6"
+          },
+          "cutoff": 10.075008330898651
+        },
+        {
+          "file": "kdv_cossin_iid_seed53.json",
+          "json_sha256": "3d975ec93a803a4e31ab0627921d33766618159e15feb4c63fb959a10b6bda4a",
+          "npz_sha256": "c1ce767ba4cfdd0eaa83843ca7ac4d2b708ce17373cf7f75ace882a0e85700bf",
+          "raw_sha256": {
+            "u": "570f6c96bc1af9b8185cf85b77c5bde31ec6897387115642e03db80954868941"
+          },
+          "cutoff": 5.734538783738602
+        }
+      ]
+    },
+    {
+      "seed": 53,
+      "setting": "on",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -0.3254520878058264,
+            -0.038899261326614365,
+            -0.19083219482590608
+          ],
+          "bank_ratios": [
+            0.1748991390135738,
+            0.947084923399731
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.16750009528105525
+          ],
+          "bank_ratios": [
+            0.17173904857857047,
+            0.12257537333830405
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.03903662465245126,
+            -0.19047497732666552
+          ],
+          "bank_ratios": [
+            0.17492362041889903,
+            0.941153134234166
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3973678130853433,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.21429597473143536
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            1.3110626619608727,
+            -0.16708292036772238
+          ],
+          "bank_ratios": [
+            0.1717845677421711,
+            0.12277683220672651
+          ]
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed53.json",
+          "json_sha256": "6f7c25f5492015157c24ccc44acf0a6f682ecd3249f1866af3ce47d3f3331557",
+          "npz_sha256": "2e216c0058bc27505ccf6c0444a0581b20b40e72e722726605e811f2b081feff",
+          "raw_sha256": {
+            "u": "3fa6617204e6d2745e1a628003b6251a1aadb9cff7671e5ef9ce0b8546b493b6"
+          },
+          "cutoff": 10.075008330898651
+        },
+        {
+          "file": "kdv_cossin_iid_seed53.json",
+          "json_sha256": "3d975ec93a803a4e31ab0627921d33766618159e15feb4c63fb959a10b6bda4a",
+          "npz_sha256": "c1ce767ba4cfdd0eaa83843ca7ac4d2b708ce17373cf7f75ace882a0e85700bf",
+          "raw_sha256": {
+            "u": "570f6c96bc1af9b8185cf85b77c5bde31ec6897387115642e03db80954868941"
+          },
+          "cutoff": 5.734538783738602
+        }
+      ]
+    },
+    {
+      "seed": 53,
+      "setting": "pair",
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.027922541916682017,
+            0.17220405722660903,
+            0.5106096269723983
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.07735358110444289,
+            1288.6523637700955,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 9.57250606235366e-09
+        },
+        "drop_nonlinear": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.192138911127,
+            0.0,
+            2.7097469826302643e-07
+          ],
+          "scaled_min_eigenvalue": 2.6130196613607844e-09
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.09467042813232902,
+            0.0,
+            0.32630064320510505,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.09669222965826664
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.02792254191668196,
+            0.17220405722660903,
+            0.5106096269723983
+          ]
+        }
+      },
+      "physical": {
+        "passed": true,
+        "bank_pass": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "rival": {
+        "passed": false,
+        "bank_pass": [
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      "inputs": [
+        {
+          "file": "kdv_iid_seed53.json",
+          "json_sha256": "6f7c25f5492015157c24ccc44acf0a6f682ecd3249f1866af3ce47d3f3331557",
+          "npz_sha256": "2e216c0058bc27505ccf6c0444a0581b20b40e72e722726605e811f2b081feff",
+          "raw_sha256": {
+            "u": "3fa6617204e6d2745e1a628003b6251a1aadb9cff7671e5ef9ce0b8546b493b6"
+          },
+          "cutoff": 10.075008330898651
+        },
+        {
+          "file": "kdv_cossin_iid_seed53.json",
+          "json_sha256": "3d975ec93a803a4e31ab0627921d33766618159e15feb4c63fb959a10b6bda4a",
+          "npz_sha256": "c1ce767ba4cfdd0eaa83843ca7ac4d2b708ce17373cf7f75ace882a0e85700bf",
+          "raw_sha256": {
+            "u": "570f6c96bc1af9b8185cf85b77c5bde31ec6897387115642e03db80954868941"
+          },
+          "cutoff": 5.734538783738602
+        }
+      ]
+    }
+  ],
+  "source_hashes": {
+    "pair.py": "2b312940ee1bba49e328fc53f3bc870487c9b1b177311d034e5854d67aa6d49b",
+    "protocol.txt": "1b164c2d33233502715d203c4a513ca7e823c6cf7790ad25827c4aa0a6495e5a",
+    "resolution.py": "13e63dd212019271c317ab95e2c6bcf08f0557ac8f4fbd8863cb9177c51e60d6",
+    "audit.py": "6688070ca0cdf6f0cd88bf5b71030358094061c3de734ae819a3e7fdca3bacb3"
+  }
+}

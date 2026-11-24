@@ -1,0 +1,69 @@
+{
+  "production_rows": 16,
+  "production_draws": 256,
+  "exact_zero_score": 0.0,
+  "score_at_sigma1_median": 0.9652454700513174,
+  "score_at_sigma_1e_minus8_median": 0.9652454700513172,
+  "nonzero_constant_score_at_sigma_1e_minus8_median": 1.1572276031697315e-09,
+  "production_formula_max_relative_error": 1.8363087052125723e-14,
+  "quantile_levels": [
+    0.5,
+    0.9,
+    0.95,
+    0.99
+  ],
+  "empirical_quantiles": [
+    0.9995742963926897,
+    6.282497239796095,
+    12.652592385856746,
+    63.67183870549803
+  ],
+  "analytic_quantiles": [
+    0.9999999999999999,
+    6.313751514675041,
+    12.706204736174696,
+    63.6567411628717
+  ],
+  "prefix_statistics": [
+    {
+      "n": 128,
+      "mean": 3.8590561836008868,
+      "sd": 8.672768716566884,
+      "median": 1.1681659237806437
+    },
+    {
+      "n": 512,
+      "mean": 8.156399239862349,
+      "sd": 69.18469859628638,
+      "median": 1.0554558679958301
+    },
+    {
+      "n": 4096,
+      "mean": 6.115831247523245,
+      "sd": 46.57271568696132,
+      "median": 1.0336754845752287
+    },
+    {
+      "n": 65536,
+      "mean": 12.980186943193631,
+      "sd": 1653.3831925686638,
+      "median": 0.9958742414986648
+    },
+    {
+      "n": 1048576,
+      "mean": 13.30870505760574,
+      "sd": 4728.334495229762,
+      "median": 0.9995742963926897
+    }
+  ],
+  "sd_across_128_draw_batches_quantiles": [
+    4.854070085340612,
+    12.686407119167132,
+    69.46705702736746,
+    682.139259519748,
+    10434.20796313474
+  ],
+  "uncapped_analytic_mean": "infinite",
+  "uncapped_analytic_variance": "does not exist",
+  "caveat": "Production float cap is finite; the uncapped model describes the near-zero-median ratio pathology, not every real candidate."
+}

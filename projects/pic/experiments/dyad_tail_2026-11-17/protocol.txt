@@ -1,0 +1,33 @@
+Dyad zero-coefficient limit and monotone-coordinate uncertainty
+2026-11-17, frozen before this follow-up's outcomes.
+
+Follow-up motivated by completed uncertainty_refit seed18/19/20 results.
+This is an analytic check and exploratory reanalysis of those SAME arrays,
+not an independent validation sample or a new discovery run.
+
+1. Minimal production geometry: one constant feature,16 observations,
+two equal8-row slabs, no intercept, target iid Gaussian noise and true
+coefficient zero. Verify production dyad equals |c1-c2|/|c1+c2|, with c1,c2
+the two slab means. A45-degree rotation makes numerator and denominator
+independent zero-mean equal-variance Gaussians, so the uncapped ratio has
+the absolute-Cauchy distribution. Derive its median/tail and lack of finite
+mean/variance; distinguish this analytic model from all real candidates.
+Check invariance as the noise amplitude tends to zero, contrasted with
+the implementation's exactly zero-noise score0. Preserve valid nonzero
+constants; this analysis does not justify banning constant terms.
+
+2. Apply two fixed monotone transforms to the stored dyad sums: log1p(I)
+and I/(1+I), alongside unchanged I. No coefficient/fitting/data changes.
+Verify all candidate pairwise orders, including ties, are unchanged on
+every saved anchor, center and repeated measurement. Therefore the Pareto
+fronts with unchanged discrepancy must be identical. No free scale or
+per-system transform selection. Test uncertainty of transformed pair
+differences with the same nominal95% empirical error-range procedure.
+Retain all results, including regressions. Transforming does not correct
+pilot bias or change raw winning probabilities; numerical tail control
+must not be misreported as confidence in structural correctness.
+
+Record complete per-pair coverage, per-system means, analytical/production
+agreement, zero-noise limit checks, input/source hashes and scientific
+plots. Any successful transform still requires a fresh confirmation before
+promotion. No production changes, thresholds, equation solvers or PINNs.

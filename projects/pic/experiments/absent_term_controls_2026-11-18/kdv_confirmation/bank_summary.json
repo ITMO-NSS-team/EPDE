@@ -1,0 +1,40 @@
+{
+  "local_time": {
+    "fields": 32,
+    "candidate_cases": 256,
+    "with_wins": 243,
+    "with_wins_when_others_fixed": 256,
+    "fitted_addition_beats_fixed_truth": 0,
+    "reference_beats_fixed_truth": 0,
+    "exact": [
+      -6.0,
+      -1.0,
+      1.0
+    ],
+    "reference_equation": "-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + 1.0 * cos(t)sin(x){power: 1.0} = du/dx0{power: 1.0}",
+    "reference_medians": [
+      3.51172941557826,
+      0.014245063826660865,
+      -0.2340359161633933
+    ]
+  },
+  "broad": {
+    "fields": 32,
+    "candidate_cases": 256,
+    "with_wins": 221,
+    "with_wins_when_others_fixed": 249,
+    "fitted_addition_beats_fixed_truth": 0,
+    "reference_beats_fixed_truth": 0,
+    "exact": [
+      -6.0,
+      -1.0,
+      1.0
+    ],
+    "reference_equation": "-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + 1.0 * cos(t)sin(x){power: 1.0} = du/dx0{power: 1.0}",
+    "reference_medians": [
+      0.031000867904394602,
+      -0.4582488596795913,
+      0.30411553456991725
+    ]
+  }
+}

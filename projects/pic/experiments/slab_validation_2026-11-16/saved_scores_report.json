@@ -1,0 +1,3466 @@
+{
+  "scope": "Offline rescoring of four saved archives; no evolutionary search rerun.",
+  "conditions": "One record, 5% noise, weak form, 30 epochs, seed 0.",
+  "definitions": {
+    "out": "Fit on k-1 slabs; predict each held slab; pool all residual magnitudes / sum(abs(target)).",
+    "one": "Fit on each single slab; score its complement; pool residual magnitudes / ((k-1)*sum(abs(target))).",
+    "mean_out_2_4_8": "Equal-weight average of the three already-pooled partition scores, with original instability.",
+    "max_out_2_4_8": "Maximum of the three partition scores, with original instability.",
+    "vector_out_2_4_8": "Three separate pooled partition scores and original instability (four objectives).",
+    "vector_out_and_one_2_4_8": "Six pooled protocol/partition scores and original instability (seven objectives; k=2 duplicated).",
+    "vector_two_halves": "Separate ab and ba validation errors and original instability."
+  },
+  "limits": [
+    "Saved files contain pooled errors, not individual 4-/8-slab errors or fitted slab coefficients.",
+    "These are comparisons against existing archive candidates, not results of a search with new objectives.",
+    "Reference-law structures were refitted to noisy data; reported scores do not fix analytical coefficients.",
+    "The rational keep-arm archive excludes trig tokens; it is only a historical diagnostic control.",
+    "The rational plain-target arm cannot generate the reference's target-related right-hand term.",
+    "More objective dimensions can remove dominance without identifying the physical law.",
+    "Comparisons retain each equation's original target normalization and instability."
+  ],
+  "runs": [
+    {
+      "run": "rational_trace_PW_e30_n5_weak_kf",
+      "source_path": "D:\\Temp\\claude\\af09ad276a711cff\\c5a71b1a-1530-4755-b8a8-0feb3924d241\\scratchpad\\rho\\h\\rational_trace_PW_e30_n5_weak_kf_ref.json",
+      "source_sha256": "38bafb659c94ee54123ba87a5b185dc6cf54881641593c434653782e88bcd8f7",
+      "archive_size": 13,
+      "reference": {
+        "name": "exact",
+        "target": "du/dx0",
+        "terms": [
+          "du/dx0*u^2",
+          "u"
+        ],
+        "constant": 0.0
+      },
+      "metrics": {
+        "original": {
+          "reference_objectives": [
+            0.09361334759033754,
+            0.42555495780581265
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u",
+                "u^2",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.027463160720363325,
+                0.20406795090955204
+              ]
+            }
+          ]
+        },
+        "mean_out_2_4_8": {
+          "reference_objectives": [
+            0.1466600110952613,
+            0.42555495780581265
+          ],
+          "dominator_count": 2,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1458941758362868,
+                0.13966054888972973
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u",
+                "u^2",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1444633995492451,
+                0.20406795090955204
+              ]
+            }
+          ]
+        },
+        "max_out_2_4_8": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.42555495780581265
+          ],
+          "dominator_count": 4,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1766377401754839,
+                0.13966054888972973
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*sin~190@0"
+              ],
+              "constant": -0.4030277223861722,
+              "objectives": [
+                0.18442522913394757,
+                0.11399266028712227
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0"
+              ],
+              "constant": -0.39358180338784066,
+              "objectives": [
+                0.1969086088571236,
+                0.03679932748559289
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0*u"
+              ],
+              "constant": -0.4028147018600425,
+              "objectives": [
+                0.1845965812914377,
+                0.0988751586253053
+              ]
+            }
+          ]
+        },
+        "vector_out_2_4_8": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.11773215649050324,
+            0.11618598120727777,
+            0.42555495780581265
+          ],
+          "dominator_count": 0,
+          "dominators": []
+        },
+        "mean_one_2_4_8": {
+          "reference_objectives": [
+            0.45833141357111007,
+            0.42555495780581265
+          ],
+          "dominator_count": 4,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.30565755205118506,
+                0.13966054888972973
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*sin~190@0"
+              ],
+              "constant": -0.4030277223861722,
+              "objectives": [
+                0.22260856744236937,
+                0.11399266028712227
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0"
+              ],
+              "constant": -0.39358180338784066,
+              "objectives": [
+                0.217299848573088,
+                0.03679932748559289
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0*u"
+              ],
+              "constant": -0.4028147018600425,
+              "objectives": [
+                0.22230348339885678,
+                0.0988751586253053
+              ]
+            }
+          ]
+        },
+        "vector_out_and_one_2_4_8": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.11773215649050324,
+            0.11618598120727777,
+            0.2060618955880029,
+            0.3482076767016154,
+            0.8207246684237118,
+            0.42555495780581265
+          ],
+          "dominator_count": 0,
+          "dominators": []
+        },
+        "vector_two_halves": {
+          "reference_objectives": [
+            0.2435362754138183,
+            0.16583134925039636,
+            0.42555495780581265
+          ],
+          "dominator_count": 3,
+          "dominators": [
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*sin~190@0"
+              ],
+              "constant": -0.4030277223861722,
+              "objectives": [
+                0.23279073188227556,
+                0.0877859185598905,
+                0.11399266028712227
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0"
+              ],
+              "constant": -0.39358180338784066,
+              "objectives": [
+                0.23941321001073176,
+                0.10207884301964422,
+                0.03679932748559289
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0*u"
+              ],
+              "constant": -0.4028147018600425,
+              "objectives": [
+                0.2327961345183402,
+                0.08784260089203781,
+                0.0988751586253053
+              ]
+            }
+          ]
+        },
+        "out_2": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.42555495780581265
+          ],
+          "dominator_count": 4,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1766377401754839,
+                0.13966054888972973
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*sin~190@0"
+              ],
+              "constant": -0.4030277223861722,
+              "objectives": [
+                0.16285996018851848,
+                0.11399266028712227
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0"
+              ],
+              "constant": -0.39358180338784066,
+              "objectives": [
+                0.17318162746037657,
+                0.03679932748559289
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "sin~190@0*u"
+              ],
+              "constant": -0.4028147018600425,
+              "objectives": [
+                0.1628900932361958,
+                0.0988751586253053
+              ]
+            }
+          ]
+        },
+        "out_4": {
+          "reference_objectives": [
+            0.11773215649050324,
+            0.42555495780581265
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u",
+                "u^2",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.04334665366692756,
+                0.20406795090955204
+              ]
+            }
+          ]
+        },
+        "out_8": {
+          "reference_objectives": [
+            0.11618598120727777,
+            0.42555495780581265
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u",
+                "u^2",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.03393588154076457,
+                0.20406795090955204
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "run": "kepler_trace_PI_e30_n5_weak_kf",
+      "source_path": "D:\\Temp\\claude\\af09ad276a711cff\\c5a71b1a-1530-4755-b8a8-0feb3924d241\\scratchpad\\rho\\h\\kepler_trace_PI_e30_n5_weak_kf_ref.json",
+      "source_sha256": "cf93f826f07950c403dc0dbd44e6c8dd9d89420b2c751352df58d6ca8d463e44",
+      "archive_size": 22,
+      "reference": {
+        "name": "exact_inv",
+        "target": "d^2u/dx0^2",
+        "terms": [
+          "uinv2",
+          "uinv3"
+        ],
+        "constant": 0.0
+      },
+      "metrics": {
+        "original": {
+          "reference_objectives": [
+            0.05111349115444792,
+            0.02097124732986741
+          ],
+          "dominator_count": 11,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005911629483360969,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005951076318751587,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.020527816161953618,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005951076318751464,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005951076318751485,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005371818579505782,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0053718185795058266,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005371818579505822,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005371818579505778,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005371818579505838,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.004860452296668631,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "mean_out_2_4_8": {
+          "reference_objectives": [
+            0.07662986196554859,
+            0.02097124732986741
+          ],
+          "dominator_count": 12,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006819928687665975,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006690963100316072,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.02078505202789428,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00669096310031615,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006690963100316155,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006335343117735252,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006335343117735305,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006335343117735179,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006335343117735205,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 12,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*u^3",
+                "sin~1.233@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07504041510736982,
+                0.0003883201584730994
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0063353431177353035,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006057125438106696,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "max_out_2_4_8": {
+          "reference_objectives": [
+            0.10051510311953799,
+            0.02097124732986741
+          ],
+          "dominator_count": 12,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007060930987010041,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815125,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.021196474559774817,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815374,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815245,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0064307606770679475,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068021,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677067889,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 12,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*u^3",
+                "sin~1.233@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0761249684081303,
+                0.0003883201584730994
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006312977186998611,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "vector_out_2_4_8": {
+          "reference_objectives": [
+            0.10051510311953799,
+            0.06755076187274268,
+            0.06182372090436512,
+            0.02097124732986741
+          ],
+          "dominator_count": 11,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006639974091146413,
+                0.007060930987010041,
+                0.006758880984841468,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815125,
+                0.006655153198977406,
+                0.006634097424155685,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.020574842527197268,
+                0.02058383899671075,
+                0.021196474559774817,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815374,
+                0.006655153198977426,
+                0.006634097424155648,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815245,
+                0.006655153198977475,
+                0.006634097424155746,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0064307606770679475,
+                0.0063915398288248255,
+                0.006183728847312985,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068021,
+                0.00639153982882479,
+                0.006183728847313106,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.006391539828824701,
+                0.00618372884731282,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677067889,
+                0.006391539828824707,
+                0.006183728847313018,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.006391539828824839,
+                0.006183728847313054,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006312977186998611,
+                0.006117338253921584,
+                0.00574106087339989,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "mean_one_2_4_8": {
+          "reference_objectives": [
+            0.08490657103778942,
+            0.02097124732986741
+          ],
+          "dominator_count": 12,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00762162006344804,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007993332045951543,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0222571859093381,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007993332045951545,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007993332045951554,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007186398635714189,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007186398635714522,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007186398635714179,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0071863986357144196,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 12,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*u^3",
+                "sin~1.233@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.08090804567047521,
+                0.0003883201584730994
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007186398635714502,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006949193120822319,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "vector_out_and_one_2_4_8": {
+          "reference_objectives": [
+            0.10051510311953799,
+            0.06755076187274268,
+            0.06182372090436512,
+            0.10051510311953799,
+            0.08234174997393846,
+            0.07186286001989182,
+            0.02097124732986741
+          ],
+          "dominator_count": 11,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006639974091146413,
+                0.007060930987010041,
+                0.006758880984841468,
+                0.006639974091146413,
+                0.008013849421791949,
+                0.008211036677405758,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815125,
+                0.006655153198977406,
+                0.006634097424155685,
+                0.006783638677815125,
+                0.007165447154209596,
+                0.01003091030582991,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.020574842527197268,
+                0.02058383899671075,
+                0.021196474559774817,
+                0.020574842527197268,
+                0.020666960997585495,
+                0.025529754203231527,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815374,
+                0.006655153198977426,
+                0.006634097424155648,
+                0.006783638677815374,
+                0.00716544715420952,
+                0.010030910305829739,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815245,
+                0.006655153198977475,
+                0.006634097424155746,
+                0.006783638677815245,
+                0.007165447154209453,
+                0.010030910305829964,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0064307606770679475,
+                0.0063915398288248255,
+                0.006183728847312985,
+                0.0064307606770679475,
+                0.00713878269371736,
+                0.007989652536357259,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068021,
+                0.00639153982882479,
+                0.006183728847313106,
+                0.006430760677068021,
+                0.007138782693717436,
+                0.007989652536358107,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.006391539828824701,
+                0.00618372884731282,
+                0.006430760677068016,
+                0.007138782693717378,
+                0.007989652536357143,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677067889,
+                0.006391539828824707,
+                0.006183728847313018,
+                0.006430760677067889,
+                0.007138782693717216,
+                0.007989652536358152,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.006391539828824839,
+                0.006183728847313054,
+                0.006430760677068016,
+                0.007138782693717441,
+                0.007989652536358048,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006312977186998611,
+                0.006117338253921584,
+                0.00574106087339989,
+                0.006312977186998611,
+                0.007045623596876649,
+                0.007488978578591698,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "vector_two_halves": {
+          "reference_objectives": [
+            0.09424448338925634,
+            0.10666295883981974,
+            0.02097124732986741
+          ],
+          "dominator_count": 12,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005459738919614553,
+                0.007820230664170584,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006881334035313406,
+                0.006685941548783073,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.02117397159995184,
+                0.019975702590289083,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00688133403531365,
+                0.006685941548783359,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006881334035313615,
+                0.006685941548783153,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005481577658041139,
+                0.0073799609078619745,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005481577658041376,
+                0.007379960907861886,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005481577658041088,
+                0.007379960907862162,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0054815776580411065,
+                0.0073799609078618955,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 12,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*u^3",
+                "sin~1.233@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07570619023785063,
+                0.07247248406068281,
+                0.0003883201584730994
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0054815776580413806,
+                0.007379960907861894,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00549576772356837,
+                0.007130201469087371,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "out_2": {
+          "reference_objectives": [
+            0.10051510311953799,
+            0.02097124732986741
+          ],
+          "dominator_count": 12,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006639974091146413,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815125,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.020574842527197268,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815374,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006783638677815245,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0064307606770679475,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068021,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677067889,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 12,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*u^3",
+                "sin~1.233@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07408935180852956,
+                0.0003883201584730994
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006430760677068016,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006312977186998611,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "out_4": {
+          "reference_objectives": [
+            0.06755076187274268,
+            0.02097124732986741
+          ],
+          "dominator_count": 11,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007060930987010041,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006655153198977406,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.02058383899671075,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006655153198977426,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006655153198977475,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0063915398288248255,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00639153982882479,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006391539828824701,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006391539828824707,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006391539828824839,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006117338253921584,
+                0.019623467399186068
+              ]
+            }
+          ]
+        },
+        "out_8": {
+          "reference_objectives": [
+            0.06182372090436512,
+            0.02097124732986741
+          ],
+          "dominator_count": 11,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~1.233@0*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006758880984841468,
+                0.0042351090262678324
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006634097424155685,
+                0.0026810982550542466
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv",
+                "sin~1.233@0*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.021196474559774817,
+                0.0015621053923988723
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^3*uinv3",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006634097424155648,
+                0.002681098255058343
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006634097424155746,
+                0.0026810982550544236
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006183728847312985,
+                0.004959766791805544
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^3*uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006183728847313106,
+                0.004959766791804949
+              ]
+            },
+            {
+              "archive_index": 9,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00618372884731282,
+                0.004959766791805523
+              ]
+            },
+            {
+              "archive_index": 10,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u^2*uinv",
+                "uinv2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006183728847313018,
+                0.004959766791806057
+              ]
+            },
+            {
+              "archive_index": 13,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "u*uinv3",
+                "u^2*uinv"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006183728847313054,
+                0.004959766791803148
+              ]
+            },
+            {
+              "archive_index": 18,
+              "target": "du/dx0",
+              "terms": [
+                "cos~1.233@0*uinv2",
+                "sin~2.465@0*uinv2",
+                "u",
+                "u*uinv3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00574106087339989,
+                0.019623467399186068
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "run": "rational_trace_PK_e30_n5_weak_cap_kf_notrig",
+      "source_path": "D:\\Temp\\claude\\af09ad276a711cff\\c5a71b1a-1530-4755-b8a8-0feb3924d241\\scratchpad\\rho\\h\\rational_trace_PK_e30_n5_weak_cap_kf_notrig_ref.json",
+      "source_sha256": "dc3954256762c3eb9a0704273bba2692f8b89ae38c12005ac48e2f1fd74aa920",
+      "archive_size": 15,
+      "reference": {
+        "name": "exact",
+        "target": "du/dx0",
+        "terms": [
+          "du/dx0*u^2",
+          "u"
+        ],
+        "constant": 0.0
+      },
+      "metrics": {
+        "original": {
+          "reference_objectives": [
+            0.09361334759033754,
+            0.42555495780581265
+          ],
+          "dominator_count": 4,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.04579216013716994,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.031426491961242545,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.021526769248979297,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.015334341347666416,
+                0.2639491327683504
+              ]
+            }
+          ]
+        },
+        "mean_out_2_4_8": {
+          "reference_objectives": [
+            0.1466600110952613,
+            0.42555495780581265
+          ],
+          "dominator_count": 7,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.06861451286340138,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.006700839683563816,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0054425075969287565,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.020216646371005842,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.011170540437297032,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.012572587984999037,
+                0.2639491327683504
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1458941758362868,
+                0.13966054888972973
+              ]
+            }
+          ]
+        },
+        "max_out_2_4_8": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.42555495780581265
+          ],
+          "dominator_count": 7,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07550079783580906,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.014341604086029995,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00826208518283645,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.03874104167753788,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.01310948307007323,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.022918982033891033,
+                0.2639491327683504
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1766377401754839,
+                0.13966054888972973
+              ]
+            }
+          ]
+        },
+        "vector_out_2_4_8": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.11773215649050324,
+            0.11618598120727777,
+            0.42555495780581265
+          ],
+          "dominator_count": 6,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07550079783580906,
+                0.06565959671475777,
+                0.06468314403963733,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.014341604086029995,
+                0.0030522194125633443,
+                0.0027086955520981087,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00826208518283645,
+                0.005737599787114156,
+                0.002327837820835665,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.03874104167753788,
+                0.015090938697702182,
+                0.006817958737777465,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.01310948307007323,
+                0.011454441136221315,
+                0.00894769710559655,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.022918982033891033,
+                0.009181443261508652,
+                0.005617338659597427,
+                0.2639491327683504
+              ]
+            }
+          ]
+        },
+        "mean_one_2_4_8": {
+          "reference_objectives": [
+            0.45833141357111007,
+            0.42555495780581265
+          ],
+          "dominator_count": 7,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.29684494347971935,
+                0.05632005853380962
+              ]
+            },
+            {
+              "archive_index": 1,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.2824145527104078,
+                0.06976239097034395
+              ]
+            },
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1300273311433307,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.30415727355371913,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.08129676047287815,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.04431823144942013,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.30565755205118506,
+                0.13966054888972973
+              ]
+            }
+          ]
+        },
+        "vector_out_and_one_2_4_8": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.11773215649050324,
+            0.11618598120727777,
+            0.2060618955880029,
+            0.3482076767016154,
+            0.8207246684237118,
+            0.42555495780581265
+          ],
+          "dominator_count": 4,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07550079783580906,
+                0.06565959671475777,
+                0.06468314403963733,
+                0.07550079783580906,
+                0.15529091896978417,
+                0.15929027662439887,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.014341604086029995,
+                0.0030522194125633443,
+                0.0027086955520981087,
+                0.014341604086029995,
+                0.17184913949611172,
+                0.7262810770790157,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00826208518283645,
+                0.005737599787114156,
+                0.002327837820835665,
+                0.00826208518283645,
+                0.06414060688229967,
+                0.17148758935349834,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.01310948307007323,
+                0.011454441136221315,
+                0.00894769710559655,
+                0.01310948307007323,
+                0.059478630584904595,
+                0.06036658069328258,
+                0.0887698198386978
+              ]
+            }
+          ]
+        },
+        "vector_two_halves": {
+          "reference_objectives": [
+            0.2435362754138183,
+            0.16583134925039636,
+            0.42555495780581265
+          ],
+          "dominator_count": 6,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.05890539388448172,
+                0.12063423987592774,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.017512996183950795,
+                0.010936962372326942,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.008885295119101723,
+                0.007593039388469367,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.008977604256784283,
+                0.07069352104844978,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.007911817402414107,
+                0.018689426766595702,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.010081632963595665,
+                0.036700492736004786,
+                0.2639491327683504
+              ]
+            }
+          ]
+        },
+        "out_2": {
+          "reference_objectives": [
+            0.2060618955880029,
+            0.42555495780581265
+          ],
+          "dominator_count": 7,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.07550079783580906,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.014341604086029995,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00826208518283645,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.03874104167753788,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.01310948307007323,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.022918982033891033,
+                0.2639491327683504
+              ]
+            },
+            {
+              "archive_index": 8,
+              "target": "du/dx0",
+              "terms": [
+                "t@0*u",
+                "t^2@0*u^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.1766377401754839,
+                0.13966054888972973
+              ]
+            }
+          ]
+        },
+        "out_4": {
+          "reference_objectives": [
+            0.11773215649050324,
+            0.42555495780581265
+          ],
+          "dominator_count": 6,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.06565959671475777,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.0030522194125633443,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005737599787114156,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.015090938697702182,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.011454441136221315,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.009181443261508652,
+                0.2639491327683504
+              ]
+            }
+          ]
+        },
+        "out_8": {
+          "reference_objectives": [
+            0.11618598120727777,
+            0.42555495780581265
+          ],
+          "dominator_count": 6,
+          "dominators": [
+            {
+              "archive_index": 2,
+              "target": "d^2u/dx0^2",
+              "terms": [
+                "d^2u/dx0^2*t@0",
+                "d^2u/dx0^2*u",
+                "du/dx0",
+                "du/dx0^2"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.06468314403963733,
+                0.1499500338076562
+              ]
+            },
+            {
+              "archive_index": 3,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "u^2"
+              ],
+              "constant": 0.027451646420661318,
+              "objectives": [
+                0.0027086955520981087,
+                0.19822489512746466
+              ]
+            },
+            {
+              "archive_index": 4,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "du/dx0*u^3",
+                "t^2@0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.002327837820835665,
+                0.08539474015546009
+              ]
+            },
+            {
+              "archive_index": 5,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*u",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.006817958737777465,
+                0.22677053250246768
+              ]
+            },
+            {
+              "archive_index": 6,
+              "target": "du/dx0",
+              "terms": [
+                "du/dx0*t@0",
+                "du/dx0*u",
+                "t^2@0*u"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.00894769710559655,
+                0.0887698198386978
+              ]
+            },
+            {
+              "archive_index": 7,
+              "target": "du/dx0",
+              "terms": [
+                "d^2u/dx0^2*du/dx0^2",
+                "d^2u/dx0^2^2",
+                "du/dx0*t@0",
+                "du/dx0*t^2@0",
+                "u^3"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.005617338659597427,
+                0.2639491327683504
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "run": "cauchy_trace_FW_e30_n5_weak_proff_kf",
+      "source_path": "D:\\Temp\\claude\\af09ad276a711cff\\c5a71b1a-1530-4755-b8a8-0feb3924d241\\scratchpad\\rho\\h\\cauchy_trace_FW_e30_n5_weak_proff_kf_ref.json",
+      "source_sha256": "eefbf3cfffe9086f2345aa6cb8ce2c5e4136965c5a855f24bf7826ebb7d8a93d",
+      "archive_size": 13,
+      "reference": {
+        "name": "exact",
+        "target": "d^2u/dx0^2*t^2@0",
+        "terms": [
+          "du/dx0*t@0",
+          "u"
+        ],
+        "constant": 0.0
+      },
+      "metrics": {
+        "original": {
+          "reference_objectives": [
+            0.02212954136004289,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0016402916180203913,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "mean_out_2_4_8": {
+          "reference_objectives": [
+            0.024835050681374333,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0019751613185626797,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "max_out_2_4_8": {
+          "reference_objectives": [
+            0.025038234110658537,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.002180926860026274,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "vector_out_2_4_8": {
+          "reference_objectives": [
+            0.024563609758985448,
+            0.025038234110658537,
+            0.024903308174479014,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.002180926860026274,
+                0.0019390311437601922,
+                0.0018055259519015729,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "mean_one_2_4_8": {
+          "reference_objectives": [
+            0.039433694280542914,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0026706234579603008,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "vector_out_and_one_2_4_8": {
+          "reference_objectives": [
+            0.024563609758985448,
+            0.025038234110658537,
+            0.024903308174479014,
+            0.024563609758985448,
+            0.03208620339997142,
+            0.06165126968267187,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.002180926860026274,
+                0.0019390311437601922,
+                0.0018055259519015729,
+                0.002180926860026274,
+                0.002486628011427039,
+                0.00334431550242759,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "vector_two_halves": {
+          "reference_objectives": [
+            0.03150052230004017,
+            0.016555280945264025,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0018123510538488893,
+                0.0026627560690282047,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "out_2": {
+          "reference_objectives": [
+            0.024563609758985448,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.002180926860026274,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "out_4": {
+          "reference_objectives": [
+            0.025038234110658537,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0019390311437601922,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        },
+        "out_8": {
+          "reference_objectives": [
+            0.024903308174479014,
+            0.020352493581578073
+          ],
+          "dominator_count": 1,
+          "dominators": [
+            {
+              "archive_index": 0,
+              "target": "d^2u/dx0^2*sin~80.54@0",
+              "terms": [
+                "cos~80.54@0*du/dx0"
+              ],
+              "constant": 0.0,
+              "objectives": [
+                0.0018055259519015729,
+                0.0007774893243085842
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

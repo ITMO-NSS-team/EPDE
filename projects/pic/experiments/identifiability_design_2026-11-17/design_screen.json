@@ -1,0 +1,863 @@
+{
+  "status": "FROZEN",
+  "selected": "fraction_1_0.5_k2",
+  "rows": [
+    {
+      "bank": "local",
+      "status": "ok",
+      "score": 25.006735641803214,
+      "eigenvalues": [
+        0.12448799237683192,
+        3.1328691373229747,
+        8.361695188379453,
+        405.26542377873403,
+        1113.9637108098332,
+        3677.3727113713867
+      ],
+      "complex_rows": 216,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.24105463144328548,
+          0.7000136406496317,
+          0.7845177061904717,
+          1.0009253839489232,
+          1.1827575091358964,
+          2.0907311286317936
+        ]
+      }
+    },
+    {
+      "bank": "broad",
+      "status": "ok",
+      "score": 28.23375599848007,
+      "eigenvalues": [
+        0.6025434939695654,
+        1.898018445199808,
+        10.207544045055464,
+        591.3611890527127,
+        4809.679002571435,
+        12317.278912091708
+      ],
+      "complex_rows": 25,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.3101065893493886,
+          0.49178800037813086,
+          0.7849295020015893,
+          1.019347713228415,
+          1.4498790881109909,
+          1.9439491069314876
+        ]
+      }
+    },
+    {
+      "bank": "full_k0",
+      "status": "ok",
+      "score": 1.9583339350443033e-26,
+      "eigenvalues": [
+        -2.8926338830261846e-42,
+        -3.784246196709871e-43,
+        -1.9195830914842202e-44,
+        2.6067880399562634e-43,
+        4.021221941973441e-43,
+        1.9583339350443033e-26
+      ],
+      "complex_rows": 1,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.02562634840330155,
+          0.12914418617281997,
+          0.25528606997010106,
+          0.6770304489875701,
+          2.108226215228064,
+          2.804686731238143
+        ]
+      }
+    },
+    {
+      "bank": "full_k1",
+      "status": "ok",
+      "score": 24.86951024097342,
+      "eigenvalues": [
+        -5.881370162365678e-14,
+        0.00870175248366373,
+        1.5876665243119803,
+        450.78074725230806,
+        2900.779468761749,
+        18467.339920546183
+      ],
+      "complex_rows": 9,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.24632479103499258,
+          0.4190162495781473,
+          0.6336947161733225,
+          0.9775354535221585,
+          1.5861019013715427,
+          2.1373268883198344
+        ]
+      }
+    },
+    {
+      "bank": "full_k4",
+      "status": "ok",
+      "score": 23.61823519858943,
+      "eigenvalues": [
+        1.2551731920491953,
+        2.273269546747213,
+        4.160273541665726,
+        125.13927658977306,
+        1428.8346453418278,
+        2631.0775019044268
+      ],
+      "complex_rows": 81,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.38029905940719644,
+          0.658374841890247,
+          0.8270679875471615,
+          1.0307168217625255,
+          1.2297731526017202,
+          1.873768136791151
+        ]
+      }
+    },
+    {
+      "bank": "full_k6",
+      "status": "ok",
+      "score": 19.965304118787415,
+      "eigenvalues": [
+        0.6799883221598865,
+        1.422821067980248,
+        2.0132975269699362,
+        50.28463630425047,
+        618.5187230252174,
+        1201.5691892686523
+      ],
+      "complex_rows": 169,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.40404511276757216,
+          0.7426524869310164,
+          0.8838800340799082,
+          1.0538829474086626,
+          1.1357995255667332,
+          1.7797398932461093
+        ]
+      }
+    },
+    {
+      "bank": "fraction_0.5_1_k2",
+      "status": "ok",
+      "score": 26.12782388021544,
+      "eigenvalues": [
+        0.8543665771227763,
+        4.33071903347468,
+        6.360233462310273,
+        267.00221246359183,
+        2553.6092475899436,
+        4464.127886892702
+      ],
+      "complex_rows": 75,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.24335658050965064,
+          0.7810957384059644,
+          0.8402585583445594,
+          0.9630190769237803,
+          1.2694269769640456,
+          1.9028430688520013
+        ]
+      }
+    },
+    {
+      "bank": "fraction_1_0.5_k2",
+      "status": "ok",
+      "score": 28.69322741986509,
+      "eigenvalues": [
+        1.2644394874618436,
+        4.017403247215057,
+        10.669619381874938,
+        777.2956524334911,
+        3379.7488139926536,
+        8290.944951912952
+      ],
+      "complex_rows": 75,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.23816399474617003,
+          0.6107976498905066,
+          0.7643627635256093,
+          0.9700423370325945,
+          1.2677563076730411,
+          2.148876947132078
+        ]
+      }
+    },
+    {
+      "bank": "fraction_0.5_0.5_k2",
+      "status": "ok",
+      "score": 26.631860939050476,
+      "eigenvalues": [
+        0.8445650245793392,
+        4.519228993637062,
+        7.561994228603057,
+        489.2332449920149,
+        1749.485956647721,
+        4921.225936805264
+      ],
+      "complex_rows": 225,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.31587241944784517,
+          0.7403762561607783,
+          0.80475687004211,
+          0.9925593793597013,
+          1.1688738321909875,
+          1.9775612427985774
+        ]
+      }
+    },
+    {
+      "bank": "fraction_0.25_1_k2",
+      "status": "ok",
+      "score": 22.881893061529503,
+      "eigenvalues": [
+        0.5555080243631798,
+        1.9802336394318885,
+        4.375164673612156,
+        163.72440712338178,
+        1141.8381423922056,
+        1844.9624828731703
+      ],
+      "complex_rows": 175,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.22760890943534445,
+          0.8065524727734142,
+          0.8697750004450037,
+          0.9942907664946191,
+          1.2021609499197192,
+          1.8996119009318968
+        ]
+      }
+    },
+    {
+      "bank": "fraction_1_0.25_k2",
+      "status": "ok",
+      "score": 26.12669378043451,
+      "eigenvalues": [
+        0.19392189008029428,
+        1.948297062053592,
+        7.812841598251852,
+        528.9536539158003,
+        1920.6579087595526,
+        7031.372257231637
+      ],
+      "complex_rows": 175,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.19397430706703023,
+          0.6897537841055009,
+          0.7246210916377789,
+          1.0081021045446026,
+          1.241492524497126,
+          2.142056188147962
+        ]
+      }
+    },
+    {
+      "bank": "fraction_0.25_0.25_k2",
+      "status": "ok",
+      "score": 21.06074512490117,
+      "eigenvalues": [
+        0.11963426135089816,
+        0.7627529632712828,
+        2.8989451679185017,
+        187.17545852050196,
+        546.9720288037482,
+        1765.156802625861
+      ],
+      "complex_rows": 1225,
+      "metric": {
+        "status": "ok",
+        "rank": 6,
+        "dimension": 6,
+        "eigenvalues": [
+          0.2739873171110309,
+          0.7653703334398249,
+          0.8235358771478589,
+          1.001326566701716,
+          1.1703289912009223,
+          1.9654509143986483
+        ]
+      }
+    }
+  ],
+  "ranking": [
+    "fraction_1_0.5_k2",
+    "broad",
+    "fraction_0.5_0.5_k2",
+    "fraction_0.5_1_k2",
+    "fraction_1_0.25_k2",
+    "full_k1",
+    "full_k4",
+    "fraction_0.25_1_k2",
+    "fraction_0.25_0.25_k2",
+    "full_k6",
+    "full_k0"
+  ],
+  "specs": {
+    "local": {
+      "q": [
+        3,
+        5
+      ],
+      "radii": [
+        0.05,
+        0.07500000000000001
+      ],
+      "centers": [
+        [
+          0.07500000000000001,
+          0.125,
+          0.17500000000000002,
+          0.225,
+          0.275,
+          0.325,
+          0.375,
+          0.42500000000000004,
+          0.47500000000000003,
+          0.525,
+          0.5750000000000001,
+          0.625,
+          0.675,
+          0.7250000000000001,
+          0.775,
+          0.8250000000000001,
+          0.875,
+          0.925
+        ],
+        [
+          0.07500000000000001,
+          0.15000000000000002,
+          0.225,
+          0.30000000000000004,
+          0.375,
+          0.45,
+          0.525,
+          0.6000000000000001,
+          0.675,
+          0.75,
+          0.8250000000000001,
+          0.9
+        ]
+      ],
+      "interpolation_cut": [
+        2,
+        0
+      ],
+      "frequencies": [
+        [
+          0.0
+        ],
+        [
+          0.0
+        ]
+      ]
+    },
+    "broad": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ]
+      ]
+    },
+    "full_k0": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0
+        ],
+        [
+          0.0
+        ]
+      ]
+    },
+    "full_k1": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          -6.283185307179586
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          -6.283185307179586
+        ]
+      ]
+    },
+    "full_k4": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345
+        ]
+      ]
+    },
+    "full_k6": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          31.41592653589793,
+          37.69911184307752,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345,
+          -31.41592653589793,
+          -37.69911184307752
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          18.84955592153876,
+          25.132741228718345,
+          31.41592653589793,
+          37.69911184307752,
+          -6.283185307179586,
+          -12.566370614359172,
+          -18.84955592153876,
+          -25.132741228718345,
+          -31.41592653589793,
+          -37.69911184307752
+        ]
+      ]
+    },
+    "fraction_0.5_1_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.25,
+          0.5,
+          0.75
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.25,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ]
+      ]
+    },
+    "fraction_1_0.5_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.25,
+          0.5,
+          0.75
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.25
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ],
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ]
+      ]
+    },
+    "fraction_0.5_0.5_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.25,
+          0.5,
+          0.75
+        ],
+        [
+          0.25,
+          0.5,
+          0.75
+        ]
+      ],
+      "radii": [
+        0.25,
+        0.25
+      ],
+      "frequencies": [
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ],
+        [
+          0.0,
+          12.566370614359172,
+          25.132741228718345,
+          -12.566370614359172,
+          -25.132741228718345
+        ]
+      ]
+    },
+    "fraction_0.25_1_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ],
+        [
+          0.5
+        ]
+      ],
+      "radii": [
+        0.125,
+        0.5
+      ],
+      "frequencies": [
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ],
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ]
+      ]
+    },
+    "fraction_1_0.25_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.5
+        ],
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ]
+      ],
+      "radii": [
+        0.5,
+        0.125
+      ],
+      "frequencies": [
+        [
+          0.0,
+          6.283185307179586,
+          12.566370614359172,
+          -6.283185307179586,
+          -12.566370614359172
+        ],
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ]
+      ]
+    },
+    "fraction_0.25_0.25_k2": {
+      "q": [
+        3,
+        5
+      ],
+      "centers": [
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ],
+        [
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ]
+      ],
+      "radii": [
+        0.125,
+        0.125
+      ],
+      "frequencies": [
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ],
+        [
+          0.0,
+          25.132741228718345,
+          50.26548245743669,
+          -25.132741228718345,
+          -50.26548245743669
+        ]
+      ]
+    }
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed51.json": "e06b7a1c6aa85419a2e2adeb03e1439380b54031ed589f3a3fac4834292e6e29",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\results\\kdv_cossin_iid_seed51.npz": "6ca57199b95513d92fb99c0aea19416b64d7019d525652370d8d70d6f327bc67"
+  },
+  "array_sha256": "9f2b298855af213b24d2eca0120e6aed236962c1fa7ffec4132366447946ea7c",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_metric.py": "a372ae02a7d55602930befa0c1fd02774973850e060e32537540b59d159d0ffd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_engine.py": "af312ffe431c428f6dae6f20aebb550aa731b445561281f1004b4d8aa4ad7c8d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\design_protocol.txt": "4b5ac2fcddb4da4a92f8dfdb13c3bf82b56f633dd58bfe0e7e4d468b7df82aa9",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\screen_design.py": "500073e54bbe54958b39be5a309e5cef8abf81c2433cbe48c2a8247c74979874",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\protocol.txt": "81a1998d52d6ad39b478f87b3e22d94bf38bf4fcf8542ecf0b8aaf6306ff9135"
+  },
+  "seconds": 0.40038030000869185
+}

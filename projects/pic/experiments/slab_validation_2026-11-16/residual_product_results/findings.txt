@@ -1,0 +1,176 @@
+Independent residual cross-products: Kepler feasibility result
+2026-11-16
+
+Conclusion
+----------
+The cross-product gives a meaningful improvement in point rankings, but the
+remaining score differences are not reliably resolved. The initial GCV-based
+protocol restores reference nondominance in two of three seeds. An exploratory
+exact-leave-one-out bandwidth variant restores it in all three seeds against
+the four archived rival families. However, the score differences for A, B and D
+have broad conditional uncertainty ranges spanning zero in every seed. The
+smallest point margin also remains sensitive to Monte Carlo bias estimation.
+This is not a validated production selector or a full-search recovery result.
+
+Scope
+-----
+Five structures: reference plus one representative of each of A, B, C and D.
+Three existing noise seeds, each using one record split by sample index modulo
+three. All three choices of training group were evaluated. The analysis does
+not cover every other archived candidate or a new evolutionary search.
+
+No candidate ODE/PDE was integrated. No new experimental record was introduced.
+No production objective, dyad implementation, or keep rule was changed.
+
+Method
+------
+One raw group selects the existing two token-frequency slots and spectral
+bandwidth, then fits coefficients with CLSM on its own GCV reconstruction.
+The other groups independently reconstruct the signal and rebuild all terms.
+Every evaluation-group smoother/noise model sees only that group's raw data.
+
+Evaluate complete residuals r_A and r_B, then score
+  D_product = Re sum(conj(r_A)*r_B) / S_train,
+where S_train is target energy in the training reconstruction. The matched
+ordinary control is
+  D_energy = (sum|r_A|^2 + sum|r_B|^2)/(2*S_train).
+Use the same test bank, weights, coefficients and normalization in both.
+For the spectral bank, positive/negative conjugate frequencies count equally.
+Average the normalized scores across the three training rotations. They share
+observations and are not treated as independent statistical replicates.
+
+The mean-corrected arm subtracts E[F(smooth(pilot+noise))]-F(pilot) estimated
+separately in each evaluation group. It targets nonlinear and smoothing bias.
+Both score arms use the same corrected training coefficients. No residual
+variance enters the denominator. Signed products are retained without clipping
+or square roots; a negative value is not a physically negative model error.
+
+The original full-record raw CLSM dyad coordinates are frozen to isolate the
+discrepancy axis. New training-group dyad values are logged separately. Thus
+this is a discrepancy feasibility comparison, not an entirely new validated
+objective pair. Supports were previously selected on the full record.
+
+Results at 128 draws per raw group
+---------------------------------
+Counts below are DISTINCT FAMILIES dominating the reference, not duplicate
+spellings. The initial spectral arm uses the predeclared GCV bandwidth rule.
+
+                                                    seed 0   seed 1   seed 2
+Local weak product, mean corrected                    4        4        4
+Spectral ordinary energy, mean corrected, GCV          3        4        3
+Spectral product, no mean correction, GCV               2        2        0
+Spectral product, mean corrected, GCV                  0        3        0
+
+Exploratory exact-LOO bandwidth follow-up:
+Spectral ordinary energy, mean corrected               3        3        3
+Spectral product, no mean correction                   2        0        0
+Spectral product, mean corrected                      0        0        0
+
+All clean-input controls and clean-field swaps with noisy-trained coefficients
+have zero dominators. Counts for each protocol were unchanged at 32/64/128
+bootstrap draws. This count agreement does not establish precision of tiny
+score margins.
+
+Why the bandwidth follow-up was needed
+-------------------------------------
+The initial seed-1/group-0 GCV projection selected mode 498 for 500 training
+observations (499 degrees of freedom). Exact leave-one-out error for the SAME
+DCT projection family selected mode 82. The formula was checked against actual
+omitted-observation refits. This selection uses training observations only.
+
+GCV maximum modes by seed, training groups 0/1/2:
+  seed 0: 83 / 99 / 81
+  seed 1: 498 / 85 / 93
+  seed 2: 82 / 93 / 71
+Exact-LOO maximum modes:
+  seed 0: 83 / 99 / 82
+  seed 1: 82 / 85 / 93
+  seed 2: 89 / 93 / 71
+
+The exact-LOO rule was applied to all training groups, not just the failing one.
+It was added AFTER inspecting the GCV failure and is an exploratory result;
+the original result is preserved. No favorable bandwidth was selected using
+the true equation's ranking.
+
+Exact-LOO point scores, 128 draws
+-------------------------------
+These are SIGNED relative SQUARED residual estimates, not previous L1 WAPE.
+
+                    seed 0         seed 1         seed 2
+Reference           0.0003051      0.0016318     -0.0033543
+A                   0.0019956      0.0017735      0.0011766
+B                   0.0041456      0.0044129      0.0029002
+C                   0.0995716      0.1044130      0.0969709
+D                   0.0019885      0.0018045      0.0011572
+
+The negative seed-2 reference score is a finite-sample estimation outcome.
+It is not evidence of a better-than-zero physical residual. Separate training
+rotations produce both positive and negative reference estimates, often with
+different point rankings.
+
+Uncertainty and the extended Monte Carlo check
+---------------------------------------------
+Conditional uncertainty propagates independent centered bootstrap deviations
+in the two evaluation groups while keeping training fits, frequencies, bank
+and bias estimates fixed. Reuse of evaluation groups across rotations is
+preserved. Quantiles are descriptive conditional spreads, not calibrated full
+confidence intervals; omitted training/selection uncertainty remains.
+
+All A/B/D-minus-reference 5--95% ranges span zero in every seed. Family C is
+clearly separated in this diagnostic. For example, in seed 1 the small A gap
+is overwhelmed by the conditional spread.
+
+Because seed 1 had the smallest exact-LOO margin, extend its three independent
+bootstrap streams from 128 to 256 draws without replacing prior draws:
+  draws        A-minus-reference       D-minus-reference
+    64            0.0002520                 0.0002808
+   128            0.0001417                 0.0001726
+   256            0.0000633                 0.0000960
+
+At 256 draws reference D=0.00170483 and A D=0.00176814. The A-minus-reference
+conditional 5--95% range is [-0.009012, 0.008830]. The point margin remains
+positive but is much smaller than both the sampling spread and its recent
+Monte Carlo change. We therefore do NOT claim a numerically well-separated
+or statistically established victory, despite zero point dominators.
+More bootstrap draws cannot remove the original record's measurement noise.
+
+Validation
+----------
+Independent-noise population control: true squared error 0.25, ordinary energy
+7.43, cross-product 0.25. Known mean-shift control returns 0.25 after
+correction. Exact-LOO versus brute refits agrees within 2.42e-15.
+Split coverage/disjointness, A/B symmetry, identical-group identity, and
+energy-product=half squared residual difference all pass. Weak integration
+and complex-intercept handling reuse the validated spectral implementation.
+Clean controls and source/draw digests are saved with each result.
+
+Settings and limitations
+------------------------
+Three groups are the minimum for separate training and two evaluations; all
+three rotations are used. Smoothing, frequencies, noise models and bandwidth
+are data-driven. Boundary support comes from the groups' common interpolation
+domain. Bump order/local window/old dyad are retained experimental controls.
+Bootstrap count is a computation budget with explicit numerical sensitivity,
+not a ranking threshold. 5/50/95% summaries are not acceptance gates.
+
+The independence argument assumes iid raw measurement noise. Bootstrap mean
+correction is a plug-in approximation, not proof of unbiased weak quantities.
+The training signal scale is estimated. Candidate selection on the full record
+and searching many noisy signed scores can introduce further selection bias.
+These results support further investigation of discrepancy estimation, while
+the unresolved variance prevents a reliable production ranking claim.
+
+Artifacts
+---------
+../residual_cross_product.py: runnable experiment and cache reuse
+../residual_product_protocol.txt: protocol before ranking
+../residual_product_followup_protocol.txt: explicitly exploratory follow-ups
+residual_cross_product.json/.txt: original GCV results
+../residual_product_results_loo/residual_cross_product.json/.txt: exact-LOO arm
+../residual_product_mc_check/residual_cross_product.json/.txt: seed-1 B=256 check
+../residual_product_results_loo/residual_products.png/.svg: point estimates and
+  conditional spreads for the exploratory exact-LOO arm at B=128
+
+1,536 cached bootstrap signal reconstructions were used: 128 for each of nine
+groups plus 128 additional draws for each of seed 1's three groups. All fields
+are simulated around data-only pilots; none are new measured records.

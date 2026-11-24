@@ -1,0 +1,67 @@
+Outer measurement validation and forced-KdV coefficient sensitivity
+Frozen before new-seed outcomes, 2026-11-16.
+
+Four systems: AC, forced KdV (kdv_cossin), wave, KS. Fit/inner-selection
+records use fresh 5% Gaussian noise seeds 6/7/8; their paired independent
+outer measurement records use seeds 9/10/11 respectively. Same clean fields
+and sample grids: this tests new observation noise, not new trajectories.
+Twelve system/seed runs, three rotated training groups per run. All registered
+reference/equivalent equations are retained; no structural search/count.
+
+Training uses one interleaved group. Inner selection uses the signed cross
+residual from the other two groups. Outer evaluation uses those same two
+group indices from the independent measurement record, which is generated
+only AFTER all fits, weights and inner decisions are saved and hashed.
+No refit after selection. No outer or clean result chooses a method.
+
+Reuse EXACT native local/broad geometries from native_moments seed 3 (these
+were coordinate/historical-geometry choices, not noise-dependent selections).
+Fit native local, broad and stacked local+broad banks by corrected OLS and
+unchanged 512-draw residual-covariance IRLS. Preserve full cross covariance.
+No ridge, damping, penalties or new convergence thresholds. Preserve failures.
+Do not silently average incomplete cases.
+
+Two frozen selection rules, with the same choice set of native local IRLS
+and native broad IRLS only:
+  Primary: minimize native broad whitened signed inner cross residual.
+  Comparator: minimize the previous interpolated broad whitened score.
+Each selects per training fold, then averages the three outer fold scores.
+If only one fit converges, select it and explicitly mark a forced choice.
+If neither converges or the validation metric is infeasible, report failure.
+Ties choose local. Mixed fits and OLS are fixed controls, not extra options
+in this experiment. Fixed local/broad/mixed IRLS comparisons are primary;
+OLS controls are reported separately. No reuse of old-seed baseline accuracy
+as if it were a paired baseline for these new seeds.
+
+Training pilots/noise estimates/512 shared operator draws remain unchanged
+from the preceding estimator. Native validation uses 512 training draws;
+the previous interpolated score uses the first 128. Both use training-only
+pooled weights common to candidates/fits. Inner and outer raw operators
+use each measurement group's own estimated noise for Gaussian contraction
+correction. Outer noise estimates never reach fitting or selection.
+
+After selection freeze, report outer signed scores for both metrics,
+inner-to-outer score change, common frozen clean spectral residual energy,
+coefficient errors, and clean versions of each validation metric. Assess
+selection regret against the better available local/broad fit only as a
+post-hoc diagnostic. Rotated folds share records; aggregate at system/seed
+level and do not treat folds as independent replicates. Negative cross
+scores are legitimate estimates, not truncated to zero.
+
+For forced KdV, save training moment matrices and 512 covariance draws.
+Compute fixed-weight linearized coefficient covariance including target/
+feature noise cross terms, normalized weighted-design singular values and
+weak coefficient directions. Additionally generate 64 independent pilot-
+noise draws (separate RNG stream), refit both OLS and IRLS with the same
+512 covariance draws, and report bootstrap failures, spread and drift
+relative to each estimator's noiseless pilot fit. No bootstrap outcome
+selects methods. These are conditional pilot/noise-model diagnostics;
+they omit uncertainty in noise estimation and pilot reconstruction and
+are not calibrated unconditional confidence intervals.
+
+Checks: selection cannot access outer/clean metrics; disjoint group indices
+and noise seed sets; deterministic tie/failure rules; native geometry
+matches frozen inputs; constants preserved in moment matrices; baseline
+helper invariants retained; complete result coverage; finite scored fits;
+fresh noise replay; frozen selection replay; input/source/artifact hashes.
+No candidate differential-equation solves, PINNs, production edits or commits.

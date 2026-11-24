@@ -1,0 +1,5 @@
+{
+  "feature_rescaling_invariant": true,
+  "numerical_rank_failure_explicit": true,
+  "max_scaling_error": 6.661338147750939e-16
+}

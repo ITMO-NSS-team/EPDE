@@ -1,0 +1,39 @@
+Forced KdV weak training windows
+18 November 2026
+
+On these two trajectories, fit the intrinsic nonlinear and dispersive direction from the unforced record, then fit the known input and any extra terms on the forced record. Wider forced training windows, with a measurement projected onto the known input cos(t)sin(x), substantially improved held-out ranking. This is a solver-free change to coefficient estimation. Both cohorts used the same established target-invariant held-out discrepancy and eight fixed one-term extensions. The 192 comparisons in each arm share 24 fields. Field counts below use each noise realization once.
+
+First prospective cohort
+
+Change the two records' measurements separately using 24 independent pairs of 5%-noise fields. Leave the unforced measurements as originally specified and replace the forced training banks with wide spatial windows plus a forcing-matched projection. Added terms beat the reference 17/192 times, compared with 146/192 for the original joint fit. The reference improved on all 24 fields, and every field had fewer wins for absent additions. Changing only the unforced spatial measurements left the aggregate at 146/192. Changing both measurements and fitting the intrinsic direction on the unforced record first gave 14/192 addition wins and favored retaining each genuine term on 24/24 fields. Each candidate was refitted, including the three deletions.
+
+Independent follow-up on 24 new forced/unforced noise pairs
+
+The first six arms below use the original unforced measurements. “Staged” means estimating the shared intrinsic direction on the unforced field, then estimating its relative scale, forcing, and extra coefficients on the forced field. “Projected” uses both the wide window bank and its forcing-matched projection. Wide alone uses the same window geometry with equal total bank weight. Smaller discrepancy is better. Each displayed coefficient is the median of the 24 within-field three-fold medians. The physical coefficients are (-6, -1, +1).
+
+Fit                   Extra wins    Retain each genuine term*    Beats all 11    Coefficients (nonlinear, dispersion, forcing)
+Original joint         145/192              2, 24, 23                 0/24          -3.888, +0.006, -0.240
+Wide joint              78/192              6, 24, 24                 3/24          -4.979, -0.639, +0.521
+Projected joint         15/192             17, 24, 24                13/24          -6.013, -0.988, +0.945
+Original staged        119/192              9, 11, 24                 0/24          -5.995, -0.995, +1.290
+Wide staged             18/192             24, 24, 24                12/24          -5.995, -0.995, +1.026
+Projected staged        13/192             24, 24, 24                18/24          -5.995, -0.995, +0.992
+Staged, both changed    13/192             24, 24, 24                18/24          -5.891, -0.958, +0.943
+
+* Number of fields, out of 24, where the full reference beats each refit deleting nonlinearity, dispersion and forcing, respectively. “Beats all 11” counts fields where the reference beats all eight extensions and all three deletions. These are fixed-panel comparisons per field. This pair of input trajectories supplies a priori knowledge that the intrinsic coefficients are shared and the external forcing is absent on the unforced record. Each addition is free on the forced trajectory. There was no penalty on term count or exclusion of constants.
+
+The forcing projection improved the joint reference score on all 24 fields over wide windows alone. Its median paired score change was −0.00979. The count of extensions beating the reference fell on 18 fields, tied on five and rose on one. With staged fitting it improved the reference score on 22/24, with counts falling on nine, tying on nine and rising on six. Much of the gain for the staged comparison was already present with wide windows alone. The staged projected fit improved all three median absolute coefficient errors to 0.0070, 0.0046 and 0.0347, respectively. The eight addition win counts in that fit were 1, 3, 1, 2, 1, 2, 3, 0, ordered as constant, t, t², sin(2t), cos(2t), u, u² and u³. Six fields had at least one winning extension.
+
+Why the training windows matter
+
+A retrospective diagnostic compared the noisy pilot's dispersion column with the same weak integrals of the clean forced trajectory. For each field, take the median over folds of the relative Euclidean norm error, then report the median across the 48 fields. It was 1.39 with the original windows, 0.60 with wide windows and 0.21 with the wide bank plus forcing projection. This compares each design with its own clean measurements. Projecting across the spatial moments emphasizes the component aligned with the known waveform. These error ratios concern the pilot used in training; coefficient estimation additionally used noise-corrected Grams. Clean data and registered coefficient values were used only in diagnostics.
+
+Single forced trajectory ablation
+
+Reusing both cohorts retrospectively, the joint improvement has a single-record component. Using only the forced field, the number of added-term wins fell from 180 to 40 out of 192 in the first cohort and from 191 to 48 in the second when replacing the original windows with wide, forcing-projected windows. In the second cohort the forced-only projected fit favored retaining nonlinearity in 4/24 fields, compared with 17/24 for joint fitting and 24/24 for staged fitting with the unforced record. The evidence for dispersion and forcing was stronger even on the single record.
+
+Scope and reproducibility
+
+The two cohorts are separate noise draws on the same forced and unforced dynamics. Every arm saw identical forced held-outs within each field. These experiments do not establish transfer to new trajectories or improved evolutionary discovery across the default system set. The candidate-independent wide spatial windows and a projection using a measured forcing profile are separate choices. A next transfer test can select measurement scales using training observations and compare them on a different trajectory or system. The current data support retaining dyad and held-out discrepancy while investigating fit quality.
+
+The replay on an archived pair matched original joint scores to 1.2e−15. An independent generalized eigensolve and cross-product evaluation checked 5,184 and 6,048 prospective fold scores in the two cohorts. Signed unit and permutation tests on those scores had maximum absolute discrepancy below 9e−15. The seed protocols, array hashes, per-fold scores and per-field pairwise margins are stored alongside this report. The follow-up is in projection_check; forced_only.json and dispersion_diagnostic.json contain the retrospective diagnostics.

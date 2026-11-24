@@ -1,0 +1,127 @@
+system,seed,arm,law,generated,exact_generated,first,source,held,source_fate,held_fate,exact_source,exact_held
+ac,923301,native,0,1,1,1376,0,0,dominated,dominated,0,0
+ac,923301,pvra,0,1,1,2860,0,0,dominated,dominated,0,0
+ac,923302,native,0,1,1,829,0,0,dominated,dominated,0,0
+ac,923302,pvra,0,1,1,446,0,0,dominated,dominated,0,0
+ac,923303,native,0,1,1,1020,0,0,dominated,dominated,0,0
+ac,923303,pvra,0,1,1,638,0,0,dominated,dominated,0,0
+burgers,923301,native,0,1,1,250,1,1,on front,on front,1,1
+burgers,923301,pvra,0,1,1,65,1,1,on front,on front,1,1
+burgers,923302,native,0,1,1,470,0,1,dominated,on front,0,1
+burgers,923302,pvra,0,1,1,326,0,1,dominated,on front,0,1
+burgers,923303,native,0,1,1,38,1,1,on front,on front,1,1
+burgers,923303,pvra,0,1,1,38,1,1,on front,on front,1,1
+burgers_inviscid,923301,native,0,1,1,251,1,1,on front,on front,1,1
+burgers_inviscid,923301,pvra,0,0,0,,0,0,never scored,never scored,0,0
+burgers_inviscid,923302,native,0,0,0,,0,0,never scored,never scored,0,0
+burgers_inviscid,923302,pvra,0,0,0,,0,0,never scored,never scored,0,0
+burgers_inviscid,923303,native,0,0,0,,0,0,never scored,never scored,0,0
+burgers_inviscid,923303,pvra,0,0,0,,0,0,never scored,never scored,0,0
+duffing,923301,native,0,0,0,,0,0,never scored,never scored,0,0
+duffing,923301,pvra,0,0,0,,0,0,never scored,never scored,0,0
+duffing,923302,native,0,0,0,,0,0,never scored,never scored,0,0
+duffing,923302,pvra,0,0,0,,0,0,never scored,never scored,0,0
+duffing,923303,native,0,0,0,,0,0,never scored,never scored,0,0
+duffing,923303,pvra,0,0,0,,0,0,never scored,never scored,0,0
+kdv,923301,native,0,1,1,109,1,1,on front,on front,1,1
+kdv,923301,pvra,0,1,1,762,1,1,on front,on front,1,1
+kdv,923302,native,0,1,1,185,0,1,dominated,on front,0,1
+kdv,923302,pvra,0,1,1,358,0,1,dominated,on front,0,1
+kdv,923303,native,0,1,1,876,0,1,dominated,on front,0,1
+kdv,923303,pvra,0,1,1,275,0,1,dominated,on front,0,1
+kdv_cossin,923301,native,0,0,0,,0,0,never scored,never scored,0,0
+kdv_cossin,923301,pvra,0,0,0,,0,0,never scored,never scored,0,0
+kdv_cossin,923302,native,0,0,0,,0,0,never scored,never scored,0,0
+kdv_cossin,923302,pvra,0,0,0,,0,0,never scored,never scored,0,0
+kdv_cossin,923303,native,0,0,0,,0,0,never scored,never scored,0,0
+kdv_cossin,923303,pvra,0,0,0,,0,0,never scored,never scored,0,0
+ks,923301,native,0,1,1,210,1,1,on front,on front,1,1
+ks,923301,pvra,0,1,1,128,1,1,on front,on front,1,1
+ks,923302,native,0,1,1,93,1,1,on front,on front,1,1
+ks,923302,pvra,0,1,1,93,1,1,on front,on front,1,1
+ks,923303,native,0,1,1,110,1,1,on front,on front,1,1
+ks,923303,pvra,0,1,1,220,1,1,on front,on front,1,1
+lorenz,923301,native,0,1,1,710,1,1,on front,on front,1,1
+lorenz,923301,native,1,0,0,,0,0,never scored,never scored,0,0
+lorenz,923301,native,2,1,1,1957,1,1,on front,on front,1,1
+lorenz,923301,pvra,0,1,1,389,1,1,on front,on front,1,1
+lorenz,923301,pvra,1,0,0,,0,0,never scored,never scored,0,0
+lorenz,923301,pvra,2,1,1,444,1,1,on front,on front,1,1
+lorenz,923302,native,0,1,1,2328,1,1,on front,on front,1,1
+lorenz,923302,native,1,0,0,,0,0,never scored,never scored,0,0
+lorenz,923302,native,2,1,1,568,1,1,on front,on front,1,1
+lorenz,923302,pvra,0,1,1,1336,1,1,on front,on front,1,1
+lorenz,923302,pvra,1,1,1,1758,1,1,on front,on front,1,1
+lorenz,923302,pvra,2,1,1,1922,1,1,on front,on front,1,1
+lorenz,923303,native,0,1,1,252,1,1,on front,on front,1,1
+lorenz,923303,native,1,0,0,,0,0,never scored,never scored,0,0
+lorenz,923303,native,2,1,1,234,1,1,on front,on front,1,1
+lorenz,923303,pvra,0,1,1,426,1,1,on front,on front,1,1
+lorenz,923303,pvra,1,0,0,,0,0,never scored,never scored,0,0
+lorenz,923303,pvra,2,1,1,234,1,1,on front,on front,1,1
+lv,923301,native,0,1,1,207,1,1,on front,on front,1,1
+lv,923301,native,1,1,1,377,1,1,on front,on front,1,1
+lv,923301,pvra,0,1,1,364,1,1,on front,on front,1,1
+lv,923301,pvra,1,1,1,390,1,1,on front,on front,1,1
+lv,923302,native,0,1,1,265,1,1,on front,on front,1,1
+lv,923302,native,1,1,1,156,1,1,on front,on front,1,1
+lv,923302,pvra,0,1,1,378,1,1,on front,on front,1,1
+lv,923302,pvra,1,1,1,1097,1,1,on front,on front,1,1
+lv,923303,native,0,1,1,143,0,1,dominated,on front,0,1
+lv,923303,native,1,1,1,251,1,1,on front,on front,1,1
+lv,923303,pvra,0,1,1,159,0,1,dominated,on front,0,1
+lv,923303,pvra,1,1,1,153,1,1,on front,on front,1,1
+ns,923301,native,0,1,1,2219,1,1,on front,on front,1,1
+ns,923301,native,1,0,0,,0,0,never scored,never scored,0,0
+ns,923301,native,2,1,1,758,1,1,on front,on front,1,1
+ns,923301,pvra,0,1,1,2720,1,1,on front,on front,1,1
+ns,923301,pvra,1,0,0,,0,0,never scored,never scored,0,0
+ns,923301,pvra,2,1,1,676,1,1,on front,on front,1,1
+ns,923302,native,0,0,0,,0,0,never scored,never scored,0,0
+ns,923302,native,1,0,0,,0,0,never scored,never scored,0,0
+ns,923302,native,2,1,1,1493,1,1,on front,on front,1,1
+ns,923302,pvra,0,1,1,2185,1,1,on front,on front,1,1
+ns,923302,pvra,1,0,0,,0,0,never scored,never scored,0,0
+ns,923302,pvra,2,1,1,1049,1,1,on front,on front,1,1
+ns,923303,native,0,0,0,,0,0,never scored,never scored,0,0
+ns,923303,native,1,0,0,,0,0,never scored,never scored,0,0
+ns,923303,native,2,1,1,1058,1,1,on front,on front,1,1
+ns,923303,pvra,0,0,0,,0,0,never scored,never scored,0,0
+ns,923303,pvra,1,0,0,,0,0,never scored,never scored,0,0
+ns,923303,pvra,2,1,1,2240,1,1,on front,on front,1,1
+ode,923301,native,0,0,0,,0,0,never scored,never scored,0,0
+ode,923301,pvra,0,0,0,,0,0,never scored,never scored,0,0
+ode,923302,native,0,0,0,,0,0,never scored,never scored,0,0
+ode,923302,pvra,0,0,0,,0,0,never scored,never scored,0,0
+ode,923303,native,0,0,0,,0,0,never scored,never scored,0,0
+ode,923303,pvra,0,0,0,,0,0,never scored,never scored,0,0
+pde_compound,923301,native,0,1,1,123,1,0,on front,dominated,1,0
+pde_compound,923301,pvra,0,1,1,468,1,0,on front,dominated,1,0
+pde_compound,923302,native,0,1,1,289,1,1,on front,on front,1,1
+pde_compound,923302,pvra,0,1,1,146,1,1,on front,on front,1,1
+pde_compound,923303,native,0,0,0,,0,0,never scored,never scored,0,0
+pde_compound,923303,pvra,0,0,0,,0,0,never scored,never scored,0,0
+pde_divide,923301,native,0,1,1,1338,1,1,on front,on front,1,1
+pde_divide,923301,pvra,0,1,1,549,1,1,on front,on front,1,1
+pde_divide,923302,native,0,1,1,689,1,1,on front,on front,1,1
+pde_divide,923302,pvra,0,1,1,1367,1,1,on front,on front,1,1
+pde_divide,923303,native,0,1,1,1149,1,1,on front,on front,1,1
+pde_divide,923303,pvra,0,1,1,181,1,1,on front,on front,1,1
+vdp,923301,native,0,1,1,659,0,1,dominated,on front,0,1
+vdp,923301,pvra,0,1,1,141,0,1,dominated,on front,0,1
+vdp,923302,native,0,1,1,396,1,1,on front,on front,1,1
+vdp,923302,pvra,0,1,1,58,0,1,dominated,on front,0,1
+vdp,923303,native,0,1,1,1082,0,0,dominated,dominated,0,0
+vdp,923303,pvra,0,1,1,240,0,0,dominated,dominated,0,0
+wave,923301,native,0,1,1,2354,0,0,dominated,outside WAPE cutoff,0,0
+wave,923301,pvra,0,1,1,138,0,0,dominated,dominated,0,0
+wave,923302,native,0,1,1,1260,0,0,dominated,dominated,0,0
+wave,923302,pvra,0,1,1,2173,0,0,dominated,outside WAPE cutoff,0,0
+wave,923303,native,0,1,1,50,0,0,dominated,dominated,0,0
+wave,923303,pvra,0,1,1,50,0,0,dominated,dominated,0,0
+ode_simple,923301,native,0,1,1,159,1,1,on front,on front,1,1
+ode_simple,923301,pvra,0,1,1,148,1,1,on front,on front,1,1
+ode_simple,923302,native,0,1,1,348,1,1,on front,on front,1,1
+ode_simple,923302,pvra,0,1,1,354,1,1,on front,on front,1,1
+ode_simple,923303,native,0,1,1,333,1,1,on front,on front,1,1
+ode_simple,923303,pvra,0,1,1,162,1,1,on front,on front,1,1

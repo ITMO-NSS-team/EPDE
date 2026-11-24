@@ -1,0 +1,7 @@
+Independent forced-KdV measurement replication.
+
+The archived dispersion-only coefficient intersection across 27 records and both three-bank designs was approximately [-0.318,-0.169]. Choose -0.25 from that retrospective intersection before generating new data. Also retain the failed iid least-squares coefficient from the scalar protocol, the known benchmark value -1 applied to dispersion alone, zero, and the complete physical benchmark equation as declared controls.
+
+Generate six new noisy fields on the saved forced-KdV trajectory, two per profile (iid, +0.4, -0.4), seeds 4701 and 4702 at 5% noise. Reuse the full_k4 weak design, exact existing implementation of the nuisance_direction procedure and 128 noise refits per observed field. Fit each field's noise parameters and pilot and recompute all covariances and calibration cutoffs. Use the 123rd of the 128 per-draw maxima of the studentized scores across local, broad and selected banks. This keeps inter-bank dependence. Preserve all fit warnings.
+
+Evaluate the locked candidates only after the observation-specific calibration is complete. Audit the score cutoffs, binary64 inequalities, and observation hashes. Report observed acceptance, separate clean weak residuals and full-library error containment. Test if deleting dispersion with both other coefficients free can be excluded on these same fields. Repeated measurement on this trajectory limits extrapolation to new solutions or forcing conditions. No candidate dynamics are integrated.

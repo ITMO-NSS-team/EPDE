@@ -1,0 +1,17 @@
+{
+  "original": {
+    "fields": 48,
+    "median_relative_dispersion_moment_error": 1.3916915603152518,
+    "median_unforced_dispersion_norm_fraction": 0.00042389778974422164
+  },
+  "wide": {
+    "fields": 48,
+    "median_relative_dispersion_moment_error": 0.5990271863322307,
+    "median_unforced_dispersion_norm_fraction": 0.0021505055540574007
+  },
+  "projected": {
+    "fields": 48,
+    "median_relative_dispersion_moment_error": 0.2108959582260332,
+    "median_unforced_dispersion_norm_fraction": 0.0005941105476775822
+  }
+}

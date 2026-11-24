@@ -1,0 +1,18 @@
+Noise optimizer repair, declared after profiling and before repaired outcomes
+==========================================================================
+The extreme ode bootstrap fit is worse than a moderate-rho profile point by
+18.37 units of -2 log likelihood. Small projected gradient did not establish
+a globally good optimum. The original four band optimizations include early
+stops which were discarded before exact-state polishing.
+
+Candidate repair: exact-state objective/gradient certification of EVERY one
+of the original four band starts, with exact-state L-BFGS-B polishing when
+projected gradient exceeds2e-5. Also include the old final certified fit.
+Choose the smallest exact objective, report all basins and unresolved fits.
+Keep the same likelihood, bounds, data contrasts and spatial estimator.
+No rho clipping, added oracle starts, or selected-draw removal.
+First characterize the six already-profiled fields. If the repair recovers
+the missed basin, freeze its implementation and test it on independent ODE
+seeds54..56 and all128 refits per seed. Also compare all45 archived iid
+observed fields across the default15 systems to detect regressions.
+This is a research repair; previous results and production remain unchanged.

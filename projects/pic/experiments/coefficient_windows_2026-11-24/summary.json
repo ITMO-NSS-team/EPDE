@@ -1,0 +1,884 @@
+{
+  "transfer": {
+    "replay": {
+      "recordings": 84,
+      "slots": 114,
+      "selector_proposals": 56,
+      "selected": 32,
+      "rows": 12951,
+      "replaced": 2189,
+      "cpu": {
+        "native": 2.828125,
+        "complementary": 6.75
+      },
+      "arms": {
+        "native": {
+          "hits": 109,
+          "exact": 104,
+          "additions": 170,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 114,
+          "spread": {
+            "median": 0.023652389311978907,
+            "better": 0,
+            "worse": 0,
+            "slots": 19
+          },
+          "error": {
+            "median": 0.014746489227159239,
+            "better": 0,
+            "worse": 0,
+            "slots": 19
+          }
+        },
+        "complementary": {
+          "hits": 110,
+          "exact": 105,
+          "additions": 161,
+          "gains": 1,
+          "losses": 0,
+          "valid_refs": 114,
+          "spread": {
+            "median": 0.023030361231357915,
+            "better": 6,
+            "worse": 7,
+            "slots": 19
+          },
+          "error": {
+            "median": 0.014754642810923042,
+            "better": 5,
+            "worse": 8,
+            "slots": 19
+          }
+        },
+        "rank": {
+          "hits": 109,
+          "exact": 104,
+          "additions": 171,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 114,
+          "spread": {
+            "median": 0.023652389311978907,
+            "better": 1,
+            "worse": 1,
+            "slots": 19
+          },
+          "error": {
+            "median": 0.014746489227159239,
+            "better": 0,
+            "worse": 3,
+            "slots": 19
+          }
+        }
+      },
+      "by_slot": {
+        "ac/0": {
+          "native": {
+            "spread": 0.039749197339028694,
+            "error": 0.0350638067755919,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.040798009508326086,
+            "error": 0.03490527315630929,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.039749197339028694,
+            "error": 0.0350638067755919,
+            "n": 6
+          }
+        },
+        "burgers/0": {
+          "native": {
+            "spread": 0.006886601669763942,
+            "error": 0.0030971058466424135,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.006790140164281845,
+            "error": 0.0030971058466424135,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.006886601669763942,
+            "error": 0.0036536014531932393,
+            "n": 6
+          }
+        },
+        "burgers_inviscid/0": {
+          "native": {
+            "spread": 0.020731205673986224,
+            "error": 0.013638317633475758,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.02268503092088408,
+            "error": 0.014021644333143114,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.020731205673986224,
+            "error": 0.013638317633475758,
+            "n": 6
+          }
+        },
+        "duffing/0": {
+          "native": {
+            "spread": 0.046135881242926106,
+            "error": 0.027889784362375915,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.046135881242926106,
+            "error": 0.027889784362375915,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.046135881242926106,
+            "error": 0.027889784362375915,
+            "n": 6
+          }
+        },
+        "kdv/0": {
+          "native": {
+            "spread": 0.00143225005510799,
+            "error": 0.0009844270132447971,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.00143225005510799,
+            "error": 0.0007944961732586094,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.00143225005510799,
+            "error": 0.0009844270132447971,
+            "n": 6
+          }
+        },
+        "ks/0": {
+          "native": {
+            "spread": 0.010131211449061374,
+            "error": 0.009351474240686506,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.010131211449061374,
+            "error": 0.009351474240686506,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.010131211449061374,
+            "error": 0.009351474240686506,
+            "n": 6
+          }
+        },
+        "lorenz/0": {
+          "native": {
+            "spread": 0.023652389311978907,
+            "error": 0.014746489227159239,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.023030361231357915,
+            "error": 0.014754642810923042,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.023652389311978907,
+            "error": 0.014746489227159239,
+            "n": 6
+          }
+        },
+        "lorenz/1": {
+          "native": {
+            "spread": 0.06837354673897632,
+            "error": 0.04862624320013664,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.06728648683985658,
+            "error": 0.04969121720715067,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.06837354673897632,
+            "error": 0.04862624320013664,
+            "n": 6
+          }
+        },
+        "lorenz/2": {
+          "native": {
+            "spread": 0.007480643855928182,
+            "error": 0.004837279506979033,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.007496924034325798,
+            "error": 0.004842931680499342,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.007480643855928182,
+            "error": 0.004837279506979033,
+            "n": 6
+          }
+        },
+        "lv/0": {
+          "native": {
+            "spread": 0.034005422379967364,
+            "error": 0.028127762375664993,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.034005422379967364,
+            "error": 0.028127762375664993,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.03146780337417205,
+            "error": 0.028127762375664993,
+            "n": 6
+          }
+        },
+        "lv/1": {
+          "native": {
+            "spread": 0.03950114266867071,
+            "error": 0.027440649788654528,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.03950114266867071,
+            "error": 0.027440649788654528,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.04069256699815692,
+            "error": 0.02935148707119251,
+            "n": 6
+          }
+        },
+        "ns/0": {
+          "native": {
+            "spread": 0.01016338150128297,
+            "error": 0.007839857486870026,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.009106403442647262,
+            "error": 0.006457354132217463,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.01016338150128297,
+            "error": 0.007839857486870026,
+            "n": 6
+          }
+        },
+        "ns/1": {
+          "native": {
+            "spread": 0.0050077576985375506,
+            "error": 0.0037398091220814215,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.005387622094980898,
+            "error": 0.0037520482726445432,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.0050077576985375506,
+            "error": 0.0037398091220814215,
+            "n": 6
+          }
+        },
+        "ns/2": {
+          "native": {
+            "spread": 0.0027655373995875876,
+            "error": 0.0017034307789190188,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0026121109081712634,
+            "error": 0.001695576948907543,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.0027655373995875876,
+            "error": 0.001714094203802158,
+            "n": 6
+          }
+        },
+        "ode/0": {
+          "native": {
+            "spread": 0.11338557456275294,
+            "error": 0.08066059959505077,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.3273622879186373,
+            "error": 0.09268797693964599,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.11338557456275294,
+            "error": 0.08066059959505077,
+            "n": 6
+          }
+        },
+        "pde_compound/0": {
+          "native": {
+            "spread": 0.2608186973576036,
+            "error": 0.1956288086324487,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.2525590693702967,
+            "error": 0.19829170843406563,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.2608186973576036,
+            "error": 0.1956288086324487,
+            "n": 6
+          }
+        },
+        "pde_divide/0": {
+          "native": {
+            "spread": 0.003024703636023333,
+            "error": 0.0021010775105997494,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0033865773100234526,
+            "error": 0.002093423185645314,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.003024703636023333,
+            "error": 0.0021010775105997494,
+            "n": 6
+          }
+        },
+        "vdp/0": {
+          "native": {
+            "spread": 0.08142735280565705,
+            "error": 0.06151091941284775,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.1285717035944196,
+            "error": 0.07705442799872686,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.08142735280565705,
+            "error": 0.06151091941284775,
+            "n": 6
+          }
+        },
+        "wave/0": {
+          "native": {
+            "spread": 0.06401616656574712,
+            "error": 0.04270369265860721,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.06401616656574712,
+            "error": 0.04270369265860721,
+            "n": 6
+          },
+          "rank": {
+            "spread": 0.06401616656574712,
+            "error": 0.04270369265860721,
+            "n": 6
+          }
+        }
+      },
+      "rank_selected": 4
+    },
+    "fresh": {
+      "recordings": 84,
+      "slots": 114,
+      "selector_proposals": 49,
+      "selected": 27,
+      "rows": 13446,
+      "replaced": 2243,
+      "cpu": {
+        "native": 2.875,
+        "complementary": 6.8125
+      },
+      "arms": {
+        "native": {
+          "hits": 110,
+          "exact": 103,
+          "additions": 156,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 114,
+          "spread": {
+            "median": 0.0256063761094897,
+            "better": 0,
+            "worse": 0,
+            "slots": 19
+          },
+          "error": {
+            "median": 0.01389561498935674,
+            "better": 0,
+            "worse": 0,
+            "slots": 19
+          }
+        },
+        "complementary": {
+          "hits": 111,
+          "exact": 105,
+          "additions": 157,
+          "gains": 1,
+          "losses": 0,
+          "valid_refs": 114,
+          "spread": {
+            "median": 0.025094906674493513,
+            "better": 4,
+            "worse": 7,
+            "slots": 19
+          },
+          "error": {
+            "median": 0.012830185660750289,
+            "better": 6,
+            "worse": 4,
+            "slots": 19
+          }
+        }
+      },
+      "by_slot": {
+        "ac/0": {
+          "native": {
+            "spread": 0.03601413247409122,
+            "error": 0.029818450363475336,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.037732086081489785,
+            "error": 0.029818450363475336,
+            "n": 6
+          }
+        },
+        "burgers/0": {
+          "native": {
+            "spread": 0.009924687813695307,
+            "error": 0.007854140350349896,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.009334275839682991,
+            "error": 0.0044295934714559644,
+            "n": 6
+          }
+        },
+        "burgers_inviscid/0": {
+          "native": {
+            "spread": 0.0473017687478433,
+            "error": 0.01389561498935674,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.05185613109455043,
+            "error": 0.012525056674841965,
+            "n": 6
+          }
+        },
+        "duffing/0": {
+          "native": {
+            "spread": 0.03076281680771102,
+            "error": 0.02484303706210428,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.03076281680771102,
+            "error": 0.02484303706210428,
+            "n": 6
+          }
+        },
+        "kdv/0": {
+          "native": {
+            "spread": 0.0014233315148989688,
+            "error": 0.0010064778746084408,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0014233315148989688,
+            "error": 0.0010064778746084408,
+            "n": 6
+          }
+        },
+        "ks/0": {
+          "native": {
+            "spread": 0.017305486675004818,
+            "error": 0.01793270135479868,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.017305486675004818,
+            "error": 0.01793270135479868,
+            "n": 6
+          }
+        },
+        "lorenz/0": {
+          "native": {
+            "spread": 0.02560724998568667,
+            "error": 0.009200166435499514,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.025094906674493513,
+            "error": 0.009243885438610606,
+            "n": 6
+          }
+        },
+        "lorenz/1": {
+          "native": {
+            "spread": 0.09438954022680394,
+            "error": 0.023437715487359352,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.09494768260557472,
+            "error": 0.022795799022445072,
+            "n": 6
+          }
+        },
+        "lorenz/2": {
+          "native": {
+            "spread": 0.009785243574868702,
+            "error": 0.005767222873271208,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.009773553261468464,
+            "error": 0.005767222873271208,
+            "n": 6
+          }
+        },
+        "lv/0": {
+          "native": {
+            "spread": 0.0256063761094897,
+            "error": 0.012830185660750289,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0256063761094897,
+            "error": 0.012830185660750289,
+            "n": 6
+          }
+        },
+        "lv/1": {
+          "native": {
+            "spread": 0.02229438599002228,
+            "error": 0.015223005585288118,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.02229438599002228,
+            "error": 0.015223005585288118,
+            "n": 6
+          }
+        },
+        "ns/0": {
+          "native": {
+            "spread": 0.01193881023603354,
+            "error": 0.01111831463015946,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.01225700875440033,
+            "error": 0.01224367965593012,
+            "n": 6
+          }
+        },
+        "ns/1": {
+          "native": {
+            "spread": 0.005867745353826132,
+            "error": 0.004239919332631922,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.006412505252960599,
+            "error": 0.004671573942921491,
+            "n": 6
+          }
+        },
+        "ns/2": {
+          "native": {
+            "spread": 0.0007862574834327877,
+            "error": 0.0005602536661430198,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0009400736132633611,
+            "error": 0.000563614457642518,
+            "n": 6
+          }
+        },
+        "ode/0": {
+          "native": {
+            "spread": 0.14066260715214404,
+            "error": 0.10486475230070412,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.14066260715214404,
+            "error": 0.09523462454073398,
+            "n": 6
+          }
+        },
+        "pde_compound/0": {
+          "native": {
+            "spread": 0.04727733902969227,
+            "error": 0.05407567533333406,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0504780997743454,
+            "error": 0.05243985963827465,
+            "n": 6
+          }
+        },
+        "pde_divide/0": {
+          "native": {
+            "spread": 0.0028679434985144628,
+            "error": 0.002012549617153102,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.0027393468224446026,
+            "error": 0.001929990449692502,
+            "n": 6
+          }
+        },
+        "vdp/0": {
+          "native": {
+            "spread": 0.10314498902981639,
+            "error": 0.07763308354712203,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.10314498902981639,
+            "error": 0.07763308354712203,
+            "n": 6
+          }
+        },
+        "wave/0": {
+          "native": {
+            "spread": 0.11672378899625831,
+            "error": 0.03690255634395953,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 0.11672378899625831,
+            "error": 0.03690255634395953,
+            "n": 6
+          }
+        }
+      }
+    }
+  },
+  "forced_kdv": {
+    "replay": {
+      "recordings": 6,
+      "slots": 6,
+      "selector_proposals": 4,
+      "selected": 2,
+      "rows": 700,
+      "replaced": 90,
+      "cpu": {
+        "native": 0.15625,
+        "complementary": 0.421875
+      },
+      "arms": {
+        "native": {
+          "hits": 1,
+          "exact": 1,
+          "additions": 3,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 6,
+          "spread": {
+            "median": 2.3140260359606777,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "error": {
+            "median": 18.979492687320473,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "dispersion": {
+            "median": -0.013664082861831368,
+            "median_abs_error": 0.9863359171381686,
+            "min": -0.5284762030002382,
+            "max": 0.00019515791508651001
+          }
+        },
+        "complementary": {
+          "hits": 0,
+          "exact": 0,
+          "additions": 3,
+          "gains": 0,
+          "losses": 1,
+          "valid_refs": 6,
+          "spread": {
+            "median": 2.36311818752762,
+            "better": 0,
+            "worse": 1,
+            "slots": 1
+          },
+          "error": {
+            "median": 18.979492687320473,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "dispersion": {
+            "median": -0.014269690408331058,
+            "median_abs_error": 0.985730309591669,
+            "min": -0.5688778595049279,
+            "max": 0.00019515791508651001
+          }
+        },
+        "rank": {
+          "hits": 1,
+          "exact": 1,
+          "additions": 3,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 6,
+          "spread": {
+            "median": 2.3140260359606777,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "error": {
+            "median": 18.979492687320473,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "dispersion": {
+            "median": -0.013664082861831368,
+            "median_abs_error": 0.9863359171381686,
+            "min": -0.5284762030002382,
+            "max": 0.00019515791508651001
+          }
+        }
+      },
+      "by_slot": {
+        "kdv_cossin/0": {
+          "native": {
+            "spread": 2.3140260359606777,
+            "error": 18.979492687320473,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 2.36311818752762,
+            "error": 18.979492687320473,
+            "n": 6
+          },
+          "rank": {
+            "spread": 2.3140260359606777,
+            "error": 18.979492687320473,
+            "n": 6
+          }
+        }
+      },
+      "rank_selected": 0
+    },
+    "fresh": {
+      "recordings": 6,
+      "slots": 6,
+      "selector_proposals": 6,
+      "selected": 4,
+      "rows": 522,
+      "replaced": 126,
+      "cpu": {
+        "native": 0.15625,
+        "complementary": 0.265625
+      },
+      "arms": {
+        "native": {
+          "hits": 1,
+          "exact": 1,
+          "additions": 5,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 6,
+          "spread": {
+            "median": 6.643353213959371,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "error": {
+            "median": 101.12564084469192,
+            "better": 0,
+            "worse": 0,
+            "slots": 1
+          },
+          "dispersion": {
+            "median": -0.021075125447641764,
+            "median_abs_error": 0.9789248745523582,
+            "min": -0.6890468613196494,
+            "max": 0.00046380143125427406
+          }
+        },
+        "complementary": {
+          "hits": 1,
+          "exact": 1,
+          "additions": 3,
+          "gains": 0,
+          "losses": 0,
+          "valid_refs": 6,
+          "spread": {
+            "median": 6.603286767983577,
+            "better": 1,
+            "worse": 0,
+            "slots": 1
+          },
+          "error": {
+            "median": 101.07975886937619,
+            "better": 1,
+            "worse": 0,
+            "slots": 1
+          },
+          "dispersion": {
+            "median": -0.021600483161073797,
+            "median_abs_error": 0.9783995168389261,
+            "min": -0.7308477454544694,
+            "max": -7.164687154519167e-05
+          }
+        }
+      },
+      "by_slot": {
+        "kdv_cossin/0": {
+          "native": {
+            "spread": 6.643353213959371,
+            "error": 101.12564084469192,
+            "n": 6
+          },
+          "complementary": {
+            "spread": 6.603286767983577,
+            "error": 101.07975886937619,
+            "n": 6
+          }
+        }
+      }
+    }
+  },
+  "max_arm_cpu_seconds": 0.515625,
+  "fresh_shared_plan_cpu_seconds": 36.078125
+}

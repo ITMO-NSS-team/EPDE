@@ -1,0 +1,47 @@
+[
+  {
+    "seed": 923701,
+    "parent_front": 393,
+    "assignments": 3756,
+    "relabelled_assignments_verified": 3756,
+    "requested_fits": 750,
+    "archived_fits": 49,
+    "new_fits": 701,
+    "accepted_fits": 720,
+    "recorded_systems": 99066,
+    "proposed_systems": 9275,
+    "original_front_complete": 0,
+    "proposed_complete": 6,
+    "complete_nondominated": 4
+  },
+  {
+    "seed": 923702,
+    "parent_front": 918,
+    "assignments": 20441,
+    "relabelled_assignments_verified": 20441,
+    "requested_fits": 6919,
+    "archived_fits": 508,
+    "new_fits": 6411,
+    "accepted_fits": 6493,
+    "recorded_systems": 179328,
+    "proposed_systems": 53164,
+    "original_front_complete": 0,
+    "proposed_complete": 6,
+    "complete_nondominated": 0
+  },
+  {
+    "seed": 923703,
+    "parent_front": 1307,
+    "assignments": 43043,
+    "relabelled_assignments_verified": 43043,
+    "requested_fits": 13650,
+    "archived_fits": 808,
+    "new_fits": 12842,
+    "accepted_fits": 12897,
+    "recorded_systems": 97515,
+    "proposed_systems": 85546,
+    "original_front_complete": 4,
+    "proposed_complete": 12,
+    "complete_nondominated": 8
+  }
+]

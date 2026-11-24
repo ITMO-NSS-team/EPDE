@@ -1,0 +1,4002 @@
+{
+  "operator_sha256": {
+    "arm_pvguide": "9b2fc7c4261485f9e1afffd78c3e944b956154df19c6926f7defebb7c5fdc0b7",
+    "arm_xa": "2820149627c27941bf270dcd0a77e5823a3bfa07a0f65b6a36a689da03f256a2",
+    "setcond_core": "76f50438258986f9726aef52277164c9ad0515b8500cef32b065783e7e6a660f"
+  },
+  "pairs": [
+    {
+      "dataset": "ac",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "547eb8bb724bb1c7cb63ab9b602848d68aecae2bab77aeccf5464ae3e548acad",
+        "archived_pvra": "d01e0fe946b7baab2e0798450abdf40775f0d07532abcec919b62d6f7c1749bb",
+        "pvxa": "96dc7feb81c539d94111149e2e23a2450bf17e8d78581afde9f857b5deba133d"
+      },
+      "train_hashes": {
+        "u": "7cce65c379b47992cf50943ac227adcb442af944a2b4c3e04ca9a98772eb47aa"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          8
+        ],
+        "ss": [
+          4,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          61.59689568141994,
+          117.31884678604197
+        ],
+        "1": [
+          131.79598016017442,
+          157.06207457814486
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ac",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "b6d48777c2b02dd6b8a27a4ffc05de02bda6b10d35add8927929c65313a7e494",
+        "archived_pvra": "257872e91b0066d4e7dca8c89c9e91a76441073ae17f1eaf41498c5171c956ff",
+        "pvxa": "9403334e7f3ae369531ccf0d36ac75afaf39bc05c7a59be2ea609d1ca0679243"
+      },
+      "train_hashes": {
+        "u": "8485c969bcfa89eea4a8297b622dbca9d5117a802009bfd04e453dec5791497a"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          8
+        ],
+        "ss": [
+          4,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          79.98280056703213,
+          110.94259682813953
+        ],
+        "1": [
+          144.19258237603944,
+          188.38094111160117
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ac",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "2eacbf47a0c631764f30fc6993f8bf4d393a42dd8ae573ceecb6f68f2124f2b0",
+        "archived_pvra": "3ac2b1e62d9475f7353b9b8bf7237fe5b9986cacb18d56cb7ac7b2ed146d67b3",
+        "pvxa": "10465b5ab26123afbcd1a2be9243d90d7d5c7bb6bb7a643f95d2b6c20f73ac51"
+      },
+      "train_hashes": {
+        "u": "94c860fed32008073189ff5c94266fe48ba41c8052e0574af21a455c14036c7b"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          8
+        ],
+        "ss": [
+          4,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          49.342207659508674,
+          73.93001689043174
+        ],
+        "1": [
+          138.17038799710622,
+          157.000543170278
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "burgers",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "a26b6bb0c10f83f466314dd0d21941a14f674d1342d7177ccd9bdebf12db5707",
+        "archived_pvra": "ed94c54998247111f1be000c0e924026f0cb044dbe1683f8402756babde3e617",
+        "pvxa": "4f6cea34017702ed6bfc7b7f7b7adc4bd8e012e469715ad3b2fa02ddca946ce8"
+      },
+      "train_hashes": {
+        "u": "35c9de7ff3a075cee827c6201a2b197c04a39ba27e897dfff1b78dbd029204b2"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          32,
+          16
+        ],
+        "ss": [
+          8,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          5,
+          24
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          9.942657182016777,
+          20.52790559146983
+        ],
+        "1": [
+          22.011370419135925,
+          49.46786577326689
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "burgers",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "e3746af5653db30d374eb939069931b33c2e4c9a74b30fbb7ed85807d54f71ac",
+        "archived_pvra": "734f4f5eff252f82f6923115ad2330b4c47ccab0d89bf77425e13fe213adf5b9",
+        "pvxa": "d971669034b4cfcf18a6ac78a80f171e7be2543c783bc7de574905c529f06509"
+      },
+      "train_hashes": {
+        "u": "2f11046f25ef96f1e94ab2df6aa0dc0edc7db6908756c217a0e3412d7f7f075b"
+      },
+      "windows": {
+        "q": [
+          3,
+          5
+        ],
+        "ms": [
+          16,
+          16
+        ],
+        "ss": [
+          8,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          4.973585325354781,
+          11.215890735792744
+        ],
+        "1": [
+          8.632120626842074,
+          14.13401729527016
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "burgers",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "b0c9522e88ec49d73df5e60f46241eeb2fcc739f4d94235dd4072b8841885fe0",
+        "archived_pvra": "87189a56cbf43120c5b97bca428285743571c4df0616febe57cdbf4fdf388077",
+        "pvxa": "5b42ce2deea79bddaa126fdb036aeafe0ad937dc3af6da716894d29b6be64458"
+      },
+      "train_hashes": {
+        "u": "29c67fd9996c13a4d5f88058dbd2215a302468eae4d037be82066db19a5e3efc"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          32,
+          16
+        ],
+        "ss": [
+          8,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          5,
+          24
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          23.631077975800864,
+          25.49100659745597
+        ],
+        "1": [
+          22.029130906808597,
+          33.778270777683794
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "burgers_inviscid",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "a5f007ec4375554c15ec70d6e16e0b278bf32524c72457ddac2500e2e44e2930",
+        "archived_pvra": "5afb3ce6c6c431fb90fbfb42a6901953f3e8567598e8651582f96c8eeb111507",
+        "pvxa": "2d8a3bd7e4f43fdae60ac10166b5e7cde0094f2a1db98ff22a88ad098cc60b6d"
+      },
+      "train_hashes": {
+        "u": "22c4f47078a033b6dbc853423b7771fb92e79b52c3790e1ca5b1a97e33928eff"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          8
+        ],
+        "ss": [
+          4,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          22
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          213.7445827726975,
+          238.4260513518428
+        ],
+        "1": [
+          0.09966304283246018,
+          0.13695827972835495
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "burgers_inviscid",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "218b31b8454bf6e39b78e390c36631829222fe2101b82d566142e2d7457c4f11",
+        "archived_pvra": "971dc0d7a8a881ccdddf5501a190273319eed642f4496d3c84ef59ce1530552f",
+        "pvxa": "f99e975595d7fb6185258214f4d5d7fb3807cf952ef00bbab2dd325dd4b01ec1"
+      },
+      "train_hashes": {
+        "u": "218e7ac59d8635fd74dcbafbff643e1409f1f905a84f30bc2266a2ab73ccb088"
+      },
+      "windows": {
+        "q": [
+          4,
+          6
+        ],
+        "ms": [
+          8,
+          16
+        ],
+        "ss": [
+          4,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          9
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          50.22055228675253,
+          201.19600800179086
+        ],
+        "1": [
+          0.23643336635951664,
+          0.2738146370178055
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "burgers_inviscid",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "af528a2bb34e3914535b73ec52d2ba24c5a2362983456ddb25940562c215a0b5",
+        "archived_pvra": "d141f07ad19108d913bc330569da258cb78da5569773c2cab8aa303676251051",
+        "pvxa": "24a483bd589621a29a188520a1be85f92a93a5806cacc34bb8215998692069ce"
+      },
+      "train_hashes": {
+        "u": "49d154680d9951498ee27bdb4457c937b547c819e38dbee833f4fab2ef790c8d"
+      },
+      "windows": {
+        "q": [
+          4,
+          6
+        ],
+        "ms": [
+          8,
+          16
+        ],
+        "ss": [
+          4,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          9
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          188.52252328460762,
+          213.52749734041137
+        ],
+        "1": [
+          0.03708546698671514,
+          0.26159870683640146
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "56899df71e23b4ee83a9169f1c1e19e3e1c317a4a8ea1dfe300c241f48e0a8a3",
+        "archived_pvra": "33f91e33ec8e65ac94a610b1c630cc4cde6e64f4a7aa1b3ffc1c6db3c712842f",
+        "pvxa": "430fa397bcc4021f873e13161a016b279954598f03187d72e1249c77c8d756f6"
+      },
+      "train_hashes": {
+        "u": "97bc84597c3627a105a9b83f12d8c1a6599fe5f6c03fc08b0286a61131fdb469"
+      },
+      "windows": {
+        "q": [
+          4
+        ],
+        "ms": [
+          64
+        ],
+        "ss": [
+          4
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          93
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          1.076480301289793,
+          80.84750998444383
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "0693df0ac73552a4b629dbc5ad2bdaae1925c8d3fca1203b0a449f26cbd53b12",
+        "archived_pvra": "cf418e8246d93b42b42c51d0e8ac7600df9c1424986ba9eaa5f7c6977157a5d1",
+        "pvxa": "1eb40246eea7bbdfac7df431e9c6ba70843b761288db632962012415fc72c855"
+      },
+      "train_hashes": {
+        "u": "30a21d3dba870efcdf723054cf7008eec16ba6fb8bdd1fb3b4ce63cfc94ade92"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          64
+        ],
+        "ss": [
+          4
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          93
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          1.0772721648366934,
+          19.972224991074764
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "9ffa64e6c85c5a60dd65335e52dab06e4cb7e173edbb33bf1a315d4ddbcccceb",
+        "archived_pvra": "f49115439c382054e9dee1de5e0ae1ff36632d8b93dd57917e41cc92ef2daa0a",
+        "pvxa": "e9c5b9bbea93e81b223b99b615bc1f87abfe1c34c8bb43b10a21205c1fe69856"
+      },
+      "train_hashes": {
+        "u": "20e4f31d4f14f6875ecb07776a274bff37ad12680c531c7b680e06e9e2a018e7"
+      },
+      "windows": {
+        "q": [
+          4
+        ],
+        "ms": [
+          64
+        ],
+        "ss": [
+          4
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          93
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          1.0796960984456938,
+          134.41260538488166
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "kdv",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "9f223e26c33bf9e57afa2535d0adcaa3d59ff56d84e07a10d5f83179891089fc",
+        "archived_pvra": "2d56459d2065a364fd411fb69f33e80e8af04d47cad6d9776a9ed66a10d4f3d6",
+        "pvxa": "8d0175b7866fe633d4e42f478cfbf97f9c2efb3e346dae98a0de9210e37152fe"
+      },
+      "train_hashes": {
+        "u": "746f5a7f39ecff3ff14ca8fb3c298a42b534f33a291d4da56fb4d1a1fe9ef22e"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          16,
+          32
+        ],
+        "ss": [
+          8,
+          16
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          22,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          9.379519887066236,
+          10.624452038951327
+        ],
+        "1": [
+          9.217656940223666,
+          26.594772529915016
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "kdv",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "35d2e61dfbdc8341cf830cd1ad2fbd170dd56cdaefef8f65d25f2b9add41e812",
+        "archived_pvra": "c8e43004dd089c20614cd8d9c4b7aa4ff8daf99140561adea75dc97664e371bf",
+        "pvxa": "696feb8f3ba4fe9debd4e6a68d383007f2b7a433e5d286f06dae67ea349eeb83"
+      },
+      "train_hashes": {
+        "u": "6edc32707d2eb15e242a949e4206332af7f80d46c82a224151991fef591ed3ef"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          16,
+          32
+        ],
+        "ss": [
+          8,
+          16
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          22,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          21.87123448604526,
+          29.07348618046897
+        ],
+        "1": [
+          18.642315698770773,
+          25.133260106462924
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "kdv",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "99f60825cee9e57823767f37613f7d96717c42d7a81ec2d7a71e094a71cf8b23",
+        "archived_pvra": "cc01154fd7a77785437aed96f85988847a28e0d76b94fa445513e85f238b88a0",
+        "pvxa": "982d2e01b2fa980b8d12bb720141eadcf4d753806e7876c3158d81f7c59d046e"
+      },
+      "train_hashes": {
+        "u": "1ab8d62023264f479e47ce321387d0d6b7fee6c332431f21f8703595d6c42566"
+      },
+      "windows": {
+        "q": [
+          4,
+          6
+        ],
+        "ms": [
+          32,
+          32
+        ],
+        "ss": [
+          16,
+          16
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          12
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          3.4402987345081226,
+          25.94349007662435
+        ],
+        "1": [
+          6.492268880789872,
+          13.610585013663195
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "25b72a515685a9a946505054dbe3b4822049ef9e38db6951cc62542ad2f41712",
+        "archived_pvra": "07ca8eea846c0b32e4da7a7ba0e2fac268a987d136bb208a48ede10fdbed6b98",
+        "pvxa": "4985adc7af6b70c3d48c5aa7a566f85b3ea8af61da62b8375cfa28bb19d3862e"
+      },
+      "train_hashes": {
+        "u": "d9a3320d5e9af0174201afcda1924734d7f5abed14268a6333313746f9eacc38"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          4,
+          16
+        ],
+        "ss": [
+          2,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          16,
+          7
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          87.94321801170453,
+          226.23905063618474
+        ],
+        "1": [
+          93.14960389014219,
+          105.33867518427513
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "646224d8e4afe99d8aa2aeb0728837d2a327b1c714f9f43257082648bf5b0606",
+        "archived_pvra": "15524953f4367ae780d3ae095a9c699802e1080d0edf141370b522259ecf7fa7",
+        "pvxa": "6827d28c3f2e7d806e2bd44a8364087f4b8c87c354a28a96a798a0d5ac704b0e"
+      },
+      "train_hashes": {
+        "u": "613b03bafb7ec299fb3c59032f905905204f4167a52dcbbb27dcc0b0219bcce9"
+      },
+      "windows": {
+        "q": [
+          3,
+          5
+        ],
+        "ms": [
+          2,
+          32
+        ],
+        "ss": [
+          1,
+          16
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          36,
+          2
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          150.74717660349643,
+          175.5813995200423
+        ],
+        "1": [
+          179.7983080685633,
+          223.7002852398614
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "a99ca4df524f61e66b81ad3c7262340cca85bd19e73137fd170c8d49d3a20ad6",
+        "archived_pvra": "c15aea340a210f836906a5a5cffae45ff822395169131e586cfc414a79213a41",
+        "pvxa": "b08f8ef2a63c295ec8b0ccecb3336aa892e30dc7160379f6d662b46aad3bfb32"
+      },
+      "train_hashes": {
+        "u": "acfba839e30a683cb61dad94ad0ab8767368eb7a6439018530d240fbffd021f6"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          4,
+          16
+        ],
+        "ss": [
+          2,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          16,
+          7
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          100.718885889471,
+          162.62690033445017
+        ],
+        "1": [
+          49.21922475858501,
+          68.4065811749069
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ks",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "8f651f80fd75b978af994092c7b09d0b4344e550ac959f78e0248a4d93f0f38b",
+        "archived_pvra": "a72c27dcf5e9e77bea702b700ce8a3031b49076b898e7f5cd76bbb24cd646f55",
+        "pvxa": "275883a4f075590d744c666d0839e453d6f5b60c6b62b3eb5547513b013fc79a"
+      },
+      "train_hashes": {
+        "u": "2b2d8730fe41784db4a49db5902c0e7b28c0d62070d88a3d252952b209842817"
+      },
+      "windows": {
+        "q": [
+          4,
+          6
+        ],
+        "ms": [
+          16,
+          32
+        ],
+        "ss": [
+          16,
+          32
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          14,
+          14
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          0.3078893875686056,
+          6.008974113428863
+        ],
+        "1": [
+          0.7354994540704416,
+          30.877295317942576
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ks",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "48b2cca8c04b9e884526d1628a1d3fa4d9a0977f79c6cbd00e43b5f9edf724d8",
+        "archived_pvra": "40e43230ecefe4d1ec037160a1a17721fb2711ed0cbce6cd3fdf93ad6d5e0154",
+        "pvxa": "7203f082bd5d6badb038ad15b8edcb199cd8da7ae3c8c4cdcc05ad4cb08e9ad8"
+      },
+      "train_hashes": {
+        "u": "0de48826bb23631545dc3326b2577d2468c346dcbcdfb208856c4357cbe8563d"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          32,
+          32
+        ],
+        "ss": [
+          32,
+          32
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          6,
+          14
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          0.3079017140353208,
+          2.69036856810038
+        ],
+        "1": [
+          0.7354469279235143,
+          3.501324636340709
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ks",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "a58f042b2bb810d7067c4727707fa547d6ead00dbcb0006b39c5e6a7e3909382",
+        "archived_pvra": "848926008c21a239d3c6f4208e5b10bb6063c505f10e4a95c43bee337146cfaa",
+        "pvxa": "e671be250793982c4a3ddefaae4f4312928275068d892551645e272014ac14dd"
+      },
+      "train_hashes": {
+        "u": "51c3b923c52dd25f02da4c3147e98588a23863d7c22b82d69db1544b0cab9527"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          32
+        ],
+        "ss": [
+          8,
+          32
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          30,
+          14
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          0.30791652296640654,
+          6.821098848521022
+        ],
+        "1": [
+          0.7354713627046585,
+          15.623741565190228
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "lorenz",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "644661568b1834555aaacb4cd843e06a9a88fa7a11d4f1a6f346823fd8c70e12",
+        "archived_pvra": "fccd7caa7532cc722de1e39df641995674081469615bbc472da9bb9e68be1f16",
+        "pvxa": "58875c6638a649343f10974dc7868ca164cc92788ea69f7bd71c8c9466155543"
+      },
+      "train_hashes": {
+        "u": "9e08b8749c9429b7eb6d2a04127d7432118c35d4982028d0342d589bb52d9ef4",
+        "v": "3fb543e7b903e2def7f564d48feced552752eb538c9a4e188f050856580b1b9b",
+        "w": "c095d46b3ce2fa89df452d885af26a61e4df5f236c2b75f50879ef5f994c59be"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          32
+        ],
+        "ss": [
+          4
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          114
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          3.862535586282267,
+          8.209536880688734
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "lorenz",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "8b3883a3d7469573a3df94cafcfd21980df5077bdb397ef58d739ebe89492a59",
+        "archived_pvra": "dbbb60d069c5c9f5129b923787d44ead787e53eef883178e2577fe2070db105f",
+        "pvxa": "21c1f0805fc82f589836d53acd9ee7499ef3e86632655680990e3cb1a9ed0e64"
+      },
+      "train_hashes": {
+        "u": "6ecc357dc880ea5d6e7d3e53ca243078283d462d1ba880f5ceb75cc64cf14512",
+        "v": "f02ba793ddffa765d8b824f7e211266a4d203675fd4cb8323b6acf0e3cdda408",
+        "w": "edc6d67f29231c67c629a8db1664c89fca9864c8b1ef8b2ae47aac8506022189"
+      },
+      "windows": {
+        "q": [
+          3
+        ],
+        "ms": [
+          32
+        ],
+        "ss": [
+          4
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          114
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          3.8614023975695497,
+          8.193031407071407
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "lorenz",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "cc8db0a39944ea827c5ccff8e3e9972e30f07078f346d7d6f815149c3192c836",
+        "archived_pvra": "448b3480bef1df3792a1790070457f179ab47189a197259c4f6afdc8a9f3dba0",
+        "pvxa": "d7ec46a1dbd7d3aab2d75c43a00cbb39f830734b56174d78c7f69b58f6604959"
+      },
+      "train_hashes": {
+        "u": "ac8b3146b6c7b98cc786f41f9a16229d983bfd760d3f2b810b11faeb2b9967f4",
+        "v": "e41310b0811ac6c5093b4133afcc1f108cea57a020e5ec15f5101d2f44c06050",
+        "w": "ee81c1a254840ea02023e60e82348a309b8cbad54887f6bab67048f312257129"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          16
+        ],
+        "ss": [
+          4
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          122
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          3.8656320571408886,
+          8.189891509102702
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "lv",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "e04c201e53192a79b13acb319d59f3f8466edecd12b841b60cd9fa9072c5b1cc",
+        "archived_pvra": "6019865333e1ddb5aa2d9ed9b40e055fb2cb6992d152aa0a8be86aa77349704e",
+        "pvxa": "b710503eeea22ea2673d9777339c110306db2ed4f86edaca06de34e2adc2b7af"
+      },
+      "train_hashes": {
+        "u": "0bb9f766f081ea03ba6121e7bf7cf1abc4fb8b8d47fc728f4f08fcadf453f976",
+        "v": "63a4e56bcef048a4be4611ee7b3ed1ae93e204e9b61849a4deb74c67994bdeda"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          8
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          67
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          35.54111483218064,
+          123.25834489302872
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "lv",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "2f0f0143586f60bd0897cdba7bcc057148a6c4ae650312e5842465518a48a1e2",
+        "archived_pvra": "b7df3d27ea5b7c6a2c7dbfcf0d39b815bc59d0ac4cdcc406d5308e5d0988f4d1",
+        "pvxa": "e0304113373299c1d21206bb9386235557cf3cef0099968b29022c80c06d7761"
+      },
+      "train_hashes": {
+        "u": "25f5171d49cf9c44354a436a6c678564e048b98145d909b52630e74fd8f1ff2e",
+        "v": "04f3cf5cef14ef68f96c19a4eb310d0fa94954150e26221ff252968eac6473d3"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          8
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          67
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          101.63653229871426,
+          835.4335505101603
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "lv",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "312e316a46ea5c0477296407cddff590a365f6c50d9fe5da4647e3e478eaa715",
+        "archived_pvra": "0706e690621141e747ce01421434a32737f78a2984b9074b99a8d374f364b451",
+        "pvxa": "fdeb6768684db04670688776929c14656b761dc3d659df99a916eaec49aea4ba"
+      },
+      "train_hashes": {
+        "u": "5690dfc953204a413a703b0059f076330473506d5866cb4a3af6eede996e78de",
+        "v": "029105a0ba58bdf40db78316eee3ef3a7552a98be9892a5aa5ac4c30c3779c4a"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          4
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          71
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          97.23086021601553,
+          121.7693039552586
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ns",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "ccae3ebe48d997aa51ba877346d855d070a811b76a98faab90e2fbc1c93b7d22",
+        "archived_pvra": "d20dc8cc154f7f99ac8703da1917e236ffca10f87d397025c64bc65dce6e2a16",
+        "pvxa": "473251a6628f1c4944b4f261c3daf55b8a9068aba201ba837e1f7da2cb3796b7"
+      },
+      "train_hashes": {
+        "u": "62ed19b808ba306879e33dd8db050f623c3151993db5c37bf7c740f22aaf4885",
+        "v": "1afbbde26d7f9851ec59e37b61278c17507904bb0922a7b1d1b8e24be7c16ef8",
+        "p": "1c9a1fb48e0809beea8797d03f30618e93deed0062981c62ed25f225566d88e4"
+      },
+      "windows": {
+        "q": [
+          2,
+          4,
+          4
+        ],
+        "ms": [
+          4,
+          4,
+          8
+        ],
+        "ss": [
+          2,
+          2,
+          4
+        ],
+        "cut": [
+          0,
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          6,
+          5
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          15.105218020291359,
+          22.60622978310967
+        ],
+        "1": [
+          11.39698308178172,
+          15.402608226390402
+        ],
+        "2": [
+          14.814872731822495,
+          19.735219266452905
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ns",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "ae130127f955bba03396643c9116d0ffc07ce244a5587e397aebcc2fcd0da96c",
+        "archived_pvra": "bc2b72437cba1154ec8b00595e76980f38d71b27897a7d1db213bd5e0aca8b97",
+        "pvxa": "2af7095f82de4477621107d30fcebb961f3315cbdade30620691369120cdcc6f"
+      },
+      "train_hashes": {
+        "u": "04635e2897e3e4c0a5b99f28134ecd750646df2d9d13739ff1bac8fa0581a239",
+        "v": "9a423595cde7b61a219a8db8216fbb3fc99b57bc7ef0cb3eaae8461df989755c",
+        "p": "5a6fbf237a716c18f34b15f2819c77e29d7e48abe72f7b63b2f04a328f709986"
+      },
+      "windows": {
+        "q": [
+          2,
+          4,
+          4
+        ],
+        "ms": [
+          4,
+          4,
+          8
+        ],
+        "ss": [
+          2,
+          2,
+          4
+        ],
+        "cut": [
+          0,
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          6,
+          5
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          17.611389725792034,
+          25.127005114665913
+        ],
+        "1": [
+          11.411022254742079,
+          15.409268760138945
+        ],
+        "2": [
+          13.565100483044011,
+          19.75535119804734
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ns",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "5d3488f519b87a33cb2db27c8f45a8eb85a13640996234aff788f0c91f32c328",
+        "archived_pvra": "52f6e68d1f3c72d09db9b9c81374355cbf466d61a05cb619869d2920f0163304",
+        "pvxa": "038932234a43ca89f851fb1462624847530a14655b2998c610caf418f97a1fef"
+      },
+      "train_hashes": {
+        "u": "39ad12de62699593f40e4e0598486a5a39566d8f2e634caf9b1f4c79d1a35ab2",
+        "v": "78468b0cd51e711579f94e1005dc60be4a09f2552efa1216aafddb227ea4cbe9",
+        "p": "b91428b2d7b7ed9b675a8c4ed179ae6cde04973b86a1f9aa91be64d59bb2cefa"
+      },
+      "windows": {
+        "q": [
+          4,
+          6,
+          6
+        ],
+        "ms": [
+          4,
+          4,
+          8
+        ],
+        "ss": [
+          2,
+          2,
+          4
+        ],
+        "cut": [
+          0,
+          0,
+          0
+        ],
+        "shape": [
+          9,
+          6,
+          5
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          17.597987735346987,
+          27.653840176705323
+        ],
+        "1": [
+          11.37065823927649,
+          15.395723680873767
+        ],
+        "2": [
+          17.273512087814545,
+          19.7493345027846
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ode",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "8f7a708155c49632805f1117104e374f7436bdad7d0f507c5a9ae95066a166aa",
+        "archived_pvra": "61715543bde84404be443318e0d7b784040decc16a8c8b3957c57aab99969165",
+        "pvxa": "5f0ef67eae65a0d795c4712d7de69d250af89abf9ad12d8472a3473915c6c646"
+      },
+      "train_hashes": {
+        "u": "d528052e9634059ff4f91a12d6eb2ed981bcacfa231f8882f40393b5894ee459"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          16
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          64
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          2.0540386120499,
+          15.709554461033182
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ode",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "72e9020f940dea5c2ac99ccaec3d6a0006f43e7d613ffbea5b2e3e9da5ef983d",
+        "archived_pvra": "8b07ba51efc3bc1d34812216d11ec535b4eddd464bcbac308f4f3be3e066b6c4",
+        "pvxa": "bbfe7c7de60f5e28f7d1cd7f70d45a1d4aa02046f2c201b4cdb45f71a1b13caf"
+      },
+      "train_hashes": {
+        "u": "b39013ab1eb2a3f43a8d638f99108ffc1b97e1f198b835715892797852574e41"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          16
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          64
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          2.0624736066021807,
+          28.108876428223322
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ode",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "be5a48e36577fe4b5bac2435538a43692c7f160e43c77f92b0f0a05a773fbc00",
+        "archived_pvra": "e1b42a151f8ad05e5f2c09865bc133cc8e2bdc97dd5c7893f470954e00920edb",
+        "pvxa": "a6c1116ea356536364496d0e3f5f5e820cecce308dffd07f0700322ff9f61e4c"
+      },
+      "train_hashes": {
+        "u": "8c26697f9130705ea4ddc4f8ea133cba0ca97ce1591ca1f645e84925c988dc86"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          8
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          72
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          2.059415080535508,
+          56.627128818664914
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "pde_compound",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "30a3f6a050181f8386d64e995d97a16bf9446dceb80308e94f6b72e61bcc6d85",
+        "archived_pvra": "15eac5ffe9a58e558cd286d730b7e99295bceadefa53713e35bd938d57626a01",
+        "pvxa": "f8128bd32cf38dff4b4197ff8714d7022000ec42e4b99f7816c88574a089a296"
+      },
+      "train_hashes": {
+        "u": "473758524f03ca8da95a2ed0291c149f56cd7cd3038a64958ff35ee083b78ad7"
+      },
+      "windows": {
+        "q": [
+          3,
+          5
+        ],
+        "ms": [
+          16,
+          16
+        ],
+        "ss": [
+          8,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          12,
+          9
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          477.35216205767824,
+          979.6267765776872
+        ],
+        "1": [
+          136.93716378518613,
+          286.0828332032717
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "pde_compound",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "6c1bd6b464064662c8c9be622aa4770148bcc1b776a008e47f03bb758dcc5072",
+        "archived_pvra": "f6f932319735f2a8ca62507a4efa77d57280e290c5b9798ed409feff9148d34a",
+        "pvxa": "8da116ab840382ca589a48dad782d2e9859f91ab96e7e174bbee8c3546cf1803"
+      },
+      "train_hashes": {
+        "u": "8c2d0c18690f8a982c3560677653c1983be23b8d0d8cfde32eaa539b258184dc"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          16,
+          16
+        ],
+        "ss": [
+          8,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          12,
+          9
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          402.34157215528836,
+          1181.0505411916045
+        ],
+        "1": [
+          87.13936380637865,
+          124.43390567567222
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "pde_compound",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "6958650243a4f013edfe737924ab8f70062be832374eb60435d585038ae3fee6",
+        "archived_pvra": "359351c96e85ebb78c8e1feef945b544086c3b4d142f11ee22ccc7650cc8c227",
+        "pvxa": "eb38d07c80818732b363e67a2e49295d5cac5da0226452d983d31e4d3f4243c7"
+      },
+      "train_hashes": {
+        "u": "3acbd1b14f4c9f7f58b1c4558fbec02862da4db9a17442cb34e43d2ecb0d1b71"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          16,
+          8
+        ],
+        "ss": [
+          8,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          12,
+          21
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          301.8929174310619,
+          1281.848871341569
+        ],
+        "1": [
+          80.77870727107478,
+          217.63425721081984
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "pde_divide",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "1bbacba64b289be1181581ff82340ad6ae4fd228b925752b71c857dc8aab315c",
+        "archived_pvra": "09af2361e7eb19b49423431bdd92a1211230b2b84bb3aa0a2528eff0716f844d",
+        "pvxa": "bc7596f6a946b3e1902954f047a204a4e899c71aabea2324f6c4e743872eae27"
+      },
+      "train_hashes": {
+        "u": "f1f55bcf9f927a017de11c90cfe44ab85914c8c2a56a0dd4770b73815987eb63"
+      },
+      "windows": {
+        "q": [
+          3,
+          5
+        ],
+        "ms": [
+          16,
+          32
+        ],
+        "ss": [
+          4,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          24,
+          5
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          477.34882676670554,
+          979.6263885753094
+        ],
+        "1": [
+          142.8670151896712,
+          286.0827880028252
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "pde_divide",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "0526e2365823afe88cfa7aa2190c4c194081166a334128bb95592112e396a700",
+        "archived_pvra": "5d7dc992d4b64e0cf15d757dbc75993f1c3f33687eab3a1facac37d70d950c76",
+        "pvxa": "c847d5d8ca1fd7afe73e128d172d083ea5857744138974b6af7ccf5f369f5a7f"
+      },
+      "train_hashes": {
+        "u": "57889c26dc542b2181ea085002be27ce22b60e32f044d34ff877b1f074a88a67"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          16,
+          32
+        ],
+        "ss": [
+          4,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          24,
+          5
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          402.34616846302714,
+          1181.0505426852728
+        ],
+        "1": [
+          87.14018392084282,
+          124.43398327739523
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "pde_divide",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "25bef3ccad96154175996d475ccb262b76f931ecc87146bea9572191c0b8dfce",
+        "archived_pvra": "e4fd3fb744a37ec5f15fae858150e6be5c1f7cadd91fe1555bc4ff7f5f918914",
+        "pvxa": "54b83519d831e2e14970d852b362d5fcabd0049733fc74f48935162823700512"
+      },
+      "train_hashes": {
+        "u": "465495e2aba2eb16bd3355770fc2363b7f09a7fa24327aaefbc736699883dafb"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          32
+        ],
+        "ss": [
+          2,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          55,
+          5
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          301.8902539824488,
+          1281.8488247612386
+        ],
+        "1": [
+          80.78461914918368,
+          217.6340281152221
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "vdp",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "3b2d0675256957db8b698d698edb9629195b3ad14eece1f34246b70bec38203f",
+        "archived_pvra": "f7798bf8721a81ce6e3465cfc56bc024ec845bd3c673cfe6ca0cb2e3dda146a1",
+        "pvxa": "5bb78fc6ed8848b9521384be3c3fc40b1920bdc4bdfb78066a0709b7132e98e9"
+      },
+      "train_hashes": {
+        "u": "d3f35ba03873630882dfce8854bafe2acc166e2e37149f6c9210d47b9e04a6b3"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          16
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          64
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          15.709765951646856,
+          59.57547396253075
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "vdp",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "d165e41fac3fdc131bad8ab8e9010865d438fb8df04e899f93f978c663b41a96",
+        "archived_pvra": "0c5e322e00595582a196fe27066ca0bac8b69896bd536b682f02650441268e57",
+        "pvxa": "43855c3bd53431523528373afea9ed91d18050916d4880bf5f0c9ab2d97f2f20"
+      },
+      "train_hashes": {
+        "u": "bcbeb959912e8d33ffc24d94eabbaa353b408a839c0fc0b54cd16f314393cc0b"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          16
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          64
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          20.429074729808484,
+          28.108831808331633
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "vdp",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "fb7d88169df0a99faa7f7f97d2f0607b6deffb05811d3f600916610b1ffb3271",
+        "archived_pvra": "3b47273987b2fe57e9f27e78e4a9211db432f4e1a6adde5997c4929520feb795",
+        "pvxa": "2d21de3d225d7bedf5f312f3dbdf8693093e5c192bea94a316bb4e5e0d8f4035"
+      },
+      "train_hashes": {
+        "u": "7503432ed343c7fdda7fab7999825d891f8c219a26884c0be78bfb0e44452a2a"
+      },
+      "windows": {
+        "q": [
+          3
+        ],
+        "ms": [
+          16
+        ],
+        "ss": [
+          2
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          64
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          52.63470706604783,
+          56.627129274329306
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "wave",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "6c431c305e4d99a86c7411fd3fc8a0211702223f973a0c3b16408c8b31a7d818",
+        "archived_pvra": "267c388fda9a624f788b99bded02164206d273350e1536f4b26f8dd1406d2ac3",
+        "pvxa": "48e3584db3e7982ddea43979f5cb138c6b7d6a169c9934c65456ca30041b3a23"
+      },
+      "train_hashes": {
+        "u": "a5cc6d7806614c496df96e3ee3fdb9fe08ab797bd4f2e64c24f509350c827470"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          4,
+          16
+        ],
+        "ss": [
+          2,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          16,
+          7
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          88.06437542106117,
+          226.2397954264045
+        ],
+        "1": [
+          93.16329154092253,
+          105.34241055418876
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "wave",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "9a219fb078e5389545a7edfb265a55e83a008aceb96630e9fbe1ede1184a5769",
+        "archived_pvra": "365f2942c85f7fd42119943b82d1e70804e25aa4e1b913d0d9b81cc59816841c",
+        "pvxa": "654f71c4d4bbb0253eed117174edf0ccaf395019c8a9f7ae652a96213756a465"
+      },
+      "train_hashes": {
+        "u": "1470f2588a49a6137b9153da86687bfc24d3fa785209281807b8104a28696c37"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          8,
+          16
+        ],
+        "ss": [
+          2,
+          4
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          12,
+          13
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          150.75279393797956,
+          175.5832214397933
+        ],
+        "1": [
+          179.79837013374228,
+          223.69988688798423
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "wave",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "4a4d07344e69a32d2620cfc458a5817c08bf8509d0ce0ff722e59d63e931d4c7",
+        "archived_pvra": "5541fbdee92875ea87396151ccb0fd77bace573e0f5dbec22d3ffaa1abd723f6",
+        "pvxa": "97f73c3b60fd34d8909026373245590b4a796909e356b4dc901fb286cfea7eb2"
+      },
+      "train_hashes": {
+        "u": "cca9dc437993e50a677aa9bcc81a3eca1b132c34152789df9e626bbcc868dda7"
+      },
+      "windows": {
+        "q": [
+          2,
+          4
+        ],
+        "ms": [
+          4,
+          16
+        ],
+        "ss": [
+          2,
+          8
+        ],
+        "cut": [
+          0,
+          0
+        ],
+        "shape": [
+          16,
+          7
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2,
+          4
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          50.00864429987395,
+          162.62760672063206
+        ],
+        "1": [
+          49.17415753641863,
+          68.41984369941558
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ode_simple",
+      "seed": 923301,
+      "archive_sha256": {
+        "pvra": "aca6654f1bcc0447f9ac49f0e0b62a360e7f32aa24b153119bf9c848aa03d213",
+        "archived_pvra": "8db3196208665b0ab30f9042d4204809dd73dcc94b9b192c686d246a449c05ca",
+        "pvxa": "0309c4d8a15b4ee5b1578c24e5e84f2a9700b1357f53ad66d9634e59bc3175f9"
+      },
+      "train_hashes": {
+        "u": "e1e29d42dde0d12b9f6c6901d0e7465516230ec7ab1347daa6922816b4e9d2f1"
+      },
+      "windows": {
+        "q": [
+          4
+        ],
+        "ms": [
+          8
+        ],
+        "ss": [
+          1
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          84
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923301
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          24.793048989148893,
+          29.50584037710967
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ode_simple",
+      "seed": 923302,
+      "archive_sha256": {
+        "pvra": "af253d49ae518aa160aea92e033bace567ed3f390dd3d1e834b95f35e7d337f5",
+        "archived_pvra": "0cfdf01158d7919440472df33a40064140d982c18867c55776c8f351cc498c67",
+        "pvxa": "78e814722bbe842b90415bfb854e6b598b123aafab956e9b5eb5e95126cd98dd"
+      },
+      "train_hashes": {
+        "u": "0384348c467de3477c83e744f345896d2657e31b1307a477fca0040701300e50"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          8
+        ],
+        "ss": [
+          1
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          84
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923302
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          27.0384514803647,
+          44.00504765449601
+        ]
+      },
+      "trig": true
+    },
+    {
+      "dataset": "ode_simple",
+      "seed": 923303,
+      "archive_sha256": {
+        "pvra": "d5bd353c7100c69f519c3f771e25d93144609a8d551ff28b41574f52cc212fa6",
+        "archived_pvra": "20c7d0d7b351f6116fa9a7ee23062c6c892266d42697f1d1e1b6f751a60e99ca",
+        "pvxa": "cb04a8a874663d8ca98e7b581b3e2b213ef3c0c7e3a5f16b7745041e832398e9"
+      },
+      "train_hashes": {
+        "u": "6c0015a6cb726bd05d2fcac18d878e31d0bacb042ba1abef09dde4ab0e84e834"
+      },
+      "windows": {
+        "q": [
+          2
+        ],
+        "ms": [
+          4
+        ],
+        "ss": [
+          1
+        ],
+        "cut": [
+          0
+        ],
+        "shape": [
+          92
+        ]
+      },
+      "settings": {
+        "use_solver": false,
+        "device": "cpu",
+        "multiobjective_mode": true,
+        "system_rps_mode": "plain",
+        "engine": "nsga2",
+        "evaluation_form": "weak",
+        "discrepancy_metric": "wape",
+        "instability_metric": "dyad",
+        "system_rps_params": {
+          "variable_order_seed": 923303
+        },
+        "training_epochs": 100,
+        "early_stopping_patience": null,
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {
+          "accuracy": 4
+        },
+        "max_deriv_order": [
+          2
+        ],
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 7,
+        "memory_for_cache": 2,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "verbose_params": {
+          "show_iter_idx": false,
+          "candidate_objectives": false
+        }
+      },
+      "peaks": {
+        "0": [
+          41.7264139693849,
+          44.83768487057566
+        ]
+      },
+      "trig": true
+    }
+  ]
+}

@@ -1,0 +1,519 @@
+cohort,system,profile,source,destination,candidate,term,parent,method,max_ratio,accepted,destination_refit
+core,ac,iid,52,51,e0:reference,,True,original,0.21367541870585427,True,compatible
+core,ac,iid,52,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.2139469744032636,True,compatible
+core,ac,iid,53,51,e0:reference,,True,original,0.24544965768605298,True,compatible
+core,ac,iid,53,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.22288608225904963,True,compatible
+core,ac,iid,51,52,e0:reference,,True,original,0.3502293640813915,True,compatible
+core,ac,iid,51,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3524636434921326,True,compatible
+core,ac,iid,53,52,e0:reference,,True,original,0.33877869002935806,True,compatible
+core,ac,iid,53,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.32796322939815997,True,compatible
+core,ac,iid,51,53,e0:reference,,True,original,0.41906773997706825,True,compatible
+core,ac,iid,51,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.42276295658153723,True,compatible
+core,ac,iid,52,53,e0:reference,,True,original,0.3024722735581695,True,compatible
+core,ac,iid,52,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.30313700549478967,True,compatible
+core,ac,negative,52,51,e0:reference,,True,original,0.3075542184926006,True,compatible
+core,ac,negative,52,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.31345783748074574,True,compatible
+core,ac,negative,53,51,e0:reference,,True,original,0.33205104298903587,True,compatible
+core,ac,negative,53,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.31994001958368207,True,compatible
+core,ac,negative,51,52,e0:reference,,True,original,0.2864532114626668,True,compatible
+core,ac,negative,51,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.30847183686543184,True,compatible
+core,ac,negative,53,52,e0:reference,,True,original,0.2857158555464911,True,compatible
+core,ac,negative,53,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3163194797331546,True,compatible
+core,ac,negative,51,53,e0:reference,,True,original,0.34938733961717594,True,compatible
+core,ac,negative,51,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.39503677291471934,True,compatible
+core,ac,negative,52,53,e0:reference,,True,original,0.3159291285034343,True,compatible
+core,ac,negative,52,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.37358333132993526,True,compatible
+core,ac,positive,52,51,e0:reference,,True,original,0.3382697459715812,True,compatible
+core,ac,positive,52,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3421344015384787,True,compatible
+core,ac,positive,53,51,e0:reference,,True,original,0.3421914852292206,True,compatible
+core,ac,positive,53,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.34176317671118867,True,compatible
+core,ac,positive,51,52,e0:reference,,True,original,0.3524805778240776,True,compatible
+core,ac,positive,51,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3527336479534675,True,compatible
+core,ac,positive,53,52,e0:reference,,True,original,0.3728853911460306,True,compatible
+core,ac,positive,53,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3698850308456193,True,compatible
+core,ac,positive,51,53,e0:reference,,True,original,0.34640119751123427,True,compatible
+core,ac,positive,51,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.34648689741282435,True,compatible
+core,ac,positive,52,53,e0:reference,,True,original,0.368105681878757,True,compatible
+core,ac,positive,52,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3696092671197067,True,compatible
+core,burgers,iid,52,51,e0:reference,,True,original,0.376061200929057,True,compatible
+core,burgers,iid,53,51,e0:reference,,True,original,0.5455372894498093,True,compatible
+core,burgers,iid,51,52,e0:reference,,True,original,0.1830259283774694,True,compatible
+core,burgers,iid,53,52,e0:reference,,True,original,0.506252293451485,True,compatible
+core,burgers,iid,51,53,e0:reference,,True,original,0.18741397692451278,True,compatible
+core,burgers,iid,52,53,e0:reference,,True,original,0.23929004156038078,True,compatible
+core,burgers_inviscid,iid,52,51,e0:reference,,True,original,0.21292986788328153,True,compatible
+core,burgers_inviscid,iid,53,51,e0:reference,,True,original,0.21176111910589376,True,compatible
+core,burgers_inviscid,iid,51,52,e0:reference,,True,original,0.2805829561810411,True,compatible
+core,burgers_inviscid,iid,53,52,e0:reference,,True,original,0.3017074851880772,True,compatible
+core,burgers_inviscid,iid,51,53,e0:reference,,True,original,0.16485733699563507,True,compatible
+core,burgers_inviscid,iid,52,53,e0:reference,,True,original,0.19544910139141458,True,compatible
+core,duffing,iid,52,51,e0:reference,,True,original,0.3613786895739788,True,compatible
+core,duffing,iid,52,51,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,0.2868644009071751,True,compatible
+core,duffing,iid,52,51,e0:reference,"[['u', [['power', 1.0]]]]",False,original,0.8756779901876052,True,compatible
+core,duffing,iid,52,51,e0:reference,"[['u', [['power', 3.0]]]]",False,original,0.5903866737085264,True,compatible
+core,duffing,iid,52,51,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",False,original,0.5552824651206681,True,compatible
+core,duffing,iid,53,51,e0:reference,,True,original,0.5717720110117472,True,compatible
+core,duffing,iid,53,51,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,0.7786646102845722,True,compatible
+core,duffing,iid,53,51,e0:reference,"[['u', [['power', 1.0]]]]",False,original,1.5585319233957697,False,compatible
+core,duffing,iid,53,51,e0:reference,"[['u', [['power', 3.0]]]]",False,original,0.800424320197439,True,compatible
+core,duffing,iid,53,51,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",False,original,0.9001737941764173,True,compatible
+core,duffing,iid,51,52,e0:reference,,True,original,0.22465940311499003,True,compatible
+core,duffing,iid,51,52,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,0.8664138101842109,True,compatible
+core,duffing,iid,51,52,e0:reference,"[['u', [['power', 1.0]]]]",False,original,0.9978965303217784,True,compatible
+core,duffing,iid,51,52,e0:reference,"[['u', [['power', 3.0]]]]",False,original,0.3012905884612632,True,compatible
+core,duffing,iid,51,52,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",False,original,1.2110519718687338,False,compatible
+core,duffing,iid,53,52,e0:reference,,True,original,0.15718672942584697,True,compatible
+core,duffing,iid,53,52,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,0.8530978215385956,True,compatible
+core,duffing,iid,53,52,e0:reference,"[['u', [['power', 1.0]]]]",False,original,0.9829149554490512,True,compatible
+core,duffing,iid,53,52,e0:reference,"[['u', [['power', 3.0]]]]",False,original,0.21412976599883052,True,compatible
+core,duffing,iid,53,52,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",False,original,0.8018890004927903,True,compatible
+core,duffing,iid,51,53,e0:reference,,True,original,0.4150202999309937,True,compatible
+core,duffing,iid,51,53,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,0.9368746394786284,True,compatible
+core,duffing,iid,51,53,e0:reference,"[['u', [['power', 1.0]]]]",False,original,1.309177935579228,False,compatible
+core,duffing,iid,51,53,e0:reference,"[['u', [['power', 3.0]]]]",False,original,0.5990554637340649,True,compatible
+core,duffing,iid,51,53,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",False,original,1.518828028344934,False,compatible
+core,duffing,iid,52,53,e0:reference,,True,original,0.18204380681973814,True,compatible
+core,duffing,iid,52,53,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,0.4108885960032458,True,compatible
+core,duffing,iid,52,53,e0:reference,"[['u', [['power', 1.0]]]]",False,original,1.0899485062590029,False,compatible
+core,duffing,iid,52,53,e0:reference,"[['u', [['power', 3.0]]]]",False,original,0.20366860959147984,True,compatible
+core,duffing,iid,52,53,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",False,original,0.8400358249244793,True,compatible
+core,kdv_cossin,iid,52,51,e0:reference,,True,original,0.5033926690896084,True,compatible
+core,kdv_cossin,iid,52,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.48244998550462925,True,compatible
+core,kdv_cossin,iid,52,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.9468729058867558,True,compatible
+core,kdv_cossin,iid,53,51,e0:reference,,True,original,0.4472296107453611,True,compatible
+core,kdv_cossin,iid,53,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.44539359125643513,True,compatible
+core,kdv_cossin,iid,53,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.5432271658133008,True,compatible
+core,kdv_cossin,iid,51,52,e0:reference,,True,original,0.37870992586185415,True,compatible
+core,kdv_cossin,iid,51,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.3582419379541286,True,compatible
+core,kdv_cossin,iid,51,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.8075011569787718,True,compatible
+core,kdv_cossin,iid,53,52,e0:reference,,True,original,0.40539055339991936,True,compatible
+core,kdv_cossin,iid,53,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.40660541403127737,True,compatible
+core,kdv_cossin,iid,53,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.5461376263258007,True,compatible
+core,kdv_cossin,iid,51,53,e0:reference,,True,original,0.1975595820373216,True,compatible
+core,kdv_cossin,iid,51,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.19773459637414834,True,compatible
+core,kdv_cossin,iid,51,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3248519569730873,True,compatible
+core,kdv_cossin,iid,52,53,e0:reference,,True,original,0.21804300378100783,True,compatible
+core,kdv_cossin,iid,52,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.21179791028018144,True,compatible
+core,kdv_cossin,iid,52,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3977922406380971,True,compatible
+core,kdv_cossin,negative,52,51,e0:reference,,True,original,1.4214841601862405,False,compatible
+core,kdv_cossin,negative,52,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,1.7929845786461167,False,compatible
+core,kdv_cossin,negative,52,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.6077418302005014,True,compatible
+core,kdv_cossin,negative,53,51,e0:reference,,True,original,0.7300602043270686,True,compatible
+core,kdv_cossin,negative,53,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.8789143564857276,True,compatible
+core,kdv_cossin,negative,53,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.5783132698496036,True,compatible
+core,kdv_cossin,negative,51,52,e0:reference,,True,original,0.219736976945181,True,compatible
+core,kdv_cossin,negative,51,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.23554629720345985,True,compatible
+core,kdv_cossin,negative,51,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.22260591500417073,True,compatible
+core,kdv_cossin,negative,53,52,e0:reference,,True,original,0.29959727971634975,True,compatible
+core,kdv_cossin,negative,53,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.38073371713831794,True,compatible
+core,kdv_cossin,negative,53,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.22379164136404026,True,compatible
+core,kdv_cossin,negative,51,53,e0:reference,,True,original,0.19469898540602354,True,compatible
+core,kdv_cossin,negative,51,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.1947360886104702,True,compatible
+core,kdv_cossin,negative,51,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.193622340545637,True,compatible
+core,kdv_cossin,negative,52,53,e0:reference,,True,original,0.6739995157488613,True,compatible
+core,kdv_cossin,negative,52,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.8860384233776986,True,compatible
+core,kdv_cossin,negative,52,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.19360727269574668,True,compatible
+core,kdv_cossin,positive,52,51,e0:reference,,True,original,0.28648294037035243,True,compatible
+core,kdv_cossin,positive,52,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.2569019973077952,True,compatible
+core,kdv_cossin,positive,52,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.7810113545813067,True,compatible
+core,kdv_cossin,positive,53,51,e0:reference,,True,original,0.24572625525967437,True,compatible
+core,kdv_cossin,positive,53,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.25594436035000057,True,compatible
+core,kdv_cossin,positive,53,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.464556744984617,True,compatible
+core,kdv_cossin,positive,51,52,e0:reference,,True,original,0.3675894682132089,True,compatible
+core,kdv_cossin,positive,51,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.32363699480550684,True,compatible
+core,kdv_cossin,positive,51,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.7814765517161097,True,compatible
+core,kdv_cossin,positive,53,52,e0:reference,,True,original,0.2828585111317909,True,compatible
+core,kdv_cossin,positive,53,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.27536903726504286,True,compatible
+core,kdv_cossin,positive,53,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3718838510369638,True,compatible
+core,kdv_cossin,positive,51,53,e0:reference,,True,original,0.21150885749642925,True,compatible
+core,kdv_cossin,positive,51,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.2058938899853873,True,compatible
+core,kdv_cossin,positive,51,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.71551082127111,True,compatible
+core,kdv_cossin,positive,52,53,e0:reference,,True,original,0.17572237019548173,True,compatible
+core,kdv_cossin,positive,52,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.16755581784065016,True,compatible
+core,kdv_cossin,positive,52,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.5361675241828007,True,compatible
+core,kdv,iid,52,51,e0:reference,,True,original,0.10240782266716345,True,compatible
+core,kdv,iid,53,51,e0:reference,,True,original,0.10409153691416888,True,compatible
+core,kdv,iid,51,52,e0:reference,,True,original,0.23539920864756111,True,compatible
+core,kdv,iid,53,52,e0:reference,,True,original,0.23959989772463525,True,compatible
+core,kdv,iid,51,53,e0:reference,,True,original,0.1083151501090424,True,compatible
+core,kdv,iid,52,53,e0:reference,,True,original,0.10846728430637523,True,compatible
+core,ks,iid,52,51,e0:reference,,True,original,0.9475758399824408,True,compatible
+core,ks,iid,53,51,e0:reference,,True,original,0.5095594102620473,True,compatible
+core,ks,iid,51,52,e0:reference,,True,original,0.8577179988912156,True,compatible
+core,ks,iid,53,52,e0:reference,,True,original,0.22764406876041793,True,compatible
+core,ks,iid,51,53,e0:reference,,True,original,0.4004212754449733,True,compatible
+core,ks,iid,52,53,e0:reference,,True,original,0.18036195018990714,True,compatible
+core,ks,negative,52,51,e0:reference,,True,original,0.1999848379695831,True,compatible
+core,ks,negative,53,51,e0:reference,,True,original,0.17061964601333757,True,compatible
+core,ks,negative,51,52,e0:reference,,True,original,0.18531297652069306,True,compatible
+core,ks,negative,53,52,e0:reference,,True,original,0.18841490186123547,True,compatible
+core,ks,negative,51,53,e0:reference,,True,original,0.17584577993291892,True,compatible
+core,ks,negative,52,53,e0:reference,,True,original,0.20349670546812332,True,compatible
+core,ks,positive,52,51,e0:reference,,True,original,0.47266714218612704,True,compatible
+core,ks,positive,53,51,e0:reference,,True,original,0.5589021559210208,True,compatible
+core,ks,positive,51,52,e0:reference,,True,original,0.32428549726158107,True,compatible
+core,ks,positive,53,52,e0:reference,,True,original,0.47182335593450325,True,compatible
+core,ks,positive,51,53,e0:reference,,True,original,0.4587623060011517,True,compatible
+core,ks,positive,52,53,e0:reference,,True,original,0.22433897939293726,True,compatible
+core,lorenz,iid,52,51,e0:reference,,True,original,0.04044597051419564,True,compatible
+core,lorenz,iid,52,51,e1:reference,,True,original,0.03894467659871487,True,compatible
+core,lorenz,iid,52,51,e1:reference,"[['v', [['power', 1.0]]]]",False,original,0.09396352420279949,True,compatible
+core,lorenz,iid,52,51,e2:reference,,True,original,0.15260216874811236,True,compatible
+core,lorenz,iid,53,51,e0:reference,,True,original,0.07524781087146272,True,compatible
+core,lorenz,iid,53,51,e1:reference,,True,original,0.04003113206949379,True,compatible
+core,lorenz,iid,53,51,e1:reference,"[['v', [['power', 1.0]]]]",False,original,0.07610380211152727,True,compatible
+core,lorenz,iid,53,51,e2:reference,,True,original,0.09572659244648334,True,compatible
+core,lorenz,iid,51,52,e0:reference,,True,original,0.03713090636885081,True,compatible
+core,lorenz,iid,51,52,e1:reference,,True,original,0.03745061837900618,True,compatible
+core,lorenz,iid,51,52,e1:reference,"[['v', [['power', 1.0]]]]",False,original,0.07706917212046842,True,compatible
+core,lorenz,iid,51,52,e2:reference,,True,original,0.15338739489767594,True,compatible
+core,lorenz,iid,53,52,e0:reference,,True,original,0.053111731246497186,True,compatible
+core,lorenz,iid,53,52,e1:reference,,True,original,0.037867501656658274,True,compatible
+core,lorenz,iid,53,52,e1:reference,"[['v', [['power', 1.0]]]]",False,original,0.07398910555103547,True,compatible
+core,lorenz,iid,53,52,e2:reference,,True,original,0.04590095158962226,True,compatible
+core,lorenz,iid,51,53,e0:reference,,True,original,0.04713646633284983,True,compatible
+core,lorenz,iid,51,53,e1:reference,,True,original,0.04407091493084517,True,compatible
+core,lorenz,iid,51,53,e1:reference,"[['v', [['power', 1.0]]]]",False,original,0.07978824617429087,True,compatible
+core,lorenz,iid,51,53,e2:reference,,True,original,0.09223017099712076,True,compatible
+core,lorenz,iid,52,53,e0:reference,,True,original,0.041862982923912995,True,compatible
+core,lorenz,iid,52,53,e1:reference,,True,original,0.0496461900637572,True,compatible
+core,lorenz,iid,52,53,e1:reference,"[['v', [['power', 1.0]]]]",False,original,0.07312116563319516,True,compatible
+core,lorenz,iid,52,53,e2:reference,,True,original,0.07590154795909435,True,compatible
+core,lv,iid,52,51,e0:reference,,True,original,0.06347885922287183,True,compatible
+core,lv,iid,52,51,e1:reference,,True,original,0.11064197368166719,True,compatible
+core,lv,iid,53,51,e0:reference,,True,original,0.10315005529221838,True,compatible
+core,lv,iid,53,51,e1:reference,,True,original,0.13194594764561537,True,compatible
+core,lv,iid,51,52,e0:reference,,True,original,0.04973885330017764,True,compatible
+core,lv,iid,51,52,e1:reference,,True,original,0.06519089246118975,True,compatible
+core,lv,iid,53,52,e0:reference,,True,original,0.029603103506434063,True,compatible
+core,lv,iid,53,52,e1:reference,,True,original,0.040706255087143685,True,compatible
+core,lv,iid,51,53,e0:reference,,True,original,0.1121920614567494,True,compatible
+core,lv,iid,51,53,e1:reference,,True,original,0.12177613306395657,True,compatible
+core,lv,iid,52,53,e0:reference,,True,original,0.042767125054006296,True,compatible
+core,lv,iid,52,53,e1:reference,,True,original,0.04864026321566798,True,compatible
+core,ns,iid,52,51,e0:reference,,True,original,0.1725305866143826,True,compatible
+core,ns,iid,52,51,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",False,original,0.2939343512124624,True,compatible
+core,ns,iid,52,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.5710744593637174,True,compatible
+core,ns,iid,52,51,e1:reference,,True,original,0.17179265508570393,True,compatible
+core,ns,iid,52,51,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",False,original,0.29554698521768974,True,compatible
+core,ns,iid,52,51,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",False,original,0.2156598561385357,True,compatible
+core,ns,iid,52,51,e2:reference,,True,original,0.19214600068956053,True,compatible
+core,ns,iid,53,51,e0:reference,,True,original,0.16767118390413308,True,compatible
+core,ns,iid,53,51,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",False,original,0.2694793612512435,True,compatible
+core,ns,iid,53,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.509319837491852,True,compatible
+core,ns,iid,53,51,e1:reference,,True,original,0.17231066112884447,True,compatible
+core,ns,iid,53,51,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",False,original,0.3086436077000986,True,compatible
+core,ns,iid,53,51,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",False,original,0.20445991174618955,True,compatible
+core,ns,iid,53,51,e2:reference,,True,original,0.18832505714365827,True,compatible
+core,ns,iid,51,52,e0:reference,,True,original,0.27541301581865957,True,compatible
+core,ns,iid,51,52,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",False,original,0.4484840043659525,True,compatible
+core,ns,iid,51,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.5155053574896471,True,compatible
+core,ns,iid,51,52,e1:reference,,True,original,0.20676057627659505,True,compatible
+core,ns,iid,51,52,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",False,original,0.32787231656411997,True,compatible
+core,ns,iid,51,52,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",False,original,0.272050943026895,True,compatible
+core,ns,iid,51,52,e2:reference,,True,original,0.1499989134166504,True,compatible
+core,ns,iid,53,52,e0:reference,,True,original,0.21978880770400017,True,compatible
+core,ns,iid,53,52,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",False,original,0.3910321449895358,True,compatible
+core,ns,iid,53,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.4798268946402213,True,compatible
+core,ns,iid,53,52,e1:reference,,True,original,0.2058806251772336,True,compatible
+core,ns,iid,53,52,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",False,original,0.3184711327386732,True,compatible
+core,ns,iid,53,52,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",False,original,0.2799175687045081,True,compatible
+core,ns,iid,53,52,e2:reference,,True,original,0.15685668880062034,True,compatible
+core,ns,iid,51,53,e0:reference,,True,original,0.23447678793552598,True,compatible
+core,ns,iid,51,53,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",False,original,0.3707271065617841,True,compatible
+core,ns,iid,51,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.5473875787289331,True,compatible
+core,ns,iid,51,53,e1:reference,,True,original,0.13093046227098792,True,compatible
+core,ns,iid,51,53,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",False,original,0.2274201870913098,True,compatible
+core,ns,iid,51,53,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",False,original,0.1780194559158457,True,compatible
+core,ns,iid,51,53,e2:reference,,True,original,0.14997721762694138,True,compatible
+core,ns,iid,52,53,e0:reference,,True,original,0.21288259573048493,True,compatible
+core,ns,iid,52,53,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",False,original,0.3437036540829391,True,compatible
+core,ns,iid,52,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.5591592853063709,True,compatible
+core,ns,iid,52,53,e1:reference,,True,original,0.1319443922716891,True,compatible
+core,ns,iid,52,53,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",False,original,0.22371741869962758,True,compatible
+core,ns,iid,52,53,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",False,original,0.1874009563267304,True,compatible
+core,ns,iid,52,53,e2:reference,,True,original,0.1929005759328532,True,compatible
+core,ode,iid,52,51,e0:reference,,True,original,0.5147579141306858,True,compatible
+core,ode,iid,52,51,e0:reference,"[['du/dx0', [['power', 1.0]]], ['sin', [['dim', 0.0], ['freq', 2.0], ['power', 1.0]]]]",False,original,2.12942471170188,False,excluded
+core,ode,iid,53,51,e0:reference,,True,original,0.21401941512676606,True,compatible
+core,ode,iid,51,52,e0:reference,,True,original,0.08328316240211421,True,compatible
+core,ode,iid,53,52,e0:reference,,True,original,0.07395083798852646,True,compatible
+core,ode,iid,51,53,e0:reference,,True,original,0.1809522314583285,True,compatible
+core,ode,iid,52,53,e0:reference,,True,original,0.4533027422370752,True,compatible
+core,ode,iid,52,53,e0:reference,"[['du/dx0', [['power', 1.0]]], ['sin', [['dim', 0.0], ['freq', 2.0], ['power', 1.0]]]]",False,original,2.8450298689460896,False,excluded
+core,pde_compound,iid,52,51,e0:reference,,True,original,0.18571579391458579,True,compatible
+core,pde_compound,iid,52,51,e0:reference,"[['du/dx1', [['power', 2.0]]]]",False,original,0.4912392554593267,True,compatible
+core,pde_compound,iid,53,51,e0:reference,,True,original,0.18529438617512622,True,compatible
+core,pde_compound,iid,53,51,e0:reference,"[['du/dx1', [['power', 2.0]]]]",False,original,0.47772605275187957,True,compatible
+core,pde_compound,iid,51,52,e0:reference,,True,original,0.41928120854827106,True,compatible
+core,pde_compound,iid,51,52,e0:reference,"[['du/dx1', [['power', 2.0]]]]",False,original,0.9290461479351827,True,compatible
+core,pde_compound,iid,53,52,e0:reference,,True,original,0.41109054034267034,True,compatible
+core,pde_compound,iid,53,52,e0:reference,"[['du/dx1', [['power', 2.0]]]]",False,original,0.8930466357553011,True,compatible
+core,pde_compound,iid,51,53,e0:reference,,True,original,0.18150526971591743,True,compatible
+core,pde_compound,iid,51,53,e0:reference,"[['du/dx1', [['power', 2.0]]]]",False,original,0.5318226464783012,True,compatible
+core,pde_compound,iid,52,53,e0:reference,,True,original,0.18169776180791486,True,compatible
+core,pde_compound,iid,52,53,e0:reference,"[['du/dx1', [['power', 2.0]]]]",False,original,0.5175037123761203,True,compatible
+core,pde_divide,iid,52,51,e0:reference,,True,original,0.2038413976756146,True,compatible
+core,pde_divide,iid,53,51,e0:reference,,True,original,0.1888712282219358,True,compatible
+core,pde_divide,iid,51,52,e0:reference,,True,original,0.2568629392719438,True,compatible
+core,pde_divide,iid,53,52,e0:reference,,True,original,0.18984320905096436,True,compatible
+core,pde_divide,iid,51,53,e0:reference,,True,original,0.212036471604449,True,compatible
+core,pde_divide,iid,52,53,e0:reference,,True,original,0.16234417080892335,True,compatible
+core,vdp,iid,52,51,e0:reference,,True,original,0.1421355228211493,True,compatible
+core,vdp,iid,52,51,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",False,original,0.6445332769608342,True,compatible
+core,vdp,iid,53,51,e0:reference,,True,original,0.1600345439335731,True,compatible
+core,vdp,iid,53,51,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",False,original,0.6637001297729692,True,compatible
+core,vdp,iid,53,51,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,1.4911854532204618,False,excluded
+core,vdp,iid,51,52,e0:reference,,True,original,0.142331044711045,True,compatible
+core,vdp,iid,51,52,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",False,original,0.5235399519090068,True,compatible
+core,vdp,iid,53,52,e0:reference,,True,original,0.10482062775933093,True,compatible
+core,vdp,iid,53,52,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",False,original,0.47681694447122247,True,compatible
+core,vdp,iid,53,52,e0:reference,"[['du/dx0', [['power', 1.0]]]]",False,original,1.0239000930982631,False,excluded
+core,vdp,iid,51,53,e0:reference,,True,original,0.09631873566254173,True,compatible
+core,vdp,iid,51,53,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",False,original,0.4203161583903792,True,compatible
+core,vdp,iid,52,53,e0:reference,,True,original,0.07853779922682844,True,compatible
+core,vdp,iid,52,53,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",False,original,0.42208029552164855,True,compatible
+core,wave,iid,52,51,e0:reference,,True,original,0.2506101766403637,True,compatible
+core,wave,iid,52,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.9344964307358653,True,compatible
+core,wave,iid,53,51,e0:reference,,True,original,0.25618048050610626,True,compatible
+core,wave,iid,51,52,e0:reference,,True,original,0.08744696249105169,True,compatible
+core,wave,iid,51,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.9711875815249131,True,compatible
+core,wave,iid,53,52,e0:reference,,True,original,0.08754907895528007,True,compatible
+core,wave,iid,51,53,e0:reference,,True,original,0.1673908414700285,True,compatible
+core,wave,iid,51,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,1.26361484311904,False,excluded
+core,wave,iid,52,53,e0:reference,,True,original,0.1656210277509985,True,compatible
+core,wave,iid,52,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,1.26361484311904,False,excluded
+core,wave,negative,52,51,e0:reference,,True,original,0.20821457636472318,True,compatible
+core,wave,negative,53,51,e0:reference,,True,original,0.20821108608585415,True,compatible
+core,wave,negative,51,52,e0:reference,,True,original,0.1465988092761911,True,compatible
+core,wave,negative,53,52,e0:reference,,True,original,0.14664925127749928,True,compatible
+core,wave,negative,51,53,e0:reference,,True,original,0.07382831446156474,True,compatible
+core,wave,negative,52,53,e0:reference,,True,original,0.07426422708372975,True,compatible
+core,wave,positive,52,51,e0:reference,,True,original,0.1028182913500332,True,compatible
+core,wave,positive,52,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3523971894778515,True,compatible
+core,wave,positive,53,51,e0:reference,,True,original,0.10346136221199899,True,compatible
+core,wave,positive,53,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.3523971894778515,True,compatible
+core,wave,positive,51,52,e0:reference,,True,original,0.10497671451307014,True,compatible
+core,wave,positive,51,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.27034734419423884,True,compatible
+core,wave,positive,53,52,e0:reference,,True,original,0.108079050457749,True,compatible
+core,wave,positive,53,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.27034734419423884,True,compatible
+core,wave,positive,51,53,e0:reference,,True,original,0.09017570259141162,True,compatible
+core,wave,positive,51,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.23779262637085288,True,compatible
+core,wave,positive,52,53,e0:reference,,True,original,0.08512721234400121,True,compatible
+core,wave,positive,52,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",False,original,0.23779262637085288,True,compatible
+k2,kdv_cossin,iid,55,54,e0:reference,,True,original,0.17720946646300026,True,compatible
+k2,kdv_cossin,iid,55,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.1772175490407424,True,compatible
+k2,kdv_cossin,iid,55,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.35157663577788906,True,compatible
+k2,kdv_cossin,iid,55,54,e0:reference,,True,all_three,0.18303659259842067,True,compatible
+k2,kdv_cossin,iid,55,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.18304666754444027,True,compatible
+k2,kdv_cossin,iid,55,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3515766357778889,True,compatible
+k2,kdv_cossin,iid,56,54,e0:reference,,True,original,0.27350552303165726,True,compatible
+k2,kdv_cossin,iid,56,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.2050940753163927,True,compatible
+k2,kdv_cossin,iid,56,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.6461490863153843,True,compatible
+k2,kdv_cossin,iid,56,54,e0:reference,,True,all_three,0.27339863348431526,True,compatible
+k2,kdv_cossin,iid,56,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.20503512030961987,True,compatible
+k2,kdv_cossin,iid,56,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.6461490863153843,True,compatible
+k2,kdv_cossin,iid,54,55,e0:reference,,True,original,0.2814750532900452,True,compatible
+k2,kdv_cossin,iid,54,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.27537620200955537,True,compatible
+k2,kdv_cossin,iid,54,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.29383014112511185,True,compatible
+k2,kdv_cossin,iid,54,55,e0:reference,,True,all_three,0.28130666784554703,True,compatible
+k2,kdv_cossin,iid,54,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.27520882519436457,True,compatible
+k2,kdv_cossin,iid,54,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.29369774248991726,True,compatible
+k2,kdv_cossin,iid,56,55,e0:reference,,True,original,0.40920072736163454,True,compatible
+k2,kdv_cossin,iid,56,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.3686539261664087,True,compatible
+k2,kdv_cossin,iid,56,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.6300006454062479,True,compatible
+k2,kdv_cossin,iid,56,55,e0:reference,,True,all_three,0.4088317080967521,True,compatible
+k2,kdv_cossin,iid,56,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.3683543551247041,True,compatible
+k2,kdv_cossin,iid,56,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.6297167697449421,True,compatible
+k2,kdv_cossin,iid,54,56,e0:reference,,True,original,0.40279046489178577,True,compatible
+k2,kdv_cossin,iid,54,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.36878979457887534,True,compatible
+k2,kdv_cossin,iid,54,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.4258177999379301,True,compatible
+k2,kdv_cossin,iid,54,56,e0:reference,,True,all_three,0.40283308764114006,True,compatible
+k2,kdv_cossin,iid,54,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.36883548971474,True,compatible
+k2,kdv_cossin,iid,54,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.4258177999379301,True,compatible
+k2,kdv_cossin,iid,55,56,e0:reference,,True,original,0.3898964724891091,True,compatible
+k2,kdv_cossin,iid,55,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.3945724755044485,True,compatible
+k2,kdv_cossin,iid,55,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.41510235907707016,True,compatible
+k2,kdv_cossin,iid,55,56,e0:reference,,True,all_three,0.38989609641326556,True,compatible
+k2,kdv_cossin,iid,55,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.39456970636133193,True,compatible
+k2,kdv_cossin,iid,55,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.41510235907707016,True,compatible
+k2,kdv_cossin,negative,55,54,e0:reference,,True,original,0.23416903948904874,True,compatible
+k2,kdv_cossin,negative,55,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.23383311282341168,True,compatible
+k2,kdv_cossin,negative,55,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.27726794033060115,True,compatible
+k2,kdv_cossin,negative,55,54,e0:reference,,True,all_three,0.28447972152512196,True,compatible
+k2,kdv_cossin,negative,55,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.28190212606218673,True,compatible
+k2,kdv_cossin,negative,55,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.30347573477296924,True,compatible
+k2,kdv_cossin,negative,56,54,e0:reference,,True,original,1.0579298255859877,False,compatible
+k2,kdv_cossin,negative,56,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,1.0577773497419898,False,compatible
+k2,kdv_cossin,negative,56,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.34204684613394937,True,compatible
+k2,kdv_cossin,negative,56,54,e0:reference,,True,all_three,1.057929825585987,False,compatible
+k2,kdv_cossin,negative,56,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,1.0577773497419902,False,compatible
+k2,kdv_cossin,negative,56,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3420468461339486,True,compatible
+k2,kdv_cossin,negative,54,55,e0:reference,,True,original,0.3145004316723269,True,compatible
+k2,kdv_cossin,negative,54,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.32127998213721387,True,compatible
+k2,kdv_cossin,negative,54,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.5620269135651776,True,compatible
+k2,kdv_cossin,negative,54,55,e0:reference,,True,all_three,0.31452309813561413,True,compatible
+k2,kdv_cossin,negative,54,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.32130444142358144,True,compatible
+k2,kdv_cossin,negative,54,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.5620269135651776,True,compatible
+k2,kdv_cossin,negative,56,55,e0:reference,,True,original,1.3839845731353078,False,compatible
+k2,kdv_cossin,negative,56,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,1.3839388606116876,False,compatible
+k2,kdv_cossin,negative,56,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.6743532391616375,True,compatible
+k2,kdv_cossin,negative,56,55,e0:reference,,True,all_three,1.3839845731353067,False,compatible
+k2,kdv_cossin,negative,56,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,1.3839388606116878,False,compatible
+k2,kdv_cossin,negative,56,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.6743532391616364,True,compatible
+k2,kdv_cossin,negative,54,56,e0:reference,,True,original,0.28749703903901097,True,compatible
+k2,kdv_cossin,negative,54,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.28765629590256014,True,compatible
+k2,kdv_cossin,negative,54,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.28846526858624366,True,compatible
+k2,kdv_cossin,negative,54,56,e0:reference,,True,all_three,0.25860324966740783,True,compatible
+k2,kdv_cossin,negative,54,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2587465334288645,True,compatible
+k2,kdv_cossin,negative,54,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.2594738065876026,True,compatible
+k2,kdv_cossin,negative,55,56,e0:reference,,True,original,0.412020886711306,True,compatible
+k2,kdv_cossin,negative,55,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.39219509109471845,True,compatible
+k2,kdv_cossin,negative,55,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.2893717330648514,True,compatible
+k2,kdv_cossin,negative,55,56,e0:reference,,True,all_three,0.37049269569561827,True,compatible
+k2,kdv_cossin,negative,55,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.35265490083484063,True,compatible
+k2,kdv_cossin,negative,55,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.2602891691785777,True,compatible
+k2,kdv_cossin,positive,55,54,e0:reference,,True,original,0.4614042760633524,True,compatible
+k2,kdv_cossin,positive,55,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.5254697202717546,True,compatible
+k2,kdv_cossin,positive,55,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.289669780258833,True,compatible
+k2,kdv_cossin,positive,55,54,e0:reference,,True,all_three,0.4614042760633524,True,compatible
+k2,kdv_cossin,positive,55,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.5254697202717546,True,compatible
+k2,kdv_cossin,positive,55,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.289669780258833,True,compatible
+k2,kdv_cossin,positive,56,54,e0:reference,,True,original,0.2894139582998857,True,compatible
+k2,kdv_cossin,positive,56,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.2893118110679213,True,compatible
+k2,kdv_cossin,positive,56,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.34477958434523354,True,compatible
+k2,kdv_cossin,positive,56,54,e0:reference,,True,all_three,0.2894148067634875,True,compatible
+k2,kdv_cossin,positive,56,54,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2893121031133859,True,compatible
+k2,kdv_cossin,positive,56,54,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3447795843452336,True,compatible
+k2,kdv_cossin,positive,54,55,e0:reference,,True,original,0.2456184083589842,True,compatible
+k2,kdv_cossin,positive,54,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.24564657060047335,True,compatible
+k2,kdv_cossin,positive,54,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.32760324956781367,True,compatible
+k2,kdv_cossin,positive,54,55,e0:reference,,True,all_three,0.2456186866310633,True,compatible
+k2,kdv_cossin,positive,54,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.24564681106555952,True,compatible
+k2,kdv_cossin,positive,54,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.32760324956781367,True,compatible
+k2,kdv_cossin,positive,56,55,e0:reference,,True,original,0.2456831869062897,True,compatible
+k2,kdv_cossin,positive,56,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.24556792029082472,True,compatible
+k2,kdv_cossin,positive,56,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3289539374642401,True,compatible
+k2,kdv_cossin,positive,56,55,e0:reference,,True,all_three,0.24568774218545142,True,compatible
+k2,kdv_cossin,positive,56,55,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.24557186688334381,True,compatible
+k2,kdv_cossin,positive,56,55,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3289539374642401,True,compatible
+k2,kdv_cossin,positive,54,56,e0:reference,,True,original,0.2647098739981304,True,compatible
+k2,kdv_cossin,positive,54,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.26473004196017436,True,compatible
+k2,kdv_cossin,positive,54,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3225971205418949,True,compatible
+k2,kdv_cossin,positive,54,56,e0:reference,,True,all_three,0.2730891494938611,True,compatible
+k2,kdv_cossin,positive,54,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2728500045885314,True,compatible
+k2,kdv_cossin,positive,54,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3049801077571533,True,compatible
+k2,kdv_cossin,positive,55,56,e0:reference,,True,original,0.5040418602576366,True,compatible
+k2,kdv_cossin,positive,55,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.6005579550956123,True,compatible
+k2,kdv_cossin,positive,55,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.26454454776822134,True,compatible
+k2,kdv_cossin,positive,55,56,e0:reference,,True,all_three,0.4765161592182483,True,compatible
+k2,kdv_cossin,positive,55,56,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.5677615148945173,True,compatible
+k2,kdv_cossin,positive,55,56,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.2752338283362899,True,compatible
+k4,kdv_cossin,iid,58,57,e0:reference,,True,original,0.1422817551167854,True,compatible
+k4,kdv_cossin,iid,58,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.14207845156060936,True,compatible
+k4,kdv_cossin,iid,58,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.2795719189268499,True,compatible
+k4,kdv_cossin,iid,58,57,e0:reference,,True,all_three,0.1543470152591582,True,compatible
+k4,kdv_cossin,iid,58,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.15408825807356885,True,compatible
+k4,kdv_cossin,iid,58,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.2795719189268499,True,compatible
+k4,kdv_cossin,iid,59,57,e0:reference,,True,original,0.1429436131606854,True,compatible
+k4,kdv_cossin,iid,59,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.1427532267588894,True,compatible
+k4,kdv_cossin,iid,59,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.253631989916643,True,compatible
+k4,kdv_cossin,iid,59,57,e0:reference,,True,all_three,0.15427420177923504,True,compatible
+k4,kdv_cossin,iid,59,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.1540458234373348,True,compatible
+k4,kdv_cossin,iid,59,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.253631989916643,True,compatible
+k4,kdv_cossin,iid,57,58,e0:reference,,True,original,0.26339793352235263,True,compatible
+k4,kdv_cossin,iid,57,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22119591558002813,True,compatible
+k4,kdv_cossin,iid,57,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.24267314365695908,True,compatible
+k4,kdv_cossin,iid,57,58,e0:reference,,True,all_three,0.2633996398891497,True,compatible
+k4,kdv_cossin,iid,57,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.22119478387168204,True,compatible
+k4,kdv_cossin,iid,57,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.24267314365695908,True,compatible
+k4,kdv_cossin,iid,59,58,e0:reference,,True,original,0.2019451442314457,True,compatible
+k4,kdv_cossin,iid,59,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.208651683809004,True,compatible
+k4,kdv_cossin,iid,59,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.22209301785550295,True,compatible
+k4,kdv_cossin,iid,59,58,e0:reference,,True,all_three,0.20184294299426242,True,compatible
+k4,kdv_cossin,iid,59,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.20855175178894256,True,compatible
+k4,kdv_cossin,iid,59,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.22209301785550295,True,compatible
+k4,kdv_cossin,iid,57,59,e0:reference,,True,original,0.22393218252640773,True,compatible
+k4,kdv_cossin,iid,57,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22379934048674616,True,compatible
+k4,kdv_cossin,iid,57,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.28499452990257307,True,compatible
+k4,kdv_cossin,iid,57,59,e0:reference,,True,all_three,0.26031306938346815,True,compatible
+k4,kdv_cossin,iid,57,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2603740538742047,True,compatible
+k4,kdv_cossin,iid,57,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.28499452990257307,True,compatible
+k4,kdv_cossin,iid,58,59,e0:reference,,True,original,0.22374103352144692,True,compatible
+k4,kdv_cossin,iid,58,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22380380747961695,True,compatible
+k4,kdv_cossin,iid,58,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.341156800948579,True,compatible
+k4,kdv_cossin,iid,58,59,e0:reference,,True,all_three,0.2603582138819486,True,compatible
+k4,kdv_cossin,iid,58,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.26002714921559356,True,compatible
+k4,kdv_cossin,iid,58,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.341156800948579,True,compatible
+k4,kdv_cossin,negative,58,57,e0:reference,,True,original,0.22792084270447371,True,compatible
+k4,kdv_cossin,negative,58,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22802580551189122,True,compatible
+k4,kdv_cossin,negative,58,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3060377832643873,True,compatible
+k4,kdv_cossin,negative,58,57,e0:reference,,True,all_three,0.22792080056774075,True,compatible
+k4,kdv_cossin,negative,58,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.22802576737006358,True,compatible
+k4,kdv_cossin,negative,58,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3060377832643873,True,compatible
+k4,kdv_cossin,negative,59,57,e0:reference,,True,original,0.23028298689854645,True,compatible
+k4,kdv_cossin,negative,59,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.2281218846596221,True,compatible
+k4,kdv_cossin,negative,59,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3775936908663213,True,compatible
+k4,kdv_cossin,negative,59,57,e0:reference,,True,all_three,0.23009540742448883,True,compatible
+k4,kdv_cossin,negative,59,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.22812165365610657,True,compatible
+k4,kdv_cossin,negative,59,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3775936908663213,True,compatible
+k4,kdv_cossin,negative,57,58,e0:reference,,True,original,0.22043817709538188,True,compatible
+k4,kdv_cossin,negative,57,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22034078544233335,True,compatible
+k4,kdv_cossin,negative,57,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.3343222714485418,True,compatible
+k4,kdv_cossin,negative,57,58,e0:reference,,True,all_three,0.22043768688660306,True,compatible
+k4,kdv_cossin,negative,57,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2203403572099978,True,compatible
+k4,kdv_cossin,negative,57,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.3343222714485418,True,compatible
+k4,kdv_cossin,negative,59,58,e0:reference,,True,original,0.2209974579820055,True,compatible
+k4,kdv_cossin,negative,59,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22110745388163353,True,compatible
+k4,kdv_cossin,negative,59,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.397029765199043,True,compatible
+k4,kdv_cossin,negative,59,58,e0:reference,,True,all_three,0.22099617277795064,True,compatible
+k4,kdv_cossin,negative,59,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.22110625636345402,True,compatible
+k4,kdv_cossin,negative,59,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.397029765199043,True,compatible
+k4,kdv_cossin,negative,57,59,e0:reference,,True,original,0.38025770947322823,True,compatible
+k4,kdv_cossin,negative,57,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.37608049788085673,True,compatible
+k4,kdv_cossin,negative,57,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.8287725797919868,True,compatible
+k4,kdv_cossin,negative,57,59,e0:reference,,True,all_three,0.3803494116278754,True,compatible
+k4,kdv_cossin,negative,57,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.3761731319898868,True,compatible
+k4,kdv_cossin,negative,57,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.8287725797919868,True,compatible
+k4,kdv_cossin,negative,58,59,e0:reference,,True,original,0.3478916615858449,True,compatible
+k4,kdv_cossin,negative,58,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.3439240434431694,True,compatible
+k4,kdv_cossin,negative,58,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.7583670317809887,True,compatible
+k4,kdv_cossin,negative,58,59,e0:reference,,True,all_three,0.34800554256511385,True,compatible
+k4,kdv_cossin,negative,58,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.3440393334305986,True,compatible
+k4,kdv_cossin,negative,58,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.7583670317809887,True,compatible
+k4,kdv_cossin,positive,58,57,e0:reference,,True,original,0.32215791917577974,True,compatible
+k4,kdv_cossin,positive,58,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.3318810808152276,True,compatible
+k4,kdv_cossin,positive,58,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.33960281636754,True,compatible
+k4,kdv_cossin,positive,58,57,e0:reference,,True,all_three,0.32218398868746134,True,compatible
+k4,kdv_cossin,positive,58,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.33190363936814965,True,compatible
+k4,kdv_cossin,positive,58,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.33960281636754,True,compatible
+k4,kdv_cossin,positive,59,57,e0:reference,,True,original,0.35742774488759044,True,compatible
+k4,kdv_cossin,positive,59,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.37055566870481244,True,compatible
+k4,kdv_cossin,positive,59,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.7201483611418955,True,compatible
+k4,kdv_cossin,positive,59,57,e0:reference,,True,all_three,0.357308873032752,True,compatible
+k4,kdv_cossin,positive,59,57,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.37042706738350895,True,compatible
+k4,kdv_cossin,positive,59,57,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.7201483611418955,True,compatible
+k4,kdv_cossin,positive,57,58,e0:reference,,True,original,0.2048381928004024,True,compatible
+k4,kdv_cossin,positive,57,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.20432415588233596,True,compatible
+k4,kdv_cossin,positive,57,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.20450953801374142,True,compatible
+k4,kdv_cossin,positive,57,58,e0:reference,,True,all_three,0.2048366334862672,True,compatible
+k4,kdv_cossin,positive,57,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.20432289602352263,True,compatible
+k4,kdv_cossin,positive,57,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.20450950955743097,True,compatible
+k4,kdv_cossin,positive,59,58,e0:reference,,True,original,0.204092214708722,True,compatible
+k4,kdv_cossin,positive,59,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.20363323583618476,True,compatible
+k4,kdv_cossin,positive,59,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.4729551330917759,True,compatible
+k4,kdv_cossin,positive,59,58,e0:reference,,True,all_three,0.2040930392193006,True,compatible
+k4,kdv_cossin,positive,59,58,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2036340230239628,True,compatible
+k4,kdv_cossin,positive,59,58,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.4729551330917759,True,compatible
+k4,kdv_cossin,positive,57,59,e0:reference,,True,original,0.24196129936745545,True,compatible
+k4,kdv_cossin,positive,57,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.25217993317884235,True,compatible
+k4,kdv_cossin,positive,57,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.2293548826797224,True,compatible
+k4,kdv_cossin,positive,57,59,e0:reference,,True,all_three,0.2417829257983412,True,compatible
+k4,kdv_cossin,positive,57,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.2520147251596964,True,compatible
+k4,kdv_cossin,positive,57,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.22935492293199802,True,compatible
+k4,kdv_cossin,positive,58,59,e0:reference,,True,original,0.2293700603741965,True,compatible
+k4,kdv_cossin,positive,58,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,original,0.22946238194551116,True,compatible
+k4,kdv_cossin,positive,58,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,original,0.22933416876969503,True,compatible
+k4,kdv_cossin,positive,58,59,e0:reference,,True,all_three,0.22936934465319775,True,compatible
+k4,kdv_cossin,positive,58,59,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",False,all_three,0.22946179431428954,True,compatible
+k4,kdv_cossin,positive,58,59,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",False,all_three,0.22933416876969503,True,compatible

@@ -1,0 +1,192 @@
+Direct dyad replacement check and joint objective uncertainty
+2026-11-16
+
+Decision: keep the current dyad criterion provisionally. None of the tested
+replacements improves the primary matched structural screen. The next
+problem is calibrating uncertainty and improving biased fits, not promoting
+a new instability score on this evidence. The present bootstrap must not
+be interpreted as a probability that an equation is correct.
+
+1. Controlled replacement experiment
+
+All 15 default systems, seeds 0/1/2 at 5% observation noise: 45 records and
+60 equation/seed cases. These are REUSED full candidate panels. This is an
+objective-only comparison, not a new evolutionary search or independent
+confirmation. Candidates, main fitted coefficients, discrepancy scores,
+constants, and registered equivalents remain identical between criteria.
+All candidates share the original weak matrices and widest-candidate slab
+floor. Primary discrepancy/fits: q0_white128/joint. Strict Pareto comparison
+matches the historical screen; no tolerance or uncertainty penalty added.
+
+Second coordinate          Registered retained /60     Mean front size
+production dyad_sum                     56                   3.0833
+dyad_mean                               55                   2.9667
+prediction-space dyad                   49                   3.2000
+tile                                    55                   3.0500
+survival                                54                   3.0500
+chi2                                    54                   3.0333
+feature count                           55                   2.8000
+discrepancy alone                        21                   1.0000
+
+Every alternative loses at least one primary case and gains none. The
+prediction variant loses seven cases in six records despite retaining a
+slightly larger front. It removes division by individual coefficient
+medians, but that change does not preserve discrimination on this panel.
+Original-reference retention is 52/60 for dyad, 43/60 for prediction dyad;
+the headline count also credits registered equivalent equations.
+
+The seven prediction-dyad losses: burgers seed0; duffing seed1; lorenz
+seed0 equations0 and2, seed1 equation1; lv seed0 equation0; pde_divide
+seed1. Dyad_mean loses pde_divide seed0. Tile and feature count lose forced
+KdV seed2. Survival and chi2 also lose pde_compound seed0.
+
+Evidence for dyad over a simple complexity coordinate is modest: one
+primary case. In sensitivity controls q0_plain/joint and
+q0_white128/baseline, complexity retains 54 versus dyad's 53; tile retains
+54 versus 53 in the latter. There is no consistent alternative winner.
+This supports retaining dyad, not claiming it universally optimal.
+The four primary dyad failures remain AC seeds0/2 and forced KdV seeds0/1.
+
+Front size and composition are reported to avoid crediting a method merely
+for retaining more candidates. Unregistered candidates are not automatically
+incorrect laws. The stored clean_fit_energy fields are historical local
+baseline-fit diagnostics, not the frozen joint-risk coefficients; they
+must not be read as the accuracy of the joint-risk fits used in this ablation.
+
+2. Conditional uncertainty experiment
+
+Twenty selected records: AC, forced KdV, KS and wave at all three seeds,
+plus every other record where a nontrivial alternative changes primary
+registered retention. These contain 25 equation/seed cases and 382
+unregistered-competitor/reference pairs. Selection is diagnostic, not an
+independent confirmatory sample.
+
+Each record uses 128 parametric measurements around its reconstructed
+pilot and estimated AR noise model, plus 128 fresh benchmark measurements
+of the clean field at the actual 5% iid noise level: 5,120 measurements
+total. The same field noise enters both objectives and all candidates.
+Every dyad slab fit is recomputed. Main candidate coefficients, validation
+weights, corrections, geometry and normalization remain fixed. This is
+NOT uncertainty for the full discovery/fitting/selection pipeline.
+
+For each pair, margins are competitor minus reference (negative favors
+the competitor). Bootstrap errors subtract the noise-free pilot margin;
+benchmark errors subtract the noise-free clean margin. Central 95%
+bootstrap error ranges are checked against the actual benchmark errors.
+Clean fields are diagnostic controls only; they select no estimator,
+pilot, weight, metric or threshold.
+
+Axis                   Mean coverage   Median coverage   Median SD ratio
+discrepancy                 93.54%           93.75%             1.001
+dyad_sum                    71.88%           92.19%             0.914
+prediction-space dyad       62.89%           89.84%             1.042
+
+SD ratio means bootstrap SD / benchmark SD. These are descriptive averages
+of dependent pairs, not independent coverage trials or simultaneous
+confidence guarantees. B=128 gives limited resolution, especially in tails.
+Discrepancy error calibration is relatively good; individual systems/pairs
+still deviate. The low mean dyad coverage and much higher median show
+heterogeneous failures, rather than uniform undercoverage everywhere.
+
+For the 19 previously closest dyad-eligible competitors, mean coverage is
+93.75% for discrepancy, 82.03% for dyad, and 49.14% for prediction dyad.
+Dyad coverage is 65.68% for added-term competitors, 86.47% for dropped-term
+competitors, and 76.89% for reduced-form competitors. Weak extra terms are
+a significant difficulty, but do not explain every failure.
+
+Estimated noise sigma is within 0.944--1.043 times the known benchmark
+sigma. Correct noise amplitude alone does not ensure correct uncertainty
+for the nonlinear instability statistic.
+
+3. What the failures mean
+
+The dyad formula averages MAD(coefficient)/abs(median(coefficient)) over
+partitions and axes. A nearly zero slab median can make the ratio very
+large. Empirically, Lorenz seed0 e1:add_2 has median dyad 1.196 but maximum
+13,096 across 128 actual repeated measurements. This is consistent with
+ratio instability and makes SD estimates sensitive to rare samples.
+The benchmark/bootstrapped dyad SD ratios vary greatly across pairs.
+Replacing the ratio is not sufficient: prediction dyad has much less
+extreme SD ratios yet worse error-range coverage and primary retention.
+
+The reconstructed pilot also changes the objective being perturbed.
+AC seed1's pilot field has only 1.47% relative L2 error, but its discrepancy
+margin against drop_0 is -1.0891e-4, versus +2.3422e-5 on clean data. The
+shift is 2.24 actual measurement SDs. Estimated discrepancy spread is
+accurate here (SD ratio 1.059, error coverage 94.53%), yet raw bootstrap
+Pareto retention is 6/128 versus actual repeated-noise retention 84/128.
+Correctly estimating centered noise spread does not make raw bootstrap
+win/retention frequencies reliable confidence statements.
+
+For KS seed0, the pilot relative field error is 1.26%. Against add_7,
+its discrepancy center is shifted by 5.60 actual SDs. Prediction-dyad
+pilot and clean margins differ by 13.93 SDs. Its bootstrap error bias is
+0.00275 versus actual noise bias 0.05420; coverage is 0/128 even though
+the two SDs are close. For forced KdV seed0/drop_0 the analogous prediction
+center shift is 20.11 SDs. These derivative-sensitive score differences
+are not protected by a small field reconstruction error. More bootstrap
+draws alone would not repair the missing bias.
+
+Conditional retention under actual repeated measurements, averaged across
+the 25 selected equation cases, is 80.94% for dyad versus 75.75% for
+prediction dyad, with mean fronts 3.205 versus 3.723. These are repeated
+measurement diagnostics of fixed fits, not new discovery success rates.
+There are counterexamples: prediction dyad retains forced KdV seed2 in
+128/128 versus dyad's 31/128, and forced KdV seed0 in 38/128 versus 7/128.
+It still loses substantially on Burgers and several Lorenz cases. Thus
+neither the original 56/60 nor these averages imply dyad is noise-robust
+in every system. Dyad's primary forced KdV seed2 success is fragile.
+
+Nominal conditional discrepancy intervals (observed margin minus bootstrap
+error quantiles) include zero for AC seeds1/2 and KS seed0 among the 19
+previously closest pairs. Example KS0: [-6.41e-6, 1.10e-5]. These are
+diagnostics without a new pruning gate, simultaneous correction, or full
+fit/selection uncertainty. The competitors were selected from observed data.
+
+In contrast, AC seed0 remains negative against drop_0:
+[-2.85e-4, -1.01e-4]. Forced KdV seeds0/1 remain strongly negative against
+their reduced-form competitors: [-0.3672,-0.3392] and [-0.2507,-0.2306].
+Their observed margins are approximately -52 actual measurement SDs.
+The noiseless discrepancy with these frozen fits also favors these
+competitors. This is not a close noise tie; uncertainty alone cannot fix
+inaccurate reference coefficients or an insensitive discrepancy.
+
+4. Consequences and next controlled work
+
+Keep dyad as the structural coordinate and retain complexity as a serious
+control. Report paired discrepancy uncertainty first as a diagnostic;
+avoid turning uncalibrated dyad bootstrap frequencies into confidence
+penalties or truth probabilities. Retain explicit constants and valid
+ODE_simple phase/energy identities. Added near-zero terms and a genuine
+nonzero constant are different situations; no constant ban is justified.
+
+The next uncertainty experiment should separate two effects: pilot-induced
+bias in the noise-free moment/instability centers, and uncertainty from
+refitting the main coefficients. Use independent benchmark measurements
+to test calibration of each change, then include geometry/noise-model
+selection if making a full-pipeline claim. More draws may stabilize tail
+estimates but cannot substitute for those checks. Persistent forced-KdV
+fit/discrepancy bias remains a separate task. All these steps can remain
+solver-free; this report does not claim they are already solved.
+
+5. Verification and artifacts
+
+All 45 ablation processes and 20 uncertainty processes exit successfully.
+Production dyad replay error is exactly zero. Maximum absolute discrepancy
+replay error is 1.1642e-10 (all relative/absolute tolerances pass). All
+saved scores and measurement arrays are finite. Independent audit checks
+1,440 original fronts, 1,146 pair/axis coverage calculations and 12,800
+repeated-measurement fronts, plus raw data replay and source/input/array
+hashes. Analytic ODE_simple identities and their constants pass dedicated
+checks, as do prediction-metric unit/axis invariance and drift response.
+An initial AC smoke attempt exposed JSON list versus tuple plan shapes;
+the adapter was corrected before final results. No scientific arm changed.
+
+Main files: protocol.txt; uncertainty_protocol.txt; summary.csv;
+per_equation.csv; changes.json; comparison.png; uncertainty_pairs.csv;
+uncertainty_fronts.csv; uncertainty_calibration.csv/.png;
+uncertainty_retention.png; closest_discrepancy_intervals.csv;
+uncertainty_diagnostics.json; audit.json. Raw score arrays and metadata
+are in uncertainty/, original per-record ablations in results/.
+
+No candidate differential equation solves, PINNs, production edits or commits.

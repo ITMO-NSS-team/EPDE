@@ -1,0 +1,25 @@
+seed,part,parent,observed_pair_opportunities,u_uxx_single_rank,ux_squared_single_rank,both_in_top64,joint_rank
+923101,early,(target only),0,12,32,1,1
+923101,early,u^2,13,88,11,0,
+923101,late,(target only),0,37,42,1,1569
+923101,late,u,25,14,12,1,687
+923102,early,(target only),0,13,34,1,1
+923102,early,u^2,10,47,27,1,44
+923102,late,(target only),0,22,34,1,338
+923102,late,d^2u/dx1^2*u^2,3,9,7,1,606
+923103,early,(target only),0,13,32,1,1
+923103,early,u^2,13,69,11,0,
+923103,late,(target only),0,20,39,1,258
+923103,late,u,20,17,14,1,971
+923104,early,(target only),0,34,52,1,488
+923104,early,u^2,13,13,20,1,656
+923104,late,(target only),0,16,34,1,167
+923104,late,u^2,12,3,4,1,265
+923105,early,(target only),0,25,40,1,459
+923105,early,u^2,10,63,24,1,445
+923105,late,(target only),0,40,48,1,1360
+923105,late,u,40,28,26,1,1440
+923106,early,(target only),0,13,31,1,1
+923106,early,u^2,5,84,12,0,
+923106,late,(target only),0,37,42,1,1419
+923106,late,u,24,20,13,1,841

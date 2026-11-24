@@ -1,0 +1,22 @@
+{
+  "selection_ignores_outer_and_clean": true,
+  "deterministic_tie_and_failure_rules": true,
+  "signed_cross_algebra": true,
+  "inherited_identity_checks_sha256": "c8b8793517e3111031818d5f54d2ec6150ebda1cd551edf3eed859b0e754eecc",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\deriv_calculators.py": "5d2a7c105fdb6375da6a1eea39640bd6cc2a6e6c6dcf8bf1d905f17b2a82263d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\run_eiv.py": "1ef0df4fff6346bb587321f36540507e89cc0c325428480505bc4643a645ad30",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\run_native.py": "c38bfa301e350f127ee16106052aa29a9155b88174828e677fe7805be8ef68c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\outer_selection_2026-11-16\\protocol.txt": "ef2a59def9bc87226c1b2de635b40499fa3b0972961a41e1e31a6fa028c8e509",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\outer_selection_2026-11-16\\run_outer.py": "ace3c6ca07fa57623f1c2817bc53ab37b50a7a69c9fea16d420e65a77d908385",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e"
+  }
+}

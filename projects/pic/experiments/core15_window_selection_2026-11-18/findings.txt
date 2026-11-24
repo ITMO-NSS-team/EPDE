@@ -1,0 +1,39 @@
+Choosing weak training window widths from a single observed trajectory
+18 November 2026
+
+Keep the original local-plus-time fit as the default for the solver-free panel. Choosing one width for every equation in a field preserved a registered law in 109 of 120 cases, the same count as the baseline, and admitted more one-term extensions. The middle fixed width had the highest registered-law survival in the initial panel. Its apparent gain did not repeat on fresh observations of the two systems responsible for it.
+
+Default 15 systems
+
+Six new independent 5%-iid noise realizations per benchmark trajectory gave 90 fields and 120 equation-slot observations. Within each outer training group, three inner subsamples estimated and cross-tested homogeneous coefficient directions at three widths. The shared rule chose one width by averaging the predictive ranks of distinct supports. The individual rule chose a width for each support. All methods refitted on the full training group and used the same weak held-out discrepancy and symmetric dyad. The supplementary pooled fit assigned equal weight to the three widths. PDE widths varied in space and ODE widths in time. All candidates retained the original common temporal bank. The candidate libraries included registered alternatives and additive constants.
+
+Training width           Law or equivalent     Literal law      Additions on front    Addition beats reference    Genuine term favored
+                          (out of 120)         (out of 120)       (out of 1128)           (out of 1128)              (out of 306)
+Original local                 109                 102                  94                       237                      295
+Fixed middle                   112                 106                  99                       250                      299
+Fixed wide                     104                 100                  91                       260                      288
+Shared selection               109                 102                 100                       248                      297
+Individual selection           110                 103                 114                       281                      297
+Equal-weight pooling           108                 102                 101                       238                      294
+
+A front count means survival among all candidates on both objectives. The pairwise columns use held-out discrepancy alone. Adding a term creates a support that can also represent the reference with a zero coefficient. Multiple contrasts on one field are dependent. All 120 slot observations had resolved full fits at every width.
+
+The shared rule chose local, middle and wide on 109, 134 and 27 of 270 training folds. Relative to local it gained one forced KdV case and lost one Allen–Cahn case. Individual selection gained one Allen–Cahn case and increased additions surviving on the front by 20. Among the 360 reference folds the shared and individual selectors picked the width with the smallest outer discrepancy 136 and 153 times, respectively, counting numerical ties. Always choosing the middle width did so 143 times. Width alone had limited reach on this grid. A registered law survived at one or more of the three fixed widths on 113 of 120 slots, and at every width on 103. Fixed wide windows lost registered laws on KS, Lorenz and Navier–Stokes as well as Allen–Cahn. The default simple ODE kept a registered law and its literal reference in all six cases under every method.
+
+Independent confirmation of the middle width
+
+The initial middle-width gain comprised three gains and one loss on Allen–Cahn, and one gain on forced KdV. Each system then received 24 additional noise realizations under a separately fixed protocol. On Allen–Cahn, local retained the reference on 8/24 observations and middle on 6/24, with three paired gains and five losses. Keeping true diffusion won 8/24 and 6/24 comparisons, respectively. As a secondary comparison, individual selection achieved 15/24 front survivals and favored diffusion on 16/24 fields, while admitting ten additions on the front versus four for local. This trade-off does not generalize to an advantage across all 15 systems.
+
+On forced KdV, moving from local to middle reduced additions beating the reference from 191/192 to 149/192 and increased retention of nonlinearity from 2/24 to 7/24. The reference still missed the full front on all 24 fields with both widths. A competing model expressing u_t as a constant and two time harmonics dominated the local reference on 24/24 observations and the middle-width reference on 23/24. With local training, zero one-term additions survived the full front across the same 24 fields, despite their frequent head-to-head wins.
+
+Coefficient diagnostics on the 24 confirmation observations
+
+Change only the reference coefficients and keep every fitted competitor, its dyad and the held-out measurements fixed. With all registered physical coefficients supplied, the local reference reached the front on 22/24 fields for both systems, up from 8/24 for Allen–Cahn and 0/24 for forced KdV. The remaining dominators were the reaction-only deletion in Allen–Cahn and time-polynomial or time-harmonic models in forced KdV. These controls use benchmark knowledge after evaluation.
+
+Holding just the two Allen–Cahn reaction coefficients at their physical values and freely refitting diffusion also produced 22/24 local front survivals. Holding just diffusion at its physical value and refitting reaction produced 16/24. For forced KdV, fixing any one coefficient and freely refitting the other two yielded 0/24 on the local front. At the middle width, supplying any one coefficient gave at most 3/24, while supplying all three gave 21/24. These directed diagnostics point to the joint coefficient fit, including errors in the strong reaction terms, as the next research target. A test using reaction coefficients estimated from an independent weak measurement would assess how much of the Allen–Cahn gain is available without benchmark values.
+
+Verification and scope
+
+The original training matrices and column scales replayed exactly on one Duffing, forced KdV and Navier–Stokes field. Independent linear algebra, including signed unit changes and column reordering, reproduced all width choices in 56,538 inner fit checks and agreed with 25,200 full-fit fold scores to a maximum scaled difference below 6e−12. In a one-column support the only coefficient scale cancels algebraically; implementing that exact tie removed roundoff-dependent widths. The unaffected confirmation panels contained no one-column supports. All recorded Pareto fronts were independently reconstructed. The 15-system study and the targeted confirmation used single trajectories with fresh measurement noise and fixed candidate panels. An unrestricted evolutionary search was outside this experiment.
+
+See summary.json and by_system.csv for the default panel, followup_summary.json and followup_fields.csv for confirmation, and followup_rivals.json and coefficient_controls.json for the coefficient diagnostics. protocol.txt, pooling_protocol.txt and followup_protocol.txt specify the comparisons.

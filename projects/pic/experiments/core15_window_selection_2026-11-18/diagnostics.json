@@ -1,0 +1,728 @@
+{
+  "reference": {
+    "local": {
+      "changes": {
+        "angle_tie": 120,
+        "reference_D_tie": 120
+      },
+      "front_transitions": {}
+    },
+    "middle": {
+      "changes": {
+        "angle_higher": 63,
+        "reference_D_higher": 48,
+        "reference_D_lower": 72,
+        "angle_lower": 57
+      },
+      "front_transitions": {
+        "ac": {
+          "loss": 1,
+          "gain": 3
+        },
+        "kdv_cossin": {
+          "gain": 1
+        }
+      }
+    },
+    "wide": {
+      "changes": {
+        "angle_higher": 86,
+        "reference_D_higher": 84,
+        "angle_lower": 34,
+        "reference_D_lower": 36
+      },
+      "front_transitions": {
+        "ac": {
+          "loss": 1
+        },
+        "kdv_cossin": {
+          "gain": 1
+        },
+        "ks": {
+          "loss": 1
+        },
+        "lorenz": {
+          "loss": 2
+        },
+        "ns": {
+          "loss": 2
+        }
+      }
+    },
+    "shared": {
+      "changes": {
+        "angle_tie": 21,
+        "reference_D_tie": 21,
+        "angle_lower": 60,
+        "reference_D_lower": 60,
+        "reference_D_higher": 39,
+        "angle_higher": 39
+      },
+      "front_transitions": {
+        "ac": {
+          "loss": 1
+        },
+        "kdv_cossin": {
+          "gain": 1
+        }
+      }
+    },
+    "individual": {
+      "changes": {
+        "angle_tie": 16,
+        "reference_D_tie": 16,
+        "angle_higher": 48,
+        "reference_D_higher": 43,
+        "angle_lower": 56,
+        "reference_D_lower": 61
+      },
+      "front_transitions": {
+        "ac": {
+          "gain": 1
+        }
+      }
+    },
+    "pooled": {
+      "changes": {
+        "angle_higher": 35,
+        "reference_D_higher": 39,
+        "reference_D_lower": 81,
+        "angle_lower": 85
+      },
+      "front_transitions": {
+        "ac": {
+          "loss": 1
+        }
+      }
+    }
+  },
+  "genuine_retention_below_six": {
+    "local": {
+      "ac/e0:drop_0": 1,
+      "kdv_cossin/e0:drop_0": 1,
+      "kdv_cossin/e0:drop_2": 5
+    },
+    "middle": {
+      "ac/e0:drop_0": 3,
+      "kdv_cossin/e0:drop_0": 2
+    },
+    "wide": {
+      "ac/e0:drop_0": 0,
+      "kdv_cossin/e0:drop_0": 2,
+      "ks/e0:drop_2": 2,
+      "lorenz/e1:drop_2": 4,
+      "ns/e0:drop_3": 5,
+      "ns/e1:drop_4": 5
+    },
+    "shared": {
+      "ac/e0:drop_0": 0,
+      "kdv_cossin/e0:drop_0": 3
+    },
+    "individual": {
+      "ac/e0:drop_0": 2,
+      "kdv_cossin/e0:drop_0": 1
+    },
+    "pooled": {
+      "ac/e0:drop_0": 0,
+      "kdv_cossin/e0:drop_0": 0
+    }
+  },
+  "fixed_width_bounds": {
+    "registered_on_any_fixed_width": 113,
+    "registered_on_all_fixed_widths": 103
+  },
+  "reference_width_matches": {
+    "local": {
+      "folds": 360,
+      "tied_for_lowest_heldout": 138
+    },
+    "middle": {
+      "folds": 360,
+      "tied_for_lowest_heldout": 143
+    },
+    "wide": {
+      "folds": 360,
+      "tied_for_lowest_heldout": 79
+    },
+    "shared": {
+      "folds": 360,
+      "tied_for_lowest_heldout": 136
+    },
+    "individual": {
+      "folds": 360,
+      "tied_for_lowest_heldout": 153
+    }
+  },
+  "systems": {
+    "ac": {
+      "local": [
+        1,
+        0,
+        13,
+        0
+      ],
+      "middle": [
+        3,
+        6,
+        15,
+        4
+      ],
+      "wide": [
+        0,
+        10,
+        12,
+        0
+      ],
+      "shared": [
+        0,
+        0,
+        12,
+        0
+      ],
+      "individual": [
+        2,
+        3,
+        14,
+        2
+      ],
+      "pooled": [
+        0,
+        0,
+        12,
+        0
+      ]
+    },
+    "burgers": {
+      "local": [
+        6,
+        21,
+        12,
+        9
+      ],
+      "middle": [
+        6,
+        15,
+        12,
+        7
+      ],
+      "wide": [
+        6,
+        7,
+        12,
+        5
+      ],
+      "shared": [
+        6,
+        19,
+        12,
+        7
+      ],
+      "individual": [
+        6,
+        20,
+        12,
+        9
+      ],
+      "pooled": [
+        6,
+        20,
+        12,
+        9
+      ]
+    },
+    "burgers_inviscid": {
+      "local": [
+        6,
+        9,
+        6,
+        0
+      ],
+      "middle": [
+        6,
+        2,
+        6,
+        0
+      ],
+      "wide": [
+        6,
+        3,
+        6,
+        0
+      ],
+      "shared": [
+        6,
+        2,
+        6,
+        0
+      ],
+      "individual": [
+        6,
+        2,
+        6,
+        0
+      ],
+      "pooled": [
+        6,
+        1,
+        6,
+        0
+      ]
+    },
+    "duffing": {
+      "local": [
+        6,
+        15,
+        24,
+        8
+      ],
+      "middle": [
+        6,
+        14,
+        24,
+        9
+      ],
+      "wide": [
+        6,
+        8,
+        24,
+        5
+      ],
+      "shared": [
+        6,
+        18,
+        24,
+        8
+      ],
+      "individual": [
+        6,
+        17,
+        24,
+        9
+      ],
+      "pooled": [
+        6,
+        16,
+        24,
+        6
+      ]
+    },
+    "kdv": {
+      "local": [
+        6,
+        5,
+        12,
+        1
+      ],
+      "middle": [
+        6,
+        16,
+        12,
+        1
+      ],
+      "wide": [
+        6,
+        18,
+        12,
+        0
+      ],
+      "shared": [
+        6,
+        12,
+        12,
+        2
+      ],
+      "individual": [
+        6,
+        14,
+        12,
+        1
+      ],
+      "pooled": [
+        6,
+        6,
+        12,
+        2
+      ]
+    },
+    "kdv_cossin": {
+      "local": [
+        0,
+        47,
+        12,
+        1
+      ],
+      "middle": [
+        1,
+        41,
+        14,
+        2
+      ],
+      "wide": [
+        1,
+        21,
+        14,
+        3
+      ],
+      "shared": [
+        1,
+        40,
+        15,
+        2
+      ],
+      "individual": [
+        0,
+        19,
+        13,
+        2
+      ],
+      "pooled": [
+        0,
+        48,
+        12,
+        1
+      ]
+    },
+    "ks": {
+      "local": [
+        6,
+        5,
+        18,
+        5
+      ],
+      "middle": [
+        6,
+        9,
+        18,
+        6
+      ],
+      "wide": [
+        5,
+        11,
+        14,
+        2
+      ],
+      "shared": [
+        6,
+        5,
+        18,
+        5
+      ],
+      "individual": [
+        6,
+        5,
+        18,
+        5
+      ],
+      "pooled": [
+        6,
+        9,
+        18,
+        8
+      ]
+    },
+    "lorenz": {
+      "local": [
+        18,
+        50,
+        42,
+        26
+      ],
+      "middle": [
+        18,
+        39,
+        42,
+        18
+      ],
+      "wide": [
+        16,
+        66,
+        40,
+        24
+      ],
+      "shared": [
+        18,
+        51,
+        42,
+        26
+      ],
+      "individual": [
+        18,
+        49,
+        42,
+        24
+      ],
+      "pooled": [
+        18,
+        43,
+        42,
+        26
+      ]
+    },
+    "lv": {
+      "local": [
+        12,
+        30,
+        24,
+        11
+      ],
+      "middle": [
+        12,
+        25,
+        24,
+        4
+      ],
+      "wide": [
+        12,
+        16,
+        24,
+        4
+      ],
+      "shared": [
+        12,
+        24,
+        24,
+        6
+      ],
+      "individual": [
+        12,
+        34,
+        24,
+        7
+      ],
+      "pooled": [
+        12,
+        21,
+        24,
+        11
+      ]
+    },
+    "ns": {
+      "local": [
+        18,
+        34,
+        66,
+        20
+      ],
+      "middle": [
+        18,
+        31,
+        66,
+        22
+      ],
+      "wide": [
+        16,
+        54,
+        64,
+        25
+      ],
+      "shared": [
+        18,
+        31,
+        66,
+        22
+      ],
+      "individual": [
+        18,
+        41,
+        66,
+        18
+      ],
+      "pooled": [
+        18,
+        38,
+        66,
+        21
+      ]
+    },
+    "ode": {
+      "local": [
+        6,
+        6,
+        18,
+        5
+      ],
+      "middle": [
+        6,
+        9,
+        18,
+        6
+      ],
+      "wide": [
+        6,
+        3,
+        18,
+        3
+      ],
+      "shared": [
+        6,
+        8,
+        18,
+        6
+      ],
+      "individual": [
+        6,
+        12,
+        18,
+        10
+      ],
+      "pooled": [
+        6,
+        6,
+        18,
+        5
+      ]
+    },
+    "pde_compound": {
+      "local": [
+        6,
+        5,
+        12,
+        2
+      ],
+      "middle": [
+        6,
+        10,
+        12,
+        6
+      ],
+      "wide": [
+        6,
+        7,
+        12,
+        4
+      ],
+      "shared": [
+        6,
+        10,
+        12,
+        6
+      ],
+      "individual": [
+        6,
+        25,
+        12,
+        11
+      ],
+      "pooled": [
+        6,
+        10,
+        12,
+        3
+      ]
+    },
+    "pde_divide": {
+      "local": [
+        6,
+        1,
+        12,
+        1
+      ],
+      "middle": [
+        6,
+        6,
+        12,
+        4
+      ],
+      "wide": [
+        6,
+        11,
+        12,
+        8
+      ],
+      "shared": [
+        6,
+        5,
+        12,
+        3
+      ],
+      "individual": [
+        6,
+        14,
+        12,
+        9
+      ],
+      "pooled": [
+        6,
+        6,
+        12,
+        2
+      ]
+    },
+    "vdp": {
+      "local": [
+        6,
+        4,
+        18,
+        4
+      ],
+      "middle": [
+        6,
+        8,
+        18,
+        6
+      ],
+      "wide": [
+        6,
+        8,
+        18,
+        6
+      ],
+      "shared": [
+        6,
+        7,
+        18,
+        5
+      ],
+      "individual": [
+        6,
+        8,
+        18,
+        5
+      ],
+      "pooled": [
+        6,
+        4,
+        18,
+        4
+      ]
+    },
+    "wave": {
+      "local": [
+        6,
+        5,
+        6,
+        1
+      ],
+      "middle": [
+        6,
+        19,
+        6,
+        4
+      ],
+      "wide": [
+        6,
+        17,
+        6,
+        2
+      ],
+      "shared": [
+        6,
+        16,
+        6,
+        2
+      ],
+      "individual": [
+        6,
+        18,
+        6,
+        2
+      ],
+      "pooled": [
+        6,
+        10,
+        6,
+        3
+      ]
+    }
+  }
+}

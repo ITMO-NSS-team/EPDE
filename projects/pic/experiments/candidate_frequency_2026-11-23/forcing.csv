@@ -1,0 +1,7 @@
+dataset,seed,registered,pattern_scored_anytime,pattern_in_parent_by_checkpoint,selected_matching_parents,frequencies,selected_in_band,admitted_matching_children,exact_law_scored,exact_law_held,system_held
+duffing,923301,1.0,0,0,0,[],0,0,0,0,0
+duffing,923302,1.0,0,0,0,[],0,0,0,0,0
+duffing,923303,1.0,0,0,0,[],0,0,0,0,0
+ode,923301,2.0,1,1,2,"[1.9556959637886953, 1.9556959637886904]",0,0,0,0,0
+ode,923302,2.0,1,1,1,[1.9826042952604341],1,1,1,1,1
+ode,923303,2.0,1,1,1,[1.9879666520478751],1,1,1,1,1

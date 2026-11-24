@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "exact_binary64_certificates": {
+    "compatible": 475,
+    "excluded": 254
+  },
+  "certificates_sha256": "97e3b6b9429944203909eefbf4968921f53df4640a0b05d0beee6f8ce31f1409",
+  "audit_sha256": "6688070ca0cdf6f0cd88bf5b71030358094061c3de734ae819a3e7fdca3bacb3"
+}

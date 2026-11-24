@@ -1,0 +1,23 @@
+Weak design comparison fixed before screening or fresh outcomes
+==============================================================
+Menu: original local, original broad(full k2), full k0,k1,k4,k6,
+and time/space radius fractions (.5,1),(1,.5),(.5,.5),(.25,1),
+(1,.25),(.25,.25), all k2. Radius fractions are relative to full usable
+domain halfwidths. Preserve original polynomial degrees and quadrature.
+Use the full candidate library, not a reference-equation subset.
+Score each bank by sum(log1p(eigenvalues)) of pilot residual Gram whitened
+by its noise error Gram. Project stochastic pilot columns off deterministic
+columns first. Covariance uses MC16. No ridge or oracle-selected term weights.
+Rank only valid full-rank covariance banks; ties resolved by menu order.
+Select the highest-scoring bank other than local (which remains in both pairs).
+The original broad is eligible; if it wins the comparison is unchanged.
+
+Fresh evaluation compares original pair(local,broad) with replacement pair
+(local,selected). Each pair calibrates its own max of the two full-library
+operator scores at rank123/128. Also report per-bank scores/regions.
+Shared observed and bootstrap fields across banks. Fresh noise uses the
+unchanged original RNG domains 984101 and984102, with unused seeds54..56.
+Normalization uses original domain984105. All settings fixed before these
+fresh fields are generated. Refit noise on every bootstrap field, fixed pilot
+normalization; preserve all draws. Freeze outcomes before clean-field scoring.
+Reference geometry is diagnostic only and cannot revise the selected design.

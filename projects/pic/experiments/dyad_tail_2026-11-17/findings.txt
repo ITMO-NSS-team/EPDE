@@ -1,0 +1,89 @@
+Why a small coefficient causes nonregular dyad uncertainty
+2026-11-17
+
+The production statistic has a precise counterexample to a general
+variance-based uncertainty interpretation. Take a single constant feature,
+16 observations split into two8-row slabs, no intercept, and target data
+consisting of iid Gaussian measurement noise. The true coefficient is zero.
+Let the two fitted slab coefficients be c1 and c2. Their median is
+(c1+c2)/2, and their median absolute deviation is |c1-c2|/2. Hence
+
+  I = |c1-c2| / |c1+c2|.
+
+For independent equal-variance zero-mean Gaussian c1,c2, the rotated sum
+and difference are independent equal-variance Gaussians. Their absolute
+ratio has the absolute-Cauchy distribution:
+
+  P(I > x) = (2/pi)*atan(1/x), x>0.
+
+Its median is1; its95th percentile is12.7062. The uncapped model has an
+infinite mean and no finite variance. Production code caps exact division
+failures at the largest finite float, so the literal capped implementation
+is finite; the model explains the near-zero-denominator pathology, not a
+claim that every real candidate follows this distribution exactly.
+
+Production verification uses its actual minimum-row rule and stable slab
+solver. Across256 synthetic noise records, the maximum scaled difference
+from the formula is1.84e-14. Reducing noise from sigma1 to sigma1e-8 leaves
+the median dyad unchanged at0.96525 for those paired records. At EXACTLY
+zero noise the implementation returns0. Thus the score at a zero
+coefficient does not converge to the noise-free score as noise decreases.
+This is a lack of continuity in the statistical limit, not merely a need
+for more bootstrap draws or higher numerical precision.
+
+The nonzero constant control behaves correctly: with true coefficient1.3
+and sigma1e-8, median dyad is1.16e-9. Constants are not the special problem;
+the same ratio issue can arise for any near-zero coefficient. No constant
+or identity is removed by this test.
+
+An independent1,048,576-pair Gaussian simulation yields quantiles
+0.99957,6.28250,12.65259,63.67184 at50/90/95/99%, agreeing with the analytic
+values1,6.31375,12.70620,63.65674. Across independent128-draw batches the
+sample SD has median12.69 and99.9th percentile10,434. Quantiles of the
+score remain meaningful, but its apparent sample SD can be dominated by
+rare denominator events. This does not by itself establish valid bootstrap
+coverage for a latent physical stability parameter.
+
+MONOTONE TRANSFORMS DO NOT SOLVE THE CALIBRATION PROBLEM
+
+Exploratory reanalysis uses all45 seed18/19/20 records from the completed
+uncertainty_refit experiment:957 dependent candidate pairs. It reuses those
+same arrays, rather than providing another independent confirmation.
+
+Transform                     Standard-pilot coverage   Corrected pilot
+I                                     69.76%                 70.19%
+log(1+I)                              65.97%                 65.68%
+I/(1+I)                               49.85%                 49.58%
+
+These are mean coverages of nominal95% bootstrap error ranges for pairwise
+score differences. Equal equation/seed weighting gives the same conclusion.
+Both transformed statistics control the magnitude of extreme samples,
+yet calibration worsens. They do not remove the discontinuous zero-level
+limit or make a reconstructed pilot reproduce the true noise-free score.
+
+43,070,328 ordered-pair checks verify that every candidate ordering and tie
+is preserved across saved anchors, centers and measurement ensembles.
+Therefore all Pareto fronts with unchanged discrepancy remain identical.
+Winning/retention frequencies are also unchanged. No transformation is
+selected per system, and no scale, penalty, pruning threshold or production
+change is introduced. Raw coverage reproduces the parent analysis exactly.
+
+CONCLUSION
+
+Dyad can be useful as a ranking rule and an implicit preference against
+unsupported small coefficients. That is different from measuring physical
+coefficient variation with a reliably estimable variance. The fresh parent
+experiment also ties dyad with complexity at54/60 registered retention, so
+its structural benefit should be reassessed against that simpler control.
+
+A future uncertainty-aware alternative should compare coefficient contrasts
+with their sampling uncertainty, and keep support/complexity preference
+explicit, rather than divide by a coefficient median approaching zero.
+This is a proposed direction, not a tested replacement. The existing
+prediction-space replacement already lost structural discrimination; merely
+removing a denominator is not enough. No universal production change is
+justified by the present evidence.
+
+Artifacts: protocol.txt; analytic_checks.json; zero_coefficient.png/.svg;
+pair_calibration.csv; summary.csv; audit_summary.json; run_analysis.py.
+All checks pass. Solver-free; no production edits or commits.

@@ -1,0 +1,214 @@
+system,profile,seed,candidate,term,resolution,old_zero_witness
+ac,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,iid,51,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,iid,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,iid,52,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,iid,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,iid,53,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,iid,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,negative,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,negative,51,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,negative,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,negative,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,negative,52,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,negative,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,negative,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,negative,53,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,negative,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,positive,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,positive,51,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,positive,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,positive,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,positive,52,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,positive,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ac,positive,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+ac,positive,53,e0:reference,"[['u', [['power', 3.0]]]]",excluded,False
+ac,positive,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+burgers,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+burgers,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+burgers,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+burgers,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+burgers,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+burgers,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+burgers_inviscid,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+burgers_inviscid,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+burgers_inviscid,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+duffing,iid,51,e0:reference,"[['du/dx0', [['power', 1.0]]]]",compatible,False
+duffing,iid,51,e0:reference,"[['u', [['power', 1.0]]]]",compatible,False
+duffing,iid,51,e0:reference,"[['u', [['power', 3.0]]]]",compatible,False
+duffing,iid,51,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",compatible,False
+duffing,iid,52,e0:reference,"[['du/dx0', [['power', 1.0]]]]",compatible,False
+duffing,iid,52,e0:reference,"[['u', [['power', 1.0]]]]",compatible,False
+duffing,iid,52,e0:reference,"[['u', [['power', 3.0]]]]",compatible,False
+duffing,iid,52,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",compatible,False
+duffing,iid,53,e0:reference,"[['du/dx0', [['power', 1.0]]]]",compatible,False
+duffing,iid,53,e0:reference,"[['u', [['power', 1.0]]]]",compatible,False
+duffing,iid,53,e0:reference,"[['u', [['power', 3.0]]]]",compatible,False
+duffing,iid,53,e0:reference,"[['cos', [['dim', 0.0], ['freq', 1.0], ['power', 1.0]]]]",compatible,False
+kdv_cossin,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,iid,51,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,iid,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,iid,52,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,iid,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,iid,53,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,iid,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,negative,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,negative,51,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,negative,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,negative,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,negative,52,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,negative,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,negative,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,negative,53,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,negative,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,positive,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,positive,51,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,positive,51,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,positive,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,positive,52,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,positive,52,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,positive,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv_cossin,positive,53,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,unbounded_parent
+kdv_cossin,positive,53,e0:reference,"[['cos(t)sin(x)', [['power', 1.0]]]]",compatible,unbounded_parent
+kdv,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+kdv,iid,51,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,False
+kdv,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+kdv,iid,52,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,False
+kdv,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+kdv,iid,53,e0:reference,"[['d^3u/dx1^3', [['power', 1.0]]]]",excluded,False
+ks,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,iid,51,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,iid,52,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,iid,53,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,negative,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,negative,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,negative,51,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,negative,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,negative,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,negative,52,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,negative,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,negative,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,negative,53,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,positive,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,positive,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,positive,51,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,positive,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,positive,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,positive,52,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+ks,positive,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ks,positive,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+ks,positive,53,e0:reference,"[['d^4u/dx1^4', [['power', 1.0]]]]",excluded,False
+lorenz,iid,51,e0:reference,"[['v', [['power', 1.0]]]]",excluded,False
+lorenz,iid,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lorenz,iid,51,e1:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lorenz,iid,51,e1:reference,"[['u', [['power', 1.0]]], ['w', [['power', 1.0]]]]",excluded,False
+lorenz,iid,51,e1:reference,"[['v', [['power', 1.0]]]]",compatible,False
+lorenz,iid,51,e2:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lorenz,iid,51,e2:reference,"[['w', [['power', 1.0]]]]",excluded,False
+lorenz,iid,52,e0:reference,"[['v', [['power', 1.0]]]]",excluded,False
+lorenz,iid,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lorenz,iid,52,e1:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lorenz,iid,52,e1:reference,"[['u', [['power', 1.0]]], ['w', [['power', 1.0]]]]",excluded,False
+lorenz,iid,52,e1:reference,"[['v', [['power', 1.0]]]]",compatible,False
+lorenz,iid,52,e2:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lorenz,iid,52,e2:reference,"[['w', [['power', 1.0]]]]",excluded,False
+lorenz,iid,53,e0:reference,"[['v', [['power', 1.0]]]]",excluded,False
+lorenz,iid,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lorenz,iid,53,e1:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lorenz,iid,53,e1:reference,"[['u', [['power', 1.0]]], ['w', [['power', 1.0]]]]",excluded,False
+lorenz,iid,53,e1:reference,"[['v', [['power', 1.0]]]]",compatible,False
+lorenz,iid,53,e2:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lorenz,iid,53,e2:reference,"[['w', [['power', 1.0]]]]",excluded,False
+lv,iid,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lv,iid,51,e0:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lv,iid,51,e1:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lv,iid,51,e1:reference,"[['v', [['power', 1.0]]]]",excluded,False
+lv,iid,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lv,iid,52,e0:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lv,iid,52,e1:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lv,iid,52,e1:reference,"[['v', [['power', 1.0]]]]",excluded,False
+lv,iid,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+lv,iid,53,e0:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lv,iid,53,e1:reference,"[['u', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+lv,iid,53,e1:reference,"[['v', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e0:reference,"[['du/dx2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e0:reference,"[['dp/dx2', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",compatible,True
+ns,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,False
+ns,iid,51,e1:reference,"[['dv/dx2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e1:reference,"[['dv/dx1', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e1:reference,"[['dp/dx1', [['power', 1.0]]]]",excluded,False
+ns,iid,51,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",compatible,False
+ns,iid,51,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",compatible,False
+ns,iid,51,e2:reference,"[['dv/dx1', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e0:reference,"[['du/dx2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e0:reference,"[['dp/dx2', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",compatible,True
+ns,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,False
+ns,iid,52,e1:reference,"[['dv/dx2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e1:reference,"[['dv/dx1', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e1:reference,"[['dp/dx1', [['power', 1.0]]]]",excluded,False
+ns,iid,52,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",compatible,False
+ns,iid,52,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",compatible,False
+ns,iid,52,e2:reference,"[['dv/dx1', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e0:reference,"[['du/dx2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e0:reference,"[['dp/dx2', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e0:reference,"[['d^2u/dx2^2', [['power', 1.0]]]]",compatible,True
+ns,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,False
+ns,iid,53,e1:reference,"[['dv/dx2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e1:reference,"[['dv/dx1', [['power', 1.0]]], ['v', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e1:reference,"[['dp/dx1', [['power', 1.0]]]]",excluded,False
+ns,iid,53,e1:reference,"[['d^2v/dx2^2', [['power', 1.0]]]]",compatible,False
+ns,iid,53,e1:reference,"[['d^2v/dx1^2', [['power', 1.0]]]]",compatible,True
+ns,iid,53,e2:reference,"[['dv/dx1', [['power', 1.0]]]]",excluded,False
+ode,iid,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ode,iid,51,e0:reference,"[['du/dx0', [['power', 1.0]]], ['sin', [['dim', 0.0], ['freq', 2.0], ['power', 1.0]]]]",excluded,False
+ode,iid,51,e0:reference,"[['x', [['dim', 0.0], ['power', 1.0]]]]",excluded,False
+ode,iid,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ode,iid,52,e0:reference,"[['du/dx0', [['power', 1.0]]], ['sin', [['dim', 0.0], ['freq', 2.0], ['power', 1.0]]]]",compatible,False
+ode,iid,52,e0:reference,"[['x', [['dim', 0.0], ['power', 1.0]]]]",excluded,False
+ode,iid,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+ode,iid,53,e0:reference,"[['du/dx0', [['power', 1.0]]], ['sin', [['dim', 0.0], ['freq', 2.0], ['power', 1.0]]]]",excluded,False
+ode,iid,53,e0:reference,"[['x', [['dim', 0.0], ['power', 1.0]]]]",excluded,False
+pde_compound,iid,51,e0:reference,"[['du/dx1', [['power', 2.0]]]]",compatible,True
+pde_compound,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+pde_compound,iid,52,e0:reference,"[['du/dx1', [['power', 2.0]]]]",compatible,True
+pde_compound,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+pde_compound,iid,53,e0:reference,"[['du/dx1', [['power', 2.0]]]]",compatible,True
+pde_compound,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]], ['u', [['power', 1.0]]]]",excluded,False
+pde_divide,iid,51,e0:reference,"[['du/dx1', [['power', 1.0]]]]",excluded,False
+pde_divide,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]], ['x', [['dim', 1.0], ['power', 1.0]]]]",excluded,False
+pde_divide,iid,52,e0:reference,"[['du/dx1', [['power', 1.0]]]]",excluded,False
+pde_divide,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]], ['x', [['dim', 1.0], ['power', 1.0]]]]",excluded,False
+pde_divide,iid,53,e0:reference,"[['du/dx1', [['power', 1.0]]]]",excluded,False
+pde_divide,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]], ['x', [['dim', 1.0], ['power', 1.0]]]]",excluded,False
+vdp,iid,51,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",compatible,False
+vdp,iid,51,e0:reference,"[['du/dx0', [['power', 1.0]]]]",excluded,False
+vdp,iid,51,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+vdp,iid,52,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",compatible,False
+vdp,iid,52,e0:reference,"[['du/dx0', [['power', 1.0]]]]",excluded,False
+vdp,iid,52,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+vdp,iid,53,e0:reference,"[['du/dx0', [['power', 1.0]]], ['u', [['power', 2.0]]]]",compatible,False
+vdp,iid,53,e0:reference,"[['du/dx0', [['power', 1.0]]]]",compatible,False
+vdp,iid,53,e0:reference,"[['u', [['power', 1.0]]]]",excluded,False
+wave,iid,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+wave,iid,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+wave,iid,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+wave,negative,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+wave,negative,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+wave,negative,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",excluded,False
+wave,positive,51,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+wave,positive,52,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True
+wave,positive,53,e0:reference,"[['d^2u/dx1^2', [['power', 1.0]]]]",compatible,True

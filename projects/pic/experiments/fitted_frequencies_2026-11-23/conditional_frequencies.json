@@ -1,0 +1,58 @@
+[
+  {
+    "dataset": "duffing",
+    "seed": 923701,
+    "noise": 0,
+    "fitted": {
+      "cos@0": 0.9999999979960588
+    },
+    "registered": {
+      "cos@0": 1.0
+    },
+    "within_one_percent": true,
+    "solves": 113
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923701,
+    "noise": 5,
+    "fitted": {
+      "cos@0": 1.0013043348828192
+    },
+    "registered": {
+      "cos@0": 1.0
+    },
+    "within_one_percent": true,
+    "solves": 118
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923701,
+    "noise": 0,
+    "fitted": {
+      "cos@0": 0.9995067652495309,
+      "sin@1": 0.999281957658877
+    },
+    "registered": {
+      "cos@0": 1.0,
+      "sin@1": 1.0
+    },
+    "within_one_percent": true,
+    "solves": 253
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923701,
+    "noise": 5,
+    "fitted": {
+      "cos@0": 1.5099392923576473,
+      "sin@1": 3.0274267912747352
+    },
+    "registered": {
+      "cos@0": 1.0,
+      "sin@1": 1.0
+    },
+    "within_one_percent": false,
+    "solves": 232
+  }
+]

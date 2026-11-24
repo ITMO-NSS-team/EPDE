@@ -1,0 +1,152 @@
+{
+  "summary": {
+    "native": {
+      "noisy": -0.021075125447641754,
+      "clean_dispersion_only": -1.0032686069160417,
+      "noisy_dispersion_only": -0.018931178862452176,
+      "clean": -0.99978047926128,
+      "noise_to_dispersion_signal": 53.84611813429898
+    },
+    "complementary": {
+      "noisy": -0.021600483161073804,
+      "clean_dispersion_only": -1.0015049738888062,
+      "noisy_dispersion_only": -0.019018545815905584,
+      "clean": -0.9997751441514826,
+      "noise_to_dispersion_signal": 49.511771239660824
+    }
+  },
+  "cases": [
+    {
+      "seed": 926301,
+      "arm": "native",
+      "coefficients": {
+        "noisy": -0.042078604023738315,
+        "clean_dispersion_only": -1.0067499863421712,
+        "noisy_dispersion_only": -0.037728605134901214,
+        "clean": -0.9992970132775008
+      },
+      "noise_to_dispersion_signal": 6.458047299182733
+    },
+    {
+      "seed": 926301,
+      "arm": "complementary",
+      "coefficients": {
+        "noisy": -0.04264669798752695,
+        "clean_dispersion_only": -1.0008868777832611,
+        "noisy_dispersion_only": -0.03734103355888923,
+        "clean": -0.9994309718381447
+      },
+      "noise_to_dispersion_signal": 5.878329254820934
+    },
+    {
+      "seed": 926302,
+      "arm": "native",
+      "coefficients": {
+        "noisy": 1.1602007134438594e-05,
+        "clean_dispersion_only": -1.007857917090419,
+        "noisy_dispersion_only": -0.0001292508094275538,
+        "clean": -1.000009128098354
+      },
+      "noise_to_dispersion_signal": 101.23418896941523
+    },
+    {
+      "seed": 926302,
+      "arm": "complementary",
+      "coefficients": {
+        "noisy": -0.0005542683346206554,
+        "clean_dispersion_only": -1.0077203953637792,
+        "noisy_dispersion_only": -0.0006960580729219385,
+        "clean": -0.9999984578787594
+      },
+      "noise_to_dispersion_signal": 107.07757383621475
+    },
+    {
+      "seed": 926303,
+      "arm": "native",
+      "coefficients": {
+        "noisy": -0.6890468613196494,
+        "clean_dispersion_only": -1.0010707180130995,
+        "noisy_dispersion_only": -0.6817589347460558,
+        "clean": -0.999014570575813
+      },
+      "noise_to_dispersion_signal": 0.6601630280617535
+    },
+    {
+      "seed": 926303,
+      "arm": "complementary",
+      "coefficients": {
+        "noisy": -0.7308477454544695,
+        "clean_dispersion_only": -0.9993150174032147,
+        "noisy_dispersion_only": -0.7268914696482256,
+        "clean": -0.9990649715232758
+      },
+      "noise_to_dispersion_signal": 0.5964104071583285
+    },
+    {
+      "seed": 926304,
+      "arm": "native",
+      "coefficients": {
+        "noisy": -0.4132784977969996,
+        "clean_dispersion_only": -1.0021230699943515,
+        "noisy_dispersion_only": -0.4111143025892878,
+        "clean": -0.9995518304242059
+      },
+      "noise_to_dispersion_signal": 1.2225148474303604
+    },
+    {
+      "seed": 926304,
+      "arm": "complementary",
+      "coefficients": {
+        "noisy": -0.4132784977969996,
+        "clean_dispersion_only": -1.0021230699943515,
+        "noisy_dispersion_only": -0.4111143025892878,
+        "clean": -0.9995518304242059
+      },
+      "noise_to_dispersion_signal": 1.2225148474303604
+    },
+    {
+      "seed": 926305,
+      "arm": "native",
+      "coefficients": {
+        "noisy": -7.164687154519224e-05,
+        "clean_dispersion_only": -0.9992943504011687,
+        "noisy_dispersion_only": -0.00013375259000314077,
+        "clean": -1.0000244370198692
+      },
+      "noise_to_dispersion_signal": 117.9662013285569
+    },
+    {
+      "seed": 926305,
+      "arm": "complementary",
+      "coefficients": {
+        "noisy": -7.164687154519224e-05,
+        "clean_dispersion_only": -0.9992943504011687,
+        "noisy_dispersion_only": -0.00013375259000314077,
+        "clean": -1.0000244370198692
+      },
+      "noise_to_dispersion_signal": 117.9662013285569
+    },
+    {
+      "seed": 926306,
+      "arm": "native",
+      "coefficients": {
+        "noisy": 0.00046380143125427357,
+        "clean_dispersion_only": -1.0044141438377316,
+        "noisy_dispersion_only": 0.00038414979432021694,
+        "clean": -1.0000244370198692
+      },
+      "noise_to_dispersion_signal": 125.09054508557894
+    },
+    {
+      "seed": 926306,
+      "arm": "complementary",
+      "coefficients": {
+        "noisy": -0.00030644338816274743,
+        "clean_dispersion_only": -1.0047683877619338,
+        "noisy_dispersion_only": -0.00038671370490415236,
+        "clean": -1.0000238429270767
+      },
+      "noise_to_dispersion_signal": 93.14521322450071
+    }
+  ]
+}

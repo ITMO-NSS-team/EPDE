@@ -1,0 +1,1082 @@
+[
+  {
+    "seed": 923701,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      5,
+      4
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.8688246052151107,
+        "dispersion_coefficient": -0.0033444133172055024,
+        "omega_t": 1.5099392923576473,
+        "omega_x": 3.0274267912747352
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.2425793612357234,
+        "dispersion_coefficient": -0.5719280440403799,
+        "omega_t": 1.0643228348748281,
+        "omega_x": 2.5182294914526215
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.2425793612357234,
+        "dispersion_coefficient": -0.5746600007890008,
+        "omega_t": 1.0690455194355746,
+        "omega_x": 2.5147384242188
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.04961289664604783,
+        "dispersion_coefficient": -0.1442397849352387,
+        "omega_t": 2.2923639485990077,
+        "omega_x": 4.803602718715642
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -1.0038530829905112,
+        "omega_t": 250.3319713924433,
+        "omega_x": 1.0087359432278986,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9954408947401561,
+            "sin": 1.0087359432278973
+          },
+          "residual_change_over_target": 1.1651222429478578e-10
+        }
+      }
+    }
+  },
+  {
+    "seed": 923702,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        4,
+        32
+      ],
+      "ss": [
+        2,
+        16
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        37,
+        2
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      5,
+      3
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.18999452281023027,
+        "dispersion_coefficient": -0.5774206536417521,
+        "omega_t": 0.9847391578101373,
+        "omega_x": 2.4005407046129528
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.1420380592202129,
+        "dispersion_coefficient": -1.1429053594187832,
+        "omega_t": 1.090558442716096,
+        "omega_x": 2.9072147789010976
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.1420380592202129,
+        "dispersion_coefficient": -1.1411999742094927,
+        "omega_t": 1.0911852496155419,
+        "omega_x": 2.904354319165257
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.14239717449171252,
+        "dispersion_coefficient": -1.1640015557955956,
+        "omega_t": 1.0878841965941426,
+        "omega_x": 2.9087061071403992
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.9958928797008475,
+        "omega_t": 0.99703355044694,
+        "omega_x": 0.9928177217366633
+      }
+    }
+  },
+  {
+    "seed": 923703,
+    "plan": {
+      "q": [
+        4,
+        6
+      ],
+      "ms": [
+        4,
+        32
+      ],
+      "ss": [
+        2,
+        16
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        37,
+        2
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      6,
+      3
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.3304298757947805,
+        "dispersion_coefficient": -0.1172525710759478,
+        "omega_t": 8.102368570660605,
+        "omega_x": 3.272673870823495
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.1399153619792924,
+        "dispersion_coefficient": -1.1127509039470511,
+        "omega_t": 1.0449002744373526,
+        "omega_x": 2.9228611552248998
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.1399153619792924,
+        "dispersion_coefficient": -1.1020790942466858,
+        "omega_t": 1.0417656508245818,
+        "omega_x": 2.9203459291520706
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.1399153619792924,
+        "dispersion_coefficient": -1.1127509039470511,
+        "omega_t": 1.0449002744373526,
+        "omega_x": 2.9228611552248998
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -1.0039029656913865,
+        "omega_t": 1.002677102168753,
+        "omega_x": 0.9985796639698042
+      }
+    }
+  },
+  {
+    "seed": 924701,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      3,
+      6
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.8658893807409772,
+        "dispersion_coefficient": 0.004907086473162847,
+        "omega_t": 1.492429944803748,
+        "omega_x": 2.9871800623240015
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24211833896010349,
+        "dispersion_coefficient": -0.5584312971429666,
+        "omega_t": 250.2068580977748,
+        "omega_x": 2.5068227671336696,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.1205541894086508,
+            "sin": 2.50682276713367
+          },
+          "residual_change_over_target": 2.129133668311624e-11
+        }
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24211833896010349,
+        "dispersion_coefficient": -0.5596381145891509,
+        "omega_t": 1.1226177704897233,
+        "omega_x": 2.5112880325870224
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.17157095397780567,
+        "dispersion_coefficient": -0.18566624580718813,
+        "omega_t": 1.5847292664970942,
+        "omega_x": 6.21578323638296
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -1.0123296374157913,
+        "omega_t": 250.32937134149665,
+        "omega_x": 1.0018821741983581,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9980409456867818,
+            "sin": 1.0018821741983572
+          },
+          "residual_change_over_target": 3.8868669958417817e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924702,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      6,
+      5
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.7928683007494473,
+        "dispersion_coefficient": 0.007078561753879609,
+        "omega_t": 1.4789206134799833,
+        "omega_x": 2.98773271641346
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24243566081120077,
+        "dispersion_coefficient": -0.5490912564501649,
+        "omega_t": 1.197536521712264,
+        "omega_x": 2.5045032572184787
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24243566081120077,
+        "dispersion_coefficient": -0.5484295218127144,
+        "omega_t": 1.199510818160519,
+        "omega_x": 2.508722479636899
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.2451850328485964,
+        "dispersion_coefficient": -0.013701389837406111,
+        "omega_t": 1.5391603585412292,
+        "omega_x": 3.079261252001906
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.9988436199505577,
+        "omega_t": 250.33037581423585,
+        "omega_x": 0.9918890549837935,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9970364729476131,
+            "sin": 0.991889054983794
+          },
+          "residual_change_over_target": 2.079388097580567e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924703,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      0,
+      10
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.9105571294435164,
+        "dispersion_coefficient": -0.002260710586682299,
+        "omega_t": 1.4889684853045202,
+        "omega_x": 3.005973073614603
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24299990099159335,
+        "dispersion_coefficient": -0.5743570394748105,
+        "omega_t": 1.0586606668856977,
+        "omega_x": 2.5126058490515724
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24299990099159335,
+        "dispersion_coefficient": -0.577734410085962,
+        "omega_t": 1.0627721786820066,
+        "omega_x": 2.511972441555979
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.5668652366621804,
+        "dispersion_coefficient": -0.004911635308599838,
+        "omega_t": 1.4951334327659038,
+        "omega_x": 3.009483497893861
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.9838565983387197,
+        "omega_t": 1.000562728533651,
+        "omega_x": 0.9904993716376437
+      }
+    }
+  },
+  {
+    "seed": 924704,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      4,
+      13
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 1.032526396122287,
+        "dispersion_coefficient": -0.0031441086046860994,
+        "omega_t": 1.5058533856617629,
+        "omega_x": 3.018509095850538
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24255608361084308,
+        "dispersion_coefficient": -0.5489507483918362,
+        "omega_t": 1.0733332143370933,
+        "omega_x": 2.50926519775683
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24255608361084308,
+        "dispersion_coefficient": -0.5561722822891435,
+        "omega_t": 1.0816177706930425,
+        "omega_x": 2.510946620623108
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.783757240228545,
+        "dispersion_coefficient": -0.00656288295709806,
+        "omega_t": 1.5176016359386155,
+        "omega_x": 3.0352073582608017
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.996983406694562,
+        "omega_t": 250.3314195131365,
+        "omega_x": 1.0018747847466585,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9959927740469396,
+            "sin": 1.0018747847466614
+          },
+          "residual_change_over_target": 1.5536189454726705e-10
+        }
+      }
+    }
+  },
+  {
+    "seed": 924705,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      0,
+      10
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.8760893647564705,
+        "dispersion_coefficient": -0.009896787545104396,
+        "omega_t": 1.5027612950748912,
+        "omega_x": 3.064349147084149
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.2425301962557908,
+        "dispersion_coefficient": -0.5564140737473859,
+        "omega_t": 1.1353236351520444,
+        "omega_x": 2.5072790788255648
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.2425301962557908,
+        "dispersion_coefficient": -0.5605138739290281,
+        "omega_t": 1.136827402007491,
+        "omega_x": 2.5111990626324645
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.4678360791204278,
+        "dispersion_coefficient": -0.02161948812279335,
+        "omega_t": 1.538243423358821,
+        "omega_x": 3.141724171724973
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -1.002287711125842,
+        "omega_t": 0.9988562359325884,
+        "omega_x": 0.9978359700216967
+      }
+    }
+  },
+  {
+    "seed": 924706,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      3,
+      7
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.7576992164151829,
+        "dispersion_coefficient": -0.007903906782659953,
+        "omega_t": 1.5007244607791392,
+        "omega_x": 3.0540575945600703
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24317321689824714,
+        "dispersion_coefficient": -0.5242237291826872,
+        "omega_t": 1.2247018926458457,
+        "omega_x": 2.4993706881931192
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24317321689824714,
+        "dispersion_coefficient": -0.5306308369230972,
+        "omega_t": 1.2293772427198593,
+        "omega_x": 2.500966478987785
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.31949931378820423,
+        "dispersion_coefficient": -0.02092919965435487,
+        "omega_t": 1.551316493789586,
+        "omega_x": 3.099273052301803
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.9921028748033303,
+        "omega_t": 250.32742916955186,
+        "omega_x": 0.9908897107991401,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9999831176315723,
+            "sin": 0.9908897107991379
+          },
+          "residual_change_over_target": 3.768903460047358e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924707,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      3,
+      4
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.6513344303960619,
+        "dispersion_coefficient": -0.0075577548475503215,
+        "omega_t": 1.4990098514896368,
+        "omega_x": 3.0603363363636746
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24211105178325912,
+        "dispersion_coefficient": -0.5670084982086185,
+        "omega_t": 250.20154424746084,
+        "omega_x": 2.5116219099078427,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.1258680397225902,
+            "sin": 2.511621909907845
+          },
+          "residual_change_over_target": 4.890090695861285e-11
+        }
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24211105178325912,
+        "dispersion_coefficient": -0.5699693581425858,
+        "omega_t": 1.1282988566735583,
+        "omega_x": 2.5141665550115637
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.07521638257527222,
+        "dispersion_coefficient": -0.5927158817848774,
+        "omega_t": 1.135563599375976,
+        "omega_x": 5.12111421841708e-13
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.999160066152286,
+        "omega_t": 250.326201222036,
+        "omega_x": 0.9936426711489499,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.0012110651474444,
+            "sin": 0.9936426711489474
+          },
+          "residual_change_over_target": 1.470248032615178e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924708,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      3,
+      4
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.7193423644041698,
+        "dispersion_coefficient": -0.013699653906480355,
+        "omega_t": 1.512622240864118,
+        "omega_x": 3.0995033397721685
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.2434669954456951,
+        "dispersion_coefficient": -0.4950400788617946,
+        "omega_t": 1.1903617879527695,
+        "omega_x": 2.4954845860515626
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.2434669954456951,
+        "dispersion_coefficient": -0.4956411179338804,
+        "omega_t": 1.1928933102744106,
+        "omega_x": 2.4939422220611562
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.05245272344156483,
+        "dispersion_coefficient": -0.6052951834130221,
+        "omega_t": 1.042845295364001,
+        "omega_x": 8.349389313777425e-13
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.99795089979593,
+        "omega_t": 250.32749222034454,
+        "omega_x": 0.9954344942383626,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9999200668388966,
+            "sin": 0.99543449423836
+          },
+          "residual_change_over_target": 7.1421678682411905e-12
+        }
+      }
+    }
+  },
+  {
+    "seed": 924709,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      7,
+      4
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.7990893848110618,
+        "dispersion_coefficient": -0.009859045989473778,
+        "omega_t": 1.5112407362775948,
+        "omega_x": 3.0643232727901397
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.2432372445521338,
+        "dispersion_coefficient": -0.49233594827686145,
+        "omega_t": 1.1829135145855718,
+        "omega_x": 2.4924104588848333
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.2432372445521338,
+        "dispersion_coefficient": -0.4952777406415838,
+        "omega_t": 1.1877381151236734,
+        "omega_x": 2.4919363739667513
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.053499630789785285,
+        "dispersion_coefficient": -0.5891236200773926,
+        "omega_t": 1.0472227785873611,
+        "omega_x": 4.759371927186111e-08
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.997015078476933,
+        "omega_t": 250.32959940738195,
+        "omega_x": 0.9955583851248074,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9978128798015149,
+            "sin": 0.9955583851248093
+          },
+          "residual_change_over_target": 2.7660393831491428e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924710,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      7,
+      3
+    ],
+    "derivative_degrees": [
+      1,
+      7
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.7552445037350368,
+        "dispersion_coefficient": -0.0034084905945911403,
+        "omega_t": 1.4992527379670646,
+        "omega_x": 3.0152407745916046
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.2427869901673557,
+        "dispersion_coefficient": -0.5477430441008339,
+        "omega_t": 1.2278742097537652,
+        "omega_x": 2.507740779459751
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.2427869901673557,
+        "dispersion_coefficient": -0.5521724308115339,
+        "omega_t": 1.2305991017564157,
+        "omega_x": 2.510074199056381
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.2334828245955642,
+        "dispersion_coefficient": -0.1729393691144569,
+        "omega_t": 8.423109952768074,
+        "omega_x": 3.8062840370161997
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.997817684046048,
+        "omega_t": 250.3286000277142,
+        "omega_x": 0.9935851970786078,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 0.9988122594692612,
+            "sin": 0.9935851970786089
+          },
+          "residual_change_over_target": 3.7506131964269376e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924711,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      0,
+      8
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.8771402837684796,
+        "dispersion_coefficient": -0.006153062854062558,
+        "omega_t": 1.5137525103799512,
+        "omega_x": 3.055777578773157
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24287327184695526,
+        "dispersion_coefficient": -0.5430521885192722,
+        "omega_t": 250.2789727706676,
+        "omega_x": 2.5102075660061485,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.0484395165158702,
+            "sin": 2.5102075660061445
+          },
+          "residual_change_over_target": 4.188957784811527e-11
+        }
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24287327184695526,
+        "dispersion_coefficient": -0.5437856991007732,
+        "omega_t": 250.27512350188357,
+        "omega_x": 2.50652447199066,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.052288785299865,
+            "sin": 2.5065244719906588
+          },
+          "residual_change_over_target": 7.039893474246685e-11
+        }
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.4260916766399932,
+        "dispersion_coefficient": -0.01996729429848315,
+        "omega_t": 1.5823988415182177,
+        "omega_x": 3.1525388013016693
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.9965634224915016,
+        "omega_t": 250.32665560011787,
+        "omega_x": 1.001546617358392,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.0007566870655609,
+            "sin": 1.0015466173583931
+          },
+          "residual_change_over_target": 3.325674508755103e-11
+        }
+      }
+    }
+  },
+  {
+    "seed": 924712,
+    "plan": {
+      "q": [
+        2,
+        4
+      ],
+      "ms": [
+        16,
+        16
+      ],
+      "ss": [
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0
+      ],
+      "shape": [
+        13,
+        13
+      ]
+    },
+    "smoothing_degrees": [
+      6,
+      3
+    ],
+    "derivative_degrees": [
+      4,
+      5
+    ],
+    "fits": {
+      "raw": {
+        "dispersion_column_error": 0.7679392128735497,
+        "dispersion_coefficient": -0.010750939389620795,
+        "omega_t": 1.5134311479624902,
+        "omega_x": 3.083752973427118
+      },
+      "smooth_dispersion": {
+        "dispersion_column_error": 0.24304531426437478,
+        "dispersion_coefficient": -0.5599499378599931,
+        "omega_t": 250.15232776086174,
+        "omega_x": 2.5141688320084157,
+        "alias_check": {
+          "lower_frequencies": {
+            "cos": 1.1750845263216974,
+            "sin": 2.514168832008423
+          },
+          "residual_change_over_target": 5.619525313520153e-12
+        }
+      },
+      "smooth_all": {
+        "dispersion_column_error": 0.24304531426437478,
+        "dispersion_coefficient": -0.5601966573293536,
+        "omega_t": 1.1778242123230682,
+        "omega_x": 2.5066605927307246
+      },
+      "derivative_sure": {
+        "dispersion_column_error": 0.20018056508195378,
+        "dispersion_coefficient": -0.12267458506233539,
+        "omega_t": 1.8763736312362465,
+        "omega_x": 4.374194657824179
+      },
+      "clean_dispersion_control": {
+        "dispersion_column_error": 0.0,
+        "dispersion_coefficient": -0.9950848085647338,
+        "omega_t": 0.9971891466831394,
+        "omega_x": 1.0036111583719
+      }
+    }
+  }
+]

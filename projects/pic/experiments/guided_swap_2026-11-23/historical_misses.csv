@@ -1,0 +1,29 @@
+dataset,seed,arm,budget,law,generated,first,first_total,source,held,first_coefficient_error,held_coefficient_error,suitable,right_victim,screened,shortlisted,selected,first_selected,best_useful_rank,mean_useful_draw_probability,held_fate,trace_fate
+burgers_inviscid,923301,native,full,0,1,251,251,1,1,0.010951813323130555,0.010951813323130555,10,10,0,0,1,250,,,on front,on front
+burgers_inviscid,923301,native,total,0,1,251,251,1,1,0.010951813323130555,0.010951813323130555,10,10,0,0,1,250,,,on front,on front
+burgers_inviscid,923301,guided_swap,full,0,1,253,270,1,1,0.010951813323130555,0.010951813323130555,28,28,28,28,7,252,1,0.12915457545773218,on front,on front
+burgers_inviscid,923301,guided_swap,total,0,1,253,270,1,1,0.010951813323130555,0.010951813323130555,26,26,26,26,6,252,1,0.1291881954392027,on front,on front
+burgers_inviscid,923302,native,full,0,0,,,0,0,,,4,4,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923302,native,total,0,0,,,0,0,,,4,4,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923302,guided_swap,full,0,0,,,0,0,,,3,3,3,3,0,,1,0.1266535856417993,never scored,shortlisted but not selected
+burgers_inviscid,923302,guided_swap,total,0,0,,,0,0,,,3,3,3,3,0,,1,0.1266535856417993,never scored,shortlisted but not selected
+burgers_inviscid,923303,native,full,0,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923303,native,total,0,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923303,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+burgers_inviscid,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923301,native,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923301,native,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923301,guided_swap,full,1,1,2002,2105,0,0,0.006853567045500558,,3,3,3,3,0,,1,0.12681602063563538,dominated,dominated
+lorenz,923301,guided_swap,total,1,1,2002,2105,0,0,0.006853567045500558,,3,3,3,3,0,,1,0.12681602063563538,dominated,dominated
+lorenz,923303,native,full,1,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+lorenz,923303,native,total,1,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+lorenz,923303,guided_swap,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923303,guided_swap,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,native,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,native,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+pde_compound,923303,native,full,0,0,,,0,0,,,2,0,0,0,0,,,,never scored,wrong outgoing term
+pde_compound,923303,native,total,0,0,,,0,0,,,2,0,0,0,0,,,,never scored,wrong outgoing term
+pde_compound,923303,guided_swap,full,0,0,,,0,0,,,1,0,0,0,0,,,,never scored,wrong outgoing term
+pde_compound,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent

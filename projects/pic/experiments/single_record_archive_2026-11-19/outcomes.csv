@@ -1,0 +1,505 @@
+system,seed,training,evaluation,pool,gated,hit,fate,size
+wave,921101,early,source,returned,False,False,absent from pool,13
+wave,921101,early,source,returned,True,False,absent from pool,13
+wave,921101,early,source,terminal,False,False,absent from pool,13
+wave,921101,early,source,terminal,True,False,absent from pool,13
+wave,921101,early,source,archive,False,False,dominated,13
+wave,921101,early,source,archive,True,False,dominated,13
+wave,921101,early,heldout,returned,False,False,absent from pool,4
+wave,921101,early,heldout,returned,True,False,absent from pool,4
+wave,921101,early,heldout,terminal,False,False,absent from pool,5
+wave,921101,early,heldout,terminal,True,False,absent from pool,5
+wave,921101,early,heldout,archive,False,False,validation ineligible,12
+wave,921101,early,heldout,archive,True,False,validation ineligible,12
+wave,921101,late,source,returned,False,False,absent from pool,12
+wave,921101,late,source,returned,True,False,absent from pool,12
+wave,921101,late,source,terminal,False,False,absent from pool,12
+wave,921101,late,source,terminal,True,False,absent from pool,12
+wave,921101,late,source,archive,False,False,dominated,13
+wave,921101,late,source,archive,True,False,validation ineligible,13
+wave,921101,late,heldout,returned,False,False,absent from pool,5
+wave,921101,late,heldout,returned,True,False,absent from pool,5
+wave,921101,late,heldout,terminal,False,False,absent from pool,6
+wave,921101,late,heldout,terminal,True,False,absent from pool,6
+wave,921101,late,heldout,archive,False,False,dominated,8
+wave,921101,late,heldout,archive,True,False,validation ineligible,8
+wave,921101,full,source,returned,False,False,absent from pool,11
+wave,921101,full,source,returned,True,False,absent from pool,11
+wave,921101,full,source,terminal,False,False,dominated,11
+wave,921101,full,source,terminal,True,False,dominated,11
+wave,921101,full,source,archive,False,False,dominated,11
+wave,921101,full,source,archive,True,False,dominated,11
+wave,921101,left,source,returned,False,False,never scored,8
+wave,921101,left,source,returned,True,False,never scored,4
+wave,921101,left,source,terminal,False,False,never scored,8
+wave,921101,left,source,terminal,True,False,never scored,9
+wave,921101,left,source,archive,False,False,never scored,9
+wave,921101,left,source,archive,True,False,never scored,12
+wave,921101,left,heldout,returned,False,False,never scored,0
+wave,921101,left,heldout,returned,True,False,never scored,0
+wave,921101,left,heldout,terminal,False,False,never scored,0
+wave,921101,left,heldout,terminal,True,False,never scored,0
+wave,921101,left,heldout,archive,False,False,never scored,4
+wave,921101,left,heldout,archive,True,False,never scored,4
+wave,921101,right,source,returned,False,True,retained,11
+wave,921101,right,source,returned,True,True,retained,11
+wave,921101,right,source,terminal,False,True,retained,11
+wave,921101,right,source,terminal,True,True,retained,11
+wave,921101,right,source,archive,False,True,retained,11
+wave,921101,right,source,archive,True,True,retained,11
+wave,921101,right,heldout,returned,False,True,retained,1
+wave,921101,right,heldout,returned,True,True,retained,1
+wave,921101,right,heldout,terminal,False,True,retained,1
+wave,921101,right,heldout,terminal,True,True,retained,1
+wave,921101,right,heldout,archive,False,True,retained,3
+wave,921101,right,heldout,archive,True,True,retained,3
+wave,921102,early,source,returned,False,False,absent from pool,8
+wave,921102,early,source,returned,True,False,absent from pool,8
+wave,921102,early,source,terminal,False,False,absent from pool,8
+wave,921102,early,source,terminal,True,False,absent from pool,8
+wave,921102,early,source,archive,False,False,dominated,8
+wave,921102,early,source,archive,True,False,dominated,8
+wave,921102,early,heldout,returned,False,False,absent from pool,4
+wave,921102,early,heldout,returned,True,False,absent from pool,4
+wave,921102,early,heldout,terminal,False,False,absent from pool,4
+wave,921102,early,heldout,terminal,True,False,absent from pool,4
+wave,921102,early,heldout,archive,False,False,dominated,7
+wave,921102,early,heldout,archive,True,False,dominated,7
+wave,921102,late,source,returned,False,False,absent from pool,7
+wave,921102,late,source,returned,True,False,absent from pool,7
+wave,921102,late,source,terminal,False,False,absent from pool,7
+wave,921102,late,source,terminal,True,False,absent from pool,7
+wave,921102,late,source,archive,False,False,dominated,7
+wave,921102,late,source,archive,True,False,dominated,7
+wave,921102,late,heldout,returned,False,False,absent from pool,3
+wave,921102,late,heldout,returned,True,False,absent from pool,3
+wave,921102,late,heldout,terminal,False,False,absent from pool,4
+wave,921102,late,heldout,terminal,True,False,absent from pool,4
+wave,921102,late,heldout,archive,False,False,dominated,11
+wave,921102,late,heldout,archive,True,False,dominated,11
+wave,921102,full,source,returned,False,False,absent from pool,11
+wave,921102,full,source,returned,True,False,absent from pool,10
+wave,921102,full,source,terminal,False,False,dominated,11
+wave,921102,full,source,terminal,True,False,dominated,10
+wave,921102,full,source,archive,False,False,dominated,11
+wave,921102,full,source,archive,True,False,dominated,10
+wave,921102,left,source,returned,False,True,retained,17
+wave,921102,left,source,returned,True,True,retained,10
+wave,921102,left,source,terminal,False,True,retained,17
+wave,921102,left,source,terminal,True,True,retained,11
+wave,921102,left,source,archive,False,True,retained,17
+wave,921102,left,source,archive,True,True,retained,14
+wave,921102,left,heldout,returned,False,True,retained,1
+wave,921102,left,heldout,returned,True,True,retained,1
+wave,921102,left,heldout,terminal,False,True,retained,1
+wave,921102,left,heldout,terminal,True,True,retained,1
+wave,921102,left,heldout,archive,False,True,retained,7
+wave,921102,left,heldout,archive,True,True,retained,5
+wave,921102,right,source,returned,False,False,absent from pool,19
+wave,921102,right,source,returned,True,False,absent from pool,19
+wave,921102,right,source,terminal,False,False,absent from pool,19
+wave,921102,right,source,terminal,True,False,absent from pool,19
+wave,921102,right,source,archive,False,False,dominated,19
+wave,921102,right,source,archive,True,False,dominated,19
+wave,921102,right,heldout,returned,False,False,absent from pool,0
+wave,921102,right,heldout,returned,True,False,absent from pool,0
+wave,921102,right,heldout,terminal,False,False,absent from pool,2
+wave,921102,right,heldout,terminal,True,False,absent from pool,2
+wave,921102,right,heldout,archive,False,True,retained,3
+wave,921102,right,heldout,archive,True,True,retained,3
+wave,921103,early,source,returned,False,False,absent from pool,11
+wave,921103,early,source,returned,True,False,absent from pool,11
+wave,921103,early,source,terminal,False,False,absent from pool,11
+wave,921103,early,source,terminal,True,False,absent from pool,11
+wave,921103,early,source,archive,False,False,dominated,11
+wave,921103,early,source,archive,True,False,dominated,11
+wave,921103,early,heldout,returned,False,False,absent from pool,2
+wave,921103,early,heldout,returned,True,False,absent from pool,2
+wave,921103,early,heldout,terminal,False,False,absent from pool,5
+wave,921103,early,heldout,terminal,True,False,absent from pool,5
+wave,921103,early,heldout,archive,False,False,dominated,9
+wave,921103,early,heldout,archive,True,False,dominated,9
+wave,921103,late,source,returned,False,False,absent from pool,14
+wave,921103,late,source,returned,True,False,absent from pool,14
+wave,921103,late,source,terminal,False,False,absent from pool,14
+wave,921103,late,source,terminal,True,False,absent from pool,14
+wave,921103,late,source,archive,False,False,dominated,13
+wave,921103,late,source,archive,True,False,dominated,13
+wave,921103,late,heldout,returned,False,False,absent from pool,7
+wave,921103,late,heldout,returned,True,False,absent from pool,7
+wave,921103,late,heldout,terminal,False,False,absent from pool,7
+wave,921103,late,heldout,terminal,True,False,absent from pool,7
+wave,921103,late,heldout,archive,False,False,dominated,14
+wave,921103,late,heldout,archive,True,False,dominated,14
+wave,921103,full,source,returned,False,False,absent from pool,8
+wave,921103,full,source,returned,True,False,absent from pool,8
+wave,921103,full,source,terminal,False,False,dominated,8
+wave,921103,full,source,terminal,True,False,dominated,8
+wave,921103,full,source,archive,False,True,retained,9
+wave,921103,full,source,archive,True,True,retained,9
+wave,921103,left,source,returned,False,True,retained,10
+wave,921103,left,source,returned,True,True,retained,8
+wave,921103,left,source,terminal,False,True,retained,10
+wave,921103,left,source,terminal,True,True,retained,10
+wave,921103,left,source,archive,False,True,retained,10
+wave,921103,left,source,archive,True,True,retained,11
+wave,921103,left,heldout,returned,False,True,retained,1
+wave,921103,left,heldout,returned,True,True,retained,1
+wave,921103,left,heldout,terminal,False,True,retained,2
+wave,921103,left,heldout,terminal,True,True,retained,2
+wave,921103,left,heldout,archive,False,True,retained,4
+wave,921103,left,heldout,archive,True,True,retained,4
+wave,921103,right,source,returned,False,False,absent from pool,16
+wave,921103,right,source,returned,True,False,absent from pool,16
+wave,921103,right,source,terminal,False,False,absent from pool,16
+wave,921103,right,source,terminal,True,False,absent from pool,16
+wave,921103,right,source,archive,False,False,dominated,16
+wave,921103,right,source,archive,True,False,dominated,16
+wave,921103,right,heldout,returned,False,False,absent from pool,0
+wave,921103,right,heldout,returned,True,False,absent from pool,0
+wave,921103,right,heldout,terminal,False,False,absent from pool,1
+wave,921103,right,heldout,terminal,True,False,absent from pool,1
+wave,921103,right,heldout,archive,False,False,dominated,7
+wave,921103,right,heldout,archive,True,False,dominated,7
+wave,921104,early,source,returned,False,False,absent from pool,11
+wave,921104,early,source,returned,True,False,absent from pool,11
+wave,921104,early,source,terminal,False,False,absent from pool,11
+wave,921104,early,source,terminal,True,False,absent from pool,11
+wave,921104,early,source,archive,False,False,dominated,11
+wave,921104,early,source,archive,True,False,dominated,11
+wave,921104,early,heldout,returned,False,False,absent from pool,2
+wave,921104,early,heldout,returned,True,False,absent from pool,2
+wave,921104,early,heldout,terminal,False,False,absent from pool,2
+wave,921104,early,heldout,terminal,True,False,absent from pool,2
+wave,921104,early,heldout,archive,False,False,dominated,6
+wave,921104,early,heldout,archive,True,False,dominated,6
+wave,921104,late,source,returned,False,False,absent from pool,10
+wave,921104,late,source,returned,True,False,absent from pool,10
+wave,921104,late,source,terminal,False,False,absent from pool,10
+wave,921104,late,source,terminal,True,False,absent from pool,10
+wave,921104,late,source,archive,False,False,dominated,10
+wave,921104,late,source,archive,True,False,validation ineligible,10
+wave,921104,late,heldout,returned,False,False,absent from pool,5
+wave,921104,late,heldout,returned,True,False,absent from pool,5
+wave,921104,late,heldout,terminal,False,False,absent from pool,10
+wave,921104,late,heldout,terminal,True,False,absent from pool,10
+wave,921104,late,heldout,archive,False,False,dominated,10
+wave,921104,late,heldout,archive,True,False,validation ineligible,10
+wave,921104,full,source,returned,False,False,absent from pool,11
+wave,921104,full,source,returned,True,False,absent from pool,11
+wave,921104,full,source,terminal,False,False,absent from pool,11
+wave,921104,full,source,terminal,True,False,absent from pool,11
+wave,921104,full,source,archive,False,False,dominated,11
+wave,921104,full,source,archive,True,False,dominated,11
+wave,921104,left,source,returned,False,False,absent from pool,13
+wave,921104,left,source,returned,True,False,absent from pool,9
+wave,921104,left,source,terminal,False,False,absent from pool,13
+wave,921104,left,source,terminal,True,False,absent from pool,12
+wave,921104,left,source,archive,False,False,dominated,13
+wave,921104,left,source,archive,True,False,dominated,17
+wave,921104,left,heldout,returned,False,False,absent from pool,0
+wave,921104,left,heldout,returned,True,False,absent from pool,0
+wave,921104,left,heldout,terminal,False,False,absent from pool,0
+wave,921104,left,heldout,terminal,True,False,absent from pool,0
+wave,921104,left,heldout,archive,False,True,retained,3
+wave,921104,left,heldout,archive,True,True,retained,3
+wave,921104,right,source,returned,False,True,retained,16
+wave,921104,right,source,returned,True,True,retained,16
+wave,921104,right,source,terminal,False,True,retained,16
+wave,921104,right,source,terminal,True,True,retained,16
+wave,921104,right,source,archive,False,True,retained,16
+wave,921104,right,source,archive,True,True,retained,16
+wave,921104,right,heldout,returned,False,True,retained,1
+wave,921104,right,heldout,returned,True,True,retained,1
+wave,921104,right,heldout,terminal,False,True,retained,2
+wave,921104,right,heldout,terminal,True,True,retained,2
+wave,921104,right,heldout,archive,False,True,retained,11
+wave,921104,right,heldout,archive,True,True,retained,11
+wave,921105,early,source,returned,False,False,absent from pool,11
+wave,921105,early,source,returned,True,False,absent from pool,11
+wave,921105,early,source,terminal,False,False,absent from pool,11
+wave,921105,early,source,terminal,True,False,absent from pool,11
+wave,921105,early,source,archive,False,False,dominated,11
+wave,921105,early,source,archive,True,False,validation ineligible,11
+wave,921105,early,heldout,returned,False,False,absent from pool,5
+wave,921105,early,heldout,returned,True,False,absent from pool,5
+wave,921105,early,heldout,terminal,False,False,absent from pool,5
+wave,921105,early,heldout,terminal,True,False,absent from pool,5
+wave,921105,early,heldout,archive,False,False,dominated,9
+wave,921105,early,heldout,archive,True,False,dominated,9
+wave,921105,late,source,returned,False,False,absent from pool,9
+wave,921105,late,source,returned,True,False,absent from pool,9
+wave,921105,late,source,terminal,False,False,absent from pool,9
+wave,921105,late,source,terminal,True,False,absent from pool,9
+wave,921105,late,source,archive,False,False,dominated,9
+wave,921105,late,source,archive,True,False,validation ineligible,9
+wave,921105,late,heldout,returned,False,False,absent from pool,7
+wave,921105,late,heldout,returned,True,False,absent from pool,7
+wave,921105,late,heldout,terminal,False,False,absent from pool,8
+wave,921105,late,heldout,terminal,True,False,absent from pool,8
+wave,921105,late,heldout,archive,False,False,dominated,10
+wave,921105,late,heldout,archive,True,False,validation ineligible,10
+wave,921105,full,source,returned,False,False,absent from pool,6
+wave,921105,full,source,returned,True,False,absent from pool,6
+wave,921105,full,source,terminal,False,False,absent from pool,6
+wave,921105,full,source,terminal,True,False,absent from pool,6
+wave,921105,full,source,archive,False,False,dominated,6
+wave,921105,full,source,archive,True,False,dominated,6
+wave,921105,left,source,returned,False,False,never scored,15
+wave,921105,left,source,returned,True,False,never scored,11
+wave,921105,left,source,terminal,False,False,never scored,15
+wave,921105,left,source,terminal,True,False,never scored,11
+wave,921105,left,source,archive,False,False,never scored,15
+wave,921105,left,source,archive,True,False,never scored,11
+wave,921105,left,heldout,returned,False,False,never scored,0
+wave,921105,left,heldout,returned,True,False,never scored,0
+wave,921105,left,heldout,terminal,False,False,never scored,1
+wave,921105,left,heldout,terminal,True,False,never scored,0
+wave,921105,left,heldout,archive,False,False,never scored,4
+wave,921105,left,heldout,archive,True,False,never scored,4
+wave,921105,right,source,returned,False,False,absent from pool,12
+wave,921105,right,source,returned,True,False,absent from pool,12
+wave,921105,right,source,terminal,False,False,absent from pool,12
+wave,921105,right,source,terminal,True,False,absent from pool,12
+wave,921105,right,source,archive,False,False,dominated,12
+wave,921105,right,source,archive,True,False,dominated,12
+wave,921105,right,heldout,returned,False,False,absent from pool,1
+wave,921105,right,heldout,returned,True,False,absent from pool,1
+wave,921105,right,heldout,terminal,False,False,absent from pool,1
+wave,921105,right,heldout,terminal,True,False,absent from pool,1
+wave,921105,right,heldout,archive,False,False,dominated,7
+wave,921105,right,heldout,archive,True,False,validation ineligible,7
+wave,921106,early,source,returned,False,False,absent from pool,9
+wave,921106,early,source,returned,True,False,absent from pool,9
+wave,921106,early,source,terminal,False,False,absent from pool,9
+wave,921106,early,source,terminal,True,False,absent from pool,9
+wave,921106,early,source,archive,False,False,dominated,9
+wave,921106,early,source,archive,True,False,dominated,9
+wave,921106,early,heldout,returned,False,False,absent from pool,2
+wave,921106,early,heldout,returned,True,False,absent from pool,2
+wave,921106,early,heldout,terminal,False,False,absent from pool,4
+wave,921106,early,heldout,terminal,True,False,absent from pool,4
+wave,921106,early,heldout,archive,False,False,dominated,9
+wave,921106,early,heldout,archive,True,False,dominated,9
+wave,921106,late,source,returned,False,False,absent from pool,10
+wave,921106,late,source,returned,True,False,absent from pool,10
+wave,921106,late,source,terminal,False,False,absent from pool,10
+wave,921106,late,source,terminal,True,False,absent from pool,10
+wave,921106,late,source,archive,False,False,dominated,11
+wave,921106,late,source,archive,True,False,dominated,11
+wave,921106,late,heldout,returned,False,False,absent from pool,3
+wave,921106,late,heldout,returned,True,False,absent from pool,3
+wave,921106,late,heldout,terminal,False,False,absent from pool,3
+wave,921106,late,heldout,terminal,True,False,absent from pool,3
+wave,921106,late,heldout,archive,False,False,dominated,5
+wave,921106,late,heldout,archive,True,False,validation ineligible,5
+wave,921106,full,source,returned,False,False,absent from pool,14
+wave,921106,full,source,returned,True,False,absent from pool,14
+wave,921106,full,source,terminal,False,False,dominated,14
+wave,921106,full,source,terminal,True,False,dominated,14
+wave,921106,full,source,archive,False,False,dominated,14
+wave,921106,full,source,archive,True,False,dominated,14
+wave,921106,left,source,returned,False,True,retained,19
+wave,921106,left,source,returned,True,True,retained,14
+wave,921106,left,source,terminal,False,True,retained,19
+wave,921106,left,source,terminal,True,True,retained,14
+wave,921106,left,source,archive,False,True,retained,19
+wave,921106,left,source,archive,True,True,retained,14
+wave,921106,left,heldout,returned,False,True,retained,1
+wave,921106,left,heldout,returned,True,True,retained,1
+wave,921106,left,heldout,terminal,False,True,retained,1
+wave,921106,left,heldout,terminal,True,True,retained,1
+wave,921106,left,heldout,archive,False,True,retained,4
+wave,921106,left,heldout,archive,True,True,retained,4
+wave,921106,right,source,returned,False,False,absent from pool,10
+wave,921106,right,source,returned,True,False,absent from pool,10
+wave,921106,right,source,terminal,False,False,absent from pool,10
+wave,921106,right,source,terminal,True,False,absent from pool,10
+wave,921106,right,source,archive,False,False,dominated,10
+wave,921106,right,source,archive,True,False,validation ineligible,10
+wave,921106,right,heldout,returned,False,False,absent from pool,0
+wave,921106,right,heldout,returned,True,False,absent from pool,0
+wave,921106,right,heldout,terminal,False,False,absent from pool,2
+wave,921106,right,heldout,terminal,True,False,absent from pool,2
+wave,921106,right,heldout,archive,False,False,validation ineligible,9
+wave,921106,right,heldout,archive,True,False,validation ineligible,9
+pde_compound,921101,early,source,returned,False,False,never scored,22
+pde_compound,921101,early,source,returned,True,False,never scored,22
+pde_compound,921101,early,source,terminal,False,False,never scored,22
+pde_compound,921101,early,source,terminal,True,False,never scored,22
+pde_compound,921101,early,source,archive,False,False,never scored,21
+pde_compound,921101,early,source,archive,True,False,never scored,21
+pde_compound,921101,early,heldout,returned,False,False,never scored,2
+pde_compound,921101,early,heldout,returned,True,False,never scored,2
+pde_compound,921101,early,heldout,terminal,False,False,never scored,3
+pde_compound,921101,early,heldout,terminal,True,False,never scored,3
+pde_compound,921101,early,heldout,archive,False,False,never scored,7
+pde_compound,921101,early,heldout,archive,True,False,never scored,7
+pde_compound,921101,late,source,returned,False,False,never scored,16
+pde_compound,921101,late,source,returned,True,False,never scored,16
+pde_compound,921101,late,source,terminal,False,False,never scored,16
+pde_compound,921101,late,source,terminal,True,False,never scored,16
+pde_compound,921101,late,source,archive,False,False,never scored,16
+pde_compound,921101,late,source,archive,True,False,never scored,16
+pde_compound,921101,late,heldout,returned,False,False,never scored,4
+pde_compound,921101,late,heldout,returned,True,False,never scored,3
+pde_compound,921101,late,heldout,terminal,False,False,never scored,6
+pde_compound,921101,late,heldout,terminal,True,False,never scored,5
+pde_compound,921101,late,heldout,archive,False,False,never scored,10
+pde_compound,921101,late,heldout,archive,True,False,never scored,9
+pde_compound,921101,full,source,returned,False,False,never scored,14
+pde_compound,921101,full,source,returned,True,False,never scored,14
+pde_compound,921101,full,source,terminal,False,False,never scored,14
+pde_compound,921101,full,source,terminal,True,False,never scored,14
+pde_compound,921101,full,source,archive,False,False,never scored,14
+pde_compound,921101,full,source,archive,True,False,never scored,14
+pde_compound,921102,early,source,returned,False,False,never scored,15
+pde_compound,921102,early,source,returned,True,False,never scored,15
+pde_compound,921102,early,source,terminal,False,False,never scored,15
+pde_compound,921102,early,source,terminal,True,False,never scored,15
+pde_compound,921102,early,source,archive,False,False,never scored,15
+pde_compound,921102,early,source,archive,True,False,never scored,15
+pde_compound,921102,early,heldout,returned,False,False,never scored,3
+pde_compound,921102,early,heldout,returned,True,False,never scored,3
+pde_compound,921102,early,heldout,terminal,False,False,never scored,4
+pde_compound,921102,early,heldout,terminal,True,False,never scored,4
+pde_compound,921102,early,heldout,archive,False,False,never scored,10
+pde_compound,921102,early,heldout,archive,True,False,never scored,10
+pde_compound,921102,late,source,returned,False,False,never scored,19
+pde_compound,921102,late,source,returned,True,False,never scored,19
+pde_compound,921102,late,source,terminal,False,False,never scored,19
+pde_compound,921102,late,source,terminal,True,False,never scored,19
+pde_compound,921102,late,source,archive,False,False,never scored,19
+pde_compound,921102,late,source,archive,True,False,never scored,19
+pde_compound,921102,late,heldout,returned,False,False,never scored,4
+pde_compound,921102,late,heldout,returned,True,False,never scored,4
+pde_compound,921102,late,heldout,terminal,False,False,never scored,5
+pde_compound,921102,late,heldout,terminal,True,False,never scored,5
+pde_compound,921102,late,heldout,archive,False,False,never scored,8
+pde_compound,921102,late,heldout,archive,True,False,never scored,8
+pde_compound,921102,full,source,returned,False,True,retained,12
+pde_compound,921102,full,source,returned,True,True,retained,12
+pde_compound,921102,full,source,terminal,False,True,retained,12
+pde_compound,921102,full,source,terminal,True,True,retained,12
+pde_compound,921102,full,source,archive,False,True,retained,11
+pde_compound,921102,full,source,archive,True,True,retained,11
+pde_compound,921103,early,source,returned,False,True,retained,11
+pde_compound,921103,early,source,returned,True,True,retained,11
+pde_compound,921103,early,source,terminal,False,True,retained,11
+pde_compound,921103,early,source,terminal,True,True,retained,11
+pde_compound,921103,early,source,archive,False,True,retained,12
+pde_compound,921103,early,source,archive,True,True,retained,12
+pde_compound,921103,early,heldout,returned,False,True,retained,4
+pde_compound,921103,early,heldout,returned,True,True,retained,4
+pde_compound,921103,early,heldout,terminal,False,True,retained,7
+pde_compound,921103,early,heldout,terminal,True,True,retained,7
+pde_compound,921103,early,heldout,archive,False,True,retained,9
+pde_compound,921103,early,heldout,archive,True,True,retained,9
+pde_compound,921103,late,source,returned,False,False,absent from pool,18
+pde_compound,921103,late,source,returned,True,False,absent from pool,18
+pde_compound,921103,late,source,terminal,False,False,absent from pool,18
+pde_compound,921103,late,source,terminal,True,False,absent from pool,18
+pde_compound,921103,late,source,archive,False,False,dominated,18
+pde_compound,921103,late,source,archive,True,False,dominated,18
+pde_compound,921103,late,heldout,returned,False,False,absent from pool,5
+pde_compound,921103,late,heldout,returned,True,False,absent from pool,5
+pde_compound,921103,late,heldout,terminal,False,False,absent from pool,5
+pde_compound,921103,late,heldout,terminal,True,False,absent from pool,5
+pde_compound,921103,late,heldout,archive,False,True,retained,5
+pde_compound,921103,late,heldout,archive,True,True,retained,5
+pde_compound,921103,full,source,returned,False,True,retained,12
+pde_compound,921103,full,source,returned,True,True,retained,12
+pde_compound,921103,full,source,terminal,False,True,retained,12
+pde_compound,921103,full,source,terminal,True,True,retained,12
+pde_compound,921103,full,source,archive,False,True,retained,12
+pde_compound,921103,full,source,archive,True,True,retained,12
+pde_compound,921104,early,source,returned,False,True,retained,14
+pde_compound,921104,early,source,returned,True,True,retained,14
+pde_compound,921104,early,source,terminal,False,True,retained,14
+pde_compound,921104,early,source,terminal,True,True,retained,14
+pde_compound,921104,early,source,archive,False,True,retained,14
+pde_compound,921104,early,source,archive,True,True,retained,14
+pde_compound,921104,early,heldout,returned,False,False,dominated,2
+pde_compound,921104,early,heldout,returned,True,False,dominated,2
+pde_compound,921104,early,heldout,terminal,False,False,dominated,2
+pde_compound,921104,early,heldout,terminal,True,False,dominated,2
+pde_compound,921104,early,heldout,archive,False,False,dominated,5
+pde_compound,921104,early,heldout,archive,True,False,dominated,5
+pde_compound,921104,late,source,returned,False,False,never scored,17
+pde_compound,921104,late,source,returned,True,False,never scored,17
+pde_compound,921104,late,source,terminal,False,False,never scored,17
+pde_compound,921104,late,source,terminal,True,False,never scored,17
+pde_compound,921104,late,source,archive,False,False,never scored,17
+pde_compound,921104,late,source,archive,True,False,never scored,17
+pde_compound,921104,late,heldout,returned,False,False,never scored,5
+pde_compound,921104,late,heldout,returned,True,False,never scored,5
+pde_compound,921104,late,heldout,terminal,False,False,never scored,2
+pde_compound,921104,late,heldout,terminal,True,False,never scored,2
+pde_compound,921104,late,heldout,archive,False,False,never scored,9
+pde_compound,921104,late,heldout,archive,True,False,never scored,8
+pde_compound,921104,full,source,returned,False,False,never scored,13
+pde_compound,921104,full,source,returned,True,False,never scored,13
+pde_compound,921104,full,source,terminal,False,False,never scored,13
+pde_compound,921104,full,source,terminal,True,False,never scored,13
+pde_compound,921104,full,source,archive,False,False,never scored,14
+pde_compound,921104,full,source,archive,True,False,never scored,14
+pde_compound,921105,early,source,returned,False,False,never scored,22
+pde_compound,921105,early,source,returned,True,False,never scored,22
+pde_compound,921105,early,source,terminal,False,False,never scored,22
+pde_compound,921105,early,source,terminal,True,False,never scored,22
+pde_compound,921105,early,source,archive,False,False,never scored,22
+pde_compound,921105,early,source,archive,True,False,never scored,22
+pde_compound,921105,early,heldout,returned,False,False,never scored,3
+pde_compound,921105,early,heldout,returned,True,False,never scored,3
+pde_compound,921105,early,heldout,terminal,False,False,never scored,4
+pde_compound,921105,early,heldout,terminal,True,False,never scored,4
+pde_compound,921105,early,heldout,archive,False,False,never scored,9
+pde_compound,921105,early,heldout,archive,True,False,never scored,9
+pde_compound,921105,late,source,returned,False,False,never scored,13
+pde_compound,921105,late,source,returned,True,False,never scored,13
+pde_compound,921105,late,source,terminal,False,False,never scored,13
+pde_compound,921105,late,source,terminal,True,False,never scored,13
+pde_compound,921105,late,source,archive,False,False,never scored,13
+pde_compound,921105,late,source,archive,True,False,never scored,13
+pde_compound,921105,late,heldout,returned,False,False,never scored,6
+pde_compound,921105,late,heldout,returned,True,False,never scored,6
+pde_compound,921105,late,heldout,terminal,False,False,never scored,5
+pde_compound,921105,late,heldout,terminal,True,False,never scored,5
+pde_compound,921105,late,heldout,archive,False,False,never scored,9
+pde_compound,921105,late,heldout,archive,True,False,never scored,7
+pde_compound,921105,full,source,returned,False,True,retained,8
+pde_compound,921105,full,source,returned,True,True,retained,8
+pde_compound,921105,full,source,terminal,False,True,retained,8
+pde_compound,921105,full,source,terminal,True,True,retained,8
+pde_compound,921105,full,source,archive,False,True,retained,8
+pde_compound,921105,full,source,archive,True,True,retained,8
+pde_compound,921106,early,source,returned,False,False,never scored,21
+pde_compound,921106,early,source,returned,True,False,never scored,21
+pde_compound,921106,early,source,terminal,False,False,never scored,21
+pde_compound,921106,early,source,terminal,True,False,never scored,21
+pde_compound,921106,early,source,archive,False,False,never scored,22
+pde_compound,921106,early,source,archive,True,False,never scored,22
+pde_compound,921106,early,heldout,returned,False,False,never scored,3
+pde_compound,921106,early,heldout,returned,True,False,never scored,3
+pde_compound,921106,early,heldout,terminal,False,False,never scored,3
+pde_compound,921106,early,heldout,terminal,True,False,never scored,3
+pde_compound,921106,early,heldout,archive,False,False,never scored,7
+pde_compound,921106,early,heldout,archive,True,False,never scored,7
+pde_compound,921106,late,source,returned,False,False,never scored,16
+pde_compound,921106,late,source,returned,True,False,never scored,16
+pde_compound,921106,late,source,terminal,False,False,never scored,16
+pde_compound,921106,late,source,terminal,True,False,never scored,16
+pde_compound,921106,late,source,archive,False,False,never scored,16
+pde_compound,921106,late,source,archive,True,False,never scored,16
+pde_compound,921106,late,heldout,returned,False,False,never scored,1
+pde_compound,921106,late,heldout,returned,True,False,never scored,1
+pde_compound,921106,late,heldout,terminal,False,False,never scored,1
+pde_compound,921106,late,heldout,terminal,True,False,never scored,1
+pde_compound,921106,late,heldout,archive,False,False,never scored,9
+pde_compound,921106,late,heldout,archive,True,False,never scored,9
+pde_compound,921106,full,source,returned,False,False,never scored,16
+pde_compound,921106,full,source,returned,True,False,never scored,16
+pde_compound,921106,full,source,terminal,False,False,never scored,16
+pde_compound,921106,full,source,terminal,True,False,never scored,16
+pde_compound,921106,full,source,archive,False,False,never scored,17
+pde_compound,921106,full,source,archive,True,False,never scored,17

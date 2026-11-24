@@ -1,0 +1,46 @@
+{
+  "ac": {
+    "local": {
+      "none": 8,
+      "diffusion": 16,
+      "cubic": 17,
+      "linear": 19,
+      "diffusion+cubic": 19,
+      "diffusion+linear": 20,
+      "cubic+linear": 22,
+      "diffusion+cubic+linear": 22
+    },
+    "middle": {
+      "none": 6,
+      "diffusion": 17,
+      "cubic": 14,
+      "linear": 12,
+      "diffusion+cubic": 22,
+      "diffusion+linear": 22,
+      "cubic+linear": 23,
+      "diffusion+cubic+linear": 23
+    }
+  },
+  "kdv_cossin": {
+    "local": {
+      "none": 0,
+      "nonlinear": 0,
+      "dispersion": 0,
+      "forcing": 0,
+      "nonlinear+dispersion": 0,
+      "nonlinear+forcing": 0,
+      "dispersion+forcing": 2,
+      "nonlinear+dispersion+forcing": 22
+    },
+    "middle": {
+      "none": 0,
+      "nonlinear": 0,
+      "dispersion": 3,
+      "forcing": 3,
+      "nonlinear+dispersion": 4,
+      "nonlinear+forcing": 6,
+      "dispersion+forcing": 8,
+      "nonlinear+dispersion+forcing": 21
+    }
+  }
+}

@@ -1,0 +1,240 @@
+system,slot,candidate,group,term,favor_with,favor_without,ties,median_margin,all_with,all_without,all_numerically_separated,pareto_with,pareto_without
+ac,0,e0:drop_0,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]]]",0,6,0,-2.796244806298328e-06,False,True,True,0,6
+ac,0,e0:drop_1,deletion,"[[""u"", [[""power"", 3.0]]]]",6,0,0,0.3666884240884922,True,False,True,1,0
+ac,0,e0:drop_2,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.7037474549609782,True,False,True,1,0
+ac,0,e0:add_0,addition,[],0,6,0,-1.2029762893643961e-05,False,True,True,0,6
+ac,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-5.079823200314531e-06,False,True,True,0,6
+ac,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-4.095833114084609e-06,False,True,True,0,6
+ac,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-7.069651080683859e-06,False,True,True,0,6
+ac,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-2.165678895268058e-05,False,True,True,0,6
+ac,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",1,5,0,-1.2146389961653838e-05,False,False,True,0,5
+burgers,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,0.6432798820614396,True,False,True,3,0
+burgers,0,e0:drop_1,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]]]",6,0,0,0.033318646110983854,True,False,True,1,0
+burgers,0,e0:add_0,addition,[],0,6,0,-3.0184979657188202e-06,False,True,True,0,6
+burgers,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-3.1608447530326492e-06,False,True,True,0,6
+burgers,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-2.8265149688352965e-06,False,True,True,0,6
+burgers,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-4.2280831501928714e-07,False,False,True,0,4
+burgers,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-1.0609640179276475e-06,False,False,True,0,5
+burgers,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-6.967792058493747e-07,False,True,True,0,6
+burgers,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",1,5,0,-9.85454795924734e-07,False,False,True,0,5
+burgers,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",2,4,0,-1.0802128910266363e-06,False,False,True,0,4
+burgers_inviscid,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,0.9967014557780314,True,False,True,0,0
+burgers_inviscid,0,e0:add_0,addition,[],3,3,0,-1.3608027397538488e-06,False,False,True,0,3
+burgers_inviscid,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",2,4,0,-5.272792311411669e-06,False,False,True,0,4
+burgers_inviscid,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-2.5194055302290233e-05,False,True,True,0,6
+burgers_inviscid,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",4,2,0,4.414407185625063e-07,False,False,True,0,2
+burgers_inviscid,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-1.6580809365303525e-05,False,True,True,0,6
+burgers_inviscid,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-0.00026040794636046893,False,True,True,0,6
+burgers_inviscid,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",4,2,0,2.430718180554283e-06,False,False,True,0,2
+burgers_inviscid,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",3,3,0,4.1624267442698035e-06,False,False,True,0,3
+duffing,0,e0:drop_0,deletion,"[[""du/dx0"", [[""power"", 1.0]]]]",6,0,0,0.011535881539738987,True,False,True,0,0
+duffing,0,e0:drop_1,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.022467124426645446,True,False,True,6,0
+duffing,0,e0:drop_2,deletion,"[[""u"", [[""power"", 3.0]]]]",6,0,0,0.0038737875829845687,True,False,True,0,0
+duffing,0,e0:drop_3,deletion,"[[""cos"", [[""dim"", 0.0], [""freq"", 1.0], [""power"", 1.0]]]]",6,0,0,0.032117446040030265,True,False,True,5,0
+duffing,0,e0:add_0,addition,[],2,4,0,-6.171540559923543e-06,False,False,True,0,4
+duffing,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",2,4,0,-9.399782667042178e-06,False,False,True,0,4
+duffing,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",2,4,0,-8.926263698864715e-06,False,False,True,0,4
+duffing,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-1.236537391002391e-06,False,False,True,0,4
+duffing,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",3,3,0,2.6837182747024667e-07,False,False,True,0,3
+duffing,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",3,3,0,1.0225504440786483e-07,False,False,True,1,3
+kdv,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,0.727001955571126,True,False,True,0,0
+kdv,0,e0:drop_1,deletion,"[[""d^3u/dx1^3"", [[""power"", 1.0]]]]",6,0,0,0.06193715433575732,True,False,True,0,0
+kdv,0,e0:add_0,addition,[],0,6,0,-1.3243761655528683e-05,False,True,True,0,6
+kdv,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-2.299957145671819e-05,False,True,True,0,6
+kdv,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-3.901826958317876e-05,False,True,True,0,6
+kdv,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",3,3,0,-1.494867010501028e-08,False,False,True,0,3
+kdv,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",4,2,0,1.0204787020650858e-07,False,False,True,0,2
+kdv,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-1.7596499518857388e-05,False,True,True,0,6
+kdv,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-5.7563157750627164e-06,False,True,True,0,6
+kdv,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-3.727675570335907e-06,False,True,True,0,6
+kdv_cossin,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",1,5,0,-0.0054944667024419405,False,False,True,0,4
+kdv_cossin,0,e0:drop_1,deletion,"[[""d^3u/dx1^3"", [[""power"", 1.0]]]]",6,0,0,0.08210403781532832,True,False,True,0,0
+kdv_cossin,0,e0:drop_2,deletion,"[[""cos(t)sin(x)"", [[""power"", 1.0]]]]",6,0,0,0.14694724700132733,True,False,True,1,0
+kdv_cossin,0,e0:add_0,addition,[],6,0,0,0.09426173809020053,True,False,True,2,0
+kdv_cossin,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",6,0,0,0.07249399524211654,True,False,True,2,0
+kdv_cossin,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",6,0,0,0.06035152820035036,True,False,True,1,0
+kdv_cossin,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",6,0,0,0.08397588757071833,True,False,True,1,0
+kdv_cossin,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",4,2,0,0.013392614095378098,False,False,True,0,1
+kdv_cossin,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.017757464168246577,True,False,True,1,0
+kdv_cossin,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",6,0,0,0.02833506858885021,True,False,True,3,0
+kdv_cossin,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",6,0,0,0.07306757949899678,True,False,True,1,0
+ks,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,1.3230734838591585,True,False,True,5,0
+ks,0,e0:drop_1,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]]]",6,0,0,0.026093864880371315,True,False,True,0,0
+ks,0,e0:drop_2,deletion,"[[""d^4u/dx1^4"", [[""power"", 1.0]]]]",6,0,0,0.0038287683797383924,True,False,True,6,0
+ks,0,e0:add_0,addition,[],0,6,0,-1.0954385781606771e-05,False,True,True,0,6
+ks,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-1.1086323291376012e-05,False,True,True,0,6
+ks,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-9.289588873043309e-06,False,True,True,0,6
+ks,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",4,2,0,2.868078040547e-08,False,False,True,0,2
+ks,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-4.2469476493959136e-07,False,False,True,0,4
+ks,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-1.2637456034618686e-05,False,True,True,0,6
+ks,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-1.0235535615980473e-05,False,True,True,0,6
+ks,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",1,5,0,-5.114968634556039e-06,False,False,True,0,5
+lorenz,0,e0:drop_0,deletion,"[[""v"", [[""power"", 1.0]]]]",6,0,0,1.0049969797061464,True,False,True,6,0
+lorenz,0,e0:drop_1,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.5824344698088099,True,False,True,6,0
+lorenz,0,e0:add_0,addition,[],0,6,0,-7.628082251538587e-06,False,True,True,0,6
+lorenz,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",1,5,0,-6.961879474434076e-06,False,False,True,0,5
+lorenz,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-3.6641825232657937e-06,False,True,True,0,6
+lorenz,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-8.565080498256913e-06,False,False,True,0,5
+lorenz,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",3,3,0,5.592293588674622e-07,False,False,True,0,3
+lorenz,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",3,3,0,-6.99948679375906e-07,False,False,True,0,3
+lorenz,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",3,3,0,-3.661795139408639e-06,False,False,True,0,3
+lorenz,0,e0:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",0,6,0,-4.624559646046988e-06,False,True,True,0,6
+lorenz,0,e0:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",2,4,0,-3.201714553998689e-06,False,False,True,0,4
+lorenz,0,e0:add_11,addition,"[[""w"", [[""power"", 1.0]]]]",0,6,0,-4.596259029688445e-06,False,True,True,0,6
+lorenz,0,e0:add_12,addition,"[[""w"", [[""power"", 2.0]]]]",1,5,0,-3.829211269362765e-06,False,False,True,0,5
+lorenz,0,e0:add_13,addition,"[[""w"", [[""power"", 3.0]]]]",1,5,0,-4.126581913559939e-06,False,False,True,0,5
+lorenz,1,e1:drop_0,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.02532421815553689,True,False,True,0,0
+lorenz,1,e1:drop_1,deletion,"[[""u"", [[""power"", 1.0]]], [""w"", [[""power"", 1.0]]]]",6,0,0,0.025849721894657167,True,False,True,1,0
+lorenz,1,e1:drop_2,deletion,"[[""v"", [[""power"", 1.0]]]]",6,0,0,4.7957309679001994e-05,True,False,True,0,0
+lorenz,1,e1:add_0,addition,[],0,6,0,-2.572153962175119e-06,False,True,True,0,6
+lorenz,1,e1:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-2.17842260394335e-06,False,True,True,0,6
+lorenz,1,e1:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-1.4082388216758853e-06,False,True,True,0,6
+lorenz,1,e1:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-3.611688136236212e-06,False,False,True,0,5
+lorenz,1,e1:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-8.998003301990379e-07,False,False,True,0,5
+lorenz,1,e1:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-2.328122382803204e-06,False,True,True,0,6
+lorenz,1,e1:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-6.832696857274996e-06,False,True,True,0,6
+lorenz,1,e1:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",0,6,0,-1.9138077439572044e-06,False,True,True,0,6
+lorenz,1,e1:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",2,4,0,-7.029019360286781e-07,False,False,True,0,4
+lorenz,1,e1:add_11,addition,"[[""w"", [[""power"", 1.0]]]]",0,6,0,-2.274120383861688e-06,False,True,True,0,6
+lorenz,1,e1:add_12,addition,"[[""w"", [[""power"", 2.0]]]]",0,6,0,-2.134158470090547e-06,False,True,True,0,6
+lorenz,1,e1:add_13,addition,"[[""w"", [[""power"", 3.0]]]]",1,5,0,-1.9370633618363303e-06,False,False,True,0,5
+lorenz,2,e2:drop_0,deletion,"[[""u"", [[""power"", 1.0]]], [""v"", [[""power"", 1.0]]]]",6,0,0,0.9411964930524541,True,False,True,6,0
+lorenz,2,e2:drop_1,deletion,"[[""w"", [[""power"", 1.0]]]]",6,0,0,1.0497357410432717,True,False,True,6,0
+lorenz,2,e2:add_0,addition,[],3,3,0,-4.405282450530066e-07,False,False,True,0,3
+lorenz,2,e2:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-3.603694826489055e-06,False,True,True,0,6
+lorenz,2,e2:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-7.530352396953161e-06,False,True,True,0,6
+lorenz,2,e2:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-1.012921261116256e-05,False,False,True,0,5
+lorenz,2,e2:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-6.260979066414342e-06,False,False,True,0,5
+lorenz,2,e2:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-5.38443108561391e-06,False,True,True,0,6
+lorenz,2,e2:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",4,2,0,1.3532640815420544e-06,False,False,True,0,2
+lorenz,2,e2:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",2,4,0,-6.8006528465738405e-06,False,False,True,0,4
+lorenz,2,e2:add_8,addition,"[[""v"", [[""power"", 1.0]]]]",0,6,0,-6.698131052930875e-06,False,True,True,0,6
+lorenz,2,e2:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",2,4,0,-4.225953416831928e-06,False,False,True,0,4
+lorenz,2,e2:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",1,5,0,-8.088890049741848e-06,False,False,True,0,5
+lorenz,2,e2:add_12,addition,"[[""w"", [[""power"", 2.0]]]]",4,2,0,3.0674043076241164e-06,False,False,True,0,2
+lorenz,2,e2:add_13,addition,"[[""w"", [[""power"", 3.0]]]]",5,1,0,2.4459195359155155e-06,False,False,True,0,1
+lv,0,e0:drop_0,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.7591847261708453,True,False,True,5,0
+lv,0,e0:drop_1,deletion,"[[""u"", [[""power"", 1.0]]], [""v"", [[""power"", 1.0]]]]",6,0,0,1.4772110838602819,True,False,True,6,0
+lv,0,e0:add_0,addition,[],3,3,0,-7.889148485877851e-06,False,False,True,0,3
+lv,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",3,3,0,1.1639834855140384e-07,False,False,True,0,3
+lv,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",3,3,0,-1.5378649435234313e-06,False,False,True,0,3
+lv,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",4,2,0,2.4386916267508244e-06,False,False,True,0,2
+lv,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-6.847565271754979e-05,False,False,True,0,5
+lv,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",1,5,0,-9.039750924434093e-05,False,False,True,0,5
+lv,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",2,4,0,-4.6162931752250316e-05,False,False,True,0,4
+lv,0,e0:add_8,addition,"[[""v"", [[""power"", 1.0]]]]",0,6,0,-3.886611683779093e-05,False,True,True,0,6
+lv,0,e0:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",0,6,0,-2.000073163051354e-05,False,True,True,0,6
+lv,0,e0:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",0,6,0,-1.169115054415999e-05,False,True,True,0,6
+lv,1,e1:drop_0,deletion,"[[""u"", [[""power"", 1.0]]], [""v"", [[""power"", 1.0]]]]",6,0,0,0.47573267151875226,True,False,True,6,0
+lv,1,e1:drop_1,deletion,"[[""v"", [[""power"", 1.0]]]]",6,0,0,0.7655161763941445,True,False,True,6,0
+lv,1,e1:add_0,addition,[],2,4,0,-4.279115491899834e-06,False,False,True,0,4
+lv,1,e1:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",1,5,0,-2.7290159141704614e-05,False,False,True,0,5
+lv,1,e1:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",2,4,0,-3.418175171804861e-05,False,False,True,0,4
+lv,1,e1:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-1.3989803830848012e-05,False,False,True,0,5
+lv,1,e1:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-0.00010724525978397425,False,False,True,0,4
+lv,1,e1:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-1.4991375819029013e-05,False,True,True,0,6
+lv,1,e1:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",2,4,0,-8.27700652326627e-06,False,False,True,0,4
+lv,1,e1:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",3,3,0,-2.5438326201344253e-06,False,False,True,0,3
+lv,1,e1:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",2,4,0,-5.2779470673930336e-05,False,False,True,0,4
+lv,1,e1:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",2,4,0,-3.169749740211008e-05,False,False,True,0,4
+ns,0,e0:drop_0,deletion,"[[""du/dx2"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,0.08232502948383366,True,False,True,1,0
+ns,0,e0:drop_1,deletion,"[[""du/dx1"", [[""power"", 1.0]]], [""v"", [[""power"", 1.0]]]]",6,0,0,0.12294102234055271,True,False,True,3,0
+ns,0,e0:drop_2,deletion,"[[""dp/dx2"", [[""power"", 1.0]]]]",6,0,0,0.05176274301221092,True,False,True,6,0
+ns,0,e0:drop_3,deletion,"[[""d^2u/dx2^2"", [[""power"", 1.0]]]]",6,0,0,5.6765081955626594e-05,True,False,True,0,0
+ns,0,e0:drop_4,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]]]",6,0,0,0.0011331429797489685,True,False,True,0,0
+ns,0,e0:add_0,addition,[],0,6,0,-2.7720789561851632e-05,False,True,True,0,6
+ns,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-1.1141761638105119e-05,False,True,True,0,6
+ns,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-8.772488710963176e-06,False,True,True,0,6
+ns,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-1.0624426596113178e-05,False,False,True,0,5
+ns,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-6.548797179540005e-06,False,True,True,0,6
+ns,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-2.747280939380143e-05,False,True,True,0,6
+ns,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-2.604886354864045e-05,False,True,True,0,6
+ns,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-2.4010951847892913e-05,False,True,True,0,6
+ns,0,e0:add_8,addition,"[[""v"", [[""power"", 1.0]]]]",0,6,0,-3.4626212683320117e-06,False,True,True,0,6
+ns,0,e0:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",0,6,0,-5.119464262803476e-05,False,True,True,0,6
+ns,0,e0:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",2,4,0,-5.614693170208665e-06,False,False,True,0,4
+ns,0,e0:add_11,addition,"[[""p"", [[""power"", 1.0]]]]",1,5,0,-6.5589309225864e-06,False,False,True,0,5
+ns,0,e0:add_12,addition,"[[""p"", [[""power"", 2.0]]]]",2,4,0,-1.5642675967233465e-05,False,False,True,0,4
+ns,0,e0:add_13,addition,"[[""p"", [[""power"", 3.0]]]]",2,4,0,-2.47336010770835e-05,False,False,True,0,4
+ns,1,e1:drop_0,deletion,"[[""dv/dx2"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,0.0974694067137764,True,False,True,6,0
+ns,1,e1:drop_1,deletion,"[[""dv/dx1"", [[""power"", 1.0]]], [""v"", [[""power"", 1.0]]]]",6,0,0,0.010719595136963873,True,False,True,6,0
+ns,1,e1:drop_2,deletion,"[[""dp/dx1"", [[""power"", 1.0]]]]",6,0,0,0.023594231789084454,True,False,True,6,0
+ns,1,e1:drop_3,deletion,"[[""d^2v/dx2^2"", [[""power"", 1.0]]]]",6,0,0,8.232038299778043e-05,True,False,True,0,0
+ns,1,e1:drop_4,deletion,"[[""d^2v/dx1^2"", [[""power"", 1.0]]]]",6,0,0,3.22652173201675e-05,True,False,True,0,0
+ns,1,e1:add_0,addition,[],0,6,0,-2.5853353248418612e-06,False,True,True,0,6
+ns,1,e1:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-2.7703090016641555e-06,False,True,True,0,6
+ns,1,e1:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-1.9906089823652277e-06,False,True,True,0,6
+ns,1,e1:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-7.568602785374708e-07,False,False,True,0,5
+ns,1,e1:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-1.4659394026906065e-06,False,False,True,0,4
+ns,1,e1:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-4.33429385495591e-06,False,True,True,0,6
+ns,1,e1:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-5.012370391797259e-06,False,True,True,0,6
+ns,1,e1:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-5.245641231712903e-06,False,True,True,0,6
+ns,1,e1:add_8,addition,"[[""v"", [[""power"", 1.0]]]]",2,4,0,-1.166994162737647e-06,False,False,True,0,4
+ns,1,e1:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",1,5,0,-3.26417635366995e-06,False,False,True,0,5
+ns,1,e1:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",2,4,0,-1.6996013478824056e-06,False,False,True,0,4
+ns,1,e1:add_11,addition,"[[""p"", [[""power"", 1.0]]]]",0,6,0,-2.5542329259891074e-06,False,True,True,0,6
+ns,1,e1:add_12,addition,"[[""p"", [[""power"", 2.0]]]]",1,5,0,-1.7233446170353785e-06,False,False,True,0,5
+ns,1,e1:add_13,addition,"[[""p"", [[""power"", 3.0]]]]",1,5,0,-1.6956167433492035e-06,False,False,True,0,5
+ns,2,e2:drop_0,deletion,"[[""dv/dx1"", [[""power"", 1.0]]]]",6,0,0,1.0191799231852559,True,False,True,0,0
+ns,2,e2:add_0,addition,[],0,6,0,-2.552755110223444e-05,False,True,True,0,6
+ns,2,e2:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-1.934530096904443e-05,False,True,True,0,6
+ns,2,e2:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-1.2976359017042841e-05,False,True,True,0,6
+ns,2,e2:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-3.2432204368370402e-06,False,True,True,0,6
+ns,2,e2:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-1.4932097501055079e-06,False,False,True,0,4
+ns,2,e2:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-1.8316915600073853e-05,False,True,True,0,6
+ns,2,e2:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-1.7954283401095805e-05,False,True,True,0,6
+ns,2,e2:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-1.994339423492528e-05,False,True,True,0,6
+ns,2,e2:add_8,addition,"[[""v"", [[""power"", 1.0]]]]",0,6,0,-6.93454215853534e-06,False,True,True,0,6
+ns,2,e2:add_9,addition,"[[""v"", [[""power"", 2.0]]]]",0,6,0,-2.0055529872121257e-05,False,True,True,0,6
+ns,2,e2:add_10,addition,"[[""v"", [[""power"", 3.0]]]]",0,6,0,-8.107659011371673e-06,False,True,True,0,6
+ns,2,e2:add_11,addition,"[[""p"", [[""power"", 1.0]]]]",0,6,0,-2.5393272018308525e-05,False,True,True,0,6
+ns,2,e2:add_12,addition,"[[""p"", [[""power"", 2.0]]]]",0,6,0,-1.3954641351681004e-05,False,True,True,0,6
+ns,2,e2:add_13,addition,"[[""p"", [[""power"", 3.0]]]]",0,6,0,-1.1103236806186822e-05,False,True,True,0,6
+ode,0,e0:drop_0,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.04256329029018811,True,False,True,6,0
+ode,0,e0:drop_1,deletion,"[[""du/dx0"", [[""power"", 1.0]]], [""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",6,0,0,0.0002867172701174976,True,False,True,1,0
+ode,0,e0:drop_2,deletion,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",6,0,0,0.038754864199124994,True,False,True,6,0
+ode,0,e0:add_0,addition,[],2,4,0,-1.0132230835527177e-06,False,False,True,0,4
+ode,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",1,5,0,-1.708822408289994e-05,False,False,True,0,5
+ode,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-3.059292643362421e-06,False,False,True,0,5
+ode,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",3,3,0,4.907980548338435e-07,False,False,True,0,3
+ode,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",1,5,0,-9.974603151515611e-06,False,False,True,0,5
+ode,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",2,4,0,-6.085876149066557e-06,False,False,True,0,4
+pde_compound,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 2.0]]]]",6,0,0,0.07438239054346718,True,False,True,0,0
+pde_compound,0,e0:drop_1,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]], [""u"", [[""power"", 1.0]]]]",6,0,0,0.41896327008383694,True,False,True,0,0
+pde_compound,0,e0:add_0,addition,[],0,6,0,-3.777611419818414e-05,False,True,True,0,6
+pde_compound,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-2.3147309715623713e-05,False,True,True,0,6
+pde_compound,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",1,5,0,-1.9155128692810046e-05,False,False,True,0,5
+pde_compound,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-2.5434599122630577e-05,False,True,True,0,5
+pde_compound,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-5.877534770930539e-05,False,True,True,0,5
+pde_compound,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-8.790653028275546e-05,False,True,True,0,6
+pde_compound,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-0.0004208312974458109,False,True,True,0,6
+pde_compound,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",1,5,0,-9.902349966269989e-05,False,False,True,0,5
+pde_divide,0,e0:drop_0,deletion,"[[""du/dx1"", [[""power"", 1.0]]]]",6,0,0,0.07481199171738213,True,False,True,0,0
+pde_divide,0,e0:drop_1,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]], [""x"", [[""dim"", 1.0], [""power"", 1.0]]]]",6,0,0,0.48308797036245565,True,False,True,6,0
+pde_divide,0,e0:add_0,addition,[],0,6,0,-1.2690032660119548e-05,False,True,True,0,6
+pde_divide,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-4.8756200376726866e-06,False,True,True,0,6
+pde_divide,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",0,6,0,-3.492582515615021e-06,False,True,True,0,6
+pde_divide,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-5.0348123177312115e-06,False,True,True,0,6
+pde_divide,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-1.4603767194113914e-05,False,False,True,0,5
+pde_divide,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",0,6,0,-0.000185668173593827,False,True,True,0,6
+pde_divide,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",0,6,0,-5.5325902053128975e-06,False,True,True,0,6
+pde_divide,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-2.5001493649910852e-06,False,True,True,0,6
+vdp,0,e0:drop_0,deletion,"[[""du/dx0"", [[""power"", 1.0]]], [""u"", [[""power"", 2.0]]]]",6,0,0,0.0007728180847639886,True,False,True,0,0
+vdp,0,e0:drop_1,deletion,"[[""du/dx0"", [[""power"", 1.0]]]]",6,0,0,0.0057969702116237596,True,False,True,6,0
+vdp,0,e0:drop_2,deletion,"[[""u"", [[""power"", 1.0]]]]",6,0,0,0.0856808697201118,True,False,True,0,0
+vdp,0,e0:add_0,addition,[],1,5,0,-7.445382707463476e-05,False,False,True,0,5
+vdp,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",0,6,0,-1.6133762473717562e-05,False,True,True,0,6
+vdp,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",1,5,0,-6.041562633332372e-06,False,False,True,0,5
+vdp,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",2,4,0,-4.128852845682153e-05,False,False,True,0,4
+vdp,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",0,6,0,-3.4338537932763975e-05,False,True,True,0,6
+vdp,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",1,5,0,-6.881239227803264e-05,False,False,True,0,5
+vdp,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",0,6,0,-0.0007087317903476534,False,True,True,0,6
+wave,0,e0:drop_0,deletion,"[[""d^2u/dx1^2"", [[""power"", 1.0]]]]",6,0,0,1.2548565277476453,True,False,True,0,0
+wave,0,e0:add_0,addition,[],1,5,0,-0.012963371887308894,False,False,True,0,5
+wave,0,e0:add_1,addition,"[[""x"", [[""dim"", 0.0], [""power"", 1.0]]]]",1,5,0,-0.02845786021297471,False,False,True,0,5
+wave,0,e0:add_2,addition,"[[""x"", [[""dim"", 0.0], [""power"", 2.0]]]]",1,5,0,-0.03820276879614488,False,False,True,0,5
+wave,0,e0:add_3,addition,"[[""sin"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",1,5,0,-0.024093369087780286,False,False,True,0,5
+wave,0,e0:add_4,addition,"[[""cos"", [[""dim"", 0.0], [""freq"", 2.0], [""power"", 1.0]]]]",3,3,0,-0.004925259026276045,False,False,True,0,3
+wave,0,e0:add_5,addition,"[[""u"", [[""power"", 1.0]]]]",1,5,0,-0.048492725685933824,False,False,True,0,5
+wave,0,e0:add_6,addition,"[[""u"", [[""power"", 2.0]]]]",1,5,0,-0.055395109751948335,False,False,True,0,5
+wave,0,e0:add_7,addition,"[[""u"", [[""power"", 3.0]]]]",1,5,0,-0.033019927707483104,False,False,True,0,5

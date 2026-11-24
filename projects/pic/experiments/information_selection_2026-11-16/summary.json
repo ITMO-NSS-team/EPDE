@@ -1,0 +1,42 @@
+{
+  "legacy_continuous": {
+    "cases": 12,
+    "retained": 7
+  },
+  "legacy_selected_clsm_full": {
+    "cases": 12,
+    "retained": 4
+  },
+  "legacy_selected_clsm_half": {
+    "cases": 12,
+    "retained": 4
+  },
+  "legacy_selected_ols_full": {
+    "cases": 12,
+    "retained": 4
+  },
+  "legacy_selected_ols_half": {
+    "cases": 12,
+    "retained": 4
+  },
+  "local_continuous": {
+    "cases": 12,
+    "retained": 6
+  },
+  "local_selected_clsm_full": {
+    "cases": 12,
+    "retained": 6
+  },
+  "local_selected_clsm_half": {
+    "cases": 12,
+    "retained": 5
+  },
+  "local_selected_ols_full": {
+    "cases": 12,
+    "retained": 4
+  },
+  "local_selected_ols_half": {
+    "cases": 12,
+    "retained": 4
+  }
+}

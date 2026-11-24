@@ -1,0 +1,623 @@
+{
+  "status": "COMPLETE",
+  "summary": [
+    {
+      "key": "ode_seed51_observed",
+      "archived_model": [
+        0.10622015502553123,
+        [
+          0.05527385218393212
+        ],
+        [
+          2
+        ]
+      ],
+      "grid_best_rho": 0.0,
+      "grid_improvement_over_unrestricted": 0.0,
+      "support": {
+        "2": {
+          "rhos": [
+            0.0
+          ],
+          "sigmas": [
+            0.10526656124110123
+          ]
+        },
+        "6": {
+          "rhos": [
+            0.0,
+            0.2
+          ],
+          "sigmas": [
+            0.10526656124110123,
+            0.11149646782725743
+          ]
+        }
+      },
+      "near_unit": [
+        {
+          "rho": 0.99,
+          "sigma": 1.060320891920778,
+          "innovation_sigma": 0.1495766687605027,
+          "minus2loglik_drop": 47.241392614955444
+        },
+        {
+          "rho": 0.999,
+          "sigma": 3.3487782081271207,
+          "innovation_sigma": 0.1497244691390377,
+          "minus2loglik_drop": 47.788833840982164
+        },
+        {
+          "rho": 0.9999,
+          "sigma": 10.591911695601222,
+          "innovation_sigma": 0.14978850686064338,
+          "minus2loglik_drop": 47.796987502937036
+        },
+        {
+          "rho": 0.99999,
+          "sigma": 33.49530921702213,
+          "innovation_sigma": 0.14979520218349185,
+          "minus2loglik_drop": 47.79707420928176
+        },
+        {
+          "rho": 0.999999,
+          "sigma": 105.92163689054175,
+          "innovation_sigma": 0.14979577799338611,
+          "minus2loglik_drop": 47.79707497123965
+        }
+      ],
+      "maximum_projected_gradient": 1.1753995168284348e-05,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "key": "ode_seed52_observed",
+      "archived_model": [
+        0.14272691395920237,
+        [
+          0.5155483335323797
+        ],
+        [
+          2
+        ]
+      ],
+      "grid_best_rho": 0.6,
+      "grid_improvement_over_unrestricted": 0.0,
+      "support": {
+        "2": {
+          "rhos": [],
+          "sigmas": []
+        },
+        "6": {
+          "rhos": [
+            0.0,
+            0.2,
+            0.4,
+            0.6
+          ],
+          "sigmas": [
+            0.10256561344030919,
+            0.10760762630364824,
+            0.13282128363267914,
+            0.15479534558264543
+          ]
+        }
+      },
+      "near_unit": [
+        {
+          "rho": 0.99,
+          "sigma": 1.0090370663753356,
+          "innovation_sigma": 0.1423421948905347,
+          "minus2loglik_drop": 39.66890108162455
+        },
+        {
+          "rho": 0.999,
+          "sigma": 3.194494475664927,
+          "innovation_sigma": 0.14282641602712065,
+          "minus2loglik_drop": 40.13317973425337
+        },
+        {
+          "rho": 0.9999,
+          "sigma": 10.103965610480177,
+          "innovation_sigma": 0.14288807966494357,
+          "minus2loglik_drop": 40.14046094899933
+        },
+        {
+          "rho": 0.99999,
+          "sigma": 31.952257324368166,
+          "innovation_sigma": 0.14289448158580723,
+          "minus2loglik_drop": 40.140538720182484
+        },
+        {
+          "rho": 0.999999,
+          "sigma": 101.04213594588802,
+          "innovation_sigma": 0.14289512330487142,
+          "minus2loglik_drop": 40.14053946631014
+        }
+      ],
+      "maximum_projected_gradient": 1.7961038742519975e-05,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "key": "ode_seed53_observed",
+      "archived_model": [
+        0.10981097971728711,
+        [
+          0.06309342938647722
+        ],
+        [
+          2
+        ]
+      ],
+      "grid_best_rho": 0.0,
+      "grid_improvement_over_unrestricted": 0.0,
+      "support": {
+        "2": {
+          "rhos": [
+            0.0,
+            0.4
+          ],
+          "sigmas": [
+            0.1089423482404346,
+            0.1396984843886027
+          ]
+        },
+        "6": {
+          "rhos": [
+            0.0,
+            0.2,
+            0.4
+          ],
+          "sigmas": [
+            0.1089423482404346,
+            0.11477316621526237,
+            0.1396984843886027
+          ]
+        }
+      },
+      "near_unit": [
+        {
+          "rho": 0.99,
+          "sigma": 1.0883040381205984,
+          "innovation_sigma": 0.1535241773137153,
+          "minus2loglik_drop": 51.9484829183869
+        },
+        {
+          "rho": 0.999,
+          "sigma": 3.4405899516978264,
+          "innovation_sigma": 0.15382938851933353,
+          "minus2loglik_drop": 52.53912506311161
+        },
+        {
+          "rho": 0.9999,
+          "sigma": 10.882234414591455,
+          "innovation_sigma": 0.15389418748138808,
+          "minus2loglik_drop": 52.54764468683373
+        },
+        {
+          "rho": 0.99999,
+          "sigma": 34.41340196831822,
+          "innovation_sigma": 0.15390102752197554,
+          "minus2loglik_drop": 52.547735596161274
+        },
+        {
+          "rho": 0.999999,
+          "sigma": 108.82501191042859,
+          "innovation_sigma": 0.15390176929674887,
+          "minus2loglik_drop": 52.54773659059161
+        }
+      ],
+      "maximum_projected_gradient": 1.516693253345025e-05,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "key": "ode_seed52_bootstrap112",
+      "archived_model": [
+        10.34370353297727,
+        [
+          0.9999163883228528
+        ],
+        [
+          2
+        ]
+      ],
+      "grid_best_rho": 0.6,
+      "grid_improvement_over_unrestricted": 18.37442490158093,
+      "support": {
+        "2": {
+          "rhos": [
+            0.6
+          ],
+          "sigmas": [
+            0.1491696307155174
+          ]
+        },
+        "6": {
+          "rhos": [
+            0.6,
+            0.8
+          ],
+          "sigmas": [
+            0.1491696307155174,
+            0.20631278747577075
+          ]
+        }
+      },
+      "near_unit": [
+        {
+          "rho": 0.99,
+          "sigma": 0.9439257105884145,
+          "innovation_sigma": 0.13315710783689283,
+          "minus2loglik_drop": 18.07177693568555
+        },
+        {
+          "rho": 0.999,
+          "sigma": 2.9902828263768613,
+          "innovation_sigma": 0.13369607687612534,
+          "minus2loglik_drop": 18.370099992754273
+        },
+        {
+          "rho": 0.9999,
+          "sigma": 9.458183295361179,
+          "innovation_sigma": 0.13375556690250653,
+          "minus2loglik_drop": 18.37441119175869
+        },
+        {
+          "rho": 0.99999,
+          "sigma": 29.91010269962162,
+          "innovation_sigma": 0.13376171129484354,
+          "minus2loglik_drop": 18.374457203509845
+        },
+        {
+          "rho": 0.999999,
+          "sigma": 94.58416373506503,
+          "innovation_sigma": 0.13376217370195342,
+          "minus2loglik_drop": 18.37445689946578
+        }
+      ],
+      "maximum_projected_gradient": 1.6954267430424608e-05,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "key": "vdp_seed52_observed",
+      "archived_model": [
+        0.06033717780402551,
+        [
+          0.06365356866174197
+        ],
+        [
+          2
+        ]
+      ],
+      "grid_best_rho": 0.0,
+      "grid_improvement_over_unrestricted": 0.0,
+      "support": {
+        "2": {
+          "rhos": [
+            0.0
+          ],
+          "sigmas": [
+            0.06013987599663554
+          ]
+        },
+        "6": {
+          "rhos": [
+            0.0,
+            0.2
+          ],
+          "sigmas": [
+            0.06013987599663554,
+            0.06239925697301823
+          ]
+        }
+      },
+      "near_unit": [
+        {
+          "rho": 0.99,
+          "sigma": 0.5893055581305504,
+          "innovation_sigma": 0.08313177919897326,
+          "minus2loglik_drop": 141.98661385964698
+        },
+        {
+          "rho": 0.999,
+          "sigma": 1.866481936420737,
+          "innovation_sigma": 0.08345073926066042,
+          "minus2loglik_drop": 142.43210824527569
+        },
+        {
+          "rho": 0.9999,
+          "sigma": 5.903595332369965,
+          "innovation_sigma": 0.0834873585957484,
+          "minus2loglik_drop": 142.43912555436128
+        },
+        {
+          "rho": 0.99999,
+          "sigma": 18.66922535061111,
+          "innovation_sigma": 0.08349110521370456,
+          "minus2loglik_drop": 142.43919885449372
+        },
+        {
+          "rho": 0.999999,
+          "sigma": 46.21793371440351,
+          "innovation_sigma": 0.06536201234456218,
+          "minus2loglik_drop": 134.15565759470869
+        }
+      ],
+      "maximum_projected_gradient": 1.0896423245476683e-05,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    },
+    {
+      "key": "lv_seed51_observed",
+      "archived_model": [
+        0.06296720123659383,
+        [
+          -0.06975402004809049
+        ],
+        [
+          2
+        ]
+      ],
+      "grid_best_rho": 0.0,
+      "grid_improvement_over_unrestricted": 0.0,
+      "support": {
+        "2": {
+          "rhos": [
+            0.0
+          ],
+          "sigmas": [
+            0.06439347388143228
+          ]
+        },
+        "6": {
+          "rhos": [
+            0.0
+          ],
+          "sigmas": [
+            0.06439347388143228
+          ]
+        }
+      },
+      "near_unit": [
+        {
+          "rho": 0.99,
+          "sigma": 0.7127423856797955,
+          "innovation_sigma": 0.10054468656302076,
+          "minus2loglik_drop": 45.51391585693616
+        },
+        {
+          "rho": 0.999,
+          "sigma": 2.2589473222662946,
+          "innovation_sigma": 0.10099793644695526,
+          "minus2loglik_drop": 45.52152519472378
+        },
+        {
+          "rho": 0.9999,
+          "sigma": 7.145025342715307,
+          "innovation_sigma": 0.1010433912521429,
+          "minus2loglik_drop": 45.52160756771661
+        },
+        {
+          "rho": 0.99999,
+          "sigma": 22.595062622258926,
+          "innovation_sigma": 0.10104793933742472,
+          "minus2loglik_drop": 45.521608398803096
+        },
+        {
+          "rho": 0.999999,
+          "sigma": 0.47259015564458196,
+          "innovation_sigma": 0.0006683432404840124,
+          "minus2loglik_drop": 15.974205434538984
+        }
+      ],
+      "maximum_projected_gradient": 9.482141694050483e-08,
+      "statuses": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ]
+    }
+  ],
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho00.json": "7b490409c314e120805512dd6c217c6269b624a71c23617d31ec29094d68c28e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho01.json": "0127126bc95917675a85c4a479b9e2d5e3679252e02dd3448893883848b7c78d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho02.json": "b89bc197d1bb69a8b2d74f2d2dccda2bc872e36a628bffeed9d3d339f529665c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho03.json": "5bcb0678228de3ee3ab82085a6f24f12e70623386c6fc3abcb8f8c29af8127a2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho04.json": "c7de18570b8e7b7e93c93cef45aa2502696aebbce26ab2e91de0d9a2b8b03948",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho05.json": "d7833d59ce513b0193ffcf8e72905165756a5d3fdda6f70496a956274a0b4da6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho06.json": "9b7c75a25e9721a426fd392a3ee6ee16f04f0c9dbd71c617c9a171b6dfe87275",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho07.json": "5e0b9d8620aaa058656dbe48a9b7d20a81ddeb9c22b9f45cd6f060bf2eb69c5d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho08.json": "d6d9cf682706c435e9519f3951dd4bcca1d5ebbeda4f1ae1d18b29d195c17431",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho09.json": "89d785f162c14b481916f286fc108c50f93237c1f5c8cad1300e4d80747bfa44",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho10.json": "da6e69549ec1adc66fe9a09ec2bb9c26bca300e1af68c165a314b31300ca8a99",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho11.json": "ef667912c54bd0f663aadc6fbcf05d4927a8661ca9485b12f2a5bdd54734f1ce",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho12.json": "c0c61da6fb6d12f3d45b00103cb832f64b471c87fede7994069520582de4bc74",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\lv_seed51_observed_rho13.json": "a71d45d5b62f2039f88bca3d9c774f01ede451fb9ea74435d2da526c4efe76e1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho00.json": "d1a90d194663493d26f653a0ac0c064f8c52d75431c78f839937a16ba8fd7192",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho01.json": "8a2a88b4384c5d584702db7b955d6208cc222be4f20d9d15615301e536532960",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho02.json": "89ff744ade211919aff8ec798e9528206b1185163cb1440ad7f0d2806dba39ca",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho03.json": "ab5ddce2cdf8ac87540c00f3f0addabe2c53ffb9f684d86fa13ef030660a2e03",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho04.json": "bfc45dbf95053430169c7c255b331e1f9c94178d98d474aa8fabfa57a1745f53",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho05.json": "d565257abb6de6987f980d28e369fd8c8ace514ed7e6f85103ec7b5f6324dcfb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho06.json": "96dd144765af40d6049a19dbf00bdb38f797f027490262d43b9b040637a21de0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho07.json": "020438b157a4a6eeed87b999383603c18ed406162d91107597c3e17c5e333da8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho08.json": "815a5f643b4c6ceb405284df2def5fef159feeb494e5dae1fb81f72d50c357be",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho09.json": "bbb80d5e54d61cc57a6ae985b9749f0e6032c16ad2bfbfc34e786dd0ebbff40d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho10.json": "5e3bd8ab296b1c5feac53f51251cebb9db2d4529b840e04600f2c22bb011accc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho11.json": "4a558b763ecb6e033790a412732ed0685b2de7e5846363a908710a6ba7c177d6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho12.json": "a59242656cbadef9c46ac4f80cd637873d850818dcf8439dfe3aedeaa4046cb8",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed51_observed_rho13.json": "ee78e183464080f0436ae318293fa679bbe931712c32f348106e7967c9a116b0",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho00.json": "bfd3d3206c3e1c8b71513405e43615e275038465d7de6ef564153c890aeb3174",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho01.json": "01b621cdbae9fa2b4b15073618a8e0a3c5918736a9f8e256575eb20c297d9012",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho02.json": "74aa7b227a1edfc39a91f9b3c759edc36cffe2749c5838dae0d81264e5170608",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho03.json": "5bd080a687a0c4600422dcfb190343ad36f374adb6a6129f6c27d853b9fdf2b3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho04.json": "1828a3228a8047085daf6d3d9c7813c3813e3e6788f598c8de612d6cbe48f47e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho05.json": "88dc6610fe52814df33aa74c9e4af9f47a87205d5e3dcb520e7e43e140735feb",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho06.json": "abe4c6cff68d9503e6f21f9f52074fd21f9e6d01bb78ffd36758a53397885c63",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho07.json": "191ad40187d95eacbe187ce6b46fb090cc6c99925d9d0c91e978a562a6f9d622",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho08.json": "41e27e18a799b42acae4c4e75a6a441240098f515f88f277e7beaa517a8382d5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho09.json": "3bbe0c646b6838d1a21b3e06b8f42fb759c824e69efb6bf702217f9ab1bb8597",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho10.json": "c1e894dfaa878f1821d2ebf657fc3cfcd1f27cb005b89135728c274576201a1f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho11.json": "54542b425751b789baaa955e0a14479587c8b67184ca30ca79dadbafadd3c3c6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho12.json": "ad2d3f72c84784f09c29c1299ce9d702f842c30bf036d8402b38dcb76df969dd",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_bootstrap112_rho13.json": "329000e925bbe42adffc495dc08dc83d17438ef9114e3b7b5642ba2c4bd0a05b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho00.json": "dc808b9d9ae8c51ce7b90ef3fa530e1a26b38e2a479f005be9a7758b26b62c22",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho01.json": "7df112c20e7fd82953c36cf731ef3d7fdfbeadf3e83d6a61522cdcc132066da4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho02.json": "9841429c2a187d9fdf70e70b92814f309f0f949339cef5712583836fe1819c2b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho03.json": "db631c4f9a9859909d5cf95926ef008f88c4ec91926163f358efd17909451cdc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho04.json": "5c94954f7b2db741933a396d1d04692311237839c1167a99c3eee8c4196b420a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho05.json": "8eda23eeb00e00b6e6c8c78b3df9665a87795462cdd2f60cf05efe9e4a1cbe4c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho06.json": "b41bae1b7d4614f8612d0a4942032e69ebc892b0744ef5f984c3b3abc05c2c1b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho07.json": "2e0a85a39e8f22ccff2f2f77c2ac818867f472e8fe0f3dae7ceb50baf7f1458b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho08.json": "ac576269f38fe910f7ff2cf361fc9d6069c4319648daa182077a75daff3bc30e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho09.json": "c755eebd1552f403f9824cc773c11f5f699818cc4ef5b8d7c552f4182af5cea4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho10.json": "89df3eca340ba804856ce49d1b095126b21140c34673466158a9b74a9f53c15d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho11.json": "93b1e604fab2a8b016ebbf47b4ae58ba449fd4efd4a9000a6705c7f5fee825ff",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho12.json": "6a7f835846ecd8afe8321c3934c32b5e297bb9379be352e8a0b9376762e6c92c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed52_observed_rho13.json": "7b9c4dd883829dacd1535d485a3752fc0697cbaf6f13b103f27078dafb4b4a3b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho00.json": "3ef936416d62dec37cc19d86be65532d64dbdcf765b605283aa9f97fa9e0d57e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho01.json": "da172b144956d4ab419940d6451d80ee307b4be15d49dddf71d3d0e98034054e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho02.json": "d9a29ce08437f067592caab4abc5a15ab1cc648037210acdc1604abe040cf92d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho03.json": "54a91a35699e341f3561f2f25f05b3e347fc561ad067f6972949f3a04ab759a6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho04.json": "ce5bf87b99a2c5cdaf0644c465348981eea229b7b13c962a36a81f064f35292b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho05.json": "3f31f1196725678c992165db3a10923021fda017bea6ae9159511c373c6ebcf7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho06.json": "99c2293dfc510e60c5b1effb7691e843f2f2e6f49f7e3fdcb8b3178a56a29b06",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho07.json": "fd61d668b58b827bdb8557649d1120c6398425ae6d403e0735a7720dfb20e16e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho08.json": "47928bba5e15c87b4c54e343cb5c0fc107d17af6c71f5972ba1ab9bd131f6b09",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho09.json": "d91a7e63f45f1b3874f751cbb988feeb8875d4f3194a3dacd10b21e8e25c7708",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho10.json": "aace59f5597f153e41a7acac36a44800a00c7c5828dd1d1ef2739656119725ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho11.json": "8ecfda8939c74f8b6d626a5dd8acd50fb4852a7db988653f578057dc8e29806f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho12.json": "1776d74a80b390ad0e95f2c1279c693772acff554fdd5cc1c1df9d6834d7370d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\ode_seed53_observed_rho13.json": "97a8425235ae68b78dfec44b58a0e04ab52fbbda2b1c44c4717ab5af51e653ee",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho00.json": "35fb00aa6e67f3ce91a83497a12d59408f31f44719df9a7b207a5cc1903c7d61",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho01.json": "40c2cb96ac6721a0f1015aa3cacf0474818769fc989bfcaa2009e90d70c1ab2d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho02.json": "35d20669ffa70d0d36a4f723669c99bd8108201c89272f643f784adcf4bceec6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho03.json": "0446147f3cc8b2cb97fc6aa362f3ab9e032122d07d4b9e21408f61ed3c8dedcf",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho04.json": "135bcc549415bb343549599633f2b6cb95a338a1effc41c14d37860947cbfec5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho05.json": "204d60b23edaf1e2d3e5a638a3808b570c514e68508c8be09878bbdf6fa5274e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho06.json": "1e31049539e5537ed2d5c5fd5093d386c2c96fb30be1cedff738ac72ce6b63d2",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho07.json": "0d042ab170449816baa07e4af3b484caa1f19e5468cd065d54a79da550099363",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho08.json": "0dca5c7aae30e8540f39cdaa1395eaf5b7963ccaa26db8504094caab295f7993",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho09.json": "4a92745a91426f22930c0e6c976f6463e686b70c3006dcb67b93dffcc9bf4845",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho10.json": "bc03be77a1a59864685b7c2d3f4ae04e213cb6770da1236d2ba29b3fa345d329",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho11.json": "c0c967af50a9eee76602e44c57dfcf1a20fc092648a725e7bcc0a1d487cd552b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho12.json": "646951e2c8ef7406a98b4734de866183bfc33a368cbe691bd820a96160af3e33",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_profiles\\vdp_seed52_observed_rho13.json": "d744152113c609abdbcc423095849fcaf09364f9255b11aee634b37a4f2fdfd1"
+  },
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\analyze_noise.py": "da449bf195cde4a9c7459fd82caa62a5011452392bb41210d2ff3275c4f88c58"
+  }
+}

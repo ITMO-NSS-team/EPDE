@@ -1,0 +1,4545 @@
+{
+  "rows": [
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "off_seed": null,
+      "cutoff": 14.765438674695718,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            4.2252125642239236e-05,
+            -0.11270038010056964,
+            -0.07773928942312873
+          ],
+          "bank_ratios": [
+            0.0617041728538119,
+            0.10343454105491688,
+            0.05516304035277567,
+            0.00029642174815125834,
+            2.221310644849698e-31,
+            0.0001389097472787016
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -2.053231683560624,
+            -0.12465683443247472
+          ],
+          "bank_ratios": [
+            0.06168868997905721,
+            0.12381552985197465,
+            0.05568250115583383,
+            1.770220591114475e-05,
+            0.5171956766154895,
+            0.514575646588899
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.12381024053645837
+          ],
+          "bank_ratios": [
+            0.06169994858356952,
+            0.12607421140398037,
+            0.05567241782436004,
+            1.1260384116319885e-05,
+            0.5259507920929961,
+            0.5231629105745585
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc"
+    },
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "off_seed": 51,
+      "cutoff": 14.765438674695718,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.9789375573977575,
+            -0.9588685126162921,
+            0.5022994357682785
+          ],
+          "bank_ratios": [
+            0.09306108952980206,
+            0.08633981296032434,
+            0.061696275142482056,
+            0.13413910943280166,
+            0.05575592405827438,
+            3.712182469347965e-05,
+            0.9546757001439797,
+            0.8989263144571487
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1507.6157416121398,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0386256879593813,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 4.214440589911199e-09
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3131042443775308,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.136731566414552,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 3.8684886651290075e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc"
+    },
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "off_seed": 52,
+      "cutoff": 14.765438674695718,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.001824237513347,
+            -1.0142573631900722,
+            0.5535434964077813
+          ],
+          "bank_ratios": [
+            0.09731642880767774,
+            0.23405127639975865,
+            0.0616966337330719,
+            0.13307466757216457,
+            0.05573101206747847,
+            3.119406090415566e-05,
+            0.9319952744068787,
+            0.8773503435238192
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1507.037699511936,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.037214831291388716,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 4.052044096451125e-09
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3134262749074428,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.129355817728326,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 3.9027109930086045e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc"
+    },
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "off_seed": 53,
+      "cutoff": 14.765438674695718,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.954017905831673,
+            -0.9173428589973522,
+            0.48375128475066387
+          ],
+          "bank_ratios": [
+            0.10034942396944288,
+            0.07356755038077338,
+            0.06169592471982665,
+            0.13189365080768214,
+            0.05570796945571885,
+            3.328084163901655e-05,
+            0.9124453820820593,
+            0.8587148159743428
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1507.4384673394065,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.03448168858273795,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 3.671595724770152e-09
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3130960657875358,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.122582813256827,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 3.9132112292919325e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc"
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "off_seed": null,
+      "cutoff": 11.36433032079228,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            4.612565698849935e-05,
+            -0.11405772657859824,
+            -0.08185747495845368
+          ],
+          "bank_ratios": [
+            0.09299572994198106,
+            0.2833112062810769,
+            0.25917591710365623,
+            0.014982729189857994,
+            2.0728079188954774e-30,
+            0.00016007433089999505
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            6.988365053858803e-05,
+            -0.1728055669198077
+          ],
+          "bank_ratios": [
+            0.09300658780784098,
+            0.2535694846935165,
+            0.2579464960902905,
+            0.012064161190488787,
+            2.269611561224141e-31,
+            0.0001460381673197457
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.17280559518119243
+          ],
+          "bank_ratios": [
+            0.09300658869967968,
+            0.25356948436392035,
+            0.2579465004194648,
+            0.012064156436739387,
+            2.2696107942297746e-31,
+            0.00014603815096116374
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d"
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "off_seed": 51,
+      "cutoff": 11.36433032079228,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004858798845145,
+            -1.0080348585801742,
+            0.7156354184964598
+          ],
+          "method": "profiled_interior_witness"
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4558692368679396,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.151928706811781,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.877730169639336e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.28585601229835456,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            13.701767886874208,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 5.541033841760406e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d"
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "off_seed": 52,
+      "cutoff": 11.36433032079228,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.972355386112081,
+            -0.950473802164921,
+            0.7027657624705386
+          ],
+          "bank_ratios": [
+            0.1000507367694229,
+            0.24293920854253828,
+            0.09308643187753358,
+            0.27086170931405446,
+            0.25720085159685824,
+            0.010603368125992961,
+            0.8099754787162144,
+            0.7702790018951665
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.45640965571203046,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.137142576856501,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.257018689719857e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.28625801734423084,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            13.688952118401351,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 5.580495975303431e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d"
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "off_seed": 53,
+      "cutoff": 11.36433032079228,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.986454193805527,
+            -1.0058448905583368,
+            0.7495753725299585
+          ],
+          "bank_ratios": [
+            0.09294120089044966,
+            0.14892097214472616,
+            0.09308689901541257,
+            0.272229248689436,
+            0.2572073677151923,
+            0.010613610694174005,
+            0.8442575584834799,
+            0.8033126402992182
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4559239463659799,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.127525004092847,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.379836621723728e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.2859844382077527,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            13.681174144564402,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 5.592322829360418e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d"
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "off_seed": null,
+      "cutoff": 16.91912861815391,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            6.723224938184891e-05,
+            -0.11990606102890866,
+            -0.12308816285128515
+          ],
+          "bank_ratios": [
+            0.0673689179467788,
+            0.102548694517384,
+            0.0684020603070383,
+            0.0011206813636921852,
+            1.6968900298760316e-30,
+            2.4548670113051345e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            0.0001380802847396334,
+            -0.24626073351855857
+          ],
+          "bank_ratios": [
+            0.06714831675780261,
+            0.07057274215605323,
+            0.06821822727084882,
+            0.0002874024669402052,
+            1.001663997582925e-31,
+            1.617179380900089e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.24626081094123475
+          ],
+          "bank_ratios": [
+            0.06714831751027533,
+            0.07057259692502316,
+            0.06821822484167059,
+            0.0002874014853342563,
+            0.0,
+            1.617178012372954e-05
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684"
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "off_seed": 51,
+      "cutoff": 16.91912861815391,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.978937688126478,
+            -0.9588687604815341,
+            0.26457693480763134
+          ],
+          "bank_ratios": [
+            0.09306106631438184,
+            0.08633934235594187,
+            0.06701448942330335,
+            0.08077342859615023,
+            0.06874504727782157,
+            0.0003555156609261968,
+            0.9002307741344192,
+            0.8644769303710496
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1508.14920306981,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.028426816356230053,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 9.354612315978504e-10
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3085848356191674,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.51648895370879,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.7901522873751332e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684"
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "off_seed": 52,
+      "cutoff": 16.91912861815391,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.00189485415264,
+            -1.0142834497946287,
+            0.30515906363258155
+          ],
+          "bank_ratios": [
+            0.09731652770017364,
+            0.23390241515063873,
+            0.06701120839374242,
+            0.07954787319580271,
+            0.06872707502174306,
+            0.000335031601857927,
+            0.8557988682866745,
+            0.8216747640355393
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1507.557580447701,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.02726677527766459,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 8.979002642139531e-10
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.30920977690436025,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.491752886670325,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.8167635787976398e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684"
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "off_seed": 53,
+      "cutoff": 16.91912861815391,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.954018021022158,
+            -0.9173430774475076,
+            0.27798508285050194
+          ],
+          "bank_ratios": [
+            0.10034938127058834,
+            0.07356711071022631,
+            0.0670167522295538,
+            0.07694626438049991,
+            0.06866498584029844,
+            0.00031781617206317,
+            0.7508693467786851,
+            0.7205412461767898
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1507.9440692014641,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.024791125512706524,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 7.719136826468402e-10
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3090553653131704,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.475298592514415,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.8257419929024365e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684"
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "off_seed": null,
+      "cutoff": 19.434412607374295,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            5.1243873945727714e-05,
+            -0.11721848284248648,
+            -0.09329372495900372
+          ],
+          "bank_ratios": [
+            0.0499473869330318,
+            0.036131930341056,
+            0.029606186549845027,
+            0.09293038129190598,
+            0.0,
+            0.00011826434314646229
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            5.422928421589125,
+            -0.17315563286641214
+          ],
+          "bank_ratios": [
+            0.05012185322807732,
+            0.02335307249358249,
+            0.02926881198904357,
+            0.08427383342113426,
+            0.023284580106984504,
+            0.019682593137654986
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.17348162575346668
+          ],
+          "bank_ratios": [
+            0.049992552787136164,
+            0.024570890661680708,
+            0.029295756730527,
+            0.08314158325152009,
+            0.029530472101514327,
+            0.02539684750072611
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832"
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "off_seed": 51,
+      "cutoff": 19.434412607374295,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004858824990793,
+            -1.008034607780677,
+            0.2720236834540654
+          ],
+          "method": "profiled_interior_witness"
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1508.7049204659945,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.01727860654998357
+          ],
+          "scaled_min_eigenvalue": 8.110013561403307e-10
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3406060182059722,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            10.635251471780451
+          ],
+          "scaled_min_eigenvalue": 1.845417983903901e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832"
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "off_seed": 52,
+      "cutoff": 19.434412607374295,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.972355600654572,
+            -0.9504742082874383,
+            0.2944457367686112
+          ],
+          "bank_ratios": [
+            0.10005069244863318,
+            0.2429385639640745,
+            0.05016506586264553,
+            0.04940549486253476,
+            0.02973403340023619,
+            0.08774028704782406,
+            0.8422158442546729,
+            0.8503931226559484
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1508.090370892264,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.01657388641988748
+          ],
+          "scaled_min_eigenvalue": 7.784331295600473e-10
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.3409399988359364,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            10.628116177186488
+          ],
+          "scaled_min_eigenvalue": 1.8720315643436565e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832"
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "off_seed": 53,
+      "cutoff": 19.434412607374295,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.986604878201583,
+            -1.0059002119766365,
+            0.287682347368166
+          ],
+          "bank_ratios": [
+            0.09294140293741544,
+            0.14766590919530842,
+            0.05017192799150247,
+            0.053415204483698075,
+            0.029817516738525163,
+            0.08838317051134378,
+            0.9375085699057663,
+            0.9453695124288466
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1508.4289653101541,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.015061277743377956
+          ],
+          "scaled_min_eigenvalue": 6.687592390928722e-10
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.34061100744877076,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            10.61902206876491
+          ],
+          "scaled_min_eigenvalue": 1.8808133834473033e-06
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832"
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "off_seed": null,
+      "cutoff": 15.480903514538376,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -1.4852907684519727,
+            -0.07639925570670511,
+            -0.14570634247262085
+          ],
+          "bank_ratios": [
+            0.08318870567730108,
+            0.45973835220763576,
+            0.09779803838646545,
+            0.46836474368598724,
+            1.1927754588494438e-28,
+            3.867125019422516e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.9063252159874622,
+            -0.18546151375961908
+          ],
+          "bank_ratios": [
+            0.0822099117430388,
+            0.10928510272385236,
+            0.08985245393451473,
+            0.3641797517563905,
+            0.040906564765803996,
+            0.04237152359654536
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18452790288238644
+          ],
+          "bank_ratios": [
+            0.08214786530588239,
+            0.11183643451110861,
+            0.08986045321241329,
+            0.36578647928695013,
+            0.04216864261728698,
+            0.04366760113172156
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149"
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "off_seed": 51,
+      "cutoff": 15.480903514538376,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.978936812389841,
+            -0.9588671048552293,
+            0.7086031030443743
+          ],
+          "bank_ratios": [
+            0.09306122129698885,
+            0.08634248577155296,
+            0.08197535319099755,
+            0.12268410998103517,
+            0.08950502386070384,
+            0.3420847904546744,
+            0.9407525613031856,
+            0.9375475424034145
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4210937742674329,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.134871400615078,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 6.921911129047183e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.27295790073425097,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.496128563226755,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.570177537779896e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149"
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "off_seed": 52,
+      "cutoff": 15.480903514538376,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.972354938733063,
+            -0.9504729580522421,
+            0.6979158175493063
+          ],
+          "bank_ratios": [
+            0.10005082883652185,
+            0.24294054827598435,
+            0.08197777178807561,
+            0.1235749148763725,
+            0.08952338222187366,
+            0.3424207658793745,
+            0.9591389193697634,
+            0.9559031121054544
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.42270589702308003,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.058367983807365,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 8.022656355016375e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.27346529893935406,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.476863491305838,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.5816184513483698e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149"
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "off_seed": 53,
+      "cutoff": 15.480903514538376,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.954017224842649,
+            -0.9173415721593984,
+            0.6691641979678101
+          ],
+          "bank_ratios": [
+            0.10034967534613105,
+            0.07357014036847674,
+            0.08197958498590277,
+            0.12165174894963009,
+            0.08949235568934362,
+            0.3424258945561313,
+            0.9264736086889023,
+            0.9232570091494509
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4226301327264223,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.028285779708214,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 8.378548218607403e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.27325239256097156,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.46666036971999,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.5850932562715363e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149"
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "off_seed": null,
+      "cutoff": 13.94539748075959,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -0.5465136888593131,
+            -0.16513525670684728,
+            -0.025211884173675328
+          ],
+          "bank_ratios": [
+            0.07246628879427643,
+            0.06425826343772474,
+            0.028276778707296304,
+            0.0009641860493918261,
+            2.2752194876775782e-29,
+            1.681964462480909e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -0.48716744633716147,
+            -0.18386968080017768
+          ],
+          "bank_ratios": [
+            0.0724476943620998,
+            0.052247165518674726,
+            0.028069372622131203,
+            0.001319313619616463,
+            0.0003563930639883797,
+            0.00020786228236953564
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1836773815693184
+          ],
+          "bank_ratios": [
+            0.07245496071338241,
+            0.05244210248885371,
+            0.028076228765221315,
+            0.0012983315305724397,
+            0.00033935117378657963,
+            0.00019514092264878022
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a"
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "off_seed": 51,
+      "cutoff": 13.94539748075959,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.978936672655809,
+            -0.9588668395838057,
+            0.7861903597604203
+          ],
+          "bank_ratios": [
+            0.09306124614971087,
+            0.0863429894445155,
+            0.0723229778732601,
+            0.06182682335895351,
+            0.028260572407042394,
+            0.0032835305680081577,
+            0.9708360607031097,
+            0.9702213846465536
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4107913228679231,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.741107231677621,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.0340812431661703e-06
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.27058120252503215,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.668242073662892
+          ],
+          "scaled_min_eigenvalue": 1.698826133409007e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a"
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "off_seed": 52,
+      "cutoff": 13.94539748075959,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.972354820736842,
+            -0.9504727342200446,
+            0.7797706406961964
+          ],
+          "bank_ratios": [
+            0.10005085327336644,
+            0.24294090354698752,
+            0.07232315622099508,
+            0.0609633991811161,
+            0.028245515597937854,
+            0.003295927417058918,
+            0.9477569968690014,
+            0.9472913722849273
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.41256871554426466,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.654610613395349,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.1414677494126006e-06
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.27106210447159335,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.650343830308506
+          ],
+          "scaled_min_eigenvalue": 1.710230439829841e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a"
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "off_seed": 53,
+      "cutoff": 13.94539748075959,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.954017095511538,
+            -0.9173413265692052,
+            0.7396958946348292
+          ],
+          "bank_ratios": [
+            0.1003497233618426,
+            0.07357063468333677,
+            0.07232282997600045,
+            0.06220078996835491,
+            0.028266168210223465,
+            0.003226289873363781,
+            0.9888617546258714,
+            0.988090978007381
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4125303854456801,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.623122275873319,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.1758924521451545e-06
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.2708366061148775,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.641023265617472
+          ],
+          "scaled_min_eigenvalue": 1.713646368543029e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a"
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "off_seed": null,
+      "cutoff": 13.18718169166268,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            5.066990072791211e-05,
+            -0.1169894991364036,
+            -0.09209808939341108
+          ],
+          "bank_ratios": [
+            0.0722400521575791,
+            0.2548732125794866,
+            0.07810741153509154,
+            0.011492455735383577,
+            0.0,
+            0.0002733039785915827
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.1986964279501773,
+            -0.17862587031705404
+          ],
+          "bank_ratios": [
+            0.07202427394817826,
+            0.1516893033146424,
+            0.07601463234840138,
+            0.005223308490294118,
+            0.1544240558166888,
+            0.1629435880436383
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.17809512476002992
+          ],
+          "bank_ratios": [
+            0.0720463771138377,
+            0.1531413266972216,
+            0.07601517739314367,
+            0.005343189090512647,
+            0.15564469405348194,
+            0.16419801796808633
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899"
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "off_seed": 51,
+      "cutoff": 13.18718169166268,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004859112914658,
+            -1.0080351670806342,
+            1.2257147070191967
+          ],
+          "method": "profiled_interior_witness"
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4039717003572378,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            7.0720800701745095,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.0077850631643808e-06
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.26922760899160475,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.646173511844571,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.6964744615191374e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899"
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "off_seed": 52,
+      "cutoff": 13.18718169166268,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.972354807261995,
+            -0.9504727089314227,
+            0.7710385398682316
+          ],
+          "bank_ratios": [
+            0.10005085602899227,
+            0.242940943683318,
+            0.07182619096641589,
+            0.10987269741245516,
+            0.0752183568678417,
+            0.0025645251683887055,
+            0.9645813618068932,
+            0.9154862582222256
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4061396199846619,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.964083987127193,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.117423624502683e-06
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.2697329375413271,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.626976620499493,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.7081578804270956e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899"
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "off_seed": 53,
+      "cutoff": 13.18718169166268,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.985930928080638,
+            -1.005653925199666,
+            0.9231296494498444
+          ],
+          "bank_ratios": [
+            0.09294053187224713,
+            0.15338048513515218,
+            0.07182073394429493,
+            0.09002538341393508,
+            0.07481141673743022,
+            0.0018546649615004817,
+            0.283512018347209,
+            0.2627046082588622
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4062400224216883,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.9255559435071,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.1526430484386236e-06
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.2695204405682962,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.617094601956573,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.7116779223666074e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899"
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "off_seed": null,
+      "cutoff": 13.53238466259871,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -3.5563797957937786,
+            -0.10581612933744172,
+            -0.11369673803174657
+          ],
+          "bank_ratios": [
+            0.05648077195904483,
+            0.21143970782186486,
+            0.1013020579187757,
+            0.05780646644522081,
+            7.968306375494463e-30,
+            0.0005827627232233404
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.52267258112692,
+            -0.19499818266369728
+          ],
+          "bank_ratios": [
+            0.05653813551205013,
+            0.0769541403822782,
+            0.09958247115943786,
+            0.07523483629310959,
+            0.020169034640234722,
+            0.026469018144096388
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.191103869378293
+          ],
+          "bank_ratios": [
+            0.05677935493763984,
+            0.09066999033475036,
+            0.09961729511784012,
+            0.0738613291296677,
+            0.032480707223408886,
+            0.040160420708184416
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60"
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "off_seed": 51,
+      "cutoff": 13.53238466259871,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.978936896621659,
+            -0.958867264229441,
+            0.6885186591898654
+          ],
+          "bank_ratios": [
+            0.0930612063753894,
+            0.08634218317346995,
+            0.05670765002647541,
+            0.10187583114774143,
+            0.10038178256335692,
+            0.08210470958165343,
+            0.9902027355231603,
+            0.9169282675366371
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4163571120580577,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.416460619621389,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 5.853482387528993e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.27189677678506036,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.588390890106478,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.4195734460781337e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60"
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "off_seed": 52,
+      "cutoff": 13.53238466259871,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.001339257471657,
+            -1.0140801101033323,
+            0.8200902736979716
+          ],
+          "bank_ratios": [
+            0.09731579487930685,
+            0.2351459934147147,
+            0.05673866756193472,
+            0.07974324777296513,
+            0.10002944848439611,
+            0.08499155000037448,
+            0.45781195994143714,
+            0.41492900978443986
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.41826081202753146,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.323140228271911,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 6.87640083364106e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.2724286897782637,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.567660595240945,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.4302057791291761e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60"
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "off_seed": 53,
+      "cutoff": 13.53238466259871,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.954017300470008,
+            -0.9173417152610361,
+            0.6516213794482105
+          ],
+          "bank_ratios": [
+            0.10034964738530251,
+            0.07356985234554304,
+            0.05670547704234708,
+            0.10011637205934541,
+            0.10034785948405486,
+            0.0820434817701889,
+            0.9593666152538046,
+            0.8877071828248203
+          ]
+        },
+        "drop_forcing": {
+          "status": "excluded",
+          "weights": [
+            0.4182938163374924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.2871952558496025,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 7.207997741240526e-07
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.2722287391564424,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            14.556785738157126,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.4334543558843149e-05
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": false,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60"
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "off_seed": null,
+      "cutoff": 12.47064642449152,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            9.146082034933167e-05,
+            -0.10910553481589809,
+            -0.16628845468243897
+          ],
+          "bank_ratios": [
+            0.06884371271112248,
+            0.04196028714264086,
+            0.12886208016767708,
+            0.08082509490860768,
+            7.213993813192353e-32,
+            2.3326989177209242e-07
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            0.00030391506735877316,
+            -0.36254667119905987
+          ],
+          "bank_ratios": [
+            0.06876149435043931,
+            0.03127380522261792,
+            0.12948977756429608,
+            0.09096150466638121,
+            0.0,
+            1.6649746243672475e-08
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.36254692596451626
+          ],
+          "bank_ratios": [
+            0.06876149524944501,
+            0.03127375026620423,
+            0.12948977654300933,
+            0.09096152253537396,
+            6.555156310700049e-33,
+            1.665001417233105e-08
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165"
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "off_seed": 51,
+      "cutoff": 12.47064642449152,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858264,
+            0.06870558402207397,
+            0.03365607437364551,
+            0.12978611532027404,
+            0.0884659058139375,
+            0.11267703210428888,
+            0.11265620094651041
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858326,
+            0.06870558402207397,
+            0.03365607437364551,
+            0.12978611532027404,
+            0.0884659058139375,
+            0.11267703210428888,
+            0.11265620094651041
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806910965346,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 6.943647901903869e-10
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165"
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "off_seed": 52,
+      "cutoff": 12.47064642449152,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09748269115597168,
+            0.21308461152248018,
+            0.06870640613753225,
+            0.03356713915256487,
+            0.12978134544434466,
+            0.08849801883530485,
+            0.11010523817520869,
+            0.11008615005145786
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606
+          ],
+          "bank_ratios": [
+            0.0974826911559717,
+            0.21308461152247993,
+            0.06870640613753225,
+            0.03356713915256487,
+            0.12978134544434466,
+            0.08849801883530485,
+            0.11010523817520869,
+            0.11008615005145786
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.05057400662196156,
+            1364.9729724311587,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.4685280323104844e-09
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165"
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "off_seed": 53,
+      "cutoff": 12.47064642449152,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.027922541916682017,
+            0.0687075123215797,
+            0.03344949276920855,
+            0.12977498243422114,
+            0.08854118454125115,
+            0.10669894420266754,
+            0.10668213824210636
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.02792254191668196,
+            0.0687075123215797,
+            0.03344949276920855,
+            0.12977498243422114,
+            0.08854118454125115,
+            0.10669894420266754,
+            0.10668213824210636
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.07735358422605336,
+            1288.6523548701932,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.521616708194231e-09
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165"
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "off_seed": null,
+      "cutoff": 14.72846289038839,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            5.9205193242622967e-05,
+            -0.11975669927393355,
+            -0.10135107971728732
+          ],
+          "bank_ratios": [
+            0.05889647071478384,
+            0.029131613429134805,
+            0.05906202305941664,
+            0.3109512943733334,
+            4.111985780770328e-31,
+            3.2261455212204524e-06
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            3.0623579774477294,
+            -0.11947029741629096
+          ],
+          "bank_ratios": [
+            0.059064489227506116,
+            0.04545279115049407,
+            0.05944178333038531,
+            0.32709594492498645,
+            0.34420155745502495,
+            0.3344504688596793
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1202051800852722
+          ],
+          "bank_ratios": [
+            0.05907014067231158,
+            0.045157552520970666,
+            0.059453276888978134,
+            0.32797960747152327,
+            0.3468060756566684,
+            0.3369904004017882
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e"
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "off_seed": 51,
+      "cutoff": 14.72846289038839,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858264,
+            0.05888059300184031,
+            0.04324670890121918,
+            0.06003855943682372,
+            0.31113968411515713,
+            0.43827765347426595,
+            0.4207768431729104
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858326,
+            0.05888059300184031,
+            0.04324670890121918,
+            0.06003855943682372,
+            0.31113968411515713,
+            0.43827765347426595,
+            0.4207768431729104
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806910965346,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 6.387149083828602e-10
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e"
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "off_seed": 52,
+      "cutoff": 14.72846289038839,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09748269115597168,
+            0.21308461152248018,
+            0.058881111540426384,
+            0.0430406593364545,
+            0.060031932132946254,
+            0.3111894080031704,
+            0.43371023552190047,
+            0.4163819948579606
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606
+          ],
+          "bank_ratios": [
+            0.0974826911559717,
+            0.21308461152247993,
+            0.058881111540426384,
+            0.0430406593364545,
+            0.060031932132946254,
+            0.3111894080031704,
+            0.43371023552190047,
+            0.4163819948579606
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.050574006759300044,
+            1364.9729720402297,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.350832821468331e-09
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e"
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "off_seed": 53,
+      "cutoff": 14.72846289038839,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.027922541916682017,
+            0.05888180843606114,
+            0.04276586688023861,
+            0.060023080571195486,
+            0.3112562385328372,
+            0.4276155849348586,
+            0.41051767990807964
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.02792254191668196,
+            0.05888180843606114,
+            0.04276586688023861,
+            0.060023080571195486,
+            0.3112562385328372,
+            0.4276155849348586,
+            0.41051767990807964
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.0773535845043739,
+            1288.6523540766843,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.3195216848486105e-09
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e"
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "off_seed": null,
+      "cutoff": 10.259698704063169,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -1.0528999578642468,
+            -0.030303378243424633,
+            -0.202755059262483
+          ],
+          "bank_ratios": [
+            0.09246505253342507,
+            0.09967305804157323,
+            0.1263468461595744,
+            0.029908000157658817,
+            9.693450065375689e-30,
+            0.0004256966661531921
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -0.23076953751787188,
+            -0.1282844607557475
+          ],
+          "bank_ratios": [
+            0.09183392312213917,
+            0.03751527392791671,
+            0.12034108998838143,
+            0.06417173165782825,
+            0.3177285389926029,
+            0.336130155778792
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1281957990569412
+          ],
+          "bank_ratios": [
+            0.09183521038702014,
+            0.0375703111162241,
+            0.1203425620694232,
+            0.0641414134343241,
+            0.3180341504313725,
+            0.3364436441007312
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464"
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "off_seed": 51,
+      "cutoff": 10.259698704063169,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858264,
+            0.09151042320328154,
+            0.060759772347493,
+            0.1198499565063803,
+            0.056047986083082174,
+            0.7470488145401556,
+            0.7161030847784086
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858326,
+            0.09151042320328154,
+            0.060759772347492975,
+            0.1198499565063803,
+            0.056047986083082174,
+            0.7470488145401556,
+            0.7161030847784086
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.4456047609325759,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.786781734110372,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.1627925006347938e-07
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464"
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "off_seed": 52,
+      "cutoff": 10.259698704063169,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09748269115597168,
+            0.21308461152248018,
+            0.09151125329288884,
+            0.060427772649964975,
+            0.11984420827209429,
+            0.05607318248531112,
+            0.7397500148875285,
+            0.7089658518926144
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606
+          ],
+          "bank_ratios": [
+            0.0974826911559717,
+            0.21308461152247993,
+            0.09151125329288884,
+            0.060427772649964975,
+            0.11984420827209429,
+            0.05607318248531112,
+            0.7397500148875285,
+            0.7089658518926144
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.4457536392174644,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.793709731216267,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.393200048842611e-07
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464"
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "off_seed": 53,
+      "cutoff": 10.259698704063169,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.027922541916682017,
+            0.09151236690685496,
+            0.05998445793277713,
+            0.1198365577825001,
+            0.05610705283269909,
+            0.7300067637824785,
+            0.6994394156796674
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.02792254191668196,
+            0.09151236690685496,
+            0.05998445793277713,
+            0.1198365577825001,
+            0.05610705283269909,
+            0.7300067637824785,
+            0.6994394156796674
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.4452932808565298,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            4.783403549184486,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.486331505665284e-07
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464"
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "off_seed": null,
+      "cutoff": 16.994962906906153,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -1.8026916830988942,
+            -0.010702668820659747,
+            -0.23019283402666552
+          ],
+          "bank_ratios": [
+            0.04679400636496956,
+            0.591981906226092,
+            0.06171880839026486,
+            0.005184617658796906,
+            1.6062295830036862e-29,
+            0.00039721931912927767
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            7.669493990541953e-05,
+            -0.18377935070842522
+          ],
+          "bank_ratios": [
+            0.044872421522656844,
+            0.05377365048548106,
+            0.04945892906397515,
+            0.02110681446081297,
+            0.0,
+            0.0003369922608661013
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18377938271481647
+          ],
+          "bank_ratios": [
+            0.04487242135769934,
+            0.05377362775135066,
+            0.04945892899534218,
+            0.02110681839407961,
+            0.0,
+            0.00033699226886458363
+          ]
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997"
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "off_seed": 51,
+      "cutoff": 16.994962906906153,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858264,
+            0.0447968851925482,
+            0.07773032235067853,
+            0.050074555335066585,
+            0.018288514984470546,
+            0.530077387880108,
+            0.48284941088232586
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -6.004720748087616,
+            -1.0078337986062487
+          ],
+          "bank_ratios": [
+            0.09072196413928665,
+            0.039856981495858326,
+            0.0447968851925482,
+            0.07773032235067853,
+            0.050074555335066585,
+            0.018288514984470546,
+            0.530077387880108,
+            0.48284941088232586
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            1509.5806910965346,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 6.167222155657778e-10
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997"
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "off_seed": 52,
+      "cutoff": 16.994962906906153,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09748269115597168,
+            0.21308461152248018,
+            0.04479715926271061,
+            0.07751126005092993,
+            0.05006938422974346,
+            0.018302001553904938,
+            0.525270973778899,
+            0.4783551997137396
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.992155877631413,
+            -0.9880595730085606
+          ],
+          "bank_ratios": [
+            0.0974826911559717,
+            0.21308461152247993,
+            0.04479715926271061,
+            0.07751126005092993,
+            0.05006938422974346,
+            0.018302001553904938,
+            0.525270973778899,
+            0.4783551997137396
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.05057400681353301,
+            1364.9729718858575,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 1.304319971161228e-09
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997"
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "off_seed": 53,
+      "cutoff": 16.994962906906153,
+      "fits": {
+        "full": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603,
+            0.0
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.027922541916682017,
+            0.044797526722948566,
+            0.07721854623953868,
+            0.05006247557364064,
+            0.018320133769484364,
+            0.5188522639842069,
+            0.47235428864946943
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.977898100934273,
+            -0.9627028033351603
+          ],
+          "bank_ratios": [
+            0.09428432819107838,
+            0.02792254191668196,
+            0.044797526722948566,
+            0.07721854623953865,
+            0.05006247557364064,
+            0.018320133769484364,
+            0.5188522639842069,
+            0.47235428864946943
+          ]
+        },
+        "dispersion_only": {
+          "status": "excluded",
+          "weights": [
+            0.07735358461448819,
+            1288.6523537627418,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 2.2396542415295997e-09
+        }
+      },
+      "controls": {
+        "physical": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "physical_intrinsic_without_forcing": {
+          "passed": true,
+          "bank_pass": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "rival": {
+          "passed": false,
+          "bank_pass": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "array_sha256": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997"
+    }
+  ],
+  "sources": {
+    "forcing.py": "59cad6793467b5152eb0d1d3af1801f08cb8d27931b788d1a582f6b37a630ff9",
+    "pair.py": "2b312940ee1bba49e328fc53f3bc870487c9b1b177311d034e5854d67aa6d49b",
+    "forcing_protocol.txt": "405ddc03045d16ef67a4763d7e5e669453ef4e0a613c676c48d16ecaec52df3b",
+    "forcing_profile.py": "a5261f65c41d003f1dad7b26437c58349d51daefb63dd7c3661204f37637499e",
+    "resolution.py": "13e63dd212019271c317ab95e2c6bcf08f0557ac8f4fbd8863cb9177c51e60d6",
+    "audit.py": "6688070ca0cdf6f0cd88bf5b71030358094061c3de734ae819a3e7fdca3bacb3"
+  }
+}

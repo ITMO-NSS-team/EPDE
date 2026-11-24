@@ -1,0 +1,950 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "key": "ode_seed51_observed",
+      "old_model": [
+        0.10622015502553123,
+        [
+          0.05527385218393212
+        ],
+        [
+          2
+        ]
+      ],
+      "model": [
+        0.10622015550763707,
+        [
+          0.05527378374670428
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.10622015550763707,
+        "rhos": [
+          0.05527378374670428
+        ],
+        "objective": -1.1178186094237181,
+        "old_objective": -1.1178186094236837,
+        "improvement": 3.441691376337985e-14,
+        "projected_gradient": 6.984173239743541e-10,
+        "transformed": [
+          0.05533017781833061,
+          -4.411920361731509,
+          2.7799781595406854,
+          -1.784315155188418
+        ],
+        "theta": [
+          0.05527378374670428,
+          -4.411920361731509,
+          0.9923316261069263,
+          -0.9451573678030247
+        ],
+        "selected_start": "band_start_2",
+        "starts": [
+          {
+            "start": "original_final",
+            "transformed": [
+              0.05533024646528829,
+              -4.411920653716564,
+              2.7799778744568573,
+              -1.7843147820076444
+            ],
+            "objective": -1.1178186094236837,
+            "initial_exact_objective": -1.1178186094236837,
+            "projected_gradient": 1.9105528892282564e-07,
+            "gradient": [
+              1.5379879314020585e-07,
+              9.620630375684058e-09,
+              -1.9105528897511772e-07,
+              1.369954996373787e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_0",
+            "transformed": [
+              0.05533024646528829,
+              -4.411920653716564,
+              2.7799778744568573,
+              -1.7843147820076444
+            ],
+            "objective": -1.1178186094236837,
+            "initial_exact_objective": -1.1178186094236837,
+            "projected_gradient": 1.9105528892282564e-07,
+            "gradient": [
+              1.5379879314020585e-07,
+              9.620630375684058e-09,
+              -1.9105528897511772e-07,
+              1.369954996373787e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_1",
+            "transformed": [
+              0.05533017388257541,
+              -4.411920289938102,
+              2.7799781449446495,
+              -1.7843152084375742
+            ],
+            "objective": -1.1178186094237157,
+            "initial_exact_objective": -1.1178186094237157,
+            "projected_gradient": 1.7420078712859777e-08,
+            "gradient": [
+              -3.6109392237080457e-09,
+              2.874356308524284e-09,
+              -1.742007870777502e-08,
+              -4.986815971779337e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_2",
+            "transformed": [
+              0.05533017781833061,
+              -4.411920361731509,
+              2.7799781595406854,
+              -1.784315155188418
+            ],
+            "objective": -1.1178186094237181,
+            "initial_exact_objective": -1.1178186094237181,
+            "projected_gradient": 6.984173239743541e-10,
+            "gradient": [
+              2.795911205686608e-10,
+              3.433095890903459e-10,
+              6.984174121691484e-10,
+              3.9164940381559816e-10
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_3",
+            "transformed": [
+              0.5442767146264614,
+              -5.216085822400797,
+              2.998335682726431,
+              -4.318300257428715
+            ],
+            "objective": -1.1020487890985946,
+            "initial_exact_objective": -0.8304865030596682,
+            "projected_gradient": 1.4590202956910048e-07,
+            "gradient": [
+              9.046170290542106e-08,
+              -3.5707509171700735e-10,
+              1.4590202956601892e-07,
+              -4.269798822377309e-10
+            ],
+            "polished": true,
+            "status": "ok"
+          }
+        ],
+        "contrast_count": 318,
+        "shape": [
+          320
+        ]
+      },
+      "seconds": 1.995513600006234
+    },
+    {
+      "key": "ode_seed52_observed",
+      "old_model": [
+        0.14272691395920237,
+        [
+          0.5155483335323797
+        ],
+        [
+          2
+        ]
+      ],
+      "model": [
+        0.14272691395920237,
+        [
+          0.5155483335323797
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.14272691395920237,
+        "rhos": [
+          0.5155483335323797
+        ],
+        "objective": -1.1400334725894417,
+        "old_objective": -1.1400334725894417,
+        "improvement": 0.0,
+        "projected_gradient": 2.987168001844509e-08,
+        "transformed": [
+          0.570257461021788,
+          -5.127838917789521,
+          2.9990022343601304,
+          -4.4002735703677045
+        ],
+        "theta": [
+          0.5155483335323797,
+          -5.127838917789521,
+          0.9950448999139796,
+          -0.9996987441334891
+        ],
+        "selected_start": "original_final",
+        "starts": [
+          {
+            "start": "original_final",
+            "transformed": [
+              0.570257461021788,
+              -5.127838917789521,
+              2.9990022343601304,
+              -4.4002735703677045
+            ],
+            "objective": -1.1400334725894417,
+            "initial_exact_objective": -1.1400334725894417,
+            "projected_gradient": 2.987168001844509e-08,
+            "gradient": [
+              -2.9871679980791524e-08,
+              1.9179231446064815e-08,
+              -8.979799857951762e-11,
+              -1.4382672534857034e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_0",
+            "transformed": [
+              0.10457908266842246,
+              -4.420228177541196,
+              2.7912216442929907,
+              -1.8018101521939711
+            ],
+            "objective": -1.1297107001587317,
+            "initial_exact_objective": -1.1297107001587317,
+            "projected_gradient": 6.766652777268067e-07,
+            "gradient": [
+              6.766652777260314e-07,
+              2.111409461019731e-07,
+              1.7911717504109685e-07,
+              1.6764163708772672e-07
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_1",
+            "transformed": [
+              0.10457876189940513,
+              -4.420230874105922,
+              2.791221164706309,
+              -1.8018101805221336
+            ],
+            "objective": -1.1297107001592153,
+            "initial_exact_objective": -1.1297107001592153,
+            "projected_gradient": 9.432919521878969e-08,
+            "gradient": [
+              9.43291952238752e-08,
+              3.95672505038025e-08,
+              -8.953929689207438e-08,
+              -1.0642865546105385e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_2",
+            "transformed": [
+              -2.363563950984139,
+              5.913251271352506,
+              -0.8576985842713791,
+              -0.48314370334276446
+            ],
+            "objective": -0.9078943021904768,
+            "initial_exact_objective": -0.9078943021904768,
+            "projected_gradient": 1.1784801190461991e-08,
+            "gradient": [
+              1.7380163135182461e-09,
+              -2.787615693833345e-10,
+              -9.912868741919954e-09,
+              1.1784801171962682e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_3",
+            "transformed": [
+              0.570257461021788,
+              -5.127838917789521,
+              2.9990022343601304,
+              -4.4002735703677045
+            ],
+            "objective": -1.1400334725894417,
+            "initial_exact_objective": -1.1400334725803027,
+            "projected_gradient": 2.987168001844509e-08,
+            "gradient": [
+              -2.9871679980791524e-08,
+              1.9179231446064815e-08,
+              -8.979799857951762e-11,
+              -1.4382672534857034e-08
+            ],
+            "polished": true,
+            "status": "ok"
+          }
+        ],
+        "contrast_count": 318,
+        "shape": [
+          320
+        ]
+      },
+      "seconds": 0.4722308000200428
+    },
+    {
+      "key": "ode_seed53_observed",
+      "old_model": [
+        0.10981097971728711,
+        [
+          0.06309342938647722
+        ],
+        [
+          2
+        ]
+      ],
+      "model": [
+        0.10981097971728711,
+        [
+          0.06309342938647722
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.10981097971728711,
+        "rhos": [
+          0.06309342938647722
+        ],
+        "objective": -1.1339928415509457,
+        "old_objective": -1.1339928415509457,
+        "improvement": 0.0,
+        "projected_gradient": 2.0544163703561935e-08,
+        "transformed": [
+          0.06317735029172934,
+          -4.546827740733365,
+          2.820047933108336,
+          -1.9352541124717264
+        ],
+        "theta": [
+          0.06309342938647722,
+          -4.546827740733365,
+          0.992920095911267,
+          -0.9591559643670685
+        ],
+        "selected_start": "original_final",
+        "starts": [
+          {
+            "start": "original_final",
+            "transformed": [
+              0.06317735029172934,
+              -4.546827740733365,
+              2.820047933108336,
+              -1.9352541124717264
+            ],
+            "objective": -1.1339928415509457,
+            "initial_exact_objective": -1.1339928415509457,
+            "projected_gradient": 2.0544163703561935e-08,
+            "gradient": [
+              5.490662501798589e-09,
+              -1.4000561265881117e-09,
+              -2.054416368770201e-08,
+              -8.034795348960848e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_0",
+            "transformed": [
+              0.06317735029172934,
+              -4.546827740733365,
+              2.820047933108336,
+              -1.9352541124717264
+            ],
+            "objective": -1.1339928415509457,
+            "initial_exact_objective": -1.1339928415509457,
+            "projected_gradient": 2.0544163703561935e-08,
+            "gradient": [
+              5.490662501798589e-09,
+              -1.4000561265881117e-09,
+              -2.054416368770201e-08,
+              -8.034795348960848e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_1",
+            "transformed": [
+              0.0631773436182229,
+              -4.546827832065079,
+              2.820047952303805,
+              -1.9352540313776259
+            ],
+            "objective": -1.1339928415509453,
+            "initial_exact_objective": -1.1339928415509453,
+            "projected_gradient": 7.354153286343035e-09,
+            "gradient": [
+              -6.707043891777757e-09,
+              -3.271555845674179e-09,
+              7.35415336506711e-09,
+              -6.402140458054289e-10
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_2",
+            "transformed": [
+              -0.14094744701413092,
+              -0.6317029256502927,
+              0.13470025803112431,
+              -0.965534861093228
+            ],
+            "objective": -1.0152269702986365,
+            "initial_exact_objective": -1.0152269702986365,
+            "projected_gradient": 1.1780985742504413e-07,
+            "gradient": [
+              -1.1780985741518755e-07,
+              8.284848085349239e-09,
+              -1.9523373569234015e-08,
+              6.591787247531436e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_3",
+            "transformed": [
+              5.355164010015829,
+              -14.695005954656278,
+              2.9990811449266155,
+              -5.181033482566048
+            ],
+            "objective": -0.9687484448237438,
+            "initial_exact_objective": -0.9687186015524176,
+            "projected_gradient": 1.6579395500926353e-07,
+            "gradient": [
+              3.6541979474641503e-08,
+              -9.704140634461678e-08,
+              -1.6579395502212938e-07,
+              -8.697263369610287e-10
+            ],
+            "polished": true,
+            "status": "ok"
+          }
+        ],
+        "contrast_count": 318,
+        "shape": [
+          320
+        ]
+      },
+      "seconds": 1.1066859999555163
+    },
+    {
+      "key": "ode_seed52_bootstrap112",
+      "old_model": [
+        10.34370353297727,
+        [
+          0.9999163883228528
+        ],
+        [
+          2
+        ]
+      ],
+      "model": [
+        0.1601994542261328,
+        [
+          0.6621916863743672
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.1601994542261328,
+        "rhos": [
+          0.6621916863743672
+        ],
+        "objective": -0.8747460817079179,
+        "old_objective": -0.812898056487886,
+        "improvement": 0.061848025220031855,
+        "projected_gradient": 1.606758692762611e-08,
+        "transformed": [
+          0.7967068441838192,
+          -5.445035166961674,
+          3.0030728925294095,
+          -4.244696979445141
+        ],
+        "theta": [
+          0.6621916863743672,
+          -5.445035166961674,
+          0.9950849784453637,
+          -0.9995888088617636
+        ],
+        "selected_start": "band_start_0",
+        "starts": [
+          {
+            "start": "original_final",
+            "transformed": [
+              5.041216371340845,
+              -13.801435043751338,
+              3.0028693224371796,
+              -4.512583597683631
+            ],
+            "objective": -0.812898056487886,
+            "initial_exact_objective": -0.812898056487886,
+            "projected_gradient": 1.6043067141424672e-07,
+            "gradient": [
+              8.003527194534163e-08,
+              -1.6043067171261916e-07,
+              3.963554936541338e-09,
+              -3.6013297515097136e-10
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_0",
+            "transformed": [
+              0.7967068441838192,
+              -5.445035166961674,
+              3.0030728925294095,
+              -4.244696979445141
+            ],
+            "objective": -0.8747460817079179,
+            "initial_exact_objective": -0.7391742265181215,
+            "projected_gradient": 1.606758692762611e-08,
+            "gradient": [
+              -1.6067586919970136e-08,
+              -1.724931968094534e-09,
+              -9.402114349727273e-09,
+              -3.3052806805284966e-09
+            ],
+            "polished": true,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_1",
+            "transformed": [
+              0.796706839223558,
+              -5.4450347662896785,
+              3.0030728954082835,
+              -4.244697055406904
+            ],
+            "objective": -0.8747460817079136,
+            "initial_exact_objective": -0.7409546273769934,
+            "projected_gradient": 1.6567702898484526e-07,
+            "gradient": [
+              -4.664026257834505e-09,
+              6.5403446131151455e-09,
+              1.6567702876678537e-07,
+              7.986360628860798e-09
+            ],
+            "polished": true,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_2",
+            "transformed": [
+              7.252293521881341,
+              -39.99999664494829,
+              7.254328619247669,
+              7.254328619247669
+            ],
+            "objective": -0.3705594759869175,
+            "initial_exact_objective": -0.3705594759869175,
+            "projected_gradient": 1.0553111007283178e-07,
+            "gradient": [
+              -1.0553110991088427e-07,
+              -5.198698370591885e-08,
+              -5.1992970347321184e-14,
+              -5.728628865622721e-18
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_3",
+            "transformed": [
+              5.041216371340845,
+              -13.801435043751338,
+              3.0028693224371796,
+              -4.512583597683631
+            ],
+            "objective": -0.812898056487886,
+            "initial_exact_objective": -0.8128619825569947,
+            "projected_gradient": 1.6043067141424672e-07,
+            "gradient": [
+              8.003527194534163e-08,
+              -1.6043067171261916e-07,
+              3.963554936541338e-09,
+              -3.6013297515097136e-10
+            ],
+            "polished": true,
+            "status": "ok"
+          }
+        ],
+        "contrast_count": 318,
+        "shape": [
+          320
+        ]
+      },
+      "seconds": 3.628643399977591
+    },
+    {
+      "key": "vdp_seed52_observed",
+      "old_model": [
+        0.06033717780402551,
+        [
+          0.06365356866174197
+        ],
+        [
+          2
+        ]
+      ],
+      "model": [
+        0.06033717780402551,
+        [
+          0.06365356866174197
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.06033717780402551,
+        "rhos": [
+          0.06365356866174197
+        ],
+        "objective": -1.498465468802236,
+        "old_objective": -1.498465468802236,
+        "improvement": 0.0,
+        "projected_gradient": 1.9381315663480336e-08,
+        "transformed": [
+          0.06373974828496927,
+          -6.328054943475522,
+          3.6779168899142918,
+          -4.253795696151432
+        ],
+        "theta": [
+          0.06365356866174197,
+          -6.328054943475522,
+          0.9987231066861958,
+          -0.9995962223169574
+        ],
+        "selected_start": "original_final",
+        "starts": [
+          {
+            "start": "original_final",
+            "transformed": [
+              0.06373974828496927,
+              -6.328054943475522,
+              3.6779168899142918,
+              -4.253795696151432
+            ],
+            "objective": -1.498465468802236,
+            "initial_exact_objective": -1.498465468802236,
+            "projected_gradient": 1.9381315663480336e-08,
+            "gradient": [
+              -1.1558853056118483e-08,
+              -4.740665176389269e-09,
+              -1.9381315692480478e-08,
+              -6.434217048826084e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_0",
+            "transformed": [
+              0.06373975146359624,
+              -6.328055270454593,
+              3.67791688638061,
+              -4.253795371931204
+            ],
+            "objective": -1.4984654688022143,
+            "initial_exact_objective": -1.4984654682256966,
+            "projected_gradient": 8.450588628861055e-08,
+            "gradient": [
+              -5.042293198640324e-10,
+              -1.4868426073677554e-09,
+              -8.450588623895615e-08,
+              4.430286741885307e-09
+            ],
+            "polished": true,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_1",
+            "transformed": [
+              0.06373972610504632,
+              -6.3280724932995,
+              3.6779168724689746,
+              -4.253784037662526
+            ],
+            "objective": -1.4984654688009174,
+            "initial_exact_objective": -1.4984654624391605,
+            "projected_gradient": 1.9365833026085966e-07,
+            "gradient": [
+              2.685603705253865e-08,
+              -2.1617958465003362e-08,
+              -1.434178838858177e-09,
+              1.936583301837006e-07
+            ],
+            "polished": true,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_2",
+            "transformed": [
+              0.06373974828496927,
+              -6.328054943475522,
+              3.6779168899142918,
+              -4.253795696151432
+            ],
+            "objective": -1.498465468802236,
+            "initial_exact_objective": -1.498465468426914,
+            "projected_gradient": 1.9381315663480336e-08,
+            "gradient": [
+              -1.1558853056118483e-08,
+              -4.740665176389269e-09,
+              -1.9381315692480478e-08,
+              -6.434217048826084e-09
+            ],
+            "polished": true,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_3",
+            "transformed": [
+              7.254328619247669,
+              -19.997508543217656,
+              3.6857258090296856,
+              -7.254328619247669
+            ],
+            "objective": -1.050543457991898,
+            "initial_exact_objective": -1.0487803880942437,
+            "projected_gradient": 7.589414802833261e-06,
+            "gradient": [
+              1.5344687744542402e-06,
+              7.678926248026741e-07,
+              7.589414802995829e-06,
+              1.8946239508232347e-05
+            ],
+            "polished": true,
+            "status": "ok"
+          }
+        ],
+        "contrast_count": 318,
+        "shape": [
+          320
+        ]
+      },
+      "seconds": 3.093383899948094
+    },
+    {
+      "key": "lv_seed51_observed",
+      "old_model": [
+        0.06296720123659383,
+        [
+          -0.06975402004809049
+        ],
+        [
+          2
+        ]
+      ],
+      "model": [
+        0.0629672008991258,
+        [
+          -0.06975400623411909
+        ],
+        [
+          2
+        ]
+      ],
+      "info": {
+        "status": "ok",
+        "sigma": 0.0629672008991258,
+        "rhos": [
+          -0.06975400623411909
+        ],
+        "objective": -0.793012686098407,
+        "old_objective": -0.7930126860984006,
+        "improvement": 6.439293542825908e-15,
+        "projected_gradient": 4.028293462687849e-09,
+        "transformed": [
+          -0.06986746985621257,
+          -2.105634775437485,
+          1.6244781472508674,
+          -0.8407380769899029
+        ],
+        "theta": [
+          -0.06975400623411909,
+          -2.105634775437485,
+          0.9252711809073918,
+          -0.6861997986106343
+        ],
+        "selected_start": "band_start_0",
+        "starts": [
+          {
+            "start": "original_final",
+            "transformed": [
+              -0.06986748373772618,
+              -2.1056348156568383,
+              1.6244782154535153,
+              -0.8407381766985556
+            ],
+            "objective": -0.7930126860984006,
+            "initial_exact_objective": -0.7930126860984006,
+            "projected_gradient": 2.8524206857616363e-08,
+            "gradient": [
+              -2.8524206852336512e-08,
+              -2.333400167531252e-09,
+              9.099177037161997e-09,
+              -4.8807263494756846e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_0",
+            "transformed": [
+              -0.06986746985621257,
+              -2.105634775437485,
+              1.6244781472508674,
+              -0.8407380769899029
+            ],
+            "objective": -0.793012686098407,
+            "initial_exact_objective": -0.793012686098407,
+            "projected_gradient": 4.028293462687849e-09,
+            "gradient": [
+              4.028293459639024e-09,
+              2.150766953423755e-09,
+              -4.3670180677134615e-10,
+              3.2065790371660657e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_1",
+            "transformed": [
+              -0.06986748373772618,
+              -2.1056348156568383,
+              1.6244782154535153,
+              -0.8407381766985556
+            ],
+            "objective": -0.7930126860984006,
+            "initial_exact_objective": -0.7930126860984006,
+            "projected_gradient": 2.8524206857616363e-08,
+            "gradient": [
+              -2.8524206852336512e-08,
+              -2.333400167531252e-09,
+              9.099177037161997e-09,
+              -4.8807263494756846e-09
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_2",
+            "transformed": [
+              3.7732351767388703,
+              -9.688921413219814,
+              2.090203033234713,
+              -1.4135664322106443
+            ],
+            "objective": -0.6407668139432552,
+            "initial_exact_objective": -0.6407668139432552,
+            "projected_gradient": 5.109085297050342e-07,
+            "gradient": [
+              2.1021684694999624e-07,
+              -5.109085302740235e-07,
+              2.397076130077938e-08,
+              2.229440281768277e-08
+            ],
+            "polished": false,
+            "status": "ok"
+          },
+          {
+            "start": "band_start_3",
+            "transformed": [
+              6.344582192117924,
+              -14.831611602034627,
+              2.0902033152079698,
+              -1.4135696464694427
+            ],
+            "objective": -0.6407665041441728,
+            "initial_exact_objective": -0.6407665041441728,
+            "projected_gradient": 1.2060913157085906e-08,
+            "gradient": [
+              1.2060912769641325e-08,
+              6.009032285647642e-09,
+              6.890300163559298e-10,
+              6.203116221916403e-10
+            ],
+            "polished": false,
+            "status": "ok"
+          }
+        ],
+        "contrast_count": 299,
+        "shape": [
+          301
+        ]
+      },
+      "seconds": 0.17634050000924617
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_protocol.txt": "4a9a7debdfabdf4eabe6901493079468b021325d024a1698bda890b977d76b32"
+  }
+}

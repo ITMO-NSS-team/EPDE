@@ -1,0 +1,58 @@
+Residual cross-product feasibility test, before numerical ranking
+2026-11-16
+
+Use the existing three Kepler noisy records and four distinct archived rival
+families. Split raw observations by index modulo three. Every group spans the
+record but has disjoint raw noise. Rotate the training group through all three.
+
+Each training group independently selects the two existing token-frequency
+slots from its raw spectrum and the spectral-test bandwidth by raw-u DCT GCV.
+Fit the same archived supports by CLSM on the training group's GCV spline,
+reconstructed on the original grid. Bootstrap training-group noise through
+the same smoother and all nonlinear features for the CLSM correction.
+
+Each evaluation group has its own GCV spline, noise estimate, independent RNG,
+and bootstrap reconstructions. Neither evaluation group's observations select
+the coefficients, frequencies, bandwidth, or normalization. Their full weak
+residuals are compared by a signed cross-product. A matched squared-energy
+control uses exactly the same coefficients and fields. Mean-corrected and
+uncorrected residual arms use the same corrected training coefficients.
+
+Primary score: real sum(conj(r_A)*r_B), normalized by the training spline's
+target energy, using the preceding full-record oscillating weak bank. Also
+test the original local zero-modulation weak bank. Frequencies have equal
+weights (negative conjugates count equally); no inverse-noise weighting.
+Average normalized scores over the three training rotations. Keep the saved
+full-record raw CLSM dyad coordinate fixed for the primary Pareto comparison.
+Training dyad fits are logged separately.
+
+Subtract the bootstrap estimate E[F(smooth(pilot+noise))]-F(pilot) from each
+evaluation group's weak columns. This includes the plug-in estimate of
+nonlinear/smoothing bias. No clean value is used for this correction.
+
+Clean controls use the saved clean record only after the noisy bank is fixed.
+Also report a clean-field swap retaining noisy-trained coefficients. Neither
+control selects parameters or ranks noisy candidates.
+
+Uncertainty: propagate centered, independently generated evaluation-group
+bootstrap deviations through the product, preserving shared groups across
+rotations. Report paired score-difference quantiles and fold variation. These
+are conditional spreads, not full calibrated confidence intervals; training
+fit/frequency/bandwidth uncertainty is excluded. Do not treat rotations as
+independent observations or clip negative estimates.
+
+Settings audit:
+- Group count three: minimum for disjoint training and two evaluations.
+- Three rotations: exhaustive choices of training group.
+- Smoothing, token frequencies, spectral bandwidth, and noise model: data-driven.
+- Support trimming: common interpolation domain of the three groups.
+- Weak bump order/local window/old dyad: retained controls from prior experiment.
+- Draw budget initially 128: computational budget, not a statistical cutoff.
+  Report results at 32/64/128; extend if changes affect interpretation.
+- Bootstrap RNG seeds and Fourier lattice: reproducibility/numerical design.
+- Numerical rank tolerance: existing production solver convention.
+- 5/50/95% summaries: descriptive uncertainty, no acceptance gate.
+
+Validate independent-noise population identity, known-bias correction,
+disjoint split coverage, swapped-group symmetry, identical-group equivalence,
+and energy-product=half squared difference. No solver or production edits.

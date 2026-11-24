@@ -1,0 +1,569 @@
+{
+  "status": "COMPLETE",
+  "design_coverage": {
+    "local": 9,
+    "broad": 9,
+    "selected": 9,
+    "original": 9,
+    "replacement": 9
+  },
+  "design_geometry": {
+    "original": {
+      "unbounded_certified": 9
+    },
+    "replacement": {
+      "unbounded_certified": 9
+    }
+  },
+  "design_joint_cutoff_ratio": {
+    "min": 0.5456094543208729,
+    "median": 0.6652057555125667,
+    "max": 0.7705271068214611
+  },
+  "regression": {
+    "records": 45,
+    "variable_fits": 60,
+    "statuses": {
+      "ok": 60
+    },
+    "max_sigma_relative_change": 1.471985781376084e-05,
+    "max_rho_change": 1.9657319572520537e-05,
+    "max_likelihood_gain": 0.00037051485592964895
+  },
+  "fresh_ode_coverage": {
+    "local": 2,
+    "broad": 3,
+    "joint": 3
+  },
+  "fresh_ode_fit_statuses": {
+    "ok": 384
+  },
+  "fresh_ode_extreme_diagnostic": {
+    "original": 0,
+    "repaired": 0
+  },
+  "fresh_ode_material_likelihood_improvements": 8,
+  "fresh_ode_diagnostic": {
+    "status": "COMPLETE",
+    "rows": [
+      {
+        "seed": 54,
+        "score_cutoff_ratio": {
+          "local": 0.5657751380392664,
+          "broad": 0.2175072588802766
+        },
+        "bootstrap_exceedances": {
+          "local": 57,
+          "broad": 112
+        },
+        "sigma_truth_ratio": {
+          "u": 0.9590605564703895
+        },
+        "estimated_rhos": {
+          "u": [
+            -0.02454870063473022
+          ]
+        },
+        "references": [
+          {
+            "bank": "local",
+            "candidate": "e0:reference",
+            "zero_accepted": true,
+            "noise_covered": true
+          },
+          {
+            "bank": "broad",
+            "candidate": "e0:reference",
+            "zero_accepted": true,
+            "noise_covered": true
+          }
+        ],
+        "observed_sigma_change_from_original": {
+          "u": 0.0
+        }
+      },
+      {
+        "seed": 55,
+        "score_cutoff_ratio": {
+          "local": 1.111643430332741,
+          "broad": 0.30124775248870367
+        },
+        "bootstrap_exceedances": {
+          "local": 3,
+          "broad": 89
+        },
+        "sigma_truth_ratio": {
+          "u": 0.982806901440647
+        },
+        "estimated_rhos": {
+          "u": [
+            -0.12773025643407263
+          ]
+        },
+        "references": [
+          {
+            "bank": "local",
+            "candidate": "e0:reference",
+            "zero_accepted": true,
+            "noise_covered": true
+          },
+          {
+            "bank": "broad",
+            "candidate": "e0:reference",
+            "zero_accepted": true,
+            "noise_covered": true
+          }
+        ],
+        "observed_sigma_change_from_original": {
+          "u": -1.0633202429666255e-08
+        },
+        "old_fit_same_fields": {
+          "cutoffs": {
+            "local": 2.6868212138666063,
+            "broad": 6.85551655455162
+          },
+          "coverage": {
+            "local": false,
+            "broad": true
+          },
+          "note": "Paired refit diagnostic conditional on repaired anchor and pilot; not a separately regenerated old procedure."
+        },
+        "oracle_noise_posthoc_only": {
+          "local": {
+            "score": 2.2485562728832407,
+            "unchanged_cutoff": 2.6868211156247006
+          },
+          "broad": {
+            "score": 1.5395170123383521,
+            "unchanged_cutoff": 6.85551655455162
+          }
+        }
+      },
+      {
+        "seed": 56,
+        "score_cutoff_ratio": {
+          "local": 0.5351239263264073,
+          "broad": 0.7838845260624745
+        },
+        "bootstrap_exceedances": {
+          "local": 50,
+          "broad": 15
+        },
+        "sigma_truth_ratio": {
+          "u": 1.016640088686283
+        },
+        "estimated_rhos": {
+          "u": [
+            -0.0009825435881678812
+          ]
+        },
+        "references": [
+          {
+            "bank": "local",
+            "candidate": "e0:reference",
+            "zero_accepted": true,
+            "noise_covered": true
+          },
+          {
+            "bank": "broad",
+            "candidate": "e0:reference",
+            "zero_accepted": true,
+            "noise_covered": true
+          }
+        ],
+        "observed_sigma_change_from_original": {
+          "u": -4.068707615267897e-08
+        }
+      }
+    ],
+    "source_sha256": {
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\fresh_failure.py": "106b91930561e210dfe1f8db60a555bf6290b5535ef13a1500fca08aa88ae9bb"
+    },
+    "input_sha256": {
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_results\\ode_iid_seed54.json": "2afb6624de91fedbef230389394b5dfbf0c07b6131973a98563ffd0c7a4ae062",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_results\\ode_iid_seed55.json": "eeb381923fd0ef4a01aa0b991cdfa97ce1601767430ad670ade900e64d360df2",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_results\\ode_iid_seed56.json": "b3b3552b9a8d6f4888ab7c633ace4de1987fca4c0a38fd521a24295296b09eb3"
+    }
+  },
+  "archive": {
+    "status": "COMPLETE",
+    "cutoffs": {
+      "local": 1.6739849750371174,
+      "broad": 4.12121742800111,
+      "joint": 4.12121742800111
+    },
+    "original_cutoffs": {
+      "local": 1.9570734379322796,
+      "broad": 4.1212213949637855,
+      "joint": 4.1212213949637855
+    },
+    "cutoff_ratios": {
+      "local": 0.8553511291869274,
+      "broad": 0.9999990374303404,
+      "joint": 0.9999990374303404
+    },
+    "coverage": {
+      "local": true,
+      "broad": true,
+      "joint": true
+    },
+    "materially_changed_draws": [
+      112
+    ],
+    "selected_fit_statuses": [
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok",
+      "ok"
+    ],
+    "source_sha256": {
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_archive_ode.py": "f195d75fc7a42d982fc0153fac6b381aa5897a11239bc6ef43321c6e00a4a161",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\certified_starts.py": "5cc2fda97acdfbeabc6470b3554b7d260a1be2dc66bd876bdf82ff0101f0f563"
+    },
+    "input_sha256": {
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw000.json": "75dd738629d93b74d9c122de435e58fc864a69d251b900169d44929f8f77e4ef",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw001.json": "67b59bf7bb932624c2be1c5d5d69d8b0e78bec3b96a0dfd6cf28918a1805c3d0",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw002.json": "a389d4d2b96850a00b86cfd5de2e4a337a045e110249105ffbf35b770996498c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw003.json": "3c9b0a96d9568b2384781af72e5d1989bc63bd9a8c68bda0b66666200f8c44b2",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw004.json": "864f49fab5477bd375e846490b85fb94c94b767b0b6c4fe9c966856ec5410b63",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw005.json": "ce05c51d3a229242fbdcd5f806f394634bf655dc324137831e75c1e8c79368ec",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw006.json": "517fe288d40cdc3e5c40441a8f9e14328ca238d3bc3d5937a79bf2963936cd74",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw007.json": "08ff26c780e7042c5465d8eebefb40035012b2641dd3367c00e053db41a03e9f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw008.json": "1688aa4f05d0b6816267e709b10adcfb17d096412703e7165499f8584269569a",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw009.json": "e0156a24b2ab5c0426468b8229eaf6612277b3ea9dcd4e6d8437e3ada06ca5af",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw010.json": "b92e5f4342814b9368bf8f953bc7ee7bb94cc8ff5508a3e55aec729321d9361e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw011.json": "0f515f24430abbd83e7fe744afd998096658e26c7af3151f1ade1f911312480c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw012.json": "ba7dd5e08e2f15f9d49513a8d9c5bc6ffa8989c83972c12467e9178f0856e5cf",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw013.json": "b8241158ea9c2b85ffbbc3550fce3801fcb4a169ed1ee4f745bc847f23c1ef85",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw014.json": "b968097d3f887f30bb1b5a9c35ecbc1c9dd4baa9a153b3b1579e87dac8bfbc71",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw015.json": "9686d93552330a036fcd45649dc65f93a6dd62f6ca5c7b0816a76187c85c0724",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw016.json": "a8e829cebd0c23375df4a06c0d95636530a8af288791fcacd066cc3c3a3ee35c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw017.json": "df14576d96622492f6153e7d20d10937708c7962628df386eb803fad75df32c4",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw018.json": "2e95563dbb398f8db38e8a99be0654a60b3b51ad732d10e7dd071bf21303ede7",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw019.json": "23eb0ba008564b8ae499e088610d86796af45c7d986c463307381dc2fd80e193",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw020.json": "a744fe343e8f2f0ac5f85480b1e85931820586993307a0715bddc7e2404348b2",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw021.json": "935b91575a1ad698e36dd74ac8ea2c7e11a15849ed6882ba46d2b6f46dec3041",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw022.json": "4ff1f0fe199efc170f45e83d0f775a1b0db9a85a35edc69a1992e4ddf7d621d8",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw023.json": "bce485eb07b8725e960bf65fc338b68de0761e565e3d6c601fc25d22b1e404f1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw024.json": "1dc17e539ef218284da7641e8c7a82d09a87de2c751d72555314a70fd2ab188a",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw025.json": "b7b42750482158d521b85ae8f76cada7f69156174c7525cbd9caf9d7324d37a7",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw026.json": "c370c453a4243f3d9b87b131f53b048524f14eff878e483ea8ec55f7ef718d59",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw027.json": "14c10c03e8b5991d660a50dadb295f0cdfc1321f9b1ee4ff9cefd6fac50a1ba8",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw028.json": "dd88e18c225695bcf759fb70aa42c76494baa938429c38b1e9412fabf8c9f1f1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw029.json": "626f288590ae50641a69013da70e18809c65e4445f78e72904df077b3e11500c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw030.json": "d4080a150a9cb7d5b6148b472d67b94481a8ad0d413eb800494ae627c081705e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw031.json": "5f875e8cb6b63549c2f4193699e82952a8947250a46e46eefac12228451751e0",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw032.json": "dc1805f26b1b4f0ba52372b9a6f3929e2e32fb70bb3c0b6d9947bd662171c15c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw033.json": "f99e7fb08bb80cf061be4007386146edccfa88b46b895f9113c95b42c0116058",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw034.json": "a76b8df9db00706c3f3358c93c2d3f538aad147b8ee24ab4bc7b6da134df7345",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw035.json": "6e5e9aa7fcb2af257aeec5a3bf4bdf1eccb3f55bdf15f200a5aa6a61e7004757",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw036.json": "53f6496d5efbb0e552525e85fcf5a561b5f08e3d76eef22e400e09f1e9ebf572",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw037.json": "87673a8a3259e867f56ff6f355f20b8a08a0afcf40d6736dcacc1d75dd1f43ae",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw038.json": "24c14a79321a682f800d43c5704305be179be52df9b6bcb3bd0ff02fddca64ff",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw039.json": "a795f4ad0ac93f871ebf48b984c23855a9c3e1c9acf26da7c3652e343918dc5c",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw040.json": "d06c99a64628bea0f7399a2b3187f91138c40bfa62df63694562aa2fe1c6484b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw041.json": "9db9a25674d4a80840ea50b01c29593083675ca93ab5d0cf86c5fd9c2c87f1a0",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw042.json": "fad02bca7e53d18d129a9f93fa2d6e67ee1454a8cfbbfc004c5b6dd7a4eb3566",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw043.json": "61f9e2bae63bf09787712fd6fae9560dbf1f77e777808f4bb0d14e6ac71a1a45",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw044.json": "15bbbf624a2208a6db234078a605cc659871d9616e0531c031806ac1fc980524",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw045.json": "0cce47c77d2bb5de4ac4fd38010d8c8ad6408fc09a6338c4f5964f7d42cfd9ec",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw046.json": "090aed4f5d774bc2e12d88b90c9bfa4be04801b4f3d2ccc55bf86711b597296e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw047.json": "6bde6b9bd3055192d76839f93cf92dd312604678a9b3d32f0ab65ea159190a0a",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw048.json": "75b8665e3e71c3f78058828302ef442b140a1203bf112406114e0477d39e7b33",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw049.json": "1a3c060ebec1fd14aa869d517280645d4cf2c3ef9bc5416e218aa2466d55490e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw050.json": "f6ad83ba1898e29033dd8b977dda2a1c8fc67700708d0c0663fb08d9a951827e",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw051.json": "bad691e959154eeb125c96a8b2a4df54742adc436be3f0cff610a8e31223dac0",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw052.json": "14b08dbaf8e052b1a04c780278d6f81f5c2f80d5c91f6f551b42a57715a92aa6",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw053.json": "aef38fbe1cb43903e5151753e327e6b02b23b3c80a2f400d935c705c9f0afc39",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw054.json": "bd42c8bbdf362d66e747cb9256a6dd859a6ed9262d2ce634b86febf5bb02bced",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw055.json": "6a0f4bef8d016a2fb47165790bda25e4fd710fd66fbfc458125e764996e3239b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw056.json": "a69b2735dfe6106067105df560d801b82d73a7325333fc67f4c690d3729b1fdd",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw057.json": "026b448ba74a0e872817f2d396620cab84d249fd17cb698707df049b268efa0b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw058.json": "a96a5f7d68a0ab97358e4e95533f0c312e98916d515a5f75868df204be65538d",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw059.json": "fe064a0c0218abd384ecfcf414d4323747a6cdd29cac8924b82923856b9467ca",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw060.json": "ecaa85abbd4838d9469ba66093382f5d8b7cca7a3ee0dbc17ea60f2aa96d3ce4",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw061.json": "a9ea6175565b0b31281bfebbc2925a130fa5e998321b98768d8a5ac1b8ab51be",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw062.json": "29120a18ba7750944888018ce9a26931791c739aefa080f57af95dd74040dd71",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw063.json": "b1a257eaa75544e8ab5241a4ccf10d21f9b98374fddbec46a05fcb46260dee73",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw064.json": "6ebc585c4efc042b567c71b386b067572601f286a7b236ccb4ddfdfa39a8e144",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw065.json": "b8935ad0de9c0b1a628973569bc461404b2938fc36345eb399fba58c2456a9ea",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw066.json": "813f91fe12933077ce38537c93f457e14e0dbb33e116b77a2e8f02beb0557212",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw067.json": "5776a13e878166a88902a35c1bf4e6d8467931254a5b5eb797be63b27152c462",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw068.json": "5deccd93591f54af319e8c246090e6990346143929ed36224b09e02747a194bf",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw069.json": "431407e42d9b6a28cb4d0345a7d86f4274e9f5defd71f12981a9f1d9f79ca95d",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw070.json": "35dd893f982e07ba18a77d518bac86015ecfc696b7fcd0f675a3d92d6c93ddd1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw071.json": "7899a1f27fe8bb0bf3d5881a18437b73861dcf7b9b058e5a5bd25b221c990202",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw072.json": "445d856aa931557bc366b3124bd2eba03a5acb8a57f20095727a1285fdb5eae4",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw073.json": "ad60d60c3515c4f660098c12af4df4f3068bf314f479cf1b4f14f770f19c2e21",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw074.json": "74222ff6dcc8b7a3228b324856810f9c82cd5abc56f68fd2f67d3af43b0227c8",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw075.json": "edfa2d85f5798cc6a2e933d5c34005a2778c6cc64b6576916f5b195ca70edd4f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw076.json": "cd21289743d5a1e9ee7030e48085a264c70e77d87ce0c52b50f0c016df390e59",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw077.json": "ad0079d726414e30a8a40e76a11795dc0c3f182e120d78fb24c97c43094664fe",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw078.json": "38689c84f24cb94f7fe9fb0310804d71ca64d595e09c32fdfdc214afb91ce037",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw079.json": "43c6e74e21d86338e5c6627e11ceb5e74524f724ea0dcebfefe8200c1a477231",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw080.json": "0dde1cff1e7a422d9606b374ff2e5d94585f0800ce34dde3a0154e17b48aa13b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw081.json": "0c404ddd5c2247a9426219ab7d800ce3b7c9e9506a91fc6cb0a6902b34727c14",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw082.json": "7e719acf4688be3968539e20713bf73f59ce9e016fbdcef7e9991cc4655e91aa",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw083.json": "bbbb651edf36c30397c4ff877a906ce690e01c882eb6ddbd7f6ccb94bda8d2be",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw084.json": "f11378328e4345277a1f048dd50a2302df54d40a96b88f3e40b6b8347258ca27",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw085.json": "f6fb4d8b8c5c1b9dead936f65d6dae2925b8caca8492efd25a1a6258bc6a491f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw086.json": "100ebe4730a168f8eb1f23cc0888d47b8007a88cbfba2585eb76dd2ef97c663f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw087.json": "c0449f900d6a27df6c769e11503e78b6b10aa340016f2087ee9ff304bee34321",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw088.json": "189307b3a7e93df62756fec8f4c1a4b33b7005f8aeafc7cd17e53323b6b8707d",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw089.json": "a5fa7596804f8f5c63c730245be19e71eb402cbca64489c15ecdc84599565a55",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw090.json": "18511a99e2330793d755e7b13fd3e12e17780e13840128faabb36a043c7664a4",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw091.json": "b8b95c651cc6a389041ad6d51e210227da500a60d8aaec7b73ee9b368c31b394",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw092.json": "3c07a5ec0995ad5a357f9edda0717a43aa4a45a8242d6fc771b57f7b8f505b0a",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw093.json": "5dc4bb6ba9e97ccb5a11ec75b6b98087689a9272c10488308ac3fc0e9f385938",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw094.json": "2dcf9e2d789d20577fb05e8bd7f04fbaac415dfee634f66f01734c1c7b31bf61",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw095.json": "662a1b908f28e28d6faed2c027a8fb11ae8fa91995b29c5463612ed7abddfc33",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw096.json": "1015f9206c74a4a49a60d2be289ea0ac752d7e330241824caaef1bb4d0c74971",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw097.json": "60275443dfe9ba4d713ef66eff6f7752faa248f787228addc77acfce93a3f304",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw098.json": "ba37b69af0ea0131aa4bd6b5bd1524226a3b87929826200098ebdf42ff892838",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw099.json": "f06b0981222b4a54ced8b85f44561f0545c27323493512f90b7170561dfe3fb0",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw100.json": "8c1c20a98f590056cda093033e698d83fbcd4360753676b5b1db0ac50d0f3a6b",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw101.json": "6e8704e8798757c1890183d856759762fbc32e0123f3409833f862a1c74f8d21",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw102.json": "abb95ee371219762af9c7bf6ee75fd7b08d21a8675b5a9b3513c0991dee21400",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw103.json": "8c6537c46a72e2e4fc16b6f1ed88fda0bf471d1acd955f599ecc5b4c6ad06d14",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw104.json": "b8fdd6b1b2a7659af9e10d8ad116ae5f30fa3701a1bd66f35c4ac35d0b82a549",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw105.json": "6147665cf270b4a805239bd83618ed0b50ac16a2a06f9b40743ac659ab6bbf34",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw106.json": "3b04b6e0c57d27bc2b79d6974f41e264f8258a86fb20d3d3eeefa527ff7000b0",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw107.json": "1596d237e93309bef0068162a26c660c35a91e53853094ab0740f390a481e7a8",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw108.json": "a07e740f1f199a180a57bc334632566b4747d57191afdc5536500e6356130e92",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw109.json": "b13e6fb780b8baa87f91bde6609c0d3382e9f0ae11689c0bc953f40abb8993a6",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw110.json": "540356e552fe37a12265adc36bf2063aa3960ad1d7758be4674efdbc8aad0e64",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw111.json": "24497073d132fd3bbb8113b9b2d409d15aa4a74b453c25bbefd5b6a0b2d2e035",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw112.json": "2c558b9a96a87d29e0e113f962d9c6e87bb2fa61d5297bc57bb8ae5f88de58ff",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw113.json": "c433ad9c7304a94f7d94d5220c9b6c19ca8ca9b6cd537bd6e361f29c3ad0a711",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw114.json": "4c6e1d9c05fe45416ad6fb30f55ab7bb68deb5a8f1a9ddbf413441c100f05da8",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw115.json": "def20ce29b2900c8917de724245fc4c57afa78d890be91b7c53cd8802e61c2b1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw116.json": "9df398b6e8180c4fe85e6ec35a0b586aef5a792c68b8bedf178cbcd4ab6bff45",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw117.json": "dfd954fa8fc238e5923ba13716293035b4b7998a01ba8fbcaefc70a4c40ce8ee",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw118.json": "680d8ef6053d04b5b16802ebfd303a54c25052fa03ef3a54653a6c32efb18f36",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw119.json": "ced74c5e76bbc74e1c58424818688207e41e8734b271fcba0f909e92770c5904",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw120.json": "d8df8a6bff217cf1a92a96ebbee767192cd9ace52fae03e14239e6d90a36d855",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw121.json": "97cd852c9ca1694b123905a6dc9ab2915162afc184020b1ce0834ed54d4521d3",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw122.json": "6c00ff6a8816ff827d5e66bc81d87e7ca825eeb56001d8b13413811aa1aa7ad1",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw123.json": "36eca19423443c93c0b6b2e38a6d6e2141a54740754947e09d5754dae64be2ea",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw124.json": "6d3679789ca47462a3e2ef7e8c526471614976a65b1673b70e251cd51246df3d",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw125.json": "8b21cfb201ef6d964a3e9da3086d817a90c9c674c7b4eb705b8c90f9ab64aafd",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw126.json": "047068c4532565274a495766f5ba5517a67d9083b64f1f19d350fbfd7838514f",
+      "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\archive_repair_draws\\draw127.json": "e3558099165e6bee2b76d212ef0737a20832408ec01d594bb205164998efc8cd"
+    }
+  },
+  "selected_bank": "fraction_1_0.5_k2",
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\report.py": "858c3259de330329e86e1bbed36e6df75b3c9251ef65d96d4a0f702c90ea3a80"
+  }
+}

@@ -1,0 +1,532 @@
+{
+  "conditional": [
+    {
+      "dataset": "duffing",
+      "seed": 923701,
+      "noise": 0,
+      "fitted": {
+        "cos@0": 0.9999999979960588
+      },
+      "registered": {
+        "cos@0": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 113
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923701,
+      "noise": 5,
+      "fitted": {
+        "cos@0": 1.0013043348828192
+      },
+      "registered": {
+        "cos@0": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 118
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923702,
+      "noise": 0,
+      "fitted": {
+        "cos@0": 0.9999999979960588
+      },
+      "registered": {
+        "cos@0": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 113
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923702,
+      "noise": 5,
+      "fitted": {
+        "cos@0": 0.9982454512072026
+      },
+      "registered": {
+        "cos@0": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 112
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923703,
+      "noise": 0,
+      "fitted": {
+        "cos@0": 0.9999999979960588
+      },
+      "registered": {
+        "cos@0": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 113
+    },
+    {
+      "dataset": "duffing",
+      "seed": 923703,
+      "noise": 5,
+      "fitted": {
+        "cos@0": 0.9999787183060558
+      },
+      "registered": {
+        "cos@0": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 109
+    },
+    {
+      "dataset": "ode",
+      "seed": 923701,
+      "noise": 0,
+      "fitted": {
+        "sin@0": 25.28349255432427
+      },
+      "registered": {
+        "sin@0": 2.0
+      },
+      "within_one_percent": false,
+      "solves": 109
+    },
+    {
+      "dataset": "ode",
+      "seed": 923701,
+      "noise": 5,
+      "fitted": {
+        "sin@0": 50.474530848418446
+      },
+      "registered": {
+        "sin@0": 2.0
+      },
+      "within_one_percent": false,
+      "solves": 96
+    },
+    {
+      "dataset": "ode",
+      "seed": 923702,
+      "noise": 0,
+      "fitted": {
+        "sin@0": 25.28349255432427
+      },
+      "registered": {
+        "sin@0": 2.0
+      },
+      "within_one_percent": false,
+      "solves": 109
+    },
+    {
+      "dataset": "ode",
+      "seed": 923702,
+      "noise": 5,
+      "fitted": {
+        "sin@0": 50.44584285328427
+      },
+      "registered": {
+        "sin@0": 2.0
+      },
+      "within_one_percent": false,
+      "solves": 95
+    },
+    {
+      "dataset": "ode",
+      "seed": 923703,
+      "noise": 0,
+      "fitted": {
+        "sin@0": 25.28349255432427
+      },
+      "registered": {
+        "sin@0": 2.0
+      },
+      "within_one_percent": false,
+      "solves": 109
+    },
+    {
+      "dataset": "ode",
+      "seed": 923703,
+      "noise": 5,
+      "fitted": {
+        "sin@0": 0.21778159364039137
+      },
+      "registered": {
+        "sin@0": 2.0
+      },
+      "within_one_percent": false,
+      "solves": 93
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923701,
+      "noise": 0,
+      "fitted": {
+        "cos@0": 0.9995067652495309,
+        "sin@1": 0.999281957658877
+      },
+      "registered": {
+        "cos@0": 1.0,
+        "sin@1": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 253
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923701,
+      "noise": 5,
+      "fitted": {
+        "cos@0": 1.5099392923576473,
+        "sin@1": 3.0274267912747352
+      },
+      "registered": {
+        "cos@0": 1.0,
+        "sin@1": 1.0
+      },
+      "within_one_percent": false,
+      "solves": 232
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923702,
+      "noise": 0,
+      "fitted": {
+        "cos@0": 0.9995067652495309,
+        "sin@1": 0.999281957658877
+      },
+      "registered": {
+        "cos@0": 1.0,
+        "sin@1": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 253
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923702,
+      "noise": 5,
+      "fitted": {
+        "cos@0": 0.9847391578101373,
+        "sin@1": 2.4005407046129528
+      },
+      "registered": {
+        "cos@0": 1.0,
+        "sin@1": 1.0
+      },
+      "within_one_percent": false,
+      "solves": 219
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923703,
+      "noise": 0,
+      "fitted": {
+        "cos@0": 0.9995067652495309,
+        "sin@1": 0.999281957658877
+      },
+      "registered": {
+        "cos@0": 1.0,
+        "sin@1": 1.0
+      },
+      "within_one_percent": true,
+      "solves": 253
+    },
+    {
+      "dataset": "kdv_cossin",
+      "seed": 923703,
+      "noise": 5,
+      "fitted": {
+        "cos@0": 8.102368570660605,
+        "sin@1": 3.272673870823495
+      },
+      "registered": {
+        "cos@0": 1.0,
+        "sin@1": 1.0
+      },
+      "within_one_percent": false,
+      "solves": 253
+    }
+  ],
+  "clean_oscillator": {
+    "923701": {
+      "physical": {
+        "fitted": {
+          "sin@0": 25.28349255432427
+        },
+        "train_wape": 0.17269908507830936,
+        "multiscale_wape": 0.2213020972006433,
+        "residual_sum_squares": 43.74838485077163
+      },
+      "expanded": {
+        "fitted": {
+          "cos@0": 6.327635363200331,
+          "sin@0": 1.9951033118441346
+        },
+        "train_wape": 0.0035833887302545394,
+        "multiscale_wape": 0.005779592119676078,
+        "residual_sum_squares": 0.02328807258624651
+      }
+    },
+    "923702": {
+      "physical": {
+        "fitted": {
+          "sin@0": 25.28349255432427
+        },
+        "train_wape": 0.17269908507830906,
+        "multiscale_wape": 0.2213020972006431,
+        "residual_sum_squares": 43.748384850771636
+      },
+      "expanded": {
+        "fitted": {
+          "sin@0": 1.9951033118441346,
+          "cos@0": 6.327635363200331
+        },
+        "train_wape": 0.0035833887302543703,
+        "multiscale_wape": 0.00577959211967882,
+        "residual_sum_squares": 0.02328807258624594
+      }
+    },
+    "923703": {
+      "physical": {
+        "fitted": {
+          "sin@0": 25.28349255432427
+        },
+        "train_wape": 0.17269908507830936,
+        "multiscale_wape": 0.2213020972006433,
+        "residual_sum_squares": 43.74838485077163
+      },
+      "expanded": {
+        "fitted": {
+          "cos@0": 6.327635363200331,
+          "sin@0": 1.9951033118441346
+        },
+        "train_wape": 0.0035833887302545394,
+        "multiscale_wape": 0.005779592119676078,
+        "residual_sum_squares": 0.02328807258624651
+      }
+    }
+  },
+  "discovered_duffing": [
+    {
+      "seed": 923703,
+      "noise": 5,
+      "point_id": 6459,
+      "first_call": 14023,
+      "target": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "old_frequency": 1.123176543955219,
+      "old_wape": 0.2408370807531597,
+      "fitted": {
+        "cos@0": 1.0019043561941428
+      },
+      "train_wape": 0.06404556414146166,
+      "multiscale_wape": 0.11759818855503776,
+      "residual_sum_squares": 0.12660993884161795
+    },
+    {
+      "seed": 923703,
+      "noise": 5,
+      "point_id": 7316,
+      "first_call": 16317,
+      "target": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "old_frequency": 1.123176543955219,
+      "old_wape": 0.2408370807531597,
+      "fitted": {
+        "cos@0": 1.0019043561941428
+      },
+      "train_wape": 0.06404556414146166,
+      "multiscale_wape": 0.11759818855503776,
+      "residual_sum_squares": 0.12660993884161795
+    },
+    {
+      "seed": 923703,
+      "noise": 5,
+      "point_id": 8593,
+      "first_call": 19799,
+      "target": [
+        [
+          "du/dx0",
+          [
+            [
+              "power",
+              1.0
+            ]
+          ]
+        ]
+      ],
+      "old_frequency": 1.123176543955219,
+      "old_wape": 0.24083708075315968,
+      "fitted": {
+        "cos@0": 1.0019043561941428
+      },
+      "train_wape": 0.06404556414146166,
+      "multiscale_wape": 0.11759818855503776,
+      "residual_sum_squares": 0.12660993884161795
+    }
+  ],
+  "oscillator_spectral_starts": [
+    {
+      "seed": 923701,
+      "noise": 0,
+      "data_peaks": [
+        1.9991316698585258,
+        3.994513135540689
+      ],
+      "default": {
+        "fitted": {
+          "sin@0": 25.28349255432427
+        },
+        "train_wape": 0.1726990850782945,
+        "multiscale_wape": 0.22130209720064298,
+        "residual_sum_squares": 43.74838485077162
+      },
+      "best": {
+        "fitted": {
+          "sin@0": 1.9955511962443164
+        },
+        "train_wape": 0.004276012118906322,
+        "multiscale_wape": 0.00484198508056609,
+        "residual_sum_squares": 0.03414143417359268
+      }
+    },
+    {
+      "seed": 923701,
+      "noise": 5,
+      "data_peaks": [
+        1.9989380682204245,
+        4.024880121088982
+      ],
+      "default": {
+        "fitted": {
+          "sin@0": 50.474530848418446
+        },
+        "train_wape": 0.08424877087349172,
+        "multiscale_wape": 0.1986505404064691,
+        "residual_sum_squares": 1.7532876962808719
+      },
+      "best": {
+        "fitted": {
+          "sin@0": 1.9931705752122815
+        },
+        "train_wape": 0.018005629465920006,
+        "multiscale_wape": 0.03058367671216103,
+        "residual_sum_squares": 0.09563618536417051
+      }
+    },
+    {
+      "seed": 923702,
+      "noise": 0,
+      "data_peaks": [
+        1.9991316698585258,
+        3.994513135540689
+      ],
+      "default": {
+        "fitted": {
+          "sin@0": 25.28349255432427
+        },
+        "train_wape": 0.1726990850782945,
+        "multiscale_wape": 0.22130209720064298,
+        "residual_sum_squares": 43.74838485077162
+      },
+      "best": {
+        "fitted": {
+          "sin@0": 1.9955511962443164
+        },
+        "train_wape": 0.004276012118906322,
+        "multiscale_wape": 0.00484198508056609,
+        "residual_sum_squares": 0.03414143417359268
+      }
+    },
+    {
+      "seed": 923702,
+      "noise": 5,
+      "data_peaks": [
+        1.9981332110435839,
+        3.9849519370746718
+      ],
+      "default": {
+        "fitted": {
+          "sin@0": 50.44584285328427
+        },
+        "train_wape": 0.11305593465940177,
+        "multiscale_wape": 0.2112647350435528,
+        "residual_sum_squares": 3.0730660412658066
+      },
+      "best": {
+        "fitted": {
+          "sin@0": 1.9920823566457226
+        },
+        "train_wape": 0.014612809742894313,
+        "multiscale_wape": 0.026067497263564873,
+        "residual_sum_squares": 0.05832845417680695
+      }
+    },
+    {
+      "seed": 923703,
+      "noise": 0,
+      "data_peaks": [
+        1.9991316698585258,
+        3.994513135540689
+      ],
+      "default": {
+        "fitted": {
+          "sin@0": 25.28349255432427
+        },
+        "train_wape": 0.1726990850782945,
+        "multiscale_wape": 0.22130209720064298,
+        "residual_sum_squares": 43.74838485077162
+      },
+      "best": {
+        "fitted": {
+          "sin@0": 1.9955511962443164
+        },
+        "train_wape": 0.004276012118906322,
+        "multiscale_wape": 0.00484198508056609,
+        "residual_sum_squares": 0.03414143417359268
+      }
+    },
+    {
+      "seed": 923703,
+      "noise": 5,
+      "data_peaks": [
+        2.0025647733456484,
+        4.005794802353281
+      ],
+      "default": {
+        "fitted": {
+          "sin@0": 0.21778159364039137
+        },
+        "train_wape": 0.09691764952584007,
+        "multiscale_wape": 0.21443937036263294,
+        "residual_sum_squares": 4.304591470831209
+      },
+      "best": {
+        "fitted": {
+          "sin@0": 1.9883107004938585
+        },
+        "train_wape": 0.0161856882000266,
+        "multiscale_wape": 0.03723233481833774,
+        "residual_sum_squares": 0.09988866831889592
+      }
+    }
+  ]
+}

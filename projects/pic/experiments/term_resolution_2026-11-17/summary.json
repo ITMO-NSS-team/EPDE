@@ -1,0 +1,388 @@
+{
+  "primary": {
+    "fields": 69,
+    "parents": 84,
+    "terms": {
+      "compatible": 67,
+      "excluded": 146
+    },
+    "old_checks": {
+      "('True', 'compatible')": 21,
+      "('False', 'excluded')": 137,
+      "('False', 'compatible')": 28,
+      "('unbounded_parent', 'compatible')": 18,
+      "('unbounded_parent', 'excluded')": 9
+    },
+    "transport": [
+      122,
+      134
+    ],
+    "by_system": {
+      "ac/iid": {
+        "compatible": 3,
+        "excluded": 6
+      },
+      "ac/negative": {
+        "compatible": 3,
+        "excluded": 6
+      },
+      "ac/positive": {
+        "compatible": 3,
+        "excluded": 6
+      },
+      "burgers/iid": {
+        "excluded": 6
+      },
+      "burgers_inviscid/iid": {
+        "excluded": 3
+      },
+      "duffing/iid": {
+        "compatible": 12
+      },
+      "kdv_cossin/iid": {
+        "compatible": 6,
+        "excluded": 3
+      },
+      "kdv_cossin/negative": {
+        "compatible": 6,
+        "excluded": 3
+      },
+      "kdv_cossin/positive": {
+        "compatible": 6,
+        "excluded": 3
+      },
+      "kdv/iid": {
+        "excluded": 6
+      },
+      "ks/iid": {
+        "excluded": 9
+      },
+      "ks/negative": {
+        "excluded": 9
+      },
+      "ks/positive": {
+        "excluded": 9
+      },
+      "lorenz/iid": {
+        "excluded": 18,
+        "compatible": 3
+      },
+      "lv/iid": {
+        "excluded": 12
+      },
+      "ns/iid": {
+        "excluded": 21,
+        "compatible": 12
+      },
+      "ode/iid": {
+        "excluded": 8,
+        "compatible": 1
+      },
+      "pde_compound/iid": {
+        "compatible": 3,
+        "excluded": 3
+      },
+      "pde_divide/iid": {
+        "excluded": 6
+      },
+      "vdp/iid": {
+        "compatible": 4,
+        "excluded": 5
+      },
+      "wave/iid": {
+        "compatible": 2,
+        "excluded": 1
+      },
+      "wave/negative": {
+        "excluded": 3
+      },
+      "wave/positive": {
+        "compatible": 3
+      }
+    }
+  },
+  "scalar": {
+    "common": [
+      [
+        -0.3179074043660044,
+        -0.16892818943001328
+      ]
+    ],
+    "ols": -0.0002162870652673308
+  },
+  "first_fresh": {
+    "physical": {
+      "library": 6,
+      "focused": 6
+    },
+    "surrogate": {
+      "library": 6,
+      "focused": 5
+    },
+    "ols": {
+      "library": 0
+    },
+    "disp_minus_one": {
+      "library": 4
+    },
+    "zero": {
+      "library": 0
+    }
+  },
+  "second_fresh": {
+    "arms": [
+      "whole",
+      "projected"
+    ],
+    "candidates": [
+      "physical",
+      "dispersion_only"
+    ],
+    "accepted": [
+      [
+        6,
+        6
+      ],
+      [
+        5,
+        6
+      ]
+    ],
+    "noise_covered": [
+      [
+        6,
+        6
+      ],
+      [
+        5,
+        5
+      ]
+    ],
+    "warnings": 0
+  },
+  "first_cutoff_fraction_range": [
+    0.41888314123587683,
+    0.569564106629422
+  ],
+  "fresh_measurement_fields": 24,
+  "bootstrap_noise_refits": 3648,
+  "forcing_confirmation": {
+    "whole": {
+      "accepted": [
+        11,
+        9
+      ],
+      "covered": [
+        11,
+        11
+      ]
+    },
+    "pilot": {
+      "accepted": [
+        11,
+        11
+      ],
+      "covered": [
+        11,
+        11
+      ]
+    },
+    "forcing": {
+      "accepted": [
+        12,
+        6
+      ],
+      "covered": [
+        12,
+        12
+      ]
+    }
+  },
+  "forcing_by_profile": {
+    "iid": {
+      "whole": {
+        "accepted": [
+          3,
+          3
+        ],
+        "covered": [
+          3,
+          3
+        ]
+      },
+      "pilot": {
+        "accepted": [
+          3,
+          3
+        ],
+        "covered": [
+          3,
+          3
+        ]
+      },
+      "forcing": {
+        "accepted": [
+          4,
+          2
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      }
+    },
+    "positive": {
+      "whole": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "pilot": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "forcing": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      }
+    },
+    "negative": {
+      "whole": {
+        "accepted": [
+          4,
+          2
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "pilot": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "forcing": {
+        "accepted": [
+          4,
+          0
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      }
+    }
+  },
+  "unrestricted_confirmation": {
+    "whole": {
+      "parent": {
+        "compatible": 12
+      },
+      "drop_nonlinear": {
+        "compatible": 12
+      },
+      "drop_dispersion": {
+        "excluded": 12
+      },
+      "drop_forcing": {
+        "compatible": 12
+      },
+      "dispersion_only": {
+        "compatible": 12
+      },
+      "parent_and_deletion_excluded": {
+        "drop_nonlinear": 0,
+        "drop_dispersion": 12,
+        "drop_forcing": 0,
+        "dispersion_only": 0
+      },
+      "error_covered": 11,
+      "eligible": 12,
+      "fixed_passed": {
+        "physical": 12,
+        "surrogate": 12
+      }
+    },
+    "projected": {
+      "parent": {
+        "compatible": 12
+      },
+      "drop_nonlinear": {
+        "compatible": 12
+      },
+      "drop_dispersion": {
+        "compatible": 12
+      },
+      "drop_forcing": {
+        "compatible": 12
+      },
+      "dispersion_only": {
+        "compatible": 12
+      },
+      "parent_and_deletion_excluded": {
+        "drop_nonlinear": 0,
+        "drop_dispersion": 0,
+        "drop_forcing": 0,
+        "dispersion_only": 0
+      },
+      "error_covered": 12,
+      "eligible": 12,
+      "fixed_passed": {
+        "physical": 12,
+        "surrogate": 7
+      }
+    },
+    "combined": {
+      "parent": {
+        "compatible": 12
+      },
+      "drop_nonlinear": {
+        "compatible": 12
+      },
+      "drop_dispersion": {
+        "excluded": 12
+      },
+      "drop_forcing": {
+        "compatible": 12
+      },
+      "dispersion_only": {
+        "compatible": 12
+      },
+      "parent_and_deletion_excluded": {
+        "drop_nonlinear": 0,
+        "drop_dispersion": 12,
+        "drop_forcing": 0,
+        "dispersion_only": 0
+      },
+      "error_covered": 12,
+      "eligible": 12,
+      "fixed_passed": {
+        "physical": 12,
+        "surrogate": 7
+      }
+    }
+  }
+}

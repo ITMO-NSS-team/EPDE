@@ -1,0 +1,958 @@
+{
+  "transfer": {
+    "screen": {
+      "recordings": 84,
+      "already_full": 22,
+      "first_proposals": 15,
+      "selected": 4,
+      "rows": 12951,
+      "replaced": 258,
+      "slots": 114,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 109,
+        "exact": 104,
+        "additions": 170,
+        "cpu_seconds": 2.84375,
+        "median_slot_spread": 0.023652389311978907
+      },
+      "complementary": {
+        "hits": 109,
+        "exact": 104,
+        "additions": 171,
+        "cpu_seconds": 5.5,
+        "median_slot_spread": 0.023652389311978907
+      },
+      "coefficient_spreads": {
+        "ac/0": [
+          0.039749197339028694,
+          0.039749197339028694
+        ],
+        "burgers/0": [
+          0.006886601669763942,
+          0.006886601669763942
+        ],
+        "burgers_inviscid/0": [
+          0.020731205673986224,
+          0.020731205673986224
+        ],
+        "duffing/0": [
+          0.046135881242926106,
+          0.046135881242926106
+        ],
+        "kdv/0": [
+          0.00143225005510799,
+          0.00143225005510799
+        ],
+        "ks/0": [
+          0.010131211449061374,
+          0.010131211449061374
+        ],
+        "lorenz/0": [
+          0.023652389311978907,
+          0.023652389311978907
+        ],
+        "lorenz/1": [
+          0.06837354673897632,
+          0.06837354673897632
+        ],
+        "lorenz/2": [
+          0.007480643855928182,
+          0.007480643855928182
+        ],
+        "lv/0": [
+          0.034005422379967364,
+          0.03146780337417205
+        ],
+        "lv/1": [
+          0.03950114266867071,
+          0.04069256699815692
+        ],
+        "ns/0": [
+          0.01016338150128297,
+          0.01016338150128297
+        ],
+        "ns/1": [
+          0.0050077576985375506,
+          0.0050077576985375506
+        ],
+        "ns/2": [
+          0.0027655373995875876,
+          0.0027655373995875876
+        ],
+        "ode/0": [
+          0.11338557456275294,
+          0.11338557456275294
+        ],
+        "pde_compound/0": [
+          0.2608186973576036,
+          0.2608186973576036
+        ],
+        "pde_divide/0": [
+          0.003024703636023333,
+          0.003024703636023333
+        ],
+        "vdp/0": [
+          0.08142735280565705,
+          0.08142735280565705
+        ],
+        "wave/0": [
+          0.06401616656574712,
+          0.06401616656574712
+        ]
+      },
+      "stability_slots": 19,
+      "more_stable": 1,
+      "less_stable": 1
+    },
+    "confirmation": {
+      "recordings": 84,
+      "already_full": 19,
+      "first_proposals": 12,
+      "selected": 3,
+      "rows": 13221,
+      "replaced": 96,
+      "slots": 114,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 109,
+        "exact": 102,
+        "additions": 165,
+        "cpu_seconds": 2.921875,
+        "median_slot_spread": 0.016680519595024455
+      },
+      "complementary": {
+        "hits": 109,
+        "exact": 102,
+        "additions": 165,
+        "cpu_seconds": 5.359375,
+        "median_slot_spread": 0.016680519595024455
+      },
+      "coefficient_spreads": {
+        "ac/0": [
+          0.02684452391042913,
+          0.02684452391042913
+        ],
+        "burgers/0": [
+          0.007423860179538515,
+          0.007423860179538515
+        ],
+        "burgers_inviscid/0": [
+          0.009942670735680064,
+          0.009942670735680064
+        ],
+        "duffing/0": [
+          0.04509899665270734,
+          0.04509899665270734
+        ],
+        "kdv/0": [
+          0.0012663745460359148,
+          0.0012663745460359148
+        ],
+        "ks/0": [
+          0.01887229905789619,
+          0.01887229905789619
+        ],
+        "lorenz/0": [
+          0.016680519595024455,
+          0.016680519595024455
+        ],
+        "lorenz/1": [
+          0.054027543252052654,
+          0.054027543252052654
+        ],
+        "lorenz/2": [
+          0.010217252690696293,
+          0.010217252690696293
+        ],
+        "lv/0": [
+          0.033616305065375815,
+          0.030204626680054966
+        ],
+        "lv/1": [
+          0.010054659728282038,
+          0.008411615370459586
+        ],
+        "ns/0": [
+          0.011563745286901553,
+          0.011563745286901553
+        ],
+        "ns/1": [
+          0.004197569721325058,
+          0.004197569721325058
+        ],
+        "ns/2": [
+          0.0008750909932440564,
+          0.0008750909932440564
+        ],
+        "ode/0": [
+          0.07412899484408433,
+          0.07412899484408433
+        ],
+        "pde_compound/0": [
+          0.27290807493111446,
+          0.27290807493111446
+        ],
+        "pde_divide/0": [
+          0.0019773429796509766,
+          0.0019773429796509766
+        ],
+        "vdp/0": [
+          0.05538974059581631,
+          0.05538974059581631
+        ],
+        "wave/0": [
+          0.04671348174341422,
+          0.04671348174341422
+        ]
+      },
+      "stability_slots": 19,
+      "more_stable": 2,
+      "less_stable": 0
+    },
+    "all": {
+      "recordings": 168,
+      "already_full": 41,
+      "first_proposals": 27,
+      "selected": 7,
+      "rows": 26172,
+      "replaced": 354,
+      "slots": 228,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 218,
+        "exact": 206,
+        "additions": 335,
+        "cpu_seconds": 5.765625,
+        "median_slot_spread": 0.019121107505319528
+      },
+      "complementary": {
+        "hits": 218,
+        "exact": 206,
+        "additions": 336,
+        "cpu_seconds": 10.859375,
+        "median_slot_spread": 0.019121107505319528
+      },
+      "coefficient_spreads": {
+        "ac/0": [
+          0.03382184731467565,
+          0.03382184731467565
+        ],
+        "burgers/0": [
+          0.006296787682302903,
+          0.0063302079717276515
+        ],
+        "burgers_inviscid/0": [
+          0.012940833768359205,
+          0.012940833768359205
+        ],
+        "duffing/0": [
+          0.045400523199407086,
+          0.045400523199407086
+        ],
+        "kdv/0": [
+          0.0011393584252392206,
+          0.0011393584252392206
+        ],
+        "ks/0": [
+          0.012279874110893301,
+          0.012279874110893301
+        ],
+        "lorenz/0": [
+          0.019121107505319528,
+          0.019121107505319528
+        ],
+        "lorenz/1": [
+          0.06264458366420303,
+          0.06264458366420303
+        ],
+        "lorenz/2": [
+          0.007566665045911648,
+          0.007566665045911648
+        ],
+        "lv/0": [
+          0.031012085140029153,
+          0.030018941707149506
+        ],
+        "lv/1": [
+          0.027434238451947573,
+          0.027822085623586665
+        ],
+        "ns/0": [
+          0.011435890344154934,
+          0.009943552026963974
+        ],
+        "ns/1": [
+          0.004429307830343383,
+          0.004429307830343383
+        ],
+        "ns/2": [
+          0.002013822693479372,
+          0.0020244864204693215
+        ],
+        "ode/0": [
+          0.09949007332338752,
+          0.09949007332338752
+        ],
+        "pde_compound/0": [
+          0.25189985481459204,
+          0.25189985481459204
+        ],
+        "pde_divide/0": [
+          0.0024522024049341722,
+          0.002338815620247092
+        ],
+        "vdp/0": [
+          0.06182648276123125,
+          0.06182648276123125
+        ],
+        "wave/0": [
+          0.057391386537532896,
+          0.057391386537532896
+        ]
+      },
+      "stability_slots": 19,
+      "more_stable": 3,
+      "less_stable": 3
+    }
+  },
+  "motivating_kdv": {
+    "screen": {
+      "recordings": 6,
+      "already_full": 1,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 700,
+      "replaced": 0,
+      "slots": 6,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 1,
+        "exact": 1,
+        "additions": 3,
+        "cpu_seconds": 0.125,
+        "median_slot_spread": 2.3140260359606777
+      },
+      "complementary": {
+        "hits": 1,
+        "exact": 1,
+        "additions": 3,
+        "cpu_seconds": 0.390625,
+        "median_slot_spread": 2.3140260359606777
+      },
+      "coefficient_spreads": {
+        "kdv_cossin/0": [
+          2.3140260359606777,
+          2.3140260359606777
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "confirmation": {
+      "recordings": 6,
+      "already_full": 0,
+      "first_proposals": 4,
+      "selected": 1,
+      "rows": 626,
+      "replaced": 32,
+      "slots": 6,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 1,
+        "exact": 1,
+        "additions": 1,
+        "cpu_seconds": 0.140625,
+        "median_slot_spread": 7.022495925978213
+      },
+      "complementary": {
+        "hits": 1,
+        "exact": 1,
+        "additions": 0,
+        "cpu_seconds": 0.234375,
+        "median_slot_spread": 8.070084348587853
+      },
+      "coefficient_spreads": {
+        "kdv_cossin/0": [
+          7.022495925978213,
+          8.070084348587853
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 1
+    },
+    "all": {
+      "recordings": 12,
+      "already_full": 1,
+      "first_proposals": 4,
+      "selected": 1,
+      "rows": 1326,
+      "replaced": 32,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 2,
+        "exact": 2,
+        "additions": 4,
+        "cpu_seconds": 0.265625,
+        "median_slot_spread": 2.454604807792774
+      },
+      "complementary": {
+        "hits": 2,
+        "exact": 2,
+        "additions": 3,
+        "cpu_seconds": 0.625,
+        "median_slot_spread": 2.454604807792774
+      },
+      "coefficient_spreads": {
+        "kdv_cossin/0": [
+          2.454604807792774,
+          2.454604807792774
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    }
+  },
+  "systems": {
+    "ac": {
+      "recordings": 12,
+      "already_full": 12,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 1404,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 3,
+        "exact": 3,
+        "additions": 5,
+        "cpu_seconds": 0.25,
+        "median_slot_spread": 0.03382184731467565
+      },
+      "complementary": {
+        "hits": 3,
+        "exact": 3,
+        "additions": 5,
+        "cpu_seconds": 0.5625,
+        "median_slot_spread": 0.03382184731467565
+      },
+      "coefficient_spreads": {
+        "ac/0": [
+          0.03382184731467565,
+          0.03382184731467565
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "burgers": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 3,
+      "selected": 2,
+      "rows": 2244,
+      "replaced": 84,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 16,
+        "cpu_seconds": 0.25,
+        "median_slot_spread": 0.006296787682302903
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 17,
+        "cpu_seconds": 0.5625,
+        "median_slot_spread": 0.0063302079717276515
+      },
+      "coefficient_spreads": {
+        "burgers/0": [
+          0.006296787682302903,
+          0.0063302079717276515
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 1
+    },
+    "burgers_inviscid": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 6,
+      "selected": 0,
+      "rows": 1770,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 1,
+        "additions": 0,
+        "cpu_seconds": 0.265625,
+        "median_slot_spread": 0.012940833768359205
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 1,
+        "additions": 0,
+        "cpu_seconds": 0.578125,
+        "median_slot_spread": 0.012940833768359205
+      },
+      "coefficient_spreads": {
+        "burgers_inviscid/0": [
+          0.012940833768359205,
+          0.012940833768359205
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "duffing": {
+      "recordings": 12,
+      "already_full": 12,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 1116,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 13,
+        "cpu_seconds": 0.171875,
+        "median_slot_spread": 0.045400523199407086
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 13,
+        "cpu_seconds": 0.25,
+        "median_slot_spread": 0.045400523199407086
+      },
+      "coefficient_spreads": {
+        "duffing/0": [
+          0.045400523199407086,
+          0.045400523199407086
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "kdv": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 2232,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 19,
+        "cpu_seconds": 0.34375,
+        "median_slot_spread": 0.0011393584252392206
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 19,
+        "cpu_seconds": 0.71875,
+        "median_slot_spread": 0.0011393584252392206
+      },
+      "coefficient_spreads": {
+        "kdv/0": [
+          0.0011393584252392206,
+          0.0011393584252392206
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "kdv_cossin": {
+      "recordings": 12,
+      "already_full": 1,
+      "first_proposals": 4,
+      "selected": 1,
+      "rows": 1326,
+      "replaced": 32,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 2,
+        "exact": 2,
+        "additions": 4,
+        "cpu_seconds": 0.265625,
+        "median_slot_spread": 2.454604807792774
+      },
+      "complementary": {
+        "hits": 2,
+        "exact": 2,
+        "additions": 3,
+        "cpu_seconds": 0.625,
+        "median_slot_spread": 2.454604807792774
+      },
+      "coefficient_spreads": {
+        "kdv_cossin/0": [
+          2.454604807792774,
+          2.454604807792774
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "ks": {
+      "recordings": 12,
+      "already_full": 12,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 3920,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 18,
+        "cpu_seconds": 0.375,
+        "median_slot_spread": 0.012279874110893301
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 18,
+        "cpu_seconds": 0.953125,
+        "median_slot_spread": 0.012279874110893301
+      },
+      "coefficient_spreads": {
+        "ks/0": [
+          0.012279874110893301,
+          0.012279874110893301
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "lorenz": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 1376,
+      "replaced": 0,
+      "slots": 36,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 35,
+        "exact": 35,
+        "additions": 76,
+        "cpu_seconds": 0.578125,
+        "median_slot_spread": 0.019121107505319528
+      },
+      "complementary": {
+        "hits": 35,
+        "exact": 35,
+        "additions": 76,
+        "cpu_seconds": 0.71875,
+        "median_slot_spread": 0.019121107505319528
+      },
+      "coefficient_spreads": {
+        "lorenz/0": [
+          0.019121107505319528,
+          0.019121107505319528
+        ],
+        "lorenz/1": [
+          0.06264458366420303,
+          0.06264458366420303
+        ],
+        "lorenz/2": [
+          0.007566665045911648,
+          0.007566665045911648
+        ]
+      },
+      "stability_slots": 3,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "lv": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 4,
+      "selected": 3,
+      "rows": 804,
+      "replaced": 99,
+      "slots": 24,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 24,
+        "exact": 24,
+        "additions": 46,
+        "cpu_seconds": 0.328125,
+        "median_slot_spread": 0.029223161795988363
+      },
+      "complementary": {
+        "hits": 24,
+        "exact": 24,
+        "additions": 48,
+        "cpu_seconds": 0.453125,
+        "median_slot_spread": 0.028920513665368085
+      },
+      "coefficient_spreads": {
+        "lv/0": [
+          0.031012085140029153,
+          0.030018941707149506
+        ],
+        "lv/1": [
+          0.027434238451947573,
+          0.027822085623586665
+        ]
+      },
+      "stability_slots": 2,
+      "more_stable": 1,
+      "less_stable": 1
+    },
+    "ns": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 4,
+      "selected": 1,
+      "rows": 3240,
+      "replaced": 135,
+      "slots": 36,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 36,
+        "exact": 36,
+        "additions": 63,
+        "cpu_seconds": 1.84375,
+        "median_slot_spread": 0.004429307830343383
+      },
+      "complementary": {
+        "hits": 36,
+        "exact": 36,
+        "additions": 61,
+        "cpu_seconds": 3.8125,
+        "median_slot_spread": 0.004429307830343383
+      },
+      "coefficient_spreads": {
+        "ns/0": [
+          0.011435890344154934,
+          0.009943552026963974
+        ],
+        "ns/1": [
+          0.004429307830343383,
+          0.004429307830343383
+        ],
+        "ns/2": [
+          0.002013822693479372,
+          0.0020244864204693215
+        ]
+      },
+      "stability_slots": 3,
+      "more_stable": 1,
+      "less_stable": 1
+    },
+    "ode": {
+      "recordings": 12,
+      "already_full": 4,
+      "first_proposals": 0,
+      "selected": 0,
+      "rows": 840,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 11,
+        "cpu_seconds": 0.15625,
+        "median_slot_spread": 0.09949007332338752
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 11,
+        "cpu_seconds": 0.234375,
+        "median_slot_spread": 0.09949007332338752
+      },
+      "coefficient_spreads": {
+        "ode/0": [
+          0.09949007332338752,
+          0.09949007332338752
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "pde_compound": {
+      "recordings": 12,
+      "already_full": 1,
+      "first_proposals": 2,
+      "selected": 0,
+      "rows": 2736,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 19,
+        "cpu_seconds": 0.3125,
+        "median_slot_spread": 0.25189985481459204
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 19,
+        "cpu_seconds": 0.5625,
+        "median_slot_spread": 0.25189985481459204
+      },
+      "coefficient_spreads": {
+        "pde_compound/0": [
+          0.25189985481459204,
+          0.25189985481459204
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "pde_divide": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 4,
+      "selected": 1,
+      "rows": 1938,
+      "replaced": 36,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 21,
+        "cpu_seconds": 0.3125,
+        "median_slot_spread": 0.0024522024049341722
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 21,
+        "cpu_seconds": 0.546875,
+        "median_slot_spread": 0.002338815620247092
+      },
+      "coefficient_spreads": {
+        "pde_divide/0": [
+          0.0024522024049341722,
+          0.002338815620247092
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 1,
+      "less_stable": 0
+    },
+    "vdp": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 3,
+      "selected": 0,
+      "rows": 768,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 17,
+        "cpu_seconds": 0.1875,
+        "median_slot_spread": 0.06182648276123125
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 12,
+        "additions": 17,
+        "cpu_seconds": 0.265625,
+        "median_slot_spread": 0.06182648276123125
+      },
+      "coefficient_spreads": {
+        "vdp/0": [
+          0.06182648276123125,
+          0.06182648276123125
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    },
+    "wave": {
+      "recordings": 12,
+      "already_full": 0,
+      "first_proposals": 1,
+      "selected": 0,
+      "rows": 1784,
+      "replaced": 0,
+      "slots": 12,
+      "gains": 0,
+      "losses": 0,
+      "native": {
+        "hits": 12,
+        "exact": 11,
+        "additions": 11,
+        "cpu_seconds": 0.390625,
+        "median_slot_spread": 0.057391386537532896
+      },
+      "complementary": {
+        "hits": 12,
+        "exact": 11,
+        "additions": 11,
+        "cpu_seconds": 0.640625,
+        "median_slot_spread": 0.057391386537532896
+      },
+      "coefficient_spreads": {
+        "wave/0": [
+          0.057391386537532896,
+          0.057391386537532896
+        ]
+      },
+      "stability_slots": 1,
+      "more_stable": 0,
+      "less_stable": 0
+    }
+  }
+}

@@ -1,0 +1,7 @@
+dataset,seed,verified,pools,mating_pairs,registered_laws_ever_scored,actual_complete_system,pools_with_distributed_laws,pools_with_distributed_system,complementary_matings,matings_spanning_system,assembled_kept,crossed_kept
+lorenz,923301,True,10,160,2,0,2,0,1,0,1,0
+lorenz,923302,True,9,144,2,0,0,0,0,0,0,0
+lorenz,923303,True,11,187,2,0,8,0,3,0,2,0
+ns,923301,True,15,255,2,0,4,0,0,0,0,0
+ns,923302,True,14,252,1,0,0,0,0,0,0,0
+ns,923303,True,15,255,1,0,0,0,0,0,0,0

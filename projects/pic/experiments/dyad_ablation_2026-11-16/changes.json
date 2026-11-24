@@ -1,0 +1,2520 @@
+[
+  {
+    "system": "ac",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ac",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "tile",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_4",
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ac",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "survival",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ac",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "chi2",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ac",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "complexity",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:drop_0",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:add_6"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_4",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "burgers",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "duffing",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_2",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:time_poly",
+      "e0:time_harmonic",
+      "e0:field_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:drop_0",
+      "e0:drop_1",
+      "e0:add_0",
+      "e0:add_6",
+      "e0:add_7",
+      "e0:time_harmonic"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "tile",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_6",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "survival",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_1",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "chi2",
+    "change": "loss",
+    "front_ids": [
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "complexity",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:time_harmonic",
+      "e0:first_order_fit"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_3",
+      "e0:add_5",
+      "e0:time_harmonic",
+      "e0:field_harmonic"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "survival",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "chi2",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_2",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "complexity",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:drop_2",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_4",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_4",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "ks",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:drop_2",
+      "e0:add_3",
+      "e0:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_1",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_4",
+      "e2:add_5"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_4"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_0",
+      "e1:drop_2",
+      "e1:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_4"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_4",
+      "e2:add_5"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_4"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_1",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_4",
+      "e2:add_5"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_4"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_0",
+      "e1:drop_2",
+      "e1:add_4"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_4"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_4",
+      "e2:add_5"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e1:drop_2",
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_12"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_13"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_9",
+      "e2:add_13"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e1:drop_2",
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_12"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 2,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_9"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_9"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e1:drop_2",
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_3"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "slot": 2,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_9"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:add_9"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_1",
+      "e2:add_12"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 2,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_1",
+      "e2:add_12"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_2",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "slot": 2,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_0"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_1",
+      "e2:add_0",
+      "e2:add_12"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_8",
+      "e0:add_9",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_8",
+      "e0:add_9",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_4"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_4"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_8",
+      "e0:add_9",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_8",
+      "e0:add_9",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_9",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_9",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_2"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_2"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:equivalent_0",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "lv",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_7"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:add_6",
+      "e1:add_7"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_13"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_2",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_10"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_8",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_0"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_0",
+      "e2:add_1"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_11"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_11"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_13"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_12",
+      "e0:add_13"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_9"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_9"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "slot": 2,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_11"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_3",
+      "e2:add_11"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_12"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_12"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "dyad_prediction",
+    "change": "gain",
+    "front_ids": [
+      "e0:reference",
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:drop_3",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 2,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_10"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_8"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_8",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_2"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_3",
+      "e1:drop_4",
+      "e1:add_2"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_8",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_9"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_9",
+      "e1:add_12"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 2,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_8"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_8",
+      "e2:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_1"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_1",
+      "e0:add_8",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_8"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_8",
+      "e1:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_10"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_3",
+      "e0:add_8",
+      "e0:add_10"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 1,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e1:add_11"
+    ],
+    "baseline_ids": [
+      "e1:reference",
+      "e1:drop_4",
+      "e1:add_7",
+      "e1:add_11",
+      "e1:add_12"
+    ]
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "slot": 2,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e2:add_10"
+    ],
+    "baseline_ids": [
+      "e2:reference",
+      "e2:drop_0",
+      "e2:add_10"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "ode",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_1",
+      "e0:add_0"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "survival",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_3",
+      "e0:time_poly"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "chi2",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_5",
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_3"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "survival",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:time_poly"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "chi2",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_5",
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "survival",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:time_poly"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "chi2",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_5",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "chi2",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_6",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_mean",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4",
+      "e0:add_5",
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "survival",
+    "change": "loss",
+    "front_ids": [
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:add_4",
+      "e0:time_poly"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "chi2",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4",
+      "e0:add_5",
+      "e0:first_order_fit"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_4"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_4"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_mean",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7",
+      "e0:time_poly",
+      "e0:time_harmonic"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_mean",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2",
+      "e0:add_7",
+      "e0:time_poly",
+      "e0:time_harmonic"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:add_4",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "dyad_prediction",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0",
+      "e0:add_4",
+      "e0:add_5"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 1,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_0"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_0",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_2",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_7"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_7",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_1",
+      "e0:add_2",
+      "e0:add_3",
+      "e0:time_poly"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2"
+    ]
+  },
+  {
+    "system": "vdp",
+    "seed": 2,
+    "slot": 0,
+    "arm": "q0_plain/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_2"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:add_2",
+      "e0:add_3"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/joint",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  },
+  {
+    "system": "wave",
+    "seed": 0,
+    "slot": 0,
+    "arm": "q0_white128/baseline",
+    "metric": "discrepancy_only",
+    "change": "loss",
+    "front_ids": [
+      "e0:add_6"
+    ],
+    "baseline_ids": [
+      "e0:reference",
+      "e0:drop_0",
+      "e0:add_6",
+      "e0:add_7"
+    ]
+  }
+]

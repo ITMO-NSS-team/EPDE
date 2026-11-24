@@ -1,0 +1,84 @@
+{
+  "laws": {
+    "generated": {
+      "native": 40,
+      "guided": 41,
+      "gains": 2,
+      "losses": 1
+    },
+    "source": {
+      "native": 28,
+      "guided": 28,
+      "gains": 2,
+      "losses": 2
+    },
+    "held": {
+      "native": 32,
+      "guided": 33,
+      "gains": 2,
+      "losses": 1
+    },
+    "exact_generated": {
+      "native": 40,
+      "guided": 41,
+      "gains": 2,
+      "losses": 1
+    },
+    "exact_source": {
+      "native": 28,
+      "guided": 28,
+      "gains": 2,
+      "losses": 2
+    },
+    "exact_held": {
+      "native": 32,
+      "guided": 33,
+      "gains": 2,
+      "losses": 1
+    }
+  },
+  "systems": {
+    "assembled": {
+      "native": 27,
+      "guided": 26,
+      "gains": 0,
+      "losses": 1
+    },
+    "source": {
+      "native": 15,
+      "guided": 13,
+      "gains": 0,
+      "losses": 2
+    },
+    "held": {
+      "native": 19,
+      "guided": 18,
+      "gains": 0,
+      "losses": 1
+    }
+  },
+  "misses": {
+    "native": {
+      "misses": 20,
+      "one_edit": 15,
+      "all_terms": 13,
+      "missing_frequency": 6
+    },
+    "pvra": {
+      "misses": 19,
+      "one_edit": 13,
+      "all_terms": 11,
+      "missing_frequency": 6
+    }
+  },
+  "common_discoveries": 39,
+  "earlier": 19,
+  "later": 16,
+  "same": 4,
+  "native_median_calls": 470,
+  "guided_median_calls": 378,
+  "median_seconds_ratio": 1.1332690799701521,
+  "gains_screened": 2870017,
+  "guided_additions": 10554,
+  "max_replay_error": 1.7763568394002505e-15
+}

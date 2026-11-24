@@ -1,0 +1,36 @@
+{
+  "outcomes": {
+    "addition": {
+      "comparisons": 188,
+      "observations": 1128,
+      "all_with": 7,
+      "all_without": 88,
+      "mixed_or_tied": 93,
+      "all_with_separated": 7,
+      "all_without_separated": 88,
+      "wins_with": 222,
+      "wins_without": 906,
+      "ties": 0,
+      "pareto_with": 12,
+      "pareto_without": 903
+    },
+    "deletion": {
+      "comparisons": 51,
+      "observations": 306,
+      "all_with": 49,
+      "all_without": 1,
+      "mixed_or_tied": 1,
+      "all_with_separated": 49,
+      "all_without_separated": 1,
+      "wins_with": 295,
+      "wins_without": 11,
+      "ties": 0,
+      "pareto_with": 130,
+      "pareto_without": 10
+    }
+  },
+  "checks": 4662,
+  "maximum_replay_error": 1.0408340855860843e-15,
+  "old_summary": "c78a9bab7088053aeef86351be4454783b1da67bba70a9f0aa2f5af463716281",
+  "pairs": "8aa3340fe2a1f2eb4a91f1e854be10079bba70eb42adc736ac32440667ea153f"
+}

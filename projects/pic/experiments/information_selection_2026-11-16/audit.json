@@ -1,0 +1,15 @@
+{
+  "cases": 12,
+  "source_and_input_hashes_verified": true,
+  "finite_scores": true,
+  "selection_failures": 0,
+  "half_full_bank_changes": 53,
+  "bank_choices": 576,
+  "error_budget_cases": 12,
+  "max_decomposition_error": 2.1671553440683056e-12,
+  "source_sha256": {
+    "diagnose_error_budget.py": "7e1887ee3bf9ff9304e3db849dc2b283d0061c38612cdfbba2897bd26c457b67",
+    "run_information.py": "023c47f4ddc52a7f41fd01fc6f697eaed5fb1008086f074f73a9b76c30cba152",
+    "summarize.py": "e3db770bf8eb8db01174bb33b6e57dbac76e90aaab6d953780c23d102b3f8239"
+  }
+}

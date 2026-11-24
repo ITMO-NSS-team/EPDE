@@ -1,0 +1,178 @@
+{
+  "full": {
+    "systems": {
+      "assembled": {
+        "cases": 45,
+        "native": 27,
+        "guided": 25,
+        "gains": 1,
+        "losses": 3
+      },
+      "source": {
+        "cases": 45,
+        "native": 15,
+        "guided": 15,
+        "gains": 2,
+        "losses": 2
+      },
+      "held": {
+        "cases": 45,
+        "native": 19,
+        "guided": 19,
+        "gains": 1,
+        "losses": 1
+      }
+    },
+    "laws": {
+      "generated": {
+        "cases": 60,
+        "native": 40,
+        "guided": 38,
+        "gains": 3,
+        "losses": 5
+      },
+      "source": {
+        "cases": 60,
+        "native": 28,
+        "guided": 26,
+        "gains": 2,
+        "losses": 4
+      },
+      "held": {
+        "cases": 60,
+        "native": 32,
+        "guided": 31,
+        "gains": 2,
+        "losses": 3
+      }
+    },
+    "common_discovery": {
+      "cases": 35,
+      "earlier": 16,
+      "later": 16,
+      "native_median": 289,
+      "guided_swap_median": 266
+    },
+    "coefficient_error_on_common_first_hits": {
+      "cases": 35,
+      "native_median": 0.006436552675262137,
+      "guided_swap_median": 0.006436552675263017
+    },
+    "guided_fates": {
+      "dominated": 7,
+      "on front": 31,
+      "shortlisted but not selected": 4,
+      "no suitable swap parent": 13,
+      "replacement outside shortlist": 4,
+      "wrong outgoing term": 1
+    },
+    "gains": [
+      [
+        "lorenz",
+        923301
+      ]
+    ],
+    "losses": [
+      [
+        "pde_divide",
+        923303
+      ]
+    ]
+  },
+  "total": {
+    "systems": {
+      "assembled": {
+        "cases": 45,
+        "native": 27,
+        "guided": 25,
+        "gains": 1,
+        "losses": 3
+      },
+      "source": {
+        "cases": 45,
+        "native": 15,
+        "guided": 15,
+        "gains": 2,
+        "losses": 2
+      },
+      "held": {
+        "cases": 45,
+        "native": 19,
+        "guided": 19,
+        "gains": 1,
+        "losses": 1
+      }
+    },
+    "laws": {
+      "generated": {
+        "cases": 60,
+        "native": 40,
+        "guided": 38,
+        "gains": 3,
+        "losses": 5
+      },
+      "source": {
+        "cases": 60,
+        "native": 28,
+        "guided": 26,
+        "gains": 2,
+        "losses": 4
+      },
+      "held": {
+        "cases": 60,
+        "native": 32,
+        "guided": 31,
+        "gains": 2,
+        "losses": 3
+      }
+    },
+    "common_discovery": {
+      "cases": 35,
+      "earlier": 14,
+      "later": 18,
+      "native_median": 289,
+      "guided_swap_median": 282
+    },
+    "coefficient_error_on_common_first_hits": {
+      "cases": 35,
+      "native_median": 0.006436552675262137,
+      "guided_swap_median": 0.006436552675263017
+    },
+    "guided_fates": {
+      "dominated": 7,
+      "on front": 31,
+      "shortlisted but not selected": 4,
+      "no suitable swap parent": 14,
+      "replacement outside shortlist": 4
+    },
+    "gains": [
+      [
+        "lorenz",
+        923301
+      ]
+    ],
+    "losses": [
+      [
+        "pde_divide",
+        923303
+      ]
+    ]
+  },
+  "work": {
+    "calls": 135000,
+    "extra_fits": 8949,
+    "gain_columns": 3532491,
+    "weak_column_cache_hits": 3314413,
+    "weak_column_requests": 3337438,
+    "fitted_cache_hits": 5086,
+    "version_cache_hits": 3015,
+    "parent_prefits": 4860,
+    "median_runtime_ratio": 1.2280966760199263
+  },
+  "max_replay_error": 1.6653345369377348e-15,
+  "control_held": {
+    "native": 3,
+    "guided_swap": 3
+  },
+  "positive_balance": false
+}

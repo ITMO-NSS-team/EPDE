@@ -1,0 +1,3119 @@
+{
+  "rows": [
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc",
+      "status": "complete",
+      "cutoff": 3.486815245644184,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -10.689992734190758,
+            -0.3925809885150521,
+            0.32216201469586897
+          ],
+          "bank_ratios": [
+            0.2611877064227039,
+            0.3534027034682036,
+            0.23183822927542355
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.41200436914568095,
+            0.35612705592272625
+          ],
+          "bank_ratios": [
+            0.2612719876666067,
+            0.359044649139324,
+            0.23152140807990285
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.40118160063661157,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.15540853969180904
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -2.053231683560614,
+            -0.1246568344324747
+          ],
+          "bank_ratios": [
+            0.2612299490045982,
+            0.5243153090167624,
+            0.23579584754231567
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1238102405364584
+          ],
+          "bank_ratios": [
+            0.261277625242878,
+            0.5338800325803261,
+            0.23575314817282686
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc",
+      "status": "complete",
+      "cutoff": 13.435666355744663,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -98.83843289007591,
+            0.011070357960034444,
+            -0.3108922424440889
+          ],
+          "bank_ratios": [
+            1.0091044733408297e-29,
+            3.061686469372496e-26,
+            3.359592450034469e-26
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.20542911241298648,
+            0.05589705245737873
+          ],
+          "bank_ratios": [
+            1.4246998096085015e-13,
+            3.4878268941897934e-05,
+            3.4444884050474736e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -93.7847529393233,
+            -0.2921374433511755
+          ],
+          "bank_ratios": [
+            5.084341692851593e-14,
+            6.351239867445572e-05,
+            6.382021547808195e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -15.064281068890983,
+            -0.1724376020990907
+          ],
+          "bank_ratios": [
+            2.3640246516499326e-15,
+            3.586866112281442e-05,
+            3.500909908085969e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1547961630124897
+          ],
+          "bank_ratios": [
+            1.0228860759050995e-05,
+            0.02718223061290795,
+            0.030176939930085005
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4705,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "b2f17343eab9792748fdfeb69fccfeda472ff17dd59bbcdedac756d66dccefbc",
+      "status": "complete",
+      "cutoff": 13.435666355744663,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            4.2252125642239236e-05,
+            -0.11270038010056961,
+            -0.07773928942312872
+          ],
+          "bank_ratios": [
+            0.06781123884162481,
+            0.11367179954856989,
+            0.060622708831290485,
+            0.0003257595885671961,
+            2.4411611032565858e-31,
+            0.00015265810421708945
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.11270039083409344,
+            -0.077739296826977
+          ],
+          "bank_ratios": [
+            0.06781123854542774,
+            0.11367174194411175,
+            0.0606227090574569,
+            0.00032575879507532756,
+            2.441160664022962e-31,
+            0.00015265809740397116
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.33934708103914146,
+            0.0,
+            0.0,
+            0.055129242239601674,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.04446672074197954
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -2.0532316835606323,
+            -0.12465683443247466
+          ],
+          "bank_ratios": [
+            0.06779422357556764,
+            0.13606996218856046,
+            0.06119358238741921,
+            1.9454251755521432e-05,
+            0.5683842426333119,
+            0.5655048995728956
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.12381024053645841
+          ],
+          "bank_ratios": [
+            0.06780659648139066,
+            0.13855219292120624,
+            0.06118250107529294,
+            1.2374861560323615e-05,
+            0.5780058808349545,
+            0.5749420734656082
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d",
+      "status": "complete",
+      "cutoff": 3.716286537931711,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            4.496732241859356,
+            -0.5928236896375968,
+            0.5877540979970475
+          ],
+          "bank_ratios": [
+            0.28446715968341285,
+            0.728731367145576,
+            0.7847800511841859
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.5791673972332211,
+            0.5661927690443792
+          ],
+          "bank_ratios": [
+            0.2845149243805319,
+            0.7293936102756512,
+            0.7850823806723095
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.40257974717315376,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.15324543402506322
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            0.053843738826574006,
+            -0.18200294649699805
+          ],
+          "bank_ratios": [
+            0.28443108625181784,
+            0.7720966406241762,
+            0.7885082137517371
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18202051869521588
+          ],
+          "bank_ratios": [
+            0.28443306399097984,
+            0.7720985983511912,
+            0.7885180705343308
+          ]
+        }
+      },
+      "error_covered": false,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d",
+      "status": "complete",
+      "cutoff": 10.202045978303332,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -74.47796215344344,
+            0.011095048262592652,
+            -0.29820898159173514
+          ],
+          "bank_ratios": [
+            3.0279383123211456e-31,
+            2.046511349360885e-28,
+            4.395879020405154e-28
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.04933062695588006,
+            -0.30944210308184594
+          ],
+          "bank_ratios": [
+            5.873264787154209e-16,
+            1.3755418040907832e-05,
+            1.3358251845216746e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -96.08966200142325,
+            -0.2949493710817617
+          ],
+          "bank_ratios": [
+            3.069850207763264e-14,
+            2.8002906436039184e-05,
+            2.8209844549396716e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -2051.4386378790773,
+            -1.0038488209484924
+          ],
+          "bank_ratios": [
+            8.079388063829424e-15,
+            2.0379016336158682e-05,
+            2.0887846546921052e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.17280559518119248
+          ],
+          "bank_ratios": [
+            0.01343858468001333,
+            2.528179820020018e-31,
+            0.000162675779984687
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4706,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "4a3ce6f203f2642755e781b9e6f90008dc016a9efc68356275fc67a1be81287d",
+      "status": "complete",
+      "cutoff": 10.202045978303332,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            4.612565698849935e-05,
+            -0.11405772657859826,
+            -0.0818574749584537
+          ],
+          "bank_ratios": [
+            0.10359041664107702,
+            0.31558788684225547,
+            0.2887029463917452,
+            0.016689660484047297,
+            5.772389658892651e-31,
+            0.00017831105408620015
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.11405773889056334,
+            -0.08185748379456156
+          ],
+          "bank_ratios": [
+            0.10359041764882786,
+            0.31558786808335487,
+            0.28870295087074965,
+            0.016689654586163314,
+            2.308955340974462e-30,
+            0.00017831103505127477
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3537216102865589,
+            0.0,
+            0.0,
+            0.06926137148329356,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.04947632189672409
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            6.988365053858803e-05,
+            -0.17280556691980772
+          ],
+          "bank_ratios": [
+            0.10360251150660427,
+            0.28245779223683115,
+            0.2873334616306567,
+            0.013438589975341206,
+            0.0,
+            0.00016267579820695928
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.17280559518119248
+          ],
+          "bank_ratios": [
+            0.10360251250004715,
+            0.2824577918696854,
+            0.2873334664530392,
+            0.01343858468001333,
+            2.528179820020018e-31,
+            0.000162675779984687
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684",
+      "status": "complete",
+      "cutoff": 3.424122733882724,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            44.11485700952537,
+            0.8092566155147256,
+            -1.0040230314435385
+          ],
+          "bank_ratios": [
+            0.33096119801939045,
+            0.24499482117060117,
+            0.3380606725976823
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.680119989262218,
+            -0.9023361803658708
+          ],
+          "bank_ratios": [
+            0.3305042790221947,
+            0.2747547849297761,
+            0.338605656623841
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.41087104353108855,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.15447896665442012
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -7.705300478534346,
+            -0.16757341244454108
+          ],
+          "bank_ratios": [
+            0.3326010830994316,
+            0.5083337371467624,
+            0.33937331901430956
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.15949112316513472
+          ],
+          "bank_ratios": [
+            0.33231990216062224,
+            0.5837436254518376,
+            0.3405851044431222
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684",
+      "status": "complete",
+      "cutoff": 11.357887194904071,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -90.26148836978423,
+            -0.006006243805993322,
+            -0.28334537519409453
+          ],
+          "bank_ratios": [
+            1.136250091568109e-31,
+            2.273458887337646e-28,
+            2.312147082338412e-28
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            2.979182240436148,
+            -3.139842403192487
+          ],
+          "bank_ratios": [
+            5.3560842179308615e-14,
+            3.7445461986165586e-06,
+            3.3762619287668496e-06
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -90.07996232690549,
+            -0.28909281095587697
+          ],
+          "bank_ratios": [
+            8.845811588862661e-15,
+            9.107757048809316e-07,
+            9.062654343506164e-07
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -99.21042191950016,
+            -0.3021103634831747
+          ],
+          "bank_ratios": [
+            3.407768293509972e-18,
+            3.4910895525383997e-06,
+            3.398419106454829e-06
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.24626081094123475
+          ],
+          "bank_ratios": [
+            0.0004281238765604614,
+            0.0,
+            2.4090081474012742e-05
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4707,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "3c4f015e303d54bae10daa6ebe734e4f274011552f17e0d2e6e72aa8d9a6f684",
+      "status": "complete",
+      "cutoff": 11.357887194904071,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            6.723224938190442e-05,
+            -0.1199060610289087,
+            -0.1230881628512852
+          ],
+          "bank_ratios": [
+            0.10035523051495097,
+            0.15276032614074994,
+            0.10189423756565803,
+            0.0016694083861638791,
+            0.0,
+            3.6568606459956316e-05
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.11990607938414771,
+            -0.1230881816936409
+          ],
+          "bank_ratios": [
+            0.10035523166077262,
+            0.15276008678079764,
+            0.10189423343418363,
+            0.0016694055000038266,
+            0.0,
+            3.656858141002811e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3572934369007775,
+            0.0,
+            0.0,
+            0.05894929914059138,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.04808547400773891
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            0.00013808028473968892,
+            -0.24626073351855862
+          ],
+          "bank_ratios": [
+            0.10002661482916739,
+            0.10512776548879625,
+            0.10162039307942732,
+            0.00042812533879696863,
+            1.3429041462390188e-30,
+            2.4090101860091357e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.24626081094123475
+          ],
+          "bank_ratios": [
+            0.10002661595007854,
+            0.10512754914728527,
+            0.10162038946083361,
+            0.0004281238765604614,
+            0.0,
+            2.4090081474012742e-05
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832",
+      "status": "complete",
+      "cutoff": 3.9857324541283146,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -353.53572568096035,
+            11.1642610412125,
+            -14.459354003034687
+          ],
+          "bank_ratios": [
+            0.24516710619947726,
+            0.05236470502103702,
+            0.1408182845926612
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -25.903662327636606,
+            32.299995069642605
+          ],
+          "bank_ratios": [
+            0.24451196748638246,
+            0.059612327284979734,
+            0.14099839677378198
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.40316240738989023,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.1482465989563418
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            5.422928421589124,
+            -0.17315563286641222
+          ],
+          "bank_ratios": [
+            0.2443939194342498,
+            0.11386947109812058,
+            0.14271458891666586
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1734816257534667
+          ],
+          "bank_ratios": [
+            0.24376345109537187,
+            0.11980754672963047,
+            0.14284597134878202
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832",
+      "status": "complete",
+      "cutoff": 15.581838141435414,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -89.55266187070407,
+            0.0009405227332179023,
+            -0.29094310939729473
+          ],
+          "bank_ratios": [
+            1.5212632906684923e-29,
+            4.897423356642904e-29,
+            4.923815759041169e-29
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.016178910609363956,
+            -0.2610044171031639
+          ],
+          "bank_ratios": [
+            4.540083363317975e-15,
+            0.00010879165694442092,
+            0.00010709283517603346
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -95.07990120872427,
+            -0.29279093479926666
+          ],
+          "bank_ratios": [
+            6.808289720073681e-15,
+            1.336917147255461e-06,
+            1.3450351115429426e-06
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            780.7024006000905,
+            0.149023595633557
+          ],
+          "bank_ratios": [
+            2.046787033366087e-14,
+            8.88818327848166e-05,
+            8.95637136784016e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.19147061042168886
+          ],
+          "bank_ratios": [
+            0.1052783505026208,
+            0.0,
+            0.00015691682385273
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "iid",
+      "seed": 4708,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "37d820f1289220dfaf11de9e6b21e72a33deeb53031c4bb8b5ecd1bd9bab6832",
+      "status": "complete",
+      "cutoff": 15.581838141435414,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            5.1243873945727714e-05,
+            -0.1172184828424865,
+            -0.09329372495900376
+          ],
+          "bank_ratios": [
+            0.06229676611358343,
+            0.04506546892447059,
+            0.03692624964512558,
+            0.11590720923899565,
+            8.314727975317212e-31,
+            0.00014750493623322014
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.11721849655704514,
+            -0.0932937358743665
+          ],
+          "bank_ratios": [
+            0.062296763944420484,
+            0.04506549781986255,
+            0.036926250256880976,
+            0.11590719108435447,
+            8.31472606242775e-31,
+            0.00014750495164099375
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.33661490685876266,
+            0.0,
+            0.0,
+            0.01533588197703284,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.03785488256135038
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            5.422928421589127,
+            -0.17315563286641228
+          ],
+          "bank_ratios": [
+            0.06251436880802919,
+            0.029127067190058458,
+            0.03650545998229295,
+            0.10511034935962796,
+            0.02904164021478548,
+            0.02454907006144877
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1734816257534667
+          ],
+          "bank_ratios": [
+            0.062353099123621206,
+            0.03064598816361426,
+            0.03653906675055959,
+            0.1036981528798984,
+            0.036831814969585736,
+            0.031676160975075036
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149",
+      "status": "complete",
+      "cutoff": 3.7787167249442994,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -4.453618101492346,
+            -0.49489079207597514,
+            0.37482644791577713
+          ],
+          "bank_ratios": [
+            0.33565578564466414,
+            0.29102438696248023,
+            0.3632200965224924
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.5039126524956312,
+            0.38857921147563557
+          ],
+          "bank_ratios": [
+            0.33541978209077816,
+            0.2951781977580507,
+            0.3631135243670387
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.42852135232060473,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.16718172248547117
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.9063252159874657,
+            -0.18546151375961906
+          ],
+          "bank_ratios": [
+            0.3368031541584953,
+            0.44772663684370584,
+            0.3681136404648674
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18452790288238635
+          ],
+          "bank_ratios": [
+            0.3365489580975155,
+            0.4581791063213357,
+            0.36814641245026547
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149",
+      "status": "complete",
+      "cutoff": 15.105686392061628,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -211.3546999796465,
+            -0.0236942257382161,
+            -0.32907158379514734
+          ],
+          "bank_ratios": [
+            1.8151700028713864e-31,
+            6.806139445910077e-29,
+            1.550347694591538e-28
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.018131785128143972,
+            -0.262879226197246
+          ],
+          "bank_ratios": [
+            7.497355519781218e-18,
+            7.498326947707875e-05,
+            7.522781406664446e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -91.62332442449117,
+            -0.29157395024063437
+          ],
+          "bank_ratios": [
+            1.2816614770230708e-13,
+            0.00013771807604567995,
+            0.00013925195946989244
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            839.3827039398265,
+            0.18424129159200822
+          ],
+          "bank_ratios": [
+            1.3166405877933457e-17,
+            1.3401825902819265e-05,
+            1.3581861383183195e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.19249587334888305
+          ],
+          "bank_ratios": [
+            0.3774536995875146,
+            0.0,
+            1.236105376041579e-05
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4705,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "b6a4df60fde803d59c33bb32940aa682e26a966d2bdca2f2f366bc243270d149",
+      "status": "complete",
+      "cutoff": 15.105686392061628,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -1.4852907684519732,
+            -0.07639925570670505,
+            -0.14570634247262076
+          ],
+          "bank_ratios": [
+            0.08525506836726167,
+            0.4711580055176775,
+            0.10022728904047912,
+            0.4799986719189851,
+            1.3582259549814588e-29,
+            3.963182324236443e-05
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.07483930772265182,
+            -0.14682071121912932
+          ],
+          "bank_ratios": [
+            0.08515904679718575,
+            0.49660398366473923,
+            0.10068052372038958,
+            0.48684919910853136,
+            1.4174409566526217e-29,
+            4.138841841437198e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.39034309328732153,
+            0.0,
+            0.0,
+            0.10635832463544538,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.06188505637255735
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.9063252159874606,
+            -0.1854615137596192
+          ],
+          "bank_ratios": [
+            0.08425196171830518,
+            0.11199968587547714,
+            0.09208434054580446,
+            0.3732257808458161,
+            0.041922661825112735,
+            0.04342400944499953
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18452790288238638
+          ],
+          "bank_ratios": [
+            0.08418837408103337,
+            0.11461439137160394,
+            0.09209253852146204,
+            0.37487241862374693,
+            0.04321608901137694,
+            0.044752280848806295
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a",
+      "status": "complete",
+      "cutoff": 3.2736812900468917,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -0.5465136888592892,
+            -0.16513525670684723,
+            -0.025211884173675397
+          ],
+          "bank_ratios": [
+            0.3086956583905038,
+            0.27373068593662564,
+            0.12045488965209493
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.165449299962193,
+            -0.02449983805893591
+          ],
+          "bank_ratios": [
+            0.30873123298179,
+            0.2732585585285056,
+            0.12046554156358413
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.42774977018477106,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.1668541716345671
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -0.4871674463371445,
+            -0.18386968080017768
+          ],
+          "bank_ratios": [
+            0.30861644886316825,
+            0.22256518758138472,
+            0.11957137044503306
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1836773815693183
+          ],
+          "bank_ratios": [
+            0.308647402443524,
+            0.2233955902052158,
+            0.11960057659923852
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a",
+      "status": "complete",
+      "cutoff": 10.516248049998145,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -47.16767106438098,
+            -0.0494053864216461,
+            -0.2016757868383217
+          ],
+          "bank_ratios": [
+            1.1457317769679698e-32,
+            0.0,
+            0.0
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1018198304487306,
+            -0.10725824371042594
+          ],
+          "bank_ratios": [
+            4.4090675786460396e-17,
+            2.3365925227738438e-06,
+            2.3046547968067528e-06
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -91.62748059850284,
+            -0.2906728959170213
+          ],
+          "bank_ratios": [
+            1.074527624976336e-13,
+            0.00018976555790118342,
+            0.00019067566238697157
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            53.58242582577795,
+            -0.16136259516784138
+          ],
+          "bank_ratios": [
+            1.439013397944567e-17,
+            4.28793651117342e-06,
+            4.221276634367764e-06
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.19449648804955275
+          ],
+          "bank_ratios": [
+            0.00150879206109058,
+            0.11575282301208123,
+            0.11775913382453829
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4706,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "eff848dbb5a7c8417fd4257bd702672a37aef3f17dad85d3344b8051cf80065a",
+      "status": "complete",
+      "cutoff": 10.516248049998145,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -0.5465136888592909,
+            -0.1651352567068471,
+            -0.02521188417367559
+          ],
+          "bank_ratios": [
+            0.09609617388131858,
+            0.08521166682280687,
+            0.03749730100259434,
+            0.0012785888693615033,
+            1.9309603173015114e-29,
+            2.230421236387087e-05
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.16544929996219299,
+            -0.024499838058935925
+          ],
+          "bank_ratios": [
+            0.09610724816117015,
+            0.08506469476061003,
+            0.037500616915568184,
+            0.0012620532530645324,
+            1.0821454663127131e-29,
+            2.2301879288403514e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.39218961829746607,
+            0.0,
+            0.0,
+            0.1102065597308936,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.06289729469419797
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -0.48716744633715253,
+            -0.18386968080017763
+          ],
+          "bank_ratios": [
+            0.09607151615677664,
+            0.0692839772261824,
+            0.03722226371897341,
+            0.0017495168181521248,
+            0.0004726060961167156,
+            0.000275642238098621
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18367738156931826
+          ],
+          "bank_ratios": [
+            0.09608115192767028,
+            0.06954247945244378,
+            0.037231355520547675,
+            0.0017216928670333966,
+            0.0004500071681001497,
+            0.0002587726837711427
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899",
+      "status": "complete",
+      "cutoff": 3.841236546005949,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -5.615152310521347,
+            -1.1885282353157134,
+            1.2658398401119328
+          ],
+          "bank_ratios": [
+            0.24654505190285766,
+            0.2804996139551114,
+            0.2562617340588794
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -1.2154439164545907,
+            1.303116057501636
+          ],
+          "bank_ratios": [
+            0.2465979988197353,
+            0.2814260836436431,
+            0.25620701887106906
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.4237302491092861,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.16611456084846846
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.1986964279501862,
+            -0.1786258703170541
+          ],
+          "bank_ratios": [
+            0.24726339432344938,
+            0.5207579329036249,
+            0.26096251975047097
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.17809512476002992
+          ],
+          "bank_ratios": [
+            0.24733927573768175,
+            0.5257428110638949,
+            0.2609643909198094
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899",
+      "status": "complete",
+      "cutoff": 12.091288580105532,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -88.83857982893089,
+            0.0137409963459931,
+            -0.3070378336041569
+          ],
+          "bank_ratios": [
+            2.857282150778694e-29,
+            4.732127174864732e-25,
+            4.895119336403176e-25
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.36668557768301807,
+            -0.7060331372780809
+          ],
+          "bank_ratios": [
+            3.483431311027904e-14,
+            4.09758396693897e-05,
+            3.940663300265847e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -92.29720861621126,
+            -0.29150385996659733
+          ],
+          "bank_ratios": [
+            6.625682201328749e-14,
+            7.01563468348003e-05,
+            7.054728558224652e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -157.19967524177895,
+            -0.2578568737515708
+          ],
+          "bank_ratios": [
+            2.0770477631746992e-16,
+            4.89059877267407e-05,
+            4.81586870255953e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1894922510925081
+          ],
+          "bank_ratios": [
+            0.006312417630259835,
+            9.50976691072892e-31,
+            0.00025331590211324163
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4707,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "8322be2a4c344b027f14605aa10e75618af2fe9c314ef290aae01cd096eb8899",
+      "status": "complete",
+      "cutoff": 12.091288580105532,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            5.066990072791211e-05,
+            -0.11698949913640362,
+            -0.09209808939341108
+          ],
+          "bank_ratios": [
+            0.07878752433256948,
+            0.2779736287291656,
+            0.08518667142503447,
+            0.01253407367311147,
+            2.4935933632036902e-30,
+            0.0002980748659551658
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1169895126854491,
+            -0.0920981000596778
+          ],
+          "bank_ratios": [
+            0.07878752279853704,
+            0.2779734431934759,
+            0.08518666952951966,
+            0.012534061058424563,
+            9.974371210929081e-30,
+            0.0002980748163459334
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3871327971821539,
+            0.0,
+            0.0,
+            0.10715263914268254,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.06199152876429375
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -1.1986964279501637,
+            -0.17862587031705407
+          ],
+          "bank_ratios": [
+            0.07855218907995197,
+            0.16543765292172524,
+            0.08290421334022607,
+            0.005696722697235606,
+            0.1684202695293168,
+            0.1777119689756117
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1780951247600299
+          ],
+          "bank_ratios": [
+            0.0785762955645157,
+            0.16702128034404323,
+            0.08290480778506124,
+            0.005827468667436695,
+            0.16975154022902444,
+            0.17908009407026831
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60",
+      "status": "complete",
+      "cutoff": 3.235228235996531,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -3.556379795793764,
+            -0.10581612933744164,
+            -0.11369673803174662
+          ],
+          "bank_ratios": [
+            0.2362490298786863,
+            0.8844147152763753,
+            0.42372850224814745
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.4681340865124371,
+            0.3273373718346371
+          ],
+          "bank_ratios": [
+            0.23766287993113316,
+            0.2488113594041789,
+            0.41624093900758985
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.4303346022199062,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.16678276232423936
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.522672581126928,
+            -0.19499818266369745
+          ],
+          "bank_ratios": [
+            0.23648897142477054,
+            0.3218854909356461,
+            0.4165357764833444
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1911038693782929
+          ],
+          "bank_ratios": [
+            0.23749794940624702,
+            0.37925645335065794,
+            0.41668143891152487
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60",
+      "status": "complete",
+      "cutoff": 12.124118184180126,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -107.47604230928897,
+            0.003749068310382783,
+            -0.30452149827882646
+          ],
+          "bank_ratios": [
+            7.373453991155734e-30,
+            4.07972119190364e-27,
+            2.2635933285538293e-27
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.02422146066388306,
+            -0.210693884872754
+          ],
+          "bank_ratios": [
+            4.024025262139884e-15,
+            0.0003064729319347357,
+            0.00029864379563550845
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -93.07035400776572,
+            -0.2919452010512727
+          ],
+          "bank_ratios": [
+            3.721677564008097e-14,
+            4.238511951982937e-05,
+            4.207036664041284e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            241.34175286982543,
+            -0.08703035550551119
+          ],
+          "bank_ratios": [
+            7.892811521205234e-16,
+            0.00028460787626455113,
+            0.000277077188788028
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.19799760623202503
+          ],
+          "bank_ratios": [
+            0.08168009387291492,
+            0.0,
+            0.0005884485061116823
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "negative",
+      "seed": 4708,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "8c91c11a0f1e90b9494cbfb5373ba81859921ccc330d4ab48f9c017657866c60",
+      "status": "complete",
+      "cutoff": 12.124118184180126,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -3.556379795793776,
+            -0.10581612933744183,
+            -0.11369673803174629
+          ],
+          "bank_ratios": [
+            0.06304124725438741,
+            0.2359993045041767,
+            0.11306871098126206,
+            0.06452092663885836,
+            8.893858121849082e-30,
+            0.0006504530241197656
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.09065290027156264,
+            -0.13008576401818173
+          ],
+          "bank_ratios": [
+            0.06336803200014589,
+            0.3417551165694317,
+            0.11438844930771372,
+            0.05697296940774958,
+            2.717519566454559e-29,
+            0.0006797986318488303
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3927122979768851,
+            0.0,
+            0.0,
+            0.10538533959149601,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.06191088159324637
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -5.522672581126931,
+            -0.1949981826636974
+          ],
+          "bank_ratios": [
+            0.06310527382135812,
+            0.08589268210791774,
+            0.11114938710676912,
+            0.0839736737369035,
+            0.02251175144276104,
+            0.029543504090431726
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.19110386937829305
+          ],
+          "bank_ratios": [
+            0.06337451188103253,
+            0.10120168476788242,
+            0.11118825601198887,
+            0.08244062803492554,
+            0.036253475723614696,
+            0.04482521969672542
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": false
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165",
+      "status": "complete",
+      "cutoff": 3.0891964361453828,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            34.08709978571753,
+            0.4739037600015537,
+            -0.5298865762708457
+          ],
+          "bank_ratios": [
+            0.2777048596648104,
+            0.10838407401871504,
+            0.525008436480723
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            0.39700689650986215,
+            -0.4981935584535759
+          ],
+          "bank_ratios": [
+            0.2773596770894303,
+            0.11619842449172224,
+            0.5254140365751611
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.36885132352772554,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.12234712333519993
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -2.1443992221458883,
+            -0.0916272341489211
+          ],
+          "bank_ratios": [
+            0.27893347322933804,
+            0.5535970505142019,
+            0.5280882190217389
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.08954821114781684
+          ],
+          "bank_ratios": [
+            0.2788570268446396,
+            0.5807720002702067,
+            0.5285770233967664
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165",
+      "status": "complete",
+      "cutoff": 11.350434299507674,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -93.8356937424875,
+            -4.753260457021277e-05,
+            -0.28945472975037034
+          ],
+          "bank_ratios": [
+            4.043809660145512e-30,
+            5.980230977941766e-28,
+            2.0112791152350383e-28
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.008728844253524283,
+            -0.23220516072337014
+          ],
+          "bank_ratios": [
+            1.4429725233135076e-18,
+            2.4688966460870888e-05,
+            2.493277830262063e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -94.34947019507712,
+            -0.28976818688486267
+          ],
+          "bank_ratios": [
+            1.5170621029866264e-17,
+            8.978885002570161e-10,
+            9.250891086944765e-10
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            380.5986304360036,
+            -0.043940322934778724
+          ],
+          "bank_ratios": [
+            1.9281387003141122e-17,
+            2.345586729526058e-05,
+            2.3611894134138974e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.3625469259645163
+          ],
+          "bank_ratios": [
+            0.09993881783195453,
+            0.0,
+            1.8293259467188834e-08
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4705,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "504401a606a53a5e54dc9adb1eb5701f5446b391403fc4bbb461ca4e55414165",
+      "status": "complete",
+      "cutoff": 11.350434299507674,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            9.146082034933167e-05,
+            -0.10910553481589809,
+            -0.16628845468243897
+          ],
+          "bank_ratios": [
+            0.07563812776810837,
+            0.046101487486580904,
+            0.1415799075957195,
+            0.08880199243785196,
+            7.925966864254115e-32,
+            2.562920735020111e-07
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.10910555788900342,
+            -0.16628848984830877
+          ],
+          "bank_ratios": [
+            0.07563812877732039,
+            0.046101417332662174,
+            0.14157990623076114,
+            0.08880201092680336,
+            3.170385338750743e-31,
+            2.562909668576001e-07
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            19.530334999712288,
+            0.0,
+            0.5761583599977688,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.013468223429307095
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            0.00030391506735877316,
+            -0.3625466711990599
+          ],
+          "bank_ratios": [
+            0.07554779500386112,
+            0.03436032111093767,
+            0.14226955453681933,
+            0.09993879819941147,
+            7.202116772110622e-33,
+            1.8292965095759512e-08
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.3625469259645163
+          ],
+          "bank_ratios": [
+            0.07554779599159268,
+            0.03436026073069266,
+            0.14226955341473826,
+            0.09993881783195453,
+            0.0,
+            1.8293259467188834e-08
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e",
+      "status": "complete",
+      "cutoff": 3.2880903831032855,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            3.881933508865963,
+            -2.6907986868700657,
+            2.9379304738028966
+          ],
+          "bank_ratios": [
+            0.2646793534283633,
+            0.10377229870040262,
+            0.266992032838615
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -2.655313008368111,
+            2.8937469158002203
+          ],
+          "bank_ratios": [
+            0.2646796281202526,
+            0.10379566456384896,
+            0.26699432044311266
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.3551828248198791,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.12520126577049495
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            3.062357977447743,
+            -0.11947029741629087
+          ],
+          "bank_ratios": [
+            0.2645697156615363,
+            0.2035983412027752,
+            0.2662597428644304
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.12020518008527216
+          ],
+          "bank_ratios": [
+            0.26459503038388166,
+            0.20227586806727685,
+            0.26631122637962906
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e",
+      "status": "complete",
+      "cutoff": 11.137857770412595,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -68.35933588181383,
+            -0.0012944114024674852,
+            -0.28125921518918556
+          ],
+          "bank_ratios": [
+            2.4129068737837882e-30,
+            6.1976063639657315e-28,
+            4.348675837391589e-28
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.0039503696836994924,
+            -0.23821759198370104
+          ],
+          "bank_ratios": [
+            5.4766433997931225e-18,
+            1.4372575843534073e-05,
+            1.431407568049903e-05
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -101.67502811148324,
+            -0.3022360303451202
+          ],
+          "bank_ratios": [
+            1.0836265330747723e-14,
+            1.4408673936521908e-06,
+            1.4373539639806835e-06
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            378.34047197075165,
+            -0.01864998946386354
+          ],
+          "bank_ratios": [
+            6.479187313102729e-19,
+            1.3073310477845697e-05,
+            1.2718087031771258e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.20553098102512302
+          ],
+          "bank_ratios": [
+            0.4229998328123137,
+            2.0633069236978953e-32,
+            3.731750373138479e-06
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4706,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "ab68f67e3c6982267c2879a113f7910363d523ef987d1d3dc1beef8b40649a6e",
+      "status": "complete",
+      "cutoff": 11.137857770412595,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            5.920519324265072e-05,
+            -0.11975669927393359,
+            -0.10135107971728735
+          ],
+          "bank_ratios": [
+            0.07788342257358583,
+            0.038523017277877984,
+            0.07810234542343746,
+            0.4111952849732092,
+            6.041779230828491e-32,
+            4.266185254626902e-06
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.11975671632856638,
+            -0.10135109415076338
+          ],
+          "bank_ratios": [
+            0.07788342271744148,
+            0.03852301412155489,
+            0.07810234584613256,
+            0.4111953062925408,
+            6.041777681548093e-32,
+            4.266183930656166e-06
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.23498163476214062,
+            3.33840356190579,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.015647541791985648
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            3.062357977447738,
+            -0.1194702974162909
+          ],
+          "bank_ratios": [
+            0.07810560663092776,
+            0.060105790675743814,
+            0.07860453221496429,
+            0.43254462264925475,
+            0.4551647157191553,
+            0.44227008647555355
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.12020518008527219
+          ],
+          "bank_ratios": [
+            0.07811307997964621,
+            0.0597153734798719,
+            0.07861973104895038,
+            0.4337131589416529,
+            0.45860887441384984,
+            0.44562883716470714
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464",
+      "status": "complete",
+      "cutoff": 3.2123939577610576,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -1.052899957864265,
+            -0.030303378243424745,
+            -0.20275505926248308
+          ],
+          "bank_ratios": [
+            0.29531358610495695,
+            0.31833441286007996,
+            0.40352478271666353
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.02998906877595409,
+            -0.20256897488946848
+          ],
+          "bank_ratios": [
+            0.29540289419561894,
+            0.3273230872574528,
+            0.4039500912436297
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.35636943056855513,
+            7.426603893406368e-15,
+            4.938482883859578e-15
+          ],
+          "scaled_min_eigenvalue": 0.1298581887316536
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -0.2307695375178965,
+            -0.12828446075574748
+          ],
+          "bank_ratios": [
+            0.29329789385543636,
+            0.11981575496707837,
+            0.38434368300825383
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1281957990569413
+          ],
+          "bank_ratios": [
+            0.2933020051039334,
+            0.11999153196609419,
+            0.38434838452000947
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464",
+      "status": "complete",
+      "cutoff": 8.779631435016277,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -125.19258060363859,
+            0.0034708890279461363,
+            -0.3113631362599213
+          ],
+          "bank_ratios": [
+            4.336510823843053e-31,
+            4.033756328488831e-29,
+            8.879392863626409e-29
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.01030517873819869,
+            -0.22683199994030967
+          ],
+          "bank_ratios": [
+            1.994173075342412e-14,
+            0.000215651131285124,
+            0.00021561192409816932
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -93.65028312983355,
+            -0.29006553952687136
+          ],
+          "bank_ratios": [
+            1.522067817581081e-13,
+            2.660496465196212e-05,
+            2.644673193012443e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            335.9417955646914,
+            -0.04727178366098263
+          ],
+          "bank_ratios": [
+            6.574726167151245e-15,
+            0.00012952292794262692,
+            0.00012781058574088663
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.19554455594543607
+          ],
+          "bank_ratios": [
+            0.07109098602433628,
+            0.0,
+            0.0003369902063530346
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4707,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "24eef6f6991f0363387d923f8aba8eb728891b243affafbc8f7f714150d87464",
+      "status": "complete",
+      "cutoff": 8.779631435016277,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -1.052899957864243,
+            -0.030303378243424633,
+            -0.20275505926248305
+          ],
+          "bank_ratios": [
+            0.1080527795124415,
+            0.11647590812759967,
+            0.14764635433736187,
+            0.03494988061057306,
+            2.013789967476802e-29,
+            0.0004974604647566212
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.029989068775954027,
+            -0.20256897488946832
+          ],
+          "bank_ratios": [
+            0.10808545659836985,
+            0.11976478916276877,
+            0.14780197118213745,
+            0.03417412932322453,
+            0.0,
+            0.0005005051425815483
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.2931974150903168,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.027809442175917343
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -0.23076953751786103,
+            -0.12828446075574748
+          ],
+          "bank_ratios": [
+            0.10731525452053346,
+            0.043839585995116254,
+            0.14062814984181127,
+            0.07498978026588303,
+            0.37129110759081124,
+            0.3927948626506133
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.1281957990569412
+          ],
+          "bank_ratios": [
+            0.10731675879208841,
+            0.04390390133383312,
+            0.14062987008577238,
+            0.0749543510066143,
+            0.371648238901561,
+            0.3931611987268076
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "method": "whole",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected"
+      ],
+      "archive": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997",
+      "status": "complete",
+      "cutoff": 3.365682243719378,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -11.501364271566862,
+            -0.1307636820515911,
+            -0.07654001683965406
+          ],
+          "bank_ratios": [
+            0.2265270966455798,
+            0.25815149915338353,
+            0.24968363762275647
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.13663046982549168,
+            -0.06241922569667472
+          ],
+          "bank_ratios": [
+            0.2266536012888491,
+            0.27046208043757114,
+            0.2495353515515808
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.357654902339695,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.12124654532540503
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            -2.1565921916874933,
+            -0.0733184867440572
+          ],
+          "bank_ratios": [
+            0.22730456165910948,
+            0.6554074668220896,
+            0.25814198917303066
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.07237606445689788
+          ],
+          "bank_ratios": [
+            0.2273657314107971,
+            0.6739795979342589,
+            0.2584059142958947
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "method": "projected",
+      "readouts": [
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997",
+      "status": "complete",
+      "cutoff": 12.785864199952465,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -138.23437109137927,
+            0.006994516890939745,
+            -0.3290254276198977
+          ],
+          "bank_ratios": [
+            1.0308611113272983e-31,
+            2.541017294488063e-29,
+            5.50522263772494e-29
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.01587620090396484,
+            -0.22260015631168326
+          ],
+          "bank_ratios": [
+            8.32773717384126e-14,
+            0.0001331190872159834,
+            0.0001287417743704506
+          ]
+        },
+        "drop_dispersion": {
+          "status": "compatible",
+          "coefficients": [
+            -95.95848304062636,
+            -0.29647772350193924
+          ],
+          "bank_ratios": [
+            2.4305175302999137e-13,
+            7.300004043406801e-05,
+            7.380456152815916e-05
+          ]
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            289.13063860438695,
+            -0.06371235281733247
+          ],
+          "bank_ratios": [
+            2.858164014342919e-14,
+            8.237196551788457e-05,
+            7.916761850627591e-05
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18377938271481647
+          ],
+          "bank_ratios": [
+            0.02805517015357641,
+            0.0,
+            0.0004479299185180644
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    },
+    {
+      "profile": "positive",
+      "seed": 4708,
+      "method": "combined",
+      "readouts": [
+        "whole_local",
+        "whole_broad",
+        "whole_selected",
+        "projected_local",
+        "projected_broad",
+        "projected_selected"
+      ],
+      "archive": "e0638eee2534d80156946007be0e19298f11aaf7f3d2eb1679bc0ddb8eafb997",
+      "status": "complete",
+      "cutoff": 12.785864199952465,
+      "term_tests": {
+        "parent": {
+          "status": "compatible",
+          "coefficients": [
+            -1.8026916830988908,
+            -0.010702668820659844,
+            -0.23019283402666546
+          ],
+          "bank_ratios": [
+            0.06219856475881733,
+            0.7868619891887534,
+            0.08203660252037519,
+            0.006891390634202639,
+            0.0,
+            0.0005279836770463217
+          ]
+        },
+        "drop_nonlinear": {
+          "status": "compatible",
+          "coefficients": [
+            -0.009895007001999112,
+            -0.23026614594004685
+          ],
+          "bank_ratios": [
+            0.06257611991610872,
+            0.9185971195490973,
+            0.0853428615853417,
+            0.012149807897048696,
+            2.4140684237675613e-29,
+            0.0005229859197044247
+          ]
+        },
+        "drop_dispersion": {
+          "status": "excluded",
+          "weights": [
+            0.0,
+            18.726530272293903,
+            0.0,
+            0.5534532437802776,
+            0.0,
+            0.0
+          ],
+          "scaled_min_eigenvalue": 0.013753889764824091
+        },
+        "drop_forcing": {
+          "status": "compatible",
+          "coefficients": [
+            7.669493990541953e-05,
+            -0.18377935070842522
+          ],
+          "bank_ratios": [
+            0.05964439535682269,
+            0.07147590347260876,
+            0.0657407783871727,
+            0.028055164925480776,
+            0.0,
+            0.00044792990788648644
+          ]
+        },
+        "dispersion_only": {
+          "status": "compatible",
+          "coefficients": [
+            -0.18377938271481647
+          ],
+          "bank_ratios": [
+            0.05964439513756129,
+            0.0714758732544165,
+            0.06574077829594582,
+            0.02805517015357641,
+            0.0,
+            0.0004479299185180644
+          ]
+        }
+      },
+      "error_covered": true,
+      "controls": {
+        "physical": true,
+        "surrogate": true
+      }
+    }
+  ],
+  "totals": {
+    "whole": {
+      "parent": {
+        "compatible": 12
+      },
+      "drop_nonlinear": {
+        "compatible": 12
+      },
+      "drop_dispersion": {
+        "excluded": 12
+      },
+      "drop_forcing": {
+        "compatible": 12
+      },
+      "dispersion_only": {
+        "compatible": 12
+      },
+      "parent_and_deletion_excluded": {
+        "drop_nonlinear": 0,
+        "drop_dispersion": 12,
+        "drop_forcing": 0,
+        "dispersion_only": 0
+      },
+      "error_covered": 11,
+      "eligible": 12,
+      "fixed_passed": {
+        "physical": 12,
+        "surrogate": 12
+      }
+    },
+    "projected": {
+      "parent": {
+        "compatible": 12
+      },
+      "drop_nonlinear": {
+        "compatible": 12
+      },
+      "drop_dispersion": {
+        "compatible": 12
+      },
+      "drop_forcing": {
+        "compatible": 12
+      },
+      "dispersion_only": {
+        "compatible": 12
+      },
+      "parent_and_deletion_excluded": {
+        "drop_nonlinear": 0,
+        "drop_dispersion": 0,
+        "drop_forcing": 0,
+        "dispersion_only": 0
+      },
+      "error_covered": 12,
+      "eligible": 12,
+      "fixed_passed": {
+        "physical": 12,
+        "surrogate": 7
+      }
+    },
+    "combined": {
+      "parent": {
+        "compatible": 12
+      },
+      "drop_nonlinear": {
+        "compatible": 12
+      },
+      "drop_dispersion": {
+        "excluded": 12
+      },
+      "drop_forcing": {
+        "compatible": 12
+      },
+      "dispersion_only": {
+        "compatible": 12
+      },
+      "parent_and_deletion_excluded": {
+        "drop_nonlinear": 0,
+        "drop_dispersion": 12,
+        "drop_forcing": 0,
+        "dispersion_only": 0
+      },
+      "error_covered": 12,
+      "eligible": 12,
+      "fixed_passed": {
+        "physical": 12,
+        "surrogate": 7
+      }
+    }
+  },
+  "protocol_sha256": "0c1d71364a642cd75406e0e55c86df0893450bcf0cdaf8d46332ed55da647a9a",
+  "source": "a5261f65c41d003f1dad7b26437c58349d51daefb63dd7c3661204f37637499e"
+}

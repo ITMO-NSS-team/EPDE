@@ -1,0 +1,162 @@
+Kepler: structure and mechanism of the surviving dominators
+2026-11-16
+
+Scope and conclusion
+--------------------
+The ten archived Kepler candidates that dominate after CLSM coefficient
+correction are four distinct algebraic forms. The same ten survive in all
+three noise seeds, raw and smoothed stages, with ordinary and crossed weak
+discrepancy. Six entries are redundant spellings of the four forms.
+
+The four families are repeatable, approximate descriptions of this particular
+orbit. Their structural mismatch is strongly attenuated by the weak window,
+and their residuals are less sensitive to measurement noise than the reference
+inverse-force balance. Dyad measures coefficient repeatability, so these
+approximations can beat the reference on both existing objectives.
+
+Canonical structures
+--------------------
+Reference: u'' = -1/u^2 + 0.6/u^3.
+Coefficients a, b, c below are independent fitted constants in each family.
+
+A (1 entry): u' = (a*sin(omega*t) + b*cos(omega*t))/u^2
+  archive_0
+B (3 entries): u' = a + (b + c*cos(omega*t))/u^2
+  archive_1, archive_3, archive_4
+C (1 entry): u' = (a*sin(omega*t) + b*cos(omega*t))/u
+  archive_2
+D (5 entries): u' = a*u + (b + c*cos(omega*t))/u^2
+  archive_6, archive_8, archive_9, archive_10, archive_13
+
+Examples of exact aliases: u*uinv3 = u^-2; u^3*uinv3 = 1;
+u*uinv = 1; u^3*uinv2 = u; u^2*uinv = u. Maximum discrepancy/instability
+difference within equivalent groups was 2.37e-14 across all seeds/stages.
+Deduplication changes the count from ten to four; it does not restore the
+reference's nondominance.
+
+Representative scores: seed 0, corrected RAW coefficients
+---------------------------------------------------------
+All discrepancies below are dimensionless weak WAPE, shown as percentages.
+Instability I is the original dyad aggregation, left in its native units.
+Ordinary and crossed discrepancy use their respective existing row sets.
+
+             Ordinary D       Crossed D         I
+Reference       5.164%           7.275%         0.020594
+A               0.600%           1.233%         0.005070
+B               0.597%           1.204%         0.004440
+C               2.050%           2.070%         0.001594
+D               0.545%           1.154%         0.006652
+
+All four therefore dominate under either discrepancy. Their corrected full
+and slab moment matrices, and the reference's, have no negative eigen-directions;
+the surviving dominance is not caused by indefinite corrected solves.
+
+1. They encode the observed orbit's fundamental
+-----------------------------------------------
+The analytic benchmark frequency is 1.23323761; the fitted seed-0 frequency
+is 1.23318873 (about 0.004% difference). This is an orbital signal, unlike
+the Cauchy high-frequency shared-noise carrier found in the earlier analysis.
+
+For A, z=u^3 gives z'=3*a*sin(omega*t)+3*b*cos(omega*t), so z is a constant
+plus a sinusoid. The clean u^3 record is within 2.35% centered-relative RMS
+of such a sinusoid. Family C similarly describes u^2 as a sinusoid plus a
+constant. B and D add constant/state contributions to the periodic forcing.
+These transformations explain the forms; they are not new scoring rules.
+
+2. The weak window hides much of the approximation error
+-------------------------------------------------------
+The current window has support 5.1234 time units, about one orbital period
+(5.0949). Its amplitude gains at the first three orbital harmonics are
+0.5565, 0.0390, 0.0104. Higher harmonics are strongly attenuated.
+
+Clean-oracle fits evaluated with the SAME coefficients pointwise and weakly:
+
+           Pointwise WAPE      Weak WAPE
+A               4.404%           0.279%
+B               5.894%           0.409%
+C              29.712%           2.041%
+D               4.443%           0.278%
+
+These are measured residual changes, not an assumption about which harmonics
+the residual contains. Pointwise coefficients refitted by least squares still
+leave nonzero errors. The reference has pointwise relative L2 error 1.64e-15
+when refitted with exact derivatives; the alternatives are not exact analytic
+equivalents, even on this orbit. On the clean weak data the reference is also
+far more accurate (WAPE 0.001264%).
+
+Weak residuals and pointwise residuals have different target normalizations;
+their comparison diagnoses the effect of the weak pipeline, not a universal
+conversion factor between errors or an estimate of trajectory error.
+
+3. Noise reverses that clean-data advantage
+------------------------------------------
+First-order propagation of the known iid measurement noise through the SAME
+weak pipeline gives the following expected noise-only contribution to WAPE:
+reference 3.890%; A 0.707%; B 0.736%; C 0.465%; D 0.728%.
+
+This calculation includes shared target/RHS noise. It holds coefficients and
+frequency fixed and omits nonlinear bias and estimation uncertainty. It is an
+oracle sensitivity diagnostic, not a calibrated noise-normalized objective.
+
+The reference sensitivity comes predominantly from its inverse-power RHS:
+target noise RMS 0.00126, RHS noise RMS 0.01394. Thus derivative order alone
+does not explain the result. For f(u)=-u^-2+0.6*u^-3,
+f'(u)=2*u^-3-1.8*u^-4; small radius errors can strongly perturb the force.
+The two legitimate force contributions also substantially cancel. Correcting
+coefficient bias cannot remove measurement error in the scored residual.
+
+4. Dyad rewards repetition of these approximate relations
+--------------------------------------------------------
+The current K7 configuration yields only two dyad slabs here. Each spans
+about 2.39 orbital periods in weak-row centres. Both therefore see repeated
+instances of the same periodic waveform. A stable approximation to that
+waveform can have very repeatable coefficients while remaining inaccurate.
+
+For example, family A's two coefficient fits are
+(0.131327, 0.490536) and (0.132260, 0.492041), giving I=0.00507.
+Reference slab fits are (-1.001626, 0.602464) and (-0.988376, 0.585903),
+giving I=0.02059. Their greater fluctuation is consistent with the measured
+noise sensitivity of the force balance.
+
+The slabs' raw weak supports overlap by 4.8032 time units, nearly one period.
+They are not independent raw-data replicates. This is an additional limitation;
+the analysis does not isolate overlap as the cause of dominance.
+
+An algebraic illustration of what dyad does not measure
+-----------------------------------------------------
+Seed-0 D becomes, with z=u^3:
+  z' = 0.331917*z - 0.428814 + 1.579381*cos(omega*t).
+Perturbations in z satisfy delta_z'=0.331917*delta_z, an e-folding time of
+3.013. Low dyad I therefore does not establish dynamical stability or accurate
+trajectory predictions. This follows algebraically without solving a candidate
+ODE. Positive growth is not a universal rejection criterion: genuine systems
+can also have it.
+
+Implication
+-----------
+The diagnosis supports the concern about precision: coefficient repeatability
+alone cannot certify a correct equation. But simply adding the present weak
+residual does not resolve it, because the window suppresses structural mismatch
+while the reference retains a larger measurement-noise contribution. The two
+objectives can jointly prefer a repeatable approximation to one observed orbit.
+Cross-reconstruction removes one shared-noise mechanism but cannot eliminate
+these real-signal approximations. No replacement objective is validated here.
+
+Reproducibility and limits
+--------------------------
+Script: ../kepler_structures.py
+Detailed numbers/source hashes: kepler_structures.json
+Plot: kepler_structure_diagnostics.png (also SVG)
+Crossed scores: ../estimator_results/corrected_estimator.json
+
+No candidate ODE/PDE was integrated. The diagnostic uses the existing record
+and the known benchmark's analytic derivatives. Algebraic eccentric-anomaly
+inversion reproduces the saved clean radius to 5.28e-12 maximum absolute error.
+Analytic measurement Jacobians match directional finite differences to less
+than 1e-8 relative error. No production objective or keep rule was changed.
+Results cover these archived Kepler competitors, not every search candidate.
+
+Background on weak test-function spectra and noise robustness:
+Messenger & Bortz, Weak SINDy for Partial Differential Equations,
+https://arxiv.org/abs/2007.02848
+All numerical results above were measured locally for this archive.

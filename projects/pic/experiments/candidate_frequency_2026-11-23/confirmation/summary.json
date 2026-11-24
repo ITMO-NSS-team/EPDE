@@ -1,0 +1,161 @@
+{
+  "full": {
+    "systems": {
+      "assembled": {
+        "native": 104,
+        "candidate": 111,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 180
+      },
+      "source": {
+        "native": 59,
+        "candidate": 66,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 180
+      },
+      "held": {
+        "native": 72,
+        "candidate": 79,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 180
+      }
+    },
+    "laws": {
+      "generated": {
+        "native": 159,
+        "candidate": 166,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 240
+      },
+      "held": {
+        "native": 120,
+        "candidate": 127,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 240
+      }
+    },
+    "gains": [
+      [
+        "ode",
+        923704
+      ],
+      [
+        "ode",
+        923705
+      ],
+      [
+        "ode",
+        923706
+      ],
+      [
+        "ode",
+        923707
+      ],
+      [
+        "ode",
+        923709
+      ],
+      [
+        "ode",
+        923710
+      ],
+      [
+        "ode",
+        923712
+      ]
+    ],
+    "losses": []
+  },
+  "total": {
+    "systems": {
+      "assembled": {
+        "native": 104,
+        "candidate": 111,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 180
+      },
+      "source": {
+        "native": 59,
+        "candidate": 66,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 180
+      },
+      "held": {
+        "native": 72,
+        "candidate": 79,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 180
+      }
+    },
+    "laws": {
+      "generated": {
+        "native": 159,
+        "candidate": 166,
+        "gains": 7,
+        "losses": 0,
+        "pairs": 240
+      },
+      "held": {
+        "native": 120,
+        "candidate": 128,
+        "gains": 8,
+        "losses": 0,
+        "pairs": 240
+      }
+    },
+    "gains": [
+      [
+        "ode",
+        923704
+      ],
+      [
+        "ode",
+        923705
+      ],
+      [
+        "ode",
+        923706
+      ],
+      [
+        "ode",
+        923707
+      ],
+      [
+        "ode",
+        923709
+      ],
+      [
+        "ode",
+        923710
+      ],
+      [
+        "ode",
+        923712
+      ]
+    ],
+    "losses": []
+  },
+  "work": {
+    "parents": 1984,
+    "moved": 1935,
+    "admitted_children": 3035,
+    "extra_fits": 26626,
+    "weak_columns": 25160,
+    "weak_hits": 124429,
+    "profile_hits": 1984
+  },
+  "max_replay_error": 2.1094237467877974e-15,
+  "control_held": {
+    "native": 11,
+    "candidate": 11
+  },
+  "positive_balance": true
+}

@@ -1,0 +1,31 @@
+{
+  "pure": {
+    "ordinary": {
+      "seeds": 7,
+      "in_library": 0,
+      "top8": 0,
+      "strict": 0,
+      "mean_probability": 0.0,
+      "fits": 280
+    },
+    "fixed": {
+      "seeds": 7,
+      "in_library": 7,
+      "top8": 7,
+      "strict": 0,
+      "mean_probability": 0.1895040978684901,
+      "fits": 308
+    },
+    "profiled": {
+      "seeds": 7,
+      "in_library": 7,
+      "top8": 7,
+      "strict": 4,
+      "mean_probability": 0.14978393906233314,
+      "fits": 2906
+    }
+  },
+  "advance": false,
+  "verified_native_runs": 12,
+  "distinct_parents": 29
+}

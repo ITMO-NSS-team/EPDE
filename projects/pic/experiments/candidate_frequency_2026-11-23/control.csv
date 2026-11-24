@@ -1,0 +1,13 @@
+dataset,seed,arm,budget,source_identity_literal,source_identity_registered_frequency,held,held_identity_literal,held_identity_registered_frequency
+ode_simple,923301,native,full,1,1,1,1,1
+ode_simple,923301,candidate,full,1,1,1,1,1
+ode_simple,923301,native,total,1,1,1,1,1
+ode_simple,923301,candidate,total,1,1,1,1,1
+ode_simple,923302,native,full,1,1,1,1,1
+ode_simple,923302,candidate,full,1,1,1,1,1
+ode_simple,923302,native,total,1,1,1,1,1
+ode_simple,923302,candidate,total,1,1,1,1,1
+ode_simple,923303,native,full,1,1,1,1,1
+ode_simple,923303,candidate,full,1,1,1,1,1
+ode_simple,923303,native,total,1,1,1,1,1
+ode_simple,923303,candidate,total,1,1,1,1,1

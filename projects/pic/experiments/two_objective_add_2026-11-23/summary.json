@@ -1,0 +1,234 @@
+{
+  "full": {
+    "systems": {
+      "assembled": {
+        "cases": 45,
+        "pvra": 26,
+        "pvxa": 24,
+        "gains": 1,
+        "losses": 3
+      },
+      "source": {
+        "cases": 45,
+        "pvra": 13,
+        "pvxa": 12,
+        "gains": 1,
+        "losses": 2
+      },
+      "held": {
+        "cases": 45,
+        "pvra": 18,
+        "pvxa": 17,
+        "gains": 1,
+        "losses": 2
+      }
+    },
+    "laws": {
+      "generated": {
+        "cases": 60,
+        "pvra": 41,
+        "pvxa": 38,
+        "gains": 1,
+        "losses": 4
+      },
+      "source": {
+        "cases": 60,
+        "pvra": 28,
+        "pvxa": 24,
+        "gains": 1,
+        "losses": 5
+      },
+      "held": {
+        "cases": 60,
+        "pvra": 33,
+        "pvxa": 30,
+        "gains": 1,
+        "losses": 4
+      }
+    },
+    "common_first_discoveries": {
+      "cases": 37,
+      "earlier": 18,
+      "later": 10,
+      "pvra_median": 378,
+      "pvxa_median": 341
+    },
+    "common_first_coefficient_errors": {
+      "cases": 37,
+      "pvra_median": 0.006436552675263017,
+      "pvxa_median": 0.006436552675263017
+    },
+    "gains": [
+      [
+        "burgers_inviscid",
+        923301
+      ]
+    ],
+    "losses": [
+      [
+        "lv",
+        923303
+      ],
+      [
+        "pde_divide",
+        923303
+      ]
+    ],
+    "fates": {
+      "pvra": {
+        "dominated": 7,
+        "on front": 33,
+        "no suitable addition parent": 14,
+        "selectable but not drawn": 2,
+        "completion outside shortlist": 3,
+        "outside held WAPE cutoff": 1
+      },
+      "pvxa": {
+        "dominated": 8,
+        "on front": 30,
+        "no suitable addition parent": 16,
+        "completion outside shortlist": 4,
+        "selectable but not drawn": 2
+      }
+    }
+  },
+  "total": {
+    "systems": {
+      "assembled": {
+        "cases": 45,
+        "pvra": 26,
+        "pvxa": 22,
+        "gains": 0,
+        "losses": 4
+      },
+      "source": {
+        "cases": 45,
+        "pvra": 13,
+        "pvxa": 10,
+        "gains": 0,
+        "losses": 3
+      },
+      "held": {
+        "cases": 45,
+        "pvra": 18,
+        "pvxa": 15,
+        "gains": 0,
+        "losses": 3
+      }
+    },
+    "laws": {
+      "generated": {
+        "cases": 60,
+        "pvra": 41,
+        "pvxa": 36,
+        "gains": 0,
+        "losses": 5
+      },
+      "source": {
+        "cases": 60,
+        "pvra": 28,
+        "pvxa": 23,
+        "gains": 0,
+        "losses": 5
+      },
+      "held": {
+        "cases": 60,
+        "pvra": 33,
+        "pvxa": 29,
+        "gains": 0,
+        "losses": 4
+      }
+    },
+    "common_first_discoveries": {
+      "cases": 36,
+      "earlier": 9,
+      "later": 24,
+      "pvra_median": 371.0,
+      "pvxa_median": 565.5
+    },
+    "common_first_coefficient_errors": {
+      "cases": 36,
+      "pvra_median": 0.0065096809394605114,
+      "pvxa_median": 0.0065096809394605114
+    },
+    "gains": [],
+    "losses": [
+      [
+        "lv",
+        923303
+      ],
+      [
+        "pde_divide",
+        923301
+      ],
+      [
+        "pde_divide",
+        923303
+      ]
+    ],
+    "fates": {
+      "pvra": {
+        "dominated": 7,
+        "on front": 33,
+        "no suitable addition parent": 14,
+        "selectable but not drawn": 2,
+        "completion outside shortlist": 3,
+        "outside held WAPE cutoff": 1
+      },
+      "pvxa": {
+        "dominated": 7,
+        "on front": 29,
+        "no suitable addition parent": 19,
+        "completion outside shortlist": 4,
+        "selectable but not drawn": 1
+      }
+    }
+  },
+  "work": {
+    "pvra": {
+      "full_fits": 135000,
+      "extra_fits": 0,
+      "gain_columns": 2870017,
+      "shortlist_positions": 84432,
+      "shortlist_fit_attempts": 0,
+      "shortlist_cache_hits": 0,
+      "discovery_cache_hits": 0,
+      "weak_column_requests": 2919480,
+      "weak_column_cache_hits": 2896496
+    },
+    "pvxa": {
+      "full_fits": 135000,
+      "extra_fits": 98692,
+      "gain_columns": 2795693,
+      "shortlist_positions": 83400,
+      "shortlist_fit_attempts": 54332,
+      "shortlist_cache_hits": 17254,
+      "discovery_cache_hits": 11814,
+      "weak_column_requests": 4127668,
+      "weak_column_cache_hits": 4104678
+    }
+  },
+  "median_paired_runtime_ratio": 1.469385217523063,
+  "control_held": {
+    "pvra": 3,
+    "pvxa": 3
+  },
+  "max_replay_error": 1.7763568394002505e-15,
+  "pvxa_local_front_sizes_at_full_budget": {
+    "0": 13,
+    "1": 2474,
+    "2": 3095,
+    "3": 2641,
+    "4": 1371,
+    "5": 604,
+    "6": 188,
+    "7": 34,
+    "8": 5
+  },
+  "pvxa_nonempty_local_fronts": {
+    "count": 10412,
+    "top_gain_on_front": 9022,
+    "mean_pvra_draw_mass_on_front": 0.3708502467298351
+  },
+  "positive_balance": false
+}

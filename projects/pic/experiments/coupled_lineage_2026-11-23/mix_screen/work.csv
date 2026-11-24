@@ -1,0 +1,49 @@
+dataset,seed,native_scalar_path,attempts,accepted,extra_fits,replay_error,crossover_seconds,decisions,operator_work
+ac,923301,True,0,0,0,8.881784197001252e-16,0,{},{}
+ac,923302,True,0,0,0,6.661338147750939e-16,0,{},{}
+ac,923303,True,0,0,0,4.440892098500626e-16,0,{},{}
+burgers,923301,True,0,0,0,6.661338147750939e-16,0,{},{}
+burgers,923302,True,0,0,0,9.992007221626409e-16,0,{},{}
+burgers,923303,True,0,0,0,1.1102230246251565e-15,0,{},{}
+burgers_inviscid,923301,True,0,0,0,9.992007221626409e-16,0,{},{}
+burgers_inviscid,923302,True,0,0,0,1.1102230246251565e-15,0,{},{}
+burgers_inviscid,923303,True,0,0,0,5.551115123125783e-16,0,{},{}
+duffing,923301,True,0,0,0,4.440892098500626e-16,0,{},{}
+duffing,923302,True,0,0,0,5.551115123125783e-16,0,{},{}
+duffing,923303,True,0,0,0,3.3306690738754696e-16,0,{},{}
+kdv,923301,True,0,0,0,1.6653345369377348e-15,0,{},{}
+kdv,923302,True,0,0,0,7.771561172376096e-16,0,{},{}
+kdv,923303,True,0,0,0,6.661338147750939e-16,0,{},{}
+kdv_cossin,923301,True,0,0,0,8.881784197001252e-16,0,{},{}
+kdv_cossin,923302,True,0,0,0,1.1102230246251565e-15,0,{},{}
+kdv_cossin,923303,True,0,0,0,6.661338147750939e-16,0,{},{}
+ks,923301,True,0,0,0,8.881784197001252e-16,0,{},{}
+ks,923302,True,0,0,0,9.992007221626409e-16,0,{},{}
+ks,923303,True,0,0,0,6.661338147750939e-16,0,{},{}
+lorenz,923301,False,576,255,310,6.661338147750939e-16,2.6696442998945713,"{""accept_nondominated"": 255, ""no_donor"": 210, ""no_eligible_block"": 19, ""no_legal_block"": 45, ""reject_dominated"": 47}","{""child2_mutation_skipped"": 163, ""child2_stock_mutation"": 29, ""children"": 192, ""donor_same_set_merged"": 41, ""equations"": 576, ""illegal_cap"": 734, ""illegal_empty"": 5, ""illegal_partner_target"": 326, ""mix_fresh_sets"": 182, ""mix_source_fresh"": 182, ""mix_source_native"": 83, ""mix_source_proposal"": 37, ""native_cache_hits"": 83, ""parent_cache_hits"": 302, ""pool_builds"": 12, ""proposal_cache_hits"": 37, ""trials"": 302, ""weak_hits"": 5910}"
+lorenz,923302,False,672,391,392,6.661338147750939e-16,3.838226900086738,"{""accept_nondominated"": 391, ""no_donor"": 157, ""no_eligible_block"": 28, ""no_legal_block"": 32, ""reject_dominated"": 64}","{""child2_mutation_skipped"": 203, ""child2_stock_mutation"": 21, ""children"": 224, ""donor_same_set_merged"": 14, ""equations"": 672, ""illegal_cap"": 1420, ""illegal_empty"": 38, ""illegal_partner_target"": 647, ""mix_fresh_sets"": 217, ""mix_source_fresh"": 217, ""mix_source_native"": 159, ""mix_source_proposal"": 79, ""native_cache_hits"": 159, ""parent_cache_hits"": 455, ""pool_builds"": 14, ""proposal_cache_hits"": 79, ""trials"": 455, ""weak_hits"": 7412}"
+lorenz,923303,False,612,387,514,8.881784197001252e-16,3.629536799970083,"{""accept_nondominated"": 387, ""no_donor"": 68, ""no_eligible_block"": 48, ""no_legal_block"": 62, ""reject_dominated"": 46, ""reject_new_invalid"": 1}","{""child2_mutation_skipped"": 192, ""child2_stock_mutation"": 12, ""children"": 204, ""donor_same_set_merged"": 17, ""equations"": 612, ""illegal_cap"": 971, ""illegal_empty"": 8, ""illegal_partner_target"": 32, ""mix_fresh_sets"": 290, ""mix_source_fresh"": 290, ""mix_source_native"": 103, ""mix_source_proposal"": 41, ""native_cache_hits"": 103, ""parent_cache_hits"": 434, ""pool_builds"": 12, ""proposal_cache_hits"": 41, ""trials"": 434, ""weak_hits"": 8893}"
+lv,923301,False,704,434,347,5.551115123125783e-16,3.806114900391549,"{""accept_nondominated"": 434, ""no_donor"": 100, ""no_eligible_block"": 15, ""no_legal_block"": 24, ""reject_dominated"": 129, ""reject_new_invalid"": 2}","{""child2_mutation_skipped"": 290, ""child2_stock_mutation"": 62, ""children"": 352, ""donor_same_set_merged"": 33, ""equations"": 704, ""illegal_cap"": 1111, ""illegal_partner_target"": 6, ""mix_fresh_sets"": 206, ""mix_source_fresh"": 206, ""mix_source_native"": 272, ""mix_source_proposal"": 87, ""native_cache_hits"": 272, ""parent_cache_hits"": 565, ""pool_builds"": 22, ""proposal_cache_hits"": 87, ""trials"": 565, ""weak_hits"": 8021}"
+lv,923302,False,714,463,349,3.3306690738754696e-16,3.6142409001477063,"{""accept_nondominated"": 463, ""no_donor"": 83, ""no_eligible_block"": 11, ""no_legal_block"": 67, ""reject_dominated"": 88, ""reject_new_invalid"": 2}","{""child2_mutation_skipped"": 316, ""child2_stock_mutation"": 41, ""children"": 357, ""donor_same_set_merged"": 4, ""equations"": 714, ""illegal_cap"": 2670, ""illegal_partner_target"": 135, ""mix_fresh_sets"": 196, ""mix_source_fresh"": 196, ""mix_source_native"": 304, ""mix_source_proposal"": 53, ""native_cache_hits"": 304, ""parent_cache_hits"": 553, ""pool_builds"": 21, ""proposal_cache_hits"": 53, ""trials"": 553, ""weak_hits"": 7737}"
+lv,923303,False,748,412,598,5.551115123125783e-16,4.950558200245723,"{""accept_nondominated"": 412, ""no_donor"": 80, ""no_eligible_block"": 2, ""no_legal_block"": 90, ""reject_dominated"": 161, ""reject_new_invalid"": 3}","{""child2_mutation_skipped"": 306, ""child2_stock_mutation"": 68, ""children"": 374, ""donor_same_set_merged"": 11, ""equations"": 748, ""illegal_cap"": 3309, ""illegal_empty"": 154, ""illegal_partner_target"": 23, ""mix_fresh_sets"": 336, ""mix_source_fresh"": 336, ""mix_source_native"": 169, ""mix_source_proposal"": 71, ""native_cache_hits"": 169, ""parent_cache_hits"": 576, ""pool_builds"": 22, ""proposal_cache_hits"": 71, ""trials"": 576, ""weak_hits"": 10887}"
+ns,923301,False,765,451,491,9.992007221626409e-16,4.943112000240944,"{""accept_nondominated"": 451, ""no_donor"": 170, ""no_eligible_block"": 46, ""no_legal_block"": 49, ""reject_dominated"": 49}","{""child2_mutation_skipped"": 231, ""child2_stock_mutation"": 24, ""children"": 255, ""donor_same_set_merged"": 34, ""equations"": 765, ""illegal_cap"": 304, ""illegal_partner_target"": 87, ""mix_fresh_sets"": 264, ""mix_source_fresh"": 264, ""mix_source_native"": 158, ""mix_source_proposal"": 78, ""native_cache_hits"": 158, ""parent_cache_hits"": 500, ""pool_builds"": 15, ""proposal_cache_hits"": 78, ""trials"": 500, ""weak_hits"": 8523}"
+ns,923302,False,756,357,306,1.2212453270876722e-15,3.876493700197898,"{""accept_nondominated"": 357, ""no_donor"": 216, ""no_eligible_block"": 81, ""no_legal_block"": 38, ""reject_dominated"": 64}","{""child2_mutation_skipped"": 197, ""child2_stock_mutation"": 55, ""children"": 252, ""donor_same_set_merged"": 37, ""equations"": 756, ""illegal_cap"": 226, ""illegal_empty"": 10, ""illegal_partner_target"": 33, ""mix_fresh_sets"": 175, ""mix_source_fresh"": 175, ""mix_source_native"": 173, ""mix_source_proposal"": 73, ""native_cache_hits"": 173, ""parent_cache_hits"": 421, ""pool_builds"": 14, ""proposal_cache_hits"": 73, ""trials"": 421, ""weak_hits"": 6242}"
+ns,923303,False,765,383,334,1.2212453270876722e-15,4.181468000053428,"{""accept_nondominated"": 383, ""no_donor"": 269, ""no_eligible_block"": 29, ""no_legal_block"": 45, ""reject_dominated"": 39}","{""child2_mutation_skipped"": 207, ""child2_stock_mutation"": 48, ""children"": 255, ""donor_same_set_merged"": 45, ""equations"": 765, ""illegal_cap"": 530, ""illegal_partner_target"": 55, ""mix_fresh_sets"": 187, ""mix_source_fresh"": 187, ""mix_source_native"": 170, ""mix_source_proposal"": 65, ""native_cache_hits"": 170, ""parent_cache_hits"": 422, ""pool_builds"": 15, ""proposal_cache_hits"": 65, ""trials"": 422, ""weak_hits"": 6505}"
+ode,923301,True,0,0,0,6.661338147750939e-16,0,{},{}
+ode,923302,True,0,0,0,5.551115123125783e-16,0,{},{}
+ode,923303,True,0,0,0,5.551115123125783e-16,0,{},{}
+pde_compound,923301,True,0,0,0,6.661338147750939e-16,0,{},{}
+pde_compound,923302,True,0,0,0,4.440892098500626e-16,0,{},{}
+pde_compound,923303,True,0,0,0,8.881784197001252e-16,0,{},{}
+pde_divide,923301,True,0,0,0,1.1657341758564144e-15,0,{},{}
+pde_divide,923302,True,0,0,0,4.440892098500626e-16,0,{},{}
+pde_divide,923303,True,0,0,0,8.881784197001252e-16,0,{},{}
+vdp,923301,True,0,0,0,6.661338147750939e-16,0,{},{}
+vdp,923302,True,0,0,0,4.440892098500626e-16,0,{},{}
+vdp,923303,True,0,0,0,3.3306690738754696e-16,0,{},{}
+wave,923301,True,0,0,0,5.551115123125783e-16,0,{},{}
+wave,923302,True,0,0,0,9.992007221626409e-16,0,{},{}
+wave,923303,True,0,0,0,8.326672684688674e-16,0,{},{}
+ode_simple,923301,True,0,0,0,4.440892098500626e-16,0,{},{}
+ode_simple,923302,True,0,0,0,5.551115123125783e-16,0,{},{}
+ode_simple,923303,True,0,0,0,5.551115123125783e-16,0,{},{}

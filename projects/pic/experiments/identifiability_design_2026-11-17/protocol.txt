@@ -1,0 +1,34 @@
+Solver-free noise identification and weak-design study
+======================================================
+Continue from the immutable full_pipeline_uncertainty_2026-11-17 study.
+Do not alter its source, results, cutoffs, rejected probes, or manifest.
+
+A. Profile noise correlation in six archived fields: ode iid seeds51,52,53;
+ode seed52 bootstrap draw112; vdp iid seed52 and lv iid seed51 (first variable).
+Fix rho on a predefined grid and reoptimize all three curvature nuisance
+parameters and marginal noise scale. Use four fixed nuisance starts and the
+archived/replayed unrestricted nuisance fit. Certify the final nuisance score
+with the exact stationary innovations likelihood; retain unresolved fits.
+The grid includes rho=0 and approaches1 without imposing a truth-selected cap.
+Report likelihood-support curves and marginal/innovation amplitudes. Likelihood
+drop levels2 and6 are descriptive, NOT calibrated confidence limits or p-values.
+Generating noise parameters are used only for evaluation/plot annotation.
+
+B. Screen a fixed menu of native-grid weak windows and modulation frequencies
+on the archived forced-KdV iid seed51 reconstruction/noise estimate. Preserve
+the entire candidate library, constants and valid identities. The selection
+criterion must not use reference labels, exact coefficients or clean moments.
+Use the log-determinant information proxy log det(I+C^-1 G), after projecting
+pilot columns off the deterministic columns. C is the unprojected error Gram,
+so this is a design proxy, not a likelihood or confidence statement. Only after
+freezing this ranking evaluate reference geometry and clean weak residuals.
+Freeze one selected bank before testing fresh seeds54..56 under iid and +/-0.4
+noise, paired against the original local+broad procedure. Refit noise in every
+bootstrap draw; hold the observed reconstruction fixed for normalization, as
+the completed paired study found no coverage gain from refitting it there.
+Use128 bootstrap fields, MC16 fixed normalization and the123rd order statistic.
+Report all fresh outcomes and numerical failures. Three datasets per case are
+a development screen, not precise95% certification or adaptive-search coverage.
+
+No candidate dynamics are integrated. No draw rejection, oracle fallback,
+per-system cutoff tuning, coefficient clipping, or production edits.

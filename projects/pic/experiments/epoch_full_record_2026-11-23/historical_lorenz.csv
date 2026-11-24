@@ -1,0 +1,13 @@
+seed,noise_percent,method,front_size,catalog_hit,historical_hit,credited_candidates,unresolved_candidates
+923701,0,native,357,0,1,4,0
+923701,0,multiscale,555,0,1,5,0
+923701,5,native,914,0,1,5,0
+923701,5,multiscale,811,0,1,6,0
+923702,0,native,381,0,1,4,0
+923702,0,multiscale,457,0,1,7,0
+923702,5,native,1840,0,1,6,0
+923702,5,multiscale,1089,0,1,13,0
+923703,0,native,276,0,1,4,0
+923703,0,multiscale,395,0,1,4,0
+923703,5,native,1860,0,1,4,0
+923703,5,multiscale,762,0,1,4,0

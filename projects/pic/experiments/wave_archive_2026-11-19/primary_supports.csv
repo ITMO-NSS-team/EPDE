@@ -1,0 +1,51 @@
+terms,observations,seeds
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0},48,6
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0},20,3
+1 + d^2u/dx1^2{power: 1.0} + u{power: 1.0},16,2
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + t{power: 1.0, dim: 0.0} + x{power: 1.0, dim: 1.0}",8,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + t{power: 1.0, dim: 0.0}",7,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 3.0} * sin{power: 1.0, freq: 211.10764781149823, dim: 1.0}",6,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * cos{power: 1.0, freq: 118.10608876474704, dim: 0.0}",5,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + t{power: 1.0, dim: 0.0} * u{power: 1.0} + u{power: 2.0}",5,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * cos{power: 1.0, freq: 111.6238564784128, dim: 1.0}",4,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 1.0} * cos{power: 1.0, freq: 216.95101831534873, dim: 1.0}",4,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + t{power: 1.0, dim: 0.0} + u{power: 1.0}",4,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx0^2{power: 1.0} * du/dx1{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0},3,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + du/dx0{power: 1.0} * d^3u/dx1^3{power: 1.0},3,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 3.0} * sin{power: 1.0, freq: 192.03970406929292, dim: 0.0}",3,1
+"1 + d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * cos{power: 1.0, freq: 111.6238564784128, dim: 1.0}",2,1
+1 + d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0},2,1
+1 + d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + u{power: 1.0} * d^2u/dx0^2{power: 1.0},2,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * cos{power: 1.0, freq: 99.51564945964333, dim: 1.0}",2,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * d^3u/dx1^3{power: 1.0},2,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} * du/dx0{power: 1.0},2,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 3.0} + x{power: 1.0, dim: 1.0}",2,1
+"1 + d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 2.0} * sin{power: 1.0, freq: 173.6450156010019, dim: 1.0}",1,1
+"1 + d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 3.0} * cos{power: 1.0, freq: 148.9600634090717, dim: 0.0}",1,1
+"1 + d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + x{power: 1.0, dim: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * cos{power: 1.0, freq: 80.77654972831583, dim: 1.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * du/dx0{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^2u/dx1^2{power: 1.0} * sin{power: 1.0, freq: 192.34950946955672, dim: 1.0} + du/dx0{power: 1.0} * cos{power: 1.0, freq: 192.34950946955672, dim: 1.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^3u/dx1^3{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^3u/dx1^3{power: 1.0} * cos{power: 1.0, freq: 204.73593773250366, dim: 0.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^3u/dx1^3{power: 1.0} * d^4u/dx1^4{power: 1.0},1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^3u/dx1^3{power: 1.0} * u{power: 1.0} + d^4u/dx1^4{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + du/dx1{power: 1.0} * d^3u/dx1^3{power: 1.0} + x{power: 1.0, dim: 1.0} * d^3u/dx1^3{power: 1.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + u{power: 1.0} * d^4u/dx1^4{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} + u{power: 1.0} * d^4u/dx1^4{power: 1.0} + x{power: 2.0, dim: 1.0} * d^3u/dx1^3{power: 1.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} * d^3u/dx1^3{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} * du/dx0{power: 1.0} + du/dx0{power: 1.0} * sin{power: 1.0, freq: 211.10764781149823, dim: 1.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + d^4u/dx1^4{power: 1.0} * du/dx1{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 1.0} * cos{power: 1.0, freq: 180.23039826799615, dim: 0.0} + u{power: 3.0} * d^2u/dx1^2{power: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 1.0} * cos{power: 1.0, freq: 192.34950946955672, dim: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 1.0} * sin{power: 1.0, freq: 111.7446261886778, dim: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 1.0} * sin{power: 1.0, freq: 173.6450156010019, dim: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 1.0} * sin{power: 1.0, freq: 211.10764781149823, dim: 1.0}",1,1
+d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx0{power: 2.0} * d^2u/dx1^2{power: 1.0},1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx1{power: 1.0} + t{power: 1.0, dim: 0.0} * u{power: 1.0} + u{power: 2.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + du/dx1{power: 1.0} * sin{power: 1.0, freq: 80.77654972831583, dim: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + t{power: 1.0, dim: 0.0} * d^4u/dx1^4{power: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + t{power: 2.0, dim: 0.0} * sin{power: 1.0, freq: 148.9600634090717, dim: 0.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 2.0} + u{power: 2.0} * t{power: 2.0, dim: 0.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 2.0} * cos{power: 1.0, freq: 80.77654972831583, dim: 1.0}",1,1
+"d^2u/dx0^2{power: 1.0} + d^2u/dx1^2{power: 1.0} + u{power: 3.0} * cos{power: 1.0, freq: 148.9600634090717, dim: 0.0}",1,1

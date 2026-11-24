@@ -1,0 +1,138 @@
+{
+  "full": {
+    "systems": {
+      "assembled": {
+        "cases": 45,
+        "native": 27,
+        "refined": 27,
+        "gains": 0,
+        "losses": 0
+      },
+      "source": {
+        "cases": 45,
+        "native": 15,
+        "refined": 14,
+        "gains": 0,
+        "losses": 1
+      },
+      "held": {
+        "cases": 45,
+        "native": 19,
+        "refined": 19,
+        "gains": 0,
+        "losses": 0
+      }
+    },
+    "laws": {
+      "generated": {
+        "cases": 60,
+        "native": 40,
+        "refined": 41,
+        "gains": 1,
+        "losses": 0
+      },
+      "source": {
+        "cases": 60,
+        "native": 28,
+        "refined": 26,
+        "gains": 0,
+        "losses": 2
+      },
+      "held": {
+        "cases": 60,
+        "native": 32,
+        "refined": 33,
+        "gains": 1,
+        "losses": 0
+      }
+    },
+    "gains": [],
+    "losses": [],
+    "common_first_discoveries": {
+      "cases": 40,
+      "earlier": 10,
+      "later": 10,
+      "native": 433.0,
+      "refined": 521.0
+    },
+    "common_first_coefficient_error": {
+      "cases": 39,
+      "native": 0.006582809203658006,
+      "refined": 0.006436552675263017
+    }
+  },
+  "total": {
+    "systems": {
+      "assembled": {
+        "cases": 45,
+        "native": 27,
+        "refined": 27,
+        "gains": 0,
+        "losses": 0
+      },
+      "source": {
+        "cases": 45,
+        "native": 15,
+        "refined": 14,
+        "gains": 0,
+        "losses": 1
+      },
+      "held": {
+        "cases": 45,
+        "native": 19,
+        "refined": 19,
+        "gains": 0,
+        "losses": 0
+      }
+    },
+    "laws": {
+      "generated": {
+        "cases": 60,
+        "native": 40,
+        "refined": 40,
+        "gains": 1,
+        "losses": 1
+      },
+      "source": {
+        "cases": 60,
+        "native": 28,
+        "refined": 26,
+        "gains": 0,
+        "losses": 2
+      },
+      "held": {
+        "cases": 60,
+        "native": 32,
+        "refined": 32,
+        "gains": 1,
+        "losses": 1
+      }
+    },
+    "gains": [],
+    "losses": [],
+    "common_first_discoveries": {
+      "cases": 39,
+      "earlier": 10,
+      "later": 29,
+      "native": 396,
+      "refined": 560
+    },
+    "common_first_coefficient_error": {
+      "cases": 39,
+      "native": 0.006582809203658006,
+      "refined": 0.006436552675263017
+    }
+  },
+  "profiled_peaks": 156,
+  "installed_moves": 31,
+  "changed_runs": 22,
+  "extra_fits": 2142,
+  "median_calibration_seconds": 0.01885190000757575,
+  "median_remaining_calls": 2948,
+  "max_replay_error": 1.6653345369377348e-15,
+  "control_held": {
+    "native": 3,
+    "refined": 3
+  },
+  "positive_balance": false
+}

@@ -1,0 +1,49 @@
+Direct dyad replacement check, followed by uncertainty
+Stage 1 frozen before outcomes, 2026-11-16.
+
+Use all 45 saved full candidate panels: core15 x noise seeds 0/1/2 at 5%.
+These reused records permit a controlled objective ablation, not fresh-seed
+validation or a new evolutionary search. Preserve every registered equation
+and equivalent, all constants, candidates, fitted coefficients and validation
+scores. Primary discrepancy/fits: variance_reduction q0_white128 with frozen
+joint-risk fits (previous registered retention 56/60). Sensitivity controls:
+q0_white128 baseline fits and q0_plain joint fits. No criterion is selected
+per system from outcomes. New instability calculations use EXACT historical
+raw full-record weak matrices, base plans and common maximum candidate width.
+
+Compare eight second-axis definitions:
+  dyad_sum: production all-axis sum of relative coefficient MADs (baseline).
+  dyad_mean: same per-term scores averaged instead of summed.
+  dyad_prediction: same dyadic slabs, minimum-row floor and stable slab solves;
+    median over slabs of ||X(c_slab - median_coefficients)|| / ||y|| using
+    the common full raw weak matrix; average partitions, then axes.
+    No division by individual near-zero coefficient medians.
+  tile: production fixed time-slab coefficient dispersion.
+  survival: production fixed-block bootstrap coefficient survival (defaults).
+  chi2: production uncentered all-axis cumulative coefficient score path.
+  complexity: number of fitted features, constants included (control).
+  discrepancy_only: constant zero second axis (ablation).
+All explicit constants stay in the design; fit_intercept=False. No new
+centering or unscored intercept. Heterogeneity estimators are not promoted
+as replacement candidates because their current implementation is not
+invariant to feature units; no production implementation is changed here.
+
+Report Pareto retention crediting registered equivalents, exact-reference
+retention, all frontier sizes, registered/unregistered frontier composition,
+frontier feature counts, and continuous clean-fit residual diagnostics.
+An unregistered candidate is NOT automatically an invalid law. Retaining
+more candidates is not sufficient evidence for a replacement. No arbitrary
+clean-error threshold turns these diagnostic quantities into a truth label.
+Strict Pareto comparisons match the historical analysis; uncertainty in
+near ties will be examined separately, not hidden by a tolerance/penalty.
+
+Checks: reproduce saved dyad and primary 56/60 retention; identical panels,
+data hashes, frozen scores/fits; unit invariance and exact identities for
+the new prediction statistic; all-axis response and constant preservation;
+source/input hashes; complete 45-case coverage. Dedicated ODE_simple checks
+retain its phase and energy identities rather than ban their constants.
+
+Stage 2 begins after the ablation. Select disagreements and persistent hard
+cases for paired uncertainty investigation, with the scope and limitations
+of the uncertainty model frozen separately before computing its outcomes.
+No candidate differential equation solves, PINNs, production changes or commits.

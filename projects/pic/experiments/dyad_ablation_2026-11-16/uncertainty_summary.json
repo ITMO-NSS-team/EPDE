@@ -1,0 +1,346 @@
+{
+  "records": 20,
+  "equation_seed_cases": 25,
+  "pairs": 382,
+  "draws_each": 128,
+  "bootstrap_measurements": 2560,
+  "independent_benchmark_measurements": 2560,
+  "nonfinite": 0,
+  "interpretation": "Descriptive dependent-pair conditional diagnostics on selected records; no discovery confidence claim.",
+  "calibration": [
+    {
+      "system": "ALL",
+      "axis": "discrepancy",
+      "pairs": 382,
+      "mean_coverage": 0.935413939790576,
+      "median_coverage": 0.9375,
+      "median_sd_ratio": 1.0012536969807961,
+      "minimum_sd_ratio": 0.7977986622676685,
+      "maximum_sd_ratio": 1.777259877732512
+    },
+    {
+      "system": "ALL",
+      "axis": "dyad_sum",
+      "pairs": 382,
+      "mean_coverage": 0.7187909031413613,
+      "median_coverage": 0.921875,
+      "median_sd_ratio": 0.9136529875853753,
+      "minimum_sd_ratio": 0.003949568436010823,
+      "maximum_sd_ratio": 344.24281326005604
+    },
+    {
+      "system": "ALL",
+      "axis": "dyad_prediction",
+      "pairs": 382,
+      "mean_coverage": 0.6288653468586387,
+      "median_coverage": 0.8984375,
+      "median_sd_ratio": 1.0421800028991466,
+      "minimum_sd_ratio": 0.09011768439537024,
+      "maximum_sd_ratio": 2.324982988196884
+    },
+    {
+      "system": "ac",
+      "axis": "discrepancy",
+      "pairs": 39,
+      "mean_coverage": 0.9599358974358975,
+      "median_coverage": 0.9609375,
+      "median_sd_ratio": 1.1115354113498024,
+      "minimum_sd_ratio": 0.9189275090606095,
+      "maximum_sd_ratio": 1.777259877732512
+    },
+    {
+      "system": "ac",
+      "axis": "dyad_sum",
+      "pairs": 39,
+      "mean_coverage": 0.9212740384615384,
+      "median_coverage": 0.9296875,
+      "median_sd_ratio": 0.7717229122886737,
+      "minimum_sd_ratio": 0.003949568436010823,
+      "maximum_sd_ratio": 11.148349100413053
+    },
+    {
+      "system": "ac",
+      "axis": "dyad_prediction",
+      "pairs": 39,
+      "mean_coverage": 0.8034855769230769,
+      "median_coverage": 0.8984375,
+      "median_sd_ratio": 1.2708453274372267,
+      "minimum_sd_ratio": 0.6759470490824313,
+      "maximum_sd_ratio": 2.324982988196884
+    },
+    {
+      "system": "burgers",
+      "axis": "discrepancy",
+      "pairs": 14,
+      "mean_coverage": 0.9391741071428571,
+      "median_coverage": 0.9296875,
+      "median_sd_ratio": 0.9905291058746398,
+      "minimum_sd_ratio": 0.9170144684896442,
+      "maximum_sd_ratio": 1.1051415635090425
+    },
+    {
+      "system": "burgers",
+      "axis": "dyad_sum",
+      "pairs": 14,
+      "mean_coverage": 0.6690848214285714,
+      "median_coverage": 0.921875,
+      "median_sd_ratio": 1.2424253889679426,
+      "minimum_sd_ratio": 0.306014325400792,
+      "maximum_sd_ratio": 5.930591837008872
+    },
+    {
+      "system": "burgers",
+      "axis": "dyad_prediction",
+      "pairs": 14,
+      "mean_coverage": 0.5228794642857143,
+      "median_coverage": 0.58203125,
+      "median_sd_ratio": 1.04704644100886,
+      "minimum_sd_ratio": 0.9408998570733764,
+      "maximum_sd_ratio": 1.6285204454578621
+    },
+    {
+      "system": "duffing",
+      "axis": "discrepancy",
+      "pairs": 14,
+      "mean_coverage": 0.9313616071428571,
+      "median_coverage": 0.93359375,
+      "median_sd_ratio": 0.9770661742028169,
+      "minimum_sd_ratio": 0.9153576823008623,
+      "maximum_sd_ratio": 1.104255647839065
+    },
+    {
+      "system": "duffing",
+      "axis": "dyad_sum",
+      "pairs": 14,
+      "mean_coverage": 0.8560267857142857,
+      "median_coverage": 0.921875,
+      "median_sd_ratio": 1.1926724777677404,
+      "minimum_sd_ratio": 0.19648593009755125,
+      "maximum_sd_ratio": 6.315138740709493
+    },
+    {
+      "system": "duffing",
+      "axis": "dyad_prediction",
+      "pairs": 14,
+      "mean_coverage": 0.9464285714285714,
+      "median_coverage": 0.953125,
+      "median_sd_ratio": 1.0963078437175662,
+      "minimum_sd_ratio": 0.8829217079657214,
+      "maximum_sd_ratio": 1.5365971091425077
+    },
+    {
+      "system": "kdv_cossin",
+      "axis": "discrepancy",
+      "pairs": 45,
+      "mean_coverage": 0.9472222222222222,
+      "median_coverage": 0.953125,
+      "median_sd_ratio": 1.0524816681749916,
+      "minimum_sd_ratio": 0.8649608656815009,
+      "maximum_sd_ratio": 1.2154848857780434
+    },
+    {
+      "system": "kdv_cossin",
+      "axis": "dyad_sum",
+      "pairs": 45,
+      "mean_coverage": 0.8579861111111111,
+      "median_coverage": 0.9375,
+      "median_sd_ratio": 0.30974463746782677,
+      "minimum_sd_ratio": 0.042604432308636205,
+      "maximum_sd_ratio": 344.24281326005604
+    },
+    {
+      "system": "kdv_cossin",
+      "axis": "dyad_prediction",
+      "pairs": 45,
+      "mean_coverage": 0.1078125,
+      "median_coverage": 0.0,
+      "median_sd_ratio": 0.9294192221058445,
+      "minimum_sd_ratio": 0.7507499855280724,
+      "maximum_sd_ratio": 1.6711403355821493
+    },
+    {
+      "system": "ks",
+      "axis": "discrepancy",
+      "pairs": 45,
+      "mean_coverage": 0.9397569444444445,
+      "median_coverage": 0.9453125,
+      "median_sd_ratio": 1.0295624607595724,
+      "minimum_sd_ratio": 0.8377776152473675,
+      "maximum_sd_ratio": 1.263940369037339
+    },
+    {
+      "system": "ks",
+      "axis": "dyad_sum",
+      "pairs": 45,
+      "mean_coverage": 0.6623263888888888,
+      "median_coverage": 0.9140625,
+      "median_sd_ratio": 1.1402067470042212,
+      "minimum_sd_ratio": 0.11763951569716839,
+      "maximum_sd_ratio": 38.94509304983507
+    },
+    {
+      "system": "ks",
+      "axis": "dyad_prediction",
+      "pairs": 45,
+      "mean_coverage": 0.11840277777777777,
+      "median_coverage": 0.0,
+      "median_sd_ratio": 0.986056392166531,
+      "minimum_sd_ratio": 0.8294442883456266,
+      "maximum_sd_ratio": 1.3634721800040004
+    },
+    {
+      "system": "lorenz",
+      "axis": "discrepancy",
+      "pairs": 112,
+      "mean_coverage": 0.9298967633928571,
+      "median_coverage": 0.9375,
+      "median_sd_ratio": 0.980587579136783,
+      "minimum_sd_ratio": 0.7977986622676685,
+      "maximum_sd_ratio": 1.1906574033185955
+    },
+    {
+      "system": "lorenz",
+      "axis": "dyad_sum",
+      "pairs": 112,
+      "mean_coverage": 0.7259347098214286,
+      "median_coverage": 0.91015625,
+      "median_sd_ratio": 0.9934900798528317,
+      "minimum_sd_ratio": 0.00887590970999703,
+      "maximum_sd_ratio": 25.286555426778342
+    },
+    {
+      "system": "lorenz",
+      "axis": "dyad_prediction",
+      "pairs": 112,
+      "mean_coverage": 0.93994140625,
+      "median_coverage": 0.9453125,
+      "median_sd_ratio": 1.1275651765157402,
+      "minimum_sd_ratio": 0.707189009432441,
+      "maximum_sd_ratio": 2.084324975113414
+    },
+    {
+      "system": "lv",
+      "axis": "discrepancy",
+      "pairs": 32,
+      "mean_coverage": 0.9384765625,
+      "median_coverage": 0.9453125,
+      "median_sd_ratio": 0.9882703074483489,
+      "minimum_sd_ratio": 0.7987999334484726,
+      "maximum_sd_ratio": 1.072426710916645
+    },
+    {
+      "system": "lv",
+      "axis": "dyad_sum",
+      "pairs": 32,
+      "mean_coverage": 0.792236328125,
+      "median_coverage": 0.9375,
+      "median_sd_ratio": 0.9136529875853753,
+      "minimum_sd_ratio": 0.036402161354305504,
+      "maximum_sd_ratio": 36.08802627398763
+    },
+    {
+      "system": "lv",
+      "axis": "dyad_prediction",
+      "pairs": 32,
+      "mean_coverage": 0.9013671875,
+      "median_coverage": 0.94140625,
+      "median_sd_ratio": 1.0990200237227206,
+      "minimum_sd_ratio": 0.09011768439537024,
+      "maximum_sd_ratio": 1.7479044701750115
+    },
+    {
+      "system": "pde_compound",
+      "axis": "discrepancy",
+      "pairs": 14,
+      "mean_coverage": 0.8900669642857143,
+      "median_coverage": 0.93359375,
+      "median_sd_ratio": 1.0437462434433944,
+      "minimum_sd_ratio": 0.92557506318377,
+      "maximum_sd_ratio": 1.4488183447307312
+    },
+    {
+      "system": "pde_compound",
+      "axis": "dyad_sum",
+      "pairs": 14,
+      "mean_coverage": 0.4799107142857143,
+      "median_coverage": 0.4765625,
+      "median_sd_ratio": 1.0804445758463248,
+      "minimum_sd_ratio": 0.01846399987233449,
+      "maximum_sd_ratio": 24.334257576454213
+    },
+    {
+      "system": "pde_compound",
+      "axis": "dyad_prediction",
+      "pairs": 14,
+      "mean_coverage": 0.22823660714285715,
+      "median_coverage": 0.0,
+      "median_sd_ratio": 0.8415142040149521,
+      "minimum_sd_ratio": 0.4984426370275002,
+      "maximum_sd_ratio": 1.0302192948530902
+    },
+    {
+      "system": "pde_divide",
+      "axis": "discrepancy",
+      "pairs": 28,
+      "mean_coverage": 0.9305245535714286,
+      "median_coverage": 0.92578125,
+      "median_sd_ratio": 0.9318681666406927,
+      "minimum_sd_ratio": 0.8185141834412114,
+      "maximum_sd_ratio": 1.1930830908560508
+    },
+    {
+      "system": "pde_divide",
+      "axis": "dyad_sum",
+      "pairs": 28,
+      "mean_coverage": 0.51953125,
+      "median_coverage": 0.640625,
+      "median_sd_ratio": 0.7753562965082852,
+      "minimum_sd_ratio": 0.022345214140052656,
+      "maximum_sd_ratio": 21.27879752504134
+    },
+    {
+      "system": "pde_divide",
+      "axis": "dyad_prediction",
+      "pairs": 28,
+      "mean_coverage": 0.17885044642857142,
+      "median_coverage": 0.015625,
+      "median_sd_ratio": 1.0690215196616344,
+      "minimum_sd_ratio": 0.7624147637194554,
+      "maximum_sd_ratio": 1.3359489986746451
+    },
+    {
+      "system": "wave",
+      "axis": "discrepancy",
+      "pairs": 39,
+      "mean_coverage": 0.9254807692307693,
+      "median_coverage": 0.9296875,
+      "median_sd_ratio": 0.9947636751309535,
+      "minimum_sd_ratio": 0.8357797868110963,
+      "maximum_sd_ratio": 1.067576014185512
+    },
+    {
+      "system": "wave",
+      "axis": "dyad_sum",
+      "pairs": 39,
+      "mean_coverage": 0.5374599358974359,
+      "median_coverage": 0.5234375,
+      "median_sd_ratio": 0.8104754449757249,
+      "minimum_sd_ratio": 0.021899499095476102,
+      "maximum_sd_ratio": 41.326933961842926
+    },
+    {
+      "system": "wave",
+      "axis": "dyad_prediction",
+      "pairs": 39,
+      "mean_coverage": 0.9184695512820513,
+      "median_coverage": 0.921875,
+      "median_sd_ratio": 0.9679601167941815,
+      "minimum_sd_ratio": 0.7696109631127629,
+      "maximum_sd_ratio": 1.3517881117468498
+    }
+  ],
+  "noise_sigma_ratio_range": [
+    0.9439352528711253,
+    1.0431689882309605
+  ]
+}

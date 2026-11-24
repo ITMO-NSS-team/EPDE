@@ -1,0 +1,403 @@
+{
+  "arms": {
+    "baseline": {
+      "coefficients": [
+        -3.8883897215869725,
+        0.005555708535001676,
+        -0.239520290693356
+      ],
+      "median_absolute_errors": [
+        2.1116102784130275,
+        1.0055557085350015,
+        1.239520290693356
+      ],
+      "fields_closer_than_baseline": [
+        0,
+        0,
+        0
+      ],
+      "extra_wins": 145,
+      "by_addition": [
+        24,
+        23,
+        24,
+        24,
+        22,
+        0,
+        24,
+        4
+      ],
+      "fields_beating_all_eleven": 0,
+      "fewer_equal_more_extra_wins": [
+        0,
+        24,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        2,
+        24,
+        23
+      ],
+      "median_score": 0.11011210165049246,
+      "improved_reference": 0
+    },
+    "wide": {
+      "coefficients": [
+        -4.978747194582374,
+        -0.6385730675048477,
+        0.5214057089562842
+      ],
+      "median_absolute_errors": [
+        1.1870656163497717,
+        0.36423683957754627,
+        0.4785942910437157
+      ],
+      "fields_closer_than_baseline": [
+        19,
+        18,
+        18
+      ],
+      "extra_wins": 78,
+      "by_addition": [
+        18,
+        10,
+        11,
+        10,
+        7,
+        1,
+        19,
+        2
+      ],
+      "fields_beating_all_eleven": 3,
+      "fewer_equal_more_extra_wins": [
+        18,
+        5,
+        1
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        6,
+        24,
+        24
+      ],
+      "median_score": 0.013594646797565155,
+      "improved_reference": 24
+    },
+    "projected": {
+      "coefficients": [
+        -6.012880837221383,
+        -0.987917395905269,
+        0.9446302396844484
+      ],
+      "median_absolute_errors": [
+        0.7934888650334617,
+        0.20325120903975774,
+        0.22092579858640615
+      ],
+      "fields_closer_than_baseline": [
+        19,
+        22,
+        22
+      ],
+      "extra_wins": 15,
+      "by_addition": [
+        2,
+        2,
+        3,
+        2,
+        2,
+        2,
+        1,
+        1
+      ],
+      "fields_beating_all_eleven": 13,
+      "fewer_equal_more_extra_wins": [
+        24,
+        0,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        17,
+        24,
+        24
+      ],
+      "median_score": 0.00303141152438748,
+      "improved_reference": 24
+    },
+    "staged_baseline": {
+      "coefficients": [
+        -5.994781810515256,
+        -0.995377955186143,
+        1.289743385858077
+      ],
+      "median_absolute_errors": [
+        0.007046937032656686,
+        0.004622044813856918,
+        0.2897433858580769
+      ],
+      "fields_closer_than_baseline": [
+        24,
+        24,
+        24
+      ],
+      "extra_wins": 119,
+      "by_addition": [
+        24,
+        18,
+        17,
+        18,
+        18,
+        0,
+        19,
+        5
+      ],
+      "fields_beating_all_eleven": 0,
+      "fewer_equal_more_extra_wins": [
+        10,
+        10,
+        4
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        9,
+        11,
+        24
+      ],
+      "median_score": 0.1960594368122469,
+      "improved_reference": 7
+    },
+    "staged_wide": {
+      "coefficients": [
+        -5.994781810515256,
+        -0.9953779551861431,
+        1.0255815261256713
+      ],
+      "median_absolute_errors": [
+        0.007046937032656242,
+        0.004622044813856863,
+        0.04103544235031065
+      ],
+      "fields_closer_than_baseline": [
+        24,
+        24,
+        24
+      ],
+      "extra_wins": 18,
+      "by_addition": [
+        7,
+        0,
+        0,
+        1,
+        0,
+        3,
+        5,
+        2
+      ],
+      "fields_beating_all_eleven": 12,
+      "fewer_equal_more_extra_wins": [
+        24,
+        0,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        24,
+        24,
+        24
+      ],
+      "median_score": 0.005021369596533223,
+      "improved_reference": 24
+    },
+    "staged_projected": {
+      "coefficients": [
+        -5.994781810515256,
+        -0.995377955186143,
+        0.9922512740342688
+      ],
+      "median_absolute_errors": [
+        0.00704693703265713,
+        0.004622044813856918,
+        0.03469621324563066
+      ],
+      "fields_closer_than_baseline": [
+        24,
+        24,
+        24
+      ],
+      "extra_wins": 13,
+      "by_addition": [
+        1,
+        3,
+        1,
+        2,
+        1,
+        2,
+        3,
+        0
+      ],
+      "fields_beating_all_eleven": 18,
+      "fewer_equal_more_extra_wins": [
+        24,
+        0,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        24,
+        24,
+        24
+      ],
+      "median_score": 0.0020563936668493406,
+      "improved_reference": 24
+    },
+    "staged_both": {
+      "coefficients": [
+        -5.891271621334646,
+        -0.9578657129372166,
+        0.9432299962961896
+      ],
+      "median_absolute_errors": [
+        0.1087283786653539,
+        0.04213428706278344,
+        0.05677000370381041
+      ],
+      "fields_closer_than_baseline": [
+        24,
+        24,
+        24
+      ],
+      "extra_wins": 13,
+      "by_addition": [
+        1,
+        3,
+        1,
+        2,
+        1,
+        2,
+        3,
+        0
+      ],
+      "fields_beating_all_eleven": 18,
+      "fewer_equal_more_extra_wins": [
+        24,
+        0,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        24,
+        24,
+        24
+      ],
+      "median_score": 0.002122810903829985,
+      "improved_reference": 24
+    }
+  },
+  "folds_checked": 6048,
+  "baseline_replay": null,
+  "max_errors": {
+    "generalized_eigen_score_error": 5.800915303666443e-15,
+    "column_change_score_error": 8.104628079763643e-15
+  },
+  "hashes": [
+    [
+      "102210427b49542fccb0017ea5fbff223b3fb586d3ba2462ba5d35e5f294ac24",
+      "c82bf7101681e471d42bc7adc70536c94269d98ac6b4c31bc8201ed993445be8"
+    ],
+    [
+      "16cd220e6c65710b0396d0496842821a72d80efed1ae03009e073dea2d99fa3b",
+      "2725a9efac6d857575c82c07f5dded62ed1888707512bddd0752ab65e1d5e618"
+    ],
+    [
+      "21c49d3d8d5665a05fb37b20af2cebafc588486855194867720447012fd7ec48",
+      "4c59a159cf1b059e6a9391079709e92130a916330cee2c25d1e39ff5f5cc9f26"
+    ],
+    [
+      "9a4fb235ae02ca57f62e47293d966db4a24f63750064eeef5bf5b7b0f88fe8c5",
+      "56863e97f0b886adbe746a83d9ac435cae4f50351216686f73d0c1f1881fa40e"
+    ],
+    [
+      "62438dd34887932a5aa69a4e47252f8ce4238742a605b9eae34b74f73a495ec4",
+      "3eb21dc0321e07f355bdff435afb65a821f4586b2ad3bbe1cd8683f8ebb71a71"
+    ],
+    [
+      "4ab00d560a91cf90dc795c08166d7f99a45e1778dcd782ea45ddbc3f5aac2d3b",
+      "eea21d4b8c058a6cbde92373cef65fc8eb249715e83852038a610a72edcf6331"
+    ],
+    [
+      "80271a0ae75b24abc2d2e154f1b1651a8e01fb4c2651dbf9ca6a984268322fdc",
+      "abbc845c8b8d772e81b7631d3ac86d0f2ee7a13dd23d8ecb223246c442c83502"
+    ],
+    [
+      "f8f5d2c8a6b84032e9f6e914dcadb9b5fd2b2626bcc24cce024190802e4daf9f",
+      "0c77c347bd9092468d9481fc0ab2a9003b496a811f22d9f7ccc2602a68e27eee"
+    ],
+    [
+      "057486c7c15917276717ffff8098ce0f67bb3108046b76c1bd5abee82fcb77e1",
+      "56d91bc8d530c46c65c4993149dcea56fd408e206fda4a3f914d0dc890a54888"
+    ],
+    [
+      "e0f05a7b8fa5f3a0e8153f85c75714aa4837ee1380317fc50cbea3da8d1c013d",
+      "8a3241388fb34394947da93b9008d31d08f416d64bc35d70f1f07745f6c4a66f"
+    ],
+    [
+      "056518267856977992897e4b8879a92dde77ce40e626ac3bc6b467a077925b9e",
+      "cc6672b49bf1382a51a9727c069bd47a1b534fdf4f9b68b1ab471f3b27090bc1"
+    ],
+    [
+      "cfe156239cbc58fc6ad9ab89d3122e4c03308b5681b1874d1cddc48b01a1eeef",
+      "435ec2a1754079725176ebb509368992cccd710728c64863911853037055cd94"
+    ],
+    [
+      "0216f6f1ded565dd558fe1880eeb3af45a6bac31dd3727c731fb82a19370a109",
+      "542440ffd7c62d3c98fbe7a9574ef4624a1e9786b27cabeb6aafcd96194d90c8"
+    ],
+    [
+      "0f145346bfeab7adfb3e2caf66b0922cbc68e6365c919ac4ec2c045946446082",
+      "d7cd44560227044c7e30d56c3880bb5cf54fc0e64ada565c036927ef208ce2b7"
+    ],
+    [
+      "257f74743d83ae768c47a793b537e017e11a14b740d1bb22423c082ac6cac156",
+      "a3dc8c29d899ebcd1990c0ce2eb002ef04a346330a4102141050bf6c764947b8"
+    ],
+    [
+      "b7127080fa7af3a80940a7284ea85902281b999eeeada839a833ef8a3adfbe58",
+      "718b029af44b04e4ba6989899f225ec9b4424fb4eba00b5497d62ed69e974943"
+    ],
+    [
+      "fa575042aae32a65c72e324e057469231d3b806ff519406b34f09efe23678624",
+      "a336bb0f5d1ccfbdf68cde627e842e41f7ea54fb07dd51e566da9e1f2cc7ad6d"
+    ],
+    [
+      "5efa12bd5d14dd07bb142f854ff7591250bfa55a490e2c18eba00b541622452a",
+      "7f8bbdc79367584f0cd643f36f16c6fa0c0ca7ef2455e8eb281cec7b5b6fbc46"
+    ],
+    [
+      "862b8f61a89e5f7c3af2b88dabea647ecaaebfbc8464b868282060ee8066325a",
+      "f88549d0f0029e8d51027aa2cc85f624d64b9053f72f0f7fe263e760472b0016"
+    ],
+    [
+      "6fe9a33c82939f99ba69388400092eda9ba815aa4d990a496ec1c0e6a2e2ae1f",
+      "5e8df8f13b8d8914e524dfebce5a02e202700d21a0c72f611eac82fe9d75590c"
+    ],
+    [
+      "941677df11750ea5747309296531eba0409d94ac43805f8d1fd5f86dc2b499a6",
+      "a27d5a499c73e1eea5c7a330393e3bf9681173ba395b463ba2358372dee3a800"
+    ],
+    [
+      "48dd02e67b036d288808ccd382a0c9299f4332d7e3ccda86297b6f14c63f9ccc",
+      "97b1b7701e03771de1a8f098560f2766f019891787593083593e787211f9817b"
+    ],
+    [
+      "7e4e8f5343258f91f5dec9300bb8436f8b881eee53f741ab4d606a21634b16e7",
+      "e677ea6a9080646a7dd77d59db68cb3175836b6eb28866660fb19e4beb0fdd69"
+    ],
+    [
+      "24d6b263d2123df89b6202ce1d1bc041715c9c57ff9b14c7147e790e5a32d703",
+      "5dad516c387ba974d1c2429149e2f1fb0a437dcc822fed6816f7add41b40a377"
+    ]
+  ],
+  "protocol": "548e0ed367ed8c07523e31b9e193492977546beefae5460c0fe5f39bef048e97"
+}

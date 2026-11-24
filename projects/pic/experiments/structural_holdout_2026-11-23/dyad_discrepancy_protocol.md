@@ -1,0 +1,7 @@
+# Cross-validated discrepancy on native stability slabs
+
+Use the stored full-record weak window plan, term library, target orientation, proposed frequencies and actual candidate systems for each search. Form the weak matrix once. Reuse the stability implementation's axis layouts, reference width and dyadic slab edges. For each scale on each axis, withhold each slab in turn. Fit the linear coefficients on its complement, predict the omitted weak targets and divide the sum of absolute residuals by the sum of absolute target values on that slab. Average equally over slabs, then scales, then axes. Record unresolved fits or zero target magnitude as infinite discrepancy.
+
+Compare full-record WAPE, two-slab cross-validation and all-scale cross-validation on identical candidates. Rank each with discrepancy alone and again with the same archived coefficient stability objective. Preserve the existing per-law validity gates, Pareto-layer ordering, return limit of six and actual coupled-system combinations. Count complete structure on the first front, among the first six and at rank one. Also compare with the established contiguous holdout pipeline and report fold-fit costs separately from search costs.
+
+Use the existing three screening and twelve confirmation seeds on all 15 systems. Evaluate the identity control separately. The folds hold out weak equations conditional on full-record structure and frequency discovery. Weak windows on opposite sides of a slab boundary may share measurements. This experiment tests structural ranking on the given records.

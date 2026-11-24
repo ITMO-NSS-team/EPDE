@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "stage1_records": 45,
+  "stage1_equation_seed_cases": 60,
+  "stage1_fronts_checked": 1440,
+  "primary_retained": 56,
+  "maximum_dyad_replay_error": 0.0,
+  "stage1_nonfinite": 0,
+  "stage2_records": 20,
+  "stage2_measurements_each": 2560,
+  "stage2_score_replay_error": 1.1641532182693481e-10,
+  "stage2_pair_axis_coverage_checks": 1146,
+  "stage2_measurement_front_checks": 12800,
+  "stage2_nonfinite": 0,
+  "source_input_array_hashes_verified": true,
+  "raw_measurement_replay": true,
+  "constants_and_identity_checks": true,
+  "caveats": [
+    "Reused stage1 records; selected stage2 cases; dependent pair summaries.",
+    "Main fits, validation weights/corrections and geometry fixed in stage2.",
+    "Stage1 clean_fit_energy fields describe historical local baseline fits, not the frozen joint-risk fits."
+  ],
+  "analysis_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\dyad_ablation_2026-11-16\\audit.py": "43c88c38c3ea50c938d9da8a5407e3eea941d4072762ffc3def0045565833cb4",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\dyad_ablation_2026-11-16\\analyze_uncertainty.py": "59be3d2c8a0611d71a733bd6417965a360516f3db1459ae6e43998bbceed9730",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\dyad_ablation_2026-11-16\\summarize.py": "f48d1b64bb02f5ccc7c7c1e3d5ab75b883d2f00f0544ba8c0de8065bea0afe9a"
+  }
+}

@@ -1,0 +1,67 @@
+Fixed-coefficient discrepancy across weak-window widths
+
+One record, 5% noise, seed 0. No refitting, no search rerun; original dyad scores retained.
+Same admissible window widths for all equations in a run; common evaluation centres.
+Clean data and analytical coefficients are diagnostic controls, not ranking inputs.
+
+rational_trace_PW_e30_n5_weak_kf
+  metric: wape; base window: {'j': 1, 'q': (3,), 'ms': (64,), 'ss': (8,), 'cut': (0,), 'shape': (84,)}
+  baseline dominators: 1; dominate on EVERY width + dyad: 1
+  width | reference D | analytical D (noisy) | analytical D (clean) | dominators
+      2 | 3.6364956 | 3.9582584 | 1.4225191e-10 | 4
+      4 | 3.4885329 | 3.7987659 | 1.3509735e-10 | 4
+      8 | 2.3788284 | 2.5914995 | 1.2462599e-10 | 4
+     16 | 0.93142156 | 1.0155616 | 1.0868519e-10 | 5
+     32 | 0.28779558 | 0.31223305 | 8.591556e-11 | 5
+     64 | 0.093613348 | 0.10557062 | 6.6865555e-11 | 1
+  surviving archive_5: du/dx0 = (-0.35236633)*t@0*u + (0.97139984)*u^2 + (-0.33328343)*u^3 + (0.025412388)*t^2@0*u + (0); I=0.20406795
+
+kepler_trace_PI_e30_n5_weak_kf
+  metric: wape; base window: {'j': 1, 'q': (3,), 'ms': (128,), 'ss': (16,), 'cut': (0,), 'shape': (78,)}
+  baseline dominators: 11; dominate on EVERY width + dyad: 10
+  width | reference D | analytical D (noisy) | analytical D (clean) | dominators
+      2 | 0.99764301 | 0.99751038 | 2.3816934e-06 | 13
+      4 | 0.99063 | 0.99012035 | 8.9798614e-08 | 13
+      8 | 0.84107098 | 0.84051122 | 2.4162542e-07 | 12
+     16 | 0.31157037 | 0.31830829 | 1.567859e-06 | 11
+     32 | 0.073673299 | 0.079153311 | 6.2827421e-06 | 10
+     64 | 0.036631082 | 0.045038453 | 1.4354751e-05 | 10
+    128 | 0.051113491 | 0.063419817 | 1.2801717e-05 | 11
+  surviving archive_0: du/dx0 = (0.13163495)*sin~1.233@0*uinv2 + (0.49081046)*cos~1.233@0*uinv2 + (0); I=0.004235109
+  surviving archive_1: du/dx0 = (0.15502843)*u*uinv + (-0.17027227)*u*uinv3 + (0.52603744)*cos~1.233@0*uinv2 + (0); I=0.0026810983
+  surviving archive_3: du/dx0 = (-0.17027227)*uinv2 + (0.15502843)*u^3*uinv3 + (0.52603744)*cos~1.233@0*uinv2 + (0); I=0.0026810983
+  surviving archive_4: du/dx0 = (-0.17027227)*u*uinv3 + (0.15502843)*u^3*uinv3 + (0.52603744)*cos~1.233@0*uinv2 + (0); I=0.0026810983
+  surviving archive_6: du/dx0 = (0.52601623)*cos~1.233@0*uinv2 + (-0.14280775)*uinv2 + (0.11057786)*u + (0); I=0.0049597668
+  surviving archive_8: du/dx0 = (-0.14280775)*u*uinv3 + (0.11057786)*u^3*uinv2 + (0.52601623)*cos~1.233@0*uinv2 + (0); I=0.0049597668
+  surviving archive_9: du/dx0 = (0.11057786)*u + (-0.14280775)*u*uinv3 + (0.52601623)*cos~1.233@0*uinv2 + (0); I=0.0049597668
+  surviving archive_10: du/dx0 = (-0.14280775)*uinv2 + (0.11057786)*u^2*uinv + (0.52601623)*cos~1.233@0*uinv2 + (0); I=0.0049597668
+  surviving archive_13: du/dx0 = (-0.14280775)*u*uinv3 + (0.11057786)*u^2*uinv + (0.52601623)*cos~1.233@0*uinv2 + (0); I=0.0049597668
+  surviving archive_18: du/dx0 = (0.51908696)*cos~1.233@0*uinv2 + (-0.14571864)*u*uinv3 + (-0.016100848)*sin~2.465@0*uinv2 + (0.11242742)*u + (0); I=0.019623467
+
+rational_trace_PK_e30_n5_weak_cap_kf_notrig
+  metric: wape_net_cap; base window: {'j': 1, 'q': (3,), 'ms': (64,), 'ss': (8,), 'cut': (0,), 'shape': (84,)}
+  baseline dominators: 4; dominate on EVERY width + dyad: 4
+  width | reference D | analytical D (noisy) | analytical D (clean) | dominators
+      2 | 3.6364956 | 3.9582584 | 1.4225191e-10 | 8
+      4 | 3.4885329 | 3.7987659 | 1.3509735e-10 | 9
+      8 | 2.3788284 | 2.5914995 | 1.2462599e-10 | 9
+     16 | 0.93142156 | 1.0155616 | 1.0868519e-10 | 9
+     32 | 0.28779558 | 0.31223305 | 8.591556e-11 | 8
+     64 | 0.093613348 | 0.10557062 | 6.6865555e-11 | 4
+  surviving archive_2: d^2u/dx0^2 = (0.29630655)*d^2u/dx0^2*u + (0.13808557)*d^2u/dx0^2*t@0 + (0.2970085)*du/dx0^2 + (0.16248151)*du/dx0 + (0); I=0.14995003
+  surviving archive_3: du/dx0 = (-0.010400724)*u^2 + (0.26357919)*du/dx0*u + (0.15093612)*du/dx0*t@0 + (0.027451646); I=0.1982249
+  surviving archive_5: du/dx0 = (0.33413158)*du/dx0*t@0 + (-0.028760254)*du/dx0*t^2@0 + (-0.011544887)*u^3 + (0.00064919323)*d^2u/dx0^2*u + (0); I=0.22677053
+  surviving archive_7: du/dx0 = (0.33196121)*du/dx0*t@0 + (-0.011481849)*u^3 + (-0.028635938)*du/dx0*t^2@0 + (-0.00010897845)*d^2u/dx0^2*du/dx0^2 + (-5.612307e-08)*d^2u/dx0^2^2 + (0); I=0.26394913
+
+cauchy_trace_FW_e30_n5_weak_proff_kf
+  metric: wape; base window: {'j': 0, 'q': (2,), 'ms': (128,), 'ss': (8,), 'cut': (0,), 'shape': (93,)}
+  baseline dominators: 1; dominate on EVERY width + dyad: 1
+  width | reference D | analytical D (noisy) | analytical D (clean) | dominators
+      2 | 0.99991884 | 0.99991866 | 2.0927803e-10 | 1
+      4 | 1.0004656 | 1.0004606 | 1.0742763e-09 | 1
+      8 | 0.99722663 | 0.99724343 | 1.0063397e-08 | 1
+     16 | 0.94195551 | 0.94192524 | 9.4690915e-08 | 1
+     32 | 0.61671263 | 0.61686384 | 8.2833122e-07 | 1
+     64 | 0.11127355 | 0.11125296 | 6.7019213e-06 | 1
+    128 | 0.022129541 | 0.022375159 | 5.0177827e-05 | 1
+  surviving archive_0: d^2u/dx0^2*sin~80.54@0 = (-69.387576)*cos~80.54@0*du/dx0 + (0); I=0.00077748932

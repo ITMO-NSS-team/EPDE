@@ -1,0 +1,186 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "start": "band_start_0",
+      "exact_objective": -0.7391742265181215,
+      "band_objective": -0.739174226218767,
+      "exact_gradient": [
+        0.11068072433242054,
+        0.03167951921678755,
+        0.006864846975006697,
+        0.056700964046353816
+      ],
+      "band_gradient": [
+        0.1106807243427779,
+        0.03167951918920542,
+        0.006864847074628535,
+        0.05670096304042617
+      ],
+      "projected_gradient": 0.11068072433242049,
+      "finite_difference_gradient": [
+        0.11068072413578099,
+        0.03167951924121226,
+        0.006864846863186002,
+        0.05670096404619684
+      ],
+      "finite_difference_max_error": 1.9663955186377535e-10
+    },
+    {
+      "start": "band_start_1",
+      "exact_objective": -0.7409546273769934,
+      "band_objective": -0.7409546273123782,
+      "exact_gradient": [
+        -0.1262141090585985,
+        -0.008158220597904053,
+        0.12013340599250862,
+        0.08292438915255623
+      ],
+      "band_gradient": [
+        -0.12621411066227095,
+        -0.00815822100965051,
+        0.12013340688782947,
+        0.08292438959882921
+      ],
+      "projected_gradient": 0.12621410905859853,
+      "finite_difference_gradient": [
+        -0.12621410916957565,
+        -0.008158220587972664,
+        0.12013340591199294,
+        0.08292438921086998
+      ],
+      "finite_difference_max_error": 1.1097714414098903e-10
+    },
+    {
+      "start": "band_start_2",
+      "exact_objective": -0.3705594759869175,
+      "band_objective": -0.37058305184490514,
+      "exact_gradient": [
+        -1.0553110991088427e-07,
+        -5.198698370591885e-08,
+        -5.1992970347321184e-14,
+        -5.728628865622721e-18
+      ],
+      "band_gradient": [
+        -0.00010655902794493381,
+        -5.1767450773404775e-08,
+        -5.6243558049268616e-14,
+        1.4142504073065922e-11
+      ],
+      "projected_gradient": 1.0553111007283178e-07,
+      "finite_difference_gradient": [],
+      "finite_difference_max_error": null
+    },
+    {
+      "start": "band_start_3",
+      "exact_objective": -0.8128619825569947,
+      "band_objective": -0.8129035780709621,
+      "exact_gradient": [
+        0.0014704136801532712,
+        0.0007350387168940202,
+        0.00924331603579401,
+        0.00021403890781376353
+      ],
+      "band_gradient": [
+        0.0014527169659963332,
+        0.0007502765452322632,
+        0.00898481339844907,
+        0.00024855305183298413
+      ],
+      "projected_gradient": 0.009243316035794091,
+      "finite_difference_gradient": [
+        0.0014704971906809303,
+        0.0007352079389733034,
+        0.009243396359437384,
+        0.00021403598893243722
+      ],
+      "finite_difference_max_error": 1.6922207928319038e-07
+    },
+    {
+      "start": "old_final",
+      "exact_objective": -0.812898056487886,
+      "band_objective": -0.8128598519149657,
+      "exact_gradient": [
+        8.003527194534163e-08,
+        -1.6043067171261916e-07,
+        3.963554936541338e-09,
+        -3.6013297515097136e-10
+      ],
+      "band_gradient": [
+        -2.7859656026965626e-05,
+        -1.4566247071697014e-05,
+        0.0002494482081958629,
+        -3.270748227608664e-05
+      ],
+      "projected_gradient": 1.6043067141424672e-07,
+      "finite_difference_gradient": [
+        2.0694557179012915e-08,
+        -3.027800232757727e-07,
+        4.609645998243649e-08,
+        -1.539213201340317e-07
+      ],
+      "finite_difference_max_error": 1.5356118715888072e-07
+    },
+    {
+      "start": "repaired",
+      "exact_objective": -0.8747460817079179,
+      "band_objective": -0.8747460839093881,
+      "exact_gradient": [
+        -1.6067586919970136e-08,
+        -1.724931968094534e-09,
+        -9.402114349727273e-09,
+        -3.3052806805284966e-09
+      ],
+      "band_gradient": [
+        -2.180387616326578e-08,
+        2.8495566448127896e-08,
+        -1.744004203703552e-07,
+        4.9043520511987065e-08
+      ],
+      "projected_gradient": 1.606758692762611e-08,
+      "finite_difference_gradient": [
+        -1.6259216195635418e-08,
+        -1.5376588891058416e-09,
+        -1.1624035067825387e-08,
+        -3.2529534621517082e-09
+      ],
+      "finite_difference_max_error": 2.221920718098114e-09
+    }
+  ],
+  "source_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\experiment.py": "506c3f99a97d26d7f3c563e5e6509949892704158803fa73d65957cace9b1638",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\run_case.py": "66bc437f0e68f3e56dc1922d92b73737d7de5775814245bd87e06ae1fae74156",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\protocol.txt": "6a089b3679e67b0c477da1038b39a4f60105063c232d09a82a1da379323958b1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\native_moments_2026-11-16\\native_quadrature.py": "186dd1ef00dfb6b21486620009506c04f4653600eb5aacc07c53a2fed1f98979",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\raw_validation_constants_2026-11-16\\raw_operator.py": "3ff7a7448ce44bf57dd6d95e5b184719aafb8a9c872aaa3fd2e50df1416b1d93",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\operator_weak_2026-11-16\\quadrature.py": "a2893843768078822c6ed455f1408b66caa04a85dfdb9a8859ede6d49eba60d3",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\variance_reduction_2026-11-16\\moments.py": "3b86daee92162275c273b0a4a27a72cf43694e814525fbdfceabc5a54f5c386f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\core15_residual_products_2026-11-16\\run_screen.py": "3cc125b93f59bd7780e6684274409cd4a8338df2e1ec8aac4b79066d6b7ebbb1",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\preprocessing\\weak_form.py": "bac6eeefefafbe1e871d9b15ce18d71b935a724f926e617d8dadc00a28dbcddc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\weak_fitting_2026-11-16\\run_fitting.py": "863f32c79ac615361bce40ef2308023f8b512e8548eacd883b29f32e3c304e2e",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\eiv_fitting_2026-11-16\\estimator.py": "f192a2ef842f205e13d1cf26f72c2be84abd871ebd56e68c079bc7d96461909a",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\epde_bench\\datasets.py": "9afef922c7e8fdb9f19f46ea5ad75b23df5ac8a0b95a780a8c9f1ab157dc3f6c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\study.py": "e304548960abc5db21d84dafbb07419229ce7183b5dad8415919aae0bf72b9c5",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\protocol.txt": "a97e667002b429b101a1d68db47dd22a8a22528145284f9d3b894eb732c658ac",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\joint_moment_regions_2026-11-17\\run_case.py": "8657ddab882bd9f8b99c9f21464237aa6a322b3e87c30db78ebfbbe84c5bca6b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\residual_moment_uncertainty_2026-11-17\\iid_studentization.py": "4c75b0a8376881c9a8252b87f88d475ee4e9b1d52211b9a0d357b75f46fc2356",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\epde\\operators\\common\\survival.py": "085668ceca37526fb94be7d5679ab5f4056d206b6f5404a87d4ea6bc46fad02b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\bridge.py": "8b80ec2ee5950fce5a32d9caa107703364735e6dd46abf22fcb65136fe13a146",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\common.py": "aec82c7f74ebe276c49036d59e44fe9928cf9b0204a5a4e71d0f9b9de997d128",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\time_fit.py": "789f36e416bf6de3dbc4abb36d74c5fba44ace14aad12eed3348674e6d2ee69f",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\local6_fit.py": "e2a712c46ef74a064fd3ddfea324786a284088ae1f70b1e86fb8a1ea6ee676f7",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\correlated_pilot.py": "0291a806d8ee30de08b303b3230ddc9cfd8ba9471c0c8d575624f3774a0af8bc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\state_score.py": "8063c08ff29eeded5b2d7c4dc5c05bdfd3fb941e47d06d7c741818feaf3c387c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\repair_fit.py": "277e7051306cb5d3c715ff0aa9ee6f4fcdf0d8d9ef7a70c0a3f6da4a6c06a07d",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\robust_refit_uncertainty_2026-11-17\\fast_covariance.py": "17f08f8292e60b73d175acfb687a06105e063495dd69d2a46fc510109b4b95fc",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\full_pipeline_fast.py": "ff853a765bf3e981c7ead8840a1241353fab8a51ac960de409fe42efa0e29f7b",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\compressed_time.py": "621a485cc3b7907344341134f05501bdf4a801f42ead31f70bc59360a959943c",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\full_pipeline_uncertainty_2026-11-17\\exact_metric_pair.py": "c8f83db46710c2af648cdb400b2893b18d3d18653daaa9b050903e23c1cacc34",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\research_context.py": "3d9b0567e5737fe9b5381030997c658244648749ec3f5a4cc9a974c811a4bfa6",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\optimizer_mechanism.py": "504ef848c11a69f83ce24e25d40cff5e8ef3d435b993e6a8a272f1129c6faa23"
+  },
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\noise_inputs\\ode_seed52_bootstrap112.json": "99d1609ad1cf08cba311d5315ced0264ec1d9be817eeb6953f21352348048aab",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\identifiability_design_2026-11-17\\repair_characterization\\ode_seed52_bootstrap112.json": "eb0468fa99e6714296899cae9333698625965924e131bbfb8efadf4975e555f7"
+  }
+}

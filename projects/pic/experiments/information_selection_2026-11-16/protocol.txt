@@ -1,0 +1,35 @@
+Training-only feature-information selection, 2026-11-16
+Initial targeted ac/wave/kdv_cossin/ks, seeds0/1/2, 5% noise.
+
+Candidate fitting bank family, fixed before testing:
+  local: previous adaptive continuous weak bank;
+  broad0: broad minimum-smoothness bank from broad_moments;
+  broad1: its q+1 ablation.
+Reuse existing coefficients for both ordinary and corrected least squares.
+No candidate is solved, no feature is added, and no coefficients are tuned
+against clean or held-out observations.
+
+For each candidate and outer training fold, estimate each bank's operator
+noise Gram from the original reconstructed bootstrap ensemble. Bias-correct
+the observed training operator mean as before. Let G be its feature Gram
+and N=(1+1/B) times the sample feature-error Gram. Select the feasible bank
+with the smallest largest generalized eigenvalue of (N,G): minimize the
+worst noise-to-observed-energy feature direction. No SNR threshold is chosen.
+Rank/zero handling uses the existing numerical cutoff. Empty feature sets
+tie and keep the local bank. Break other exact ties in declared bank order.
+
+This criterion is invariant to nonsingular feature rescaling in exact
+arithmetic. It does not include target noise, common reconstruction bias,
+or coefficient-dependent residual covariance; those are explicit limitations.
+Do not interpret a small score as proof of physical identifiability.
+
+The selected bank is candidate-specific for FITTING only. Every candidate
+is scored on the SAME unchanged local held-out bank and frozen spectral
+control. Preserve dyad and registered equivalences. Compare OLS and CLSM
+as separate complete arms; do not select an estimator per system from truth.
+Use clean fields only after all selections to diagnose coefficient accuracy.
+Compare half/full bootstrap noise-Gram selection as a numerical sensitivity.
+
+Record all choices, generalized ratios, infeasibilities, regression results,
+and score-only baselines. A successful targeted test requires broader
+core-15 validation before any promotion; a failed test is retained.

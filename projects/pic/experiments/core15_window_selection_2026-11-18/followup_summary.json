@@ -1,0 +1,129 @@
+{
+  "protocol": "fc63d6b0fa503d0d47eeb9a56dbf4fe499e9cc15e6071174e504c3fa069e9fd8",
+  "systems": {
+    "ac": {
+      "local": {
+        "registered": 8,
+        "extra_front": 4,
+        "add_wins": 19,
+        "focal_term_kept": 8,
+        "genuine_kept": 56,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      },
+      "middle": {
+        "registered": 6,
+        "extra_front": 3,
+        "add_wins": 26,
+        "focal_term_kept": 6,
+        "genuine_kept": 54,
+        "paired_gains": 3,
+        "paired_losses": 5,
+        "paired_ties": 16
+      },
+      "wide": {
+        "registered": 0,
+        "extra_front": 0,
+        "add_wins": 31,
+        "focal_term_kept": 0,
+        "genuine_kept": 48,
+        "paired_gains": 0,
+        "paired_losses": 8,
+        "paired_ties": 16
+      },
+      "shared": {
+        "registered": 8,
+        "extra_front": 4,
+        "add_wins": 19,
+        "focal_term_kept": 8,
+        "genuine_kept": 56,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      },
+      "individual": {
+        "registered": 15,
+        "extra_front": 10,
+        "add_wins": 24,
+        "focal_term_kept": 16,
+        "genuine_kept": 64,
+        "paired_gains": 8,
+        "paired_losses": 1,
+        "paired_ties": 15
+      },
+      "pooled": {
+        "registered": 6,
+        "extra_front": 5,
+        "add_wins": 23,
+        "focal_term_kept": 6,
+        "genuine_kept": 54,
+        "paired_gains": 0,
+        "paired_losses": 2,
+        "paired_ties": 22
+      }
+    },
+    "kdv_cossin": {
+      "local": {
+        "registered": 0,
+        "extra_front": 0,
+        "add_wins": 191,
+        "focal_term_kept": 2,
+        "genuine_kept": 48,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      },
+      "middle": {
+        "registered": 0,
+        "extra_front": 3,
+        "add_wins": 149,
+        "focal_term_kept": 7,
+        "genuine_kept": 55,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      },
+      "wide": {
+        "registered": 1,
+        "extra_front": 3,
+        "add_wins": 57,
+        "focal_term_kept": 3,
+        "genuine_kept": 51,
+        "paired_gains": 1,
+        "paired_losses": 0,
+        "paired_ties": 23
+      },
+      "shared": {
+        "registered": 0,
+        "extra_front": 3,
+        "add_wins": 155,
+        "focal_term_kept": 5,
+        "genuine_kept": 53,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      },
+      "individual": {
+        "registered": 0,
+        "extra_front": 3,
+        "add_wins": 125,
+        "focal_term_kept": 5,
+        "genuine_kept": 53,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      },
+      "pooled": {
+        "registered": 0,
+        "extra_front": 1,
+        "add_wins": 191,
+        "focal_term_kept": 2,
+        "genuine_kept": 50,
+        "paired_gains": 0,
+        "paired_losses": 0,
+        "paired_ties": 24
+      }
+    }
+  }
+}

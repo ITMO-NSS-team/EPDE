@@ -1,0 +1,40 @@
+Can weak held-out discrepancy reject a benchmark-absent term?
+
+Keep target-invariant held-out discrepancy alongside dyad in the experimental ranking. A positive deletion margin that repeats across observations can support retaining a term. On the Allen–Cahn negative controls, a range spanning zero occurred for both absent additions and the physically real but weak diffusion term. Calling those terms removable would also remove real diffusion. No production setting changed.
+
+Default system archive
+
+On six 5%-noise observations per system the corrected local-plus-time discrepancy favored removing an unregistered single addition in 906 of 1,128 pairwise comparisons. Across 188 distinct additions, 88 favored removal on every seed, 93 changed direction, and 7 favored retention on every seed. All seven were on forced KdV. Of 51 genuine single-term contrasts across the 20 equation slots, 49 favored retention on every seed; the exceptions were Allen–Cahn diffusion (0/6) and forced KdV nonlinearity (1/6). These are strict head-to-head score signs on fixed benchmark panels. The unanimously ranked pairs remained unanimous with a scaled 1e−12 numerical tolerance. All 4,662 underlying candidate-fold scores were independently replayed to within 1.1e−15 scaled error. Pairwise dominance and per-support outcomes are in archive_margins.csv and archive_pairs.csv.
+
+Prospective Allen–Cahn controls
+
+For each of six original observations, repeat the entire procedure 128 times on shared noisy fields. Compare the reference against all of its one-term extensions and all three one-term deletions. Freeze each original and recentered repeat range, then test 128 independent 5%-noise fields on the same trajectory. The margin is D(without the tested term) − D(with it), so a positive margin favors retention for both kinds of comparisons.
+
+Term           Benchmark      Fresh wins retaining term     Recentered calls from 6 observations
+u_xx           present                56/128                 6 unresolved
+u³             present               128/128                 6 retain
+u              present               128/128                 6 retain
+constant       absent                  9/128                 6 unresolved
+t              absent                 16/128                 6 unresolved
+t²             absent                 22/128                 6 unresolved
+sin(2t)        absent                 15/128                 6 unresolved
+cos(2t)        absent                 11/128                 6 unresolved
+u²             absent                 13/128                 6 unresolved
+
+Removal of each absent term improved the point score in 106–119 of 128 fields. Across all six observations and six absent additions, the recentered ranges supported deletion in 0/36 comparisons and retention in 0/36. The original ranges made the same directional calls. Each recentered range for an absent term covered 126–128 of the 128 new outcomes; for diffusion the counts were 127–128. Numerical coverage for the two reaction terms was much less stable (51–118 for u³ and 58–122 for u) even though every forecast and new field favored retaining both. These are marginal ranges sharing the same fields. Their coverage counts cannot be pooled as independent trials. A nested candidate can express the same law by assigning its extra coefficient zero. Absence from the benchmark does not imply the smaller support will beat that refitted extension on every measurement. No penalty for an extra term was applied.
+
+Forced KdV confirmation
+
+On 32 fresh forced fields, the eight one-term extensions beat the freely fitted physical support in 243/256 comparisons. Five extensions won in all 32 fields. All eight were worse than the same physical reference supplied with its registered coefficients on all 32 fields. The medians of the field-level coefficient estimates (each a median of the three rotations) were (3.51, 0.0142, −0.234) for nonlinearity, dispersion, and forcing; the physical values are (−6, −1, 1). A retrospective change to broad windows kept 221/256 wins for the additions. The exact-coefficient comparison is a diagnostic available only on this benchmark. It points to the fitted coefficients as a concrete failure mode and shows why awarding repeatable single-trajectory improvements to extra terms can be misleading.
+
+Prospective two-trajectory pilot
+
+On 16 further pairs of independently seeded forced and unforced KdV observations, share the nonlinear and dispersive coefficients across both trajectories and fit forcing on the forced record. Each candidate extra term is free to fit the forced record. Evaluate both single- and two-trajectory fits on the same forced held-out measurements. Adding the unforced record improved the reference discrepancy on 13/16 pairs. The number of comparisons favoring an absent term fell from 116/128 to 86/128. Adding u went from winning 13/16 to 0/16, whereas adding a constant still won 15/16.
+
+The median estimates changed from (3.24, 0.00369, −0.224) to (−4.15, 0.00222, −0.234) for nonlinearity, dispersion and forcing. Equal weighting of the two records therefore improved the nonlinear coefficient but left substantial errors in dispersion and forcing. On the registered support the unforced record supplied a median of 89.5% of the nonlinear column's squared training norm but only 0.041% of the dispersive column's squared norm (14.3% for the time derivative). These fractions describe the training geometry; they are not independent measures of statistical information. The joint test assumed shared intrinsic operators and used only the stored trajectories. A follow-up should change the training measurements' sensitivity to dispersion and known forcing, then check coefficient recovery and spurious additions against the same forced held-out criterion.
+
+Checks and scope
+
+The Allen–Cahn study checked 26,880 bootstrap and prospective fold scores from stored held-out cross-products and independently recovered all coefficient directions. Physical-reference and diffusion-deleted scores replayed the earlier archived bootstrap fields, including whole-field hashes. The original independent full-panel pipeline replayed all ten supports on the first and last fresh field to within 1.1e−15. There was no candidate integration, new evolutionary search, or exclusion of additive constants.
+
+All 864 joint-pilot fold scores were reproduced by projecting the unforced library into each candidate and independently solving a generalized symmetric eigenproblem. The largest absolute score difference was 7.3e−15. The inputs, protocols, numerical checks, per-anchor decisions and outcome tables accompany this report. Forced KdV results are in kdv_confirmation/outcomes.csv and kdv_joint/summary.json.

@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "seed": 4703,
+      "profile": "iid",
+      "raw": {
+        "u": "8152aa13f06cc625e166445f95f82f61ea5466dfe98048a94f7d4879570b3020"
+      },
+      "draws": 160,
+      "matrix_draws": 4
+    },
+    {
+      "seed": 4704,
+      "profile": "iid",
+      "raw": {
+        "u": "796b15d4a79c3eebb06b219c5cc634ad7df98329c1b21b09a97aaa1cea3d8aca"
+      },
+      "draws": 160,
+      "matrix_draws": 4
+    },
+    {
+      "seed": 4703,
+      "profile": "negative",
+      "raw": {
+        "u": "aa63bf1dd404942d4c67d37f8c65c4c95e683afd819bc7a0bbf85e4b30bcc97c"
+      },
+      "draws": 160,
+      "matrix_draws": 4
+    },
+    {
+      "seed": 4704,
+      "profile": "negative",
+      "raw": {
+        "u": "596e534151784fe0103515e48598e224f645f5730cae51af1a9280d3d6bcfab9"
+      },
+      "draws": 160,
+      "matrix_draws": 4
+    },
+    {
+      "seed": 4703,
+      "profile": "positive",
+      "raw": {
+        "u": "6948e30ff4e1a2db5c9b473b916d730aa3eba6fe9f20bc6ed743e161be628459"
+      },
+      "draws": 160,
+      "matrix_draws": 4
+    },
+    {
+      "seed": 4704,
+      "profile": "positive",
+      "raw": {
+        "u": "a194bc60ceb644e500a8fecd454246c054993fb78ecdc3adaea35b762ccfcf8c"
+      },
+      "draws": 160,
+      "matrix_draws": 4
+    }
+  ]
+}

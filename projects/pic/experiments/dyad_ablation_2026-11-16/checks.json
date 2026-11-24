@@ -1,0 +1,8 @@
+{
+  "exact_constant_law_stable": true,
+  "feature_target_units_invariant": true,
+  "axis_transposition_invariant": true,
+  "spatial_drift_detected": true,
+  "drift_score": 0.18191865826180467,
+  "source_sha256": "6688e7e924ca854595e1339de9aa802add36d0a5d513929ee91a33b28a026679"
+}

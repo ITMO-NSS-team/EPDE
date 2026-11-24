@@ -1,0 +1,10 @@
+profile,seed,original_covered,replacement_covered,original_cutoff,replacement_cutoff,original_geometry,replacement_geometry
+iid,54,True,True,5.226543488679537,2.851651540842754,unbounded_certified,unbounded_certified
+iid,55,True,True,4.7425207974928005,3.258702992538972,unbounded_certified,unbounded_certified
+iid,56,True,True,4.549699129405662,2.6979801725415276,unbounded_certified,unbounded_certified
+negative,54,True,True,4.10695167916022,2.7319678945893786,unbounded_certified,unbounded_certified
+negative,55,True,True,4.18034209756226,2.7514296520117405,unbounded_certified,unbounded_certified
+negative,56,True,True,3.7286623374622594,2.687269725358316,unbounded_certified,unbounded_certified
+positive,54,True,True,3.8791274899815864,2.5052410604560276,unbounded_certified,unbounded_certified
+positive,55,True,True,3.6219554597752923,2.790814861456851,unbounded_certified,unbounded_certified
+positive,56,True,True,3.7747282119877354,2.725888737468307,unbounded_certified,unbounded_certified

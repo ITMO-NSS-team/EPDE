@@ -1,0 +1,121 @@
+{
+  "full": {
+    "systems": {
+      "assembled": {
+        "native": 27,
+        "candidate": 29,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 45
+      },
+      "source": {
+        "native": 15,
+        "candidate": 16,
+        "gains": 1,
+        "losses": 0,
+        "pairs": 45
+      },
+      "held": {
+        "native": 19,
+        "candidate": 21,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 45
+      }
+    },
+    "laws": {
+      "generated": {
+        "native": 40,
+        "candidate": 42,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 60
+      },
+      "held": {
+        "native": 32,
+        "candidate": 34,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 60
+      }
+    },
+    "gains": [
+      [
+        "ode",
+        923302
+      ],
+      [
+        "ode",
+        923303
+      ]
+    ],
+    "losses": []
+  },
+  "total": {
+    "systems": {
+      "assembled": {
+        "native": 27,
+        "candidate": 29,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 45
+      },
+      "source": {
+        "native": 15,
+        "candidate": 16,
+        "gains": 1,
+        "losses": 0,
+        "pairs": 45
+      },
+      "held": {
+        "native": 19,
+        "candidate": 21,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 45
+      }
+    },
+    "laws": {
+      "generated": {
+        "native": 40,
+        "candidate": 42,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 60
+      },
+      "held": {
+        "native": 32,
+        "candidate": 34,
+        "gains": 2,
+        "losses": 0,
+        "pairs": 60
+      }
+    },
+    "gains": [
+      [
+        "ode",
+        923302
+      ],
+      [
+        "ode",
+        923303
+      ]
+    ],
+    "losses": []
+  },
+  "work": {
+    "parents": 492,
+    "moved": 485,
+    "admitted_children": 786,
+    "extra_fits": 6518,
+    "weak_columns": 6021,
+    "weak_hits": 31071,
+    "profile_hits": 492
+  },
+  "max_replay_error": 1.6653345369377348e-15,
+  "control_held": {
+    "native": 3,
+    "candidate": 3
+  },
+  "positive_balance": true
+}

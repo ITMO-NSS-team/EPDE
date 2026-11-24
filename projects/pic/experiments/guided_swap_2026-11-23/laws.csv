@@ -1,0 +1,253 @@
+dataset,seed,arm,budget,law,generated,first,first_total,source,held,first_coefficient_error,held_coefficient_error,suitable,right_victim,screened,shortlisted,selected,first_selected,best_useful_rank,mean_useful_draw_probability,held_fate,trace_fate
+ac,923301,native,full,0,1,1376,1376,0,0,1.0007618239291436,,35,12,0,0,0,,,,dominated,dominated
+ac,923301,native,total,0,1,1376,1376,0,0,1.0007618239291436,,35,12,0,0,0,,,,dominated,dominated
+ac,923301,guided_swap,full,0,1,2501,2641,0,0,0.0024609564795859042,,34,34,34,0,0,,,0.0,dominated,dominated
+ac,923301,guided_swap,total,0,1,2501,2641,0,0,0.0024609564795859042,,29,29,29,0,0,,,0.0,dominated,dominated
+ac,923302,native,full,0,1,829,829,0,0,0.00640711379552621,,26,8,0,0,0,,,,dominated,dominated
+ac,923302,native,total,0,1,829,829,0,0,0.00640711379552621,,26,8,0,0,0,,,,dominated,dominated
+ac,923302,guided_swap,full,0,1,266,279,0,0,0.00640711379552621,,43,42,42,42,7,587,6,0.11487436289762,dominated,dominated
+ac,923302,guided_swap,total,0,1,266,279,0,0,0.00640711379552621,,39,38,38,38,5,587,6,0.11481222221524477,dominated,dominated
+ac,923303,native,full,0,1,1020,1020,0,0,0.9853843798175008,,52,20,0,0,0,,,,dominated,dominated
+ac,923303,native,total,0,1,1020,1020,0,0,0.9853843798175008,,52,20,0,0,0,,,,dominated,dominated
+ac,923303,guided_swap,full,0,1,1182,1302,0,0,0.010622043788474266,,35,34,34,0,0,,,0.0,dominated,dominated
+ac,923303,guided_swap,total,0,1,1182,1302,0,0,0.010622043788474266,,23,23,23,0,0,,,0.0,dominated,dominated
+burgers,923301,native,full,0,1,250,250,1,1,0.004378176647866927,0.004378176647866927,11,3,0,0,0,,,,on front,on front
+burgers,923301,native,total,0,1,250,250,1,1,0.004378176647866927,0.004378176647866927,11,3,0,0,0,,,,on front,on front
+burgers,923301,guided_swap,full,0,1,148,155,1,1,0.01170829251677623,0.004378176647866845,22,10,9,8,4,1637,1,0.13440937745718062,on front,on front
+burgers,923301,guided_swap,total,0,1,148,155,1,1,0.01170829251677623,0.004378176647866845,20,9,8,7,4,1637,1,0.13191148134825983,on front,on front
+burgers,923302,native,full,0,1,470,470,0,1,0.006210227797590268,0.003810351023903894,7,1,0,0,0,,,,on front,on front
+burgers,923302,native,total,0,1,470,470,0,1,0.006210227797590268,0.003810351023903894,7,1,0,0,0,,,,on front,on front
+burgers,923302,guided_swap,full,0,1,654,704,1,1,0.006210227797591118,0.003810351023903894,3,0,0,0,0,,,,on front,on front
+burgers,923302,guided_swap,total,0,1,654,704,1,1,0.006210227797591118,0.003810351023903894,3,0,0,0,0,,,,on front,on front
+burgers,923303,native,full,0,1,38,38,1,1,0.006243366109629107,0.004675217991352576,13,6,0,0,1,1122,,,on front,on front
+burgers,923303,native,total,0,1,38,38,1,1,0.006243366109629107,0.004675217991352576,13,6,0,0,1,1122,,,on front,on front
+burgers,923303,guided_swap,full,0,1,38,38,1,1,0.006243366109629107,0.0046752179913526785,24,11,10,7,0,,1,0.10108149339158565,on front,on front
+burgers,923303,guided_swap,total,0,1,38,38,1,1,0.006243366109629107,0.0046752179913526785,23,10,9,6,0,,1,0.09553085365451214,on front,on front
+burgers_inviscid,923301,native,full,0,1,251,251,1,1,0.010951813323130555,0.010951813323130555,10,10,0,0,1,250,,,on front,on front
+burgers_inviscid,923301,native,total,0,1,251,251,1,1,0.010951813323130555,0.010951813323130555,10,10,0,0,1,250,,,on front,on front
+burgers_inviscid,923301,guided_swap,full,0,1,253,270,1,1,0.010951813323130555,0.010951813323130555,28,28,28,28,7,252,1,0.12915457545773218,on front,on front
+burgers_inviscid,923301,guided_swap,total,0,1,253,270,1,1,0.010951813323130555,0.010951813323130555,26,26,26,26,6,252,1,0.1291881954392027,on front,on front
+burgers_inviscid,923302,native,full,0,0,,,0,0,,,4,4,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923302,native,total,0,0,,,0,0,,,4,4,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923302,guided_swap,full,0,0,,,0,0,,,3,3,3,3,0,,1,0.1266535856417993,never scored,shortlisted but not selected
+burgers_inviscid,923302,guided_swap,total,0,0,,,0,0,,,3,3,3,3,0,,1,0.1266535856417993,never scored,shortlisted but not selected
+burgers_inviscid,923303,native,full,0,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923303,native,total,0,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+burgers_inviscid,923303,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+burgers_inviscid,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923301,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923301,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923301,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923301,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923302,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923302,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923302,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923302,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923303,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923303,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923303,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+duffing,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv,923301,native,full,0,1,109,109,1,1,0.0004455460253592542,0.0002832441043044113,11,6,0,0,0,,,,on front,on front
+kdv,923301,native,total,0,1,109,109,1,1,0.0004455460253592542,0.0002832441043044113,11,6,0,0,0,,,,on front,on front
+kdv,923301,guided_swap,full,0,1,1846,1946,1,1,0.0002832441043044113,0.0002832441043044113,14,3,3,3,0,,2,0.1307147175105425,on front,on front
+kdv,923301,guided_swap,total,0,1,1846,1946,1,1,0.0002832441043044113,0.0002832441043044113,13,3,3,3,0,,2,0.1307147175105425,on front,on front
+kdv,923302,native,full,0,1,185,185,0,1,0.0002492562880556903,0.0002492562880556903,17,7,0,0,0,,,,on front,on front
+kdv,923302,native,total,0,1,185,185,0,1,0.0002492562880556903,0.0002492562880556903,17,7,0,0,0,,,,on front,on front
+kdv,923302,guided_swap,full,0,1,75,79,0,1,0.0002492562880556903,0.0002492562880556903,21,8,8,5,1,637,2,0.08295441212883418,on front,on front
+kdv,923302,guided_swap,total,0,1,75,79,0,1,0.0002492562880556903,0.0002492562880556903,20,8,8,5,1,637,2,0.08295441212883418,on front,on front
+kdv,923303,native,full,0,1,876,876,0,1,0.0009271749465640393,0.0009271749465640393,15,6,0,0,0,,,,on front,on front
+kdv,923303,native,total,0,1,876,876,0,1,0.0009271749465640393,0.0009271749465640393,15,6,0,0,0,,,,on front,on front
+kdv,923303,guided_swap,full,0,1,772,848,0,1,0.003474274871500193,0.0009271749465640393,14,0,0,0,0,,,,on front,on front
+kdv,923303,guided_swap,total,0,1,772,848,0,1,0.003474274871500193,0.0009271749465640393,14,0,0,0,0,,,,on front,on front
+kdv_cossin,923301,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923301,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923301,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923301,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923302,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923302,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923302,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923302,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923303,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923303,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923303,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+kdv_cossin,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ks,923301,native,full,0,1,210,210,1,1,0.004958935141601457,0.004958935141601319,22,5,0,0,0,,,,on front,on front
+ks,923301,native,total,0,1,210,210,1,1,0.004958935141601457,0.004958935141601319,22,5,0,0,0,,,,on front,on front
+ks,923301,guided_swap,full,0,1,177,193,1,1,0.0043089329172818465,0.004958935141601319,17,10,10,10,1,1654,1,0.1876725754416401,on front,on front
+ks,923301,guided_swap,total,0,1,177,193,1,1,0.0043089329172818465,0.004958935141601319,17,10,10,10,1,1654,1,0.1876725754416401,on front,on front
+ks,923302,native,full,0,1,93,93,1,1,0.0011804560818659388,0.001180456081866029,11,5,0,0,0,,,,on front,on front
+ks,923302,native,total,0,1,93,93,1,1,0.0011804560818659388,0.001180456081866029,11,5,0,0,0,,,,on front,on front
+ks,923302,guided_swap,full,0,1,320,358,1,1,0.0011804560818659388,0.001180456081866029,24,17,17,17,2,679,1,0.19432059716733077,on front,on front
+ks,923302,guided_swap,total,0,1,320,358,1,1,0.0011804560818659388,0.001180456081866029,24,17,17,17,2,679,1,0.19432059716733077,on front,on front
+ks,923303,native,full,0,1,110,110,1,1,0.001110719741356295,0.0011532911246782177,11,5,0,0,1,1279,,,on front,on front
+ks,923303,native,total,0,1,110,110,1,1,0.001110719741356295,0.0011532911246782177,11,5,0,0,1,1279,,,on front,on front
+ks,923303,guided_swap,full,0,1,165,177,1,1,0.001110719741356295,0.0011532911246782177,12,11,11,11,2,1100,1,0.21158228178195115,on front,on front
+ks,923303,guided_swap,total,0,1,165,177,1,1,0.001110719741356295,0.0011532911246782177,11,10,10,10,2,1100,1,0.2083473575945852,on front,on front
+lorenz,923301,native,full,0,1,710,710,1,1,0.006436552675262137,0.006436552675262137,0,0,0,0,0,,,,on front,on front
+lorenz,923301,native,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923301,native,full,2,1,1957,1957,1,1,0.003411488456956828,0.003411488456956828,1,1,0,0,0,,,,on front,on front
+lorenz,923301,native,total,0,1,710,710,1,1,0.006436552675262137,0.006436552675262137,0,0,0,0,0,,,,on front,on front
+lorenz,923301,native,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923301,native,total,2,1,1957,1957,1,1,0.003411488456956828,0.003411488456956828,1,1,0,0,0,,,,on front,on front
+lorenz,923301,guided_swap,full,0,1,1181,1242,1,1,0.006436552675263017,0.006436552675263017,0,0,0,0,0,,,,on front,on front
+lorenz,923301,guided_swap,full,1,1,2002,2105,0,0,0.006853567045500558,,3,3,3,3,0,,1,0.12681602063563538,dominated,dominated
+lorenz,923301,guided_swap,full,2,1,270,282,1,1,0.003411488456956828,0.003411488456956828,1,0,0,0,0,,,,on front,on front
+lorenz,923301,guided_swap,total,0,1,1181,1242,1,1,0.006436552675263017,0.006436552675263017,0,0,0,0,0,,,,on front,on front
+lorenz,923301,guided_swap,total,1,1,2002,2105,0,0,0.006853567045500558,,3,3,3,3,0,,1,0.12681602063563538,dominated,dominated
+lorenz,923301,guided_swap,total,2,1,270,282,1,1,0.003411488456956828,0.003411488456956828,1,0,0,0,0,,,,on front,on front
+lorenz,923302,native,full,0,1,2328,2328,1,1,0.006582809203658006,0.006582809203658006,0,0,0,0,0,,,,on front,on front
+lorenz,923302,native,full,1,0,,,0,0,,,2,2,0,0,0,,,,never scored,ordinary draw did not complete
+lorenz,923302,native,full,2,1,568,568,1,1,0.0029596210546713824,0.0029596210546713824,1,0,0,0,0,,,,on front,on front
+lorenz,923302,native,total,0,1,2328,2328,1,1,0.006582809203658006,0.006582809203658006,0,0,0,0,0,,,,on front,on front
+lorenz,923302,native,total,1,0,,,0,0,,,2,2,0,0,0,,,,never scored,ordinary draw did not complete
+lorenz,923302,native,total,2,1,568,568,1,1,0.0029596210546713824,0.0029596210546713824,1,0,0,0,0,,,,on front,on front
+lorenz,923302,guided_swap,full,0,1,2336,2453,1,1,0.006582809203658006,0.006582809203658006,0,0,0,0,0,,,,on front,on front
+lorenz,923302,guided_swap,full,1,1,1822,1921,0,1,0.004733044839396512,0.004733044839396512,0,0,0,0,0,,,,on front,on front
+lorenz,923302,guided_swap,full,2,1,818,855,1,1,0.0029596210546713824,0.0029596210546713824,1,1,1,1,0,,1,0.1509053652256,on front,on front
+lorenz,923302,guided_swap,total,0,1,2336,2453,1,1,0.006582809203658006,0.006582809203658006,0,0,0,0,0,,,,on front,on front
+lorenz,923302,guided_swap,total,1,1,1822,1921,0,1,0.004733044839396512,0.004733044839396512,0,0,0,0,0,,,,on front,on front
+lorenz,923302,guided_swap,total,2,1,818,855,1,1,0.0029596210546713824,0.0029596210546713824,1,1,1,1,0,,1,0.1509053652256,on front,on front
+lorenz,923303,native,full,0,1,252,252,1,1,0.015299871654822817,0.015299871654822817,5,1,0,0,0,,,,on front,on front
+lorenz,923303,native,full,1,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+lorenz,923303,native,full,2,1,234,234,1,1,0.006845998708126873,0.006845998708126873,1,1,0,0,0,,,,on front,on front
+lorenz,923303,native,total,0,1,252,252,1,1,0.015299871654822817,0.015299871654822817,5,1,0,0,0,,,,on front,on front
+lorenz,923303,native,total,1,0,,,0,0,,,1,1,0,0,0,,,,never scored,ordinary draw did not complete
+lorenz,923303,native,total,2,1,234,234,1,1,0.006845998708126873,0.006845998708126873,1,1,0,0,0,,,,on front,on front
+lorenz,923303,guided_swap,full,0,1,252,252,1,1,0.015299871654822817,0.015299871654822817,5,3,3,3,0,,1,0.15934849777853075,on front,on front
+lorenz,923303,guided_swap,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923303,guided_swap,full,2,1,234,234,1,1,0.006845998708126873,0.006845998708126873,3,2,2,2,0,,1,0.14864438351889767,on front,on front
+lorenz,923303,guided_swap,total,0,1,252,252,1,1,0.015299871654822817,0.015299871654822817,5,3,3,3,0,,1,0.15934849777853075,on front,on front
+lorenz,923303,guided_swap,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+lorenz,923303,guided_swap,total,2,1,234,234,1,1,0.006845998708126873,0.006845998708126873,3,2,2,2,0,,1,0.14864438351889767,on front,on front
+lv,923301,native,full,0,1,207,207,1,1,0.007401626538383277,0.007401626538383277,1,0,0,0,0,,,,on front,on front
+lv,923301,native,full,1,1,377,377,1,1,0.008104696446479633,0.008104696446479633,6,5,0,0,0,,,,on front,on front
+lv,923301,native,total,0,1,207,207,1,1,0.007401626538383277,0.007401626538383277,1,0,0,0,0,,,,on front,on front
+lv,923301,native,total,1,1,377,377,1,1,0.008104696446479633,0.008104696446479633,6,5,0,0,0,,,,on front,on front
+lv,923301,guided_swap,full,0,1,287,301,1,1,0.007401626538383277,0.007401626538383277,3,2,2,2,1,1447,1,0.14665944441217427,on front,on front
+lv,923301,guided_swap,full,1,1,248,262,1,1,0.008104696446479633,0.008104696446479633,4,1,1,1,0,,1,0.1366826069711134,on front,on front
+lv,923301,guided_swap,total,0,1,287,301,1,1,0.007401626538383277,0.007401626538383277,3,2,2,2,1,1447,1,0.14665944441217427,on front,on front
+lv,923301,guided_swap,total,1,1,248,262,1,1,0.008104696446479633,0.008104696446479633,4,1,1,1,0,,1,0.1366826069711134,on front,on front
+lv,923302,native,full,0,1,265,265,1,1,0.023282953436192914,0.023282953436192914,1,0,0,0,0,,,,on front,on front
+lv,923302,native,full,1,1,156,156,1,1,0.007526590181910745,0.007526590181910745,7,7,0,0,0,,,,on front,on front
+lv,923302,native,total,0,1,265,265,1,1,0.023282953436192914,0.023282953436192914,1,0,0,0,0,,,,on front,on front
+lv,923302,native,total,1,1,156,156,1,1,0.007526590181910745,0.007526590181910745,7,7,0,0,0,,,,on front,on front
+lv,923302,guided_swap,full,0,1,624,683,1,1,0.023282953436192914,0.023282953436192914,5,2,2,2,1,2025,1,0.1438889628518666,on front,on front
+lv,923302,guided_swap,full,1,1,109,111,1,1,0.007526590181910745,0.007526590181910745,1,0,0,0,0,,,,on front,on front
+lv,923302,guided_swap,total,0,1,624,683,1,1,0.023282953436192914,0.023282953436192914,5,2,2,2,1,2025,1,0.1438889628518666,on front,on front
+lv,923302,guided_swap,total,1,1,109,111,1,1,0.007526590181910745,0.007526590181910745,1,0,0,0,0,,,,on front,on front
+lv,923303,native,full,0,1,143,143,0,1,0.00811720646369323,0.00811720646369323,2,1,0,0,0,,,,on front,on front
+lv,923303,native,full,1,1,251,251,1,1,0.025727247741360496,0.02572724774136058,10,4,0,0,0,,,,on front,on front
+lv,923303,native,total,0,1,143,143,0,1,0.00811720646369323,0.00811720646369323,2,1,0,0,0,,,,on front,on front
+lv,923303,native,total,1,1,251,251,1,1,0.025727247741360496,0.02572724774136058,10,4,0,0,0,,,,on front,on front
+lv,923303,guided_swap,full,0,1,141,147,0,1,0.00811720646369323,0.00811720646369323,3,3,3,3,0,,1,0.15013026488952658,on front,on front
+lv,923303,guided_swap,full,1,1,241,255,1,1,0.025727247741360496,0.02572724774136058,8,4,4,3,0,,1,0.1437431420242783,on front,on front
+lv,923303,guided_swap,total,0,1,141,147,0,1,0.00811720646369323,0.00811720646369323,2,2,2,2,0,,1,0.14912483552573896,on front,on front
+lv,923303,guided_swap,total,1,1,241,255,1,1,0.025727247741360496,0.02572724774136058,8,4,4,3,0,,1,0.1437431420242783,on front,on front
+ns,923301,native,full,0,1,2219,2219,1,1,0.0006238382945580817,0.0006238382945580817,3,1,0,0,0,,,,on front,on front
+ns,923301,native,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923301,native,full,2,1,758,758,1,1,4.4667194250003206e-05,4.4667194250003206e-05,7,6,0,0,0,,,,on front,on front
+ns,923301,native,total,0,1,2219,2219,1,1,0.0006238382945580817,0.0006238382945580817,3,1,0,0,0,,,,on front,on front
+ns,923301,native,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923301,native,total,2,1,758,758,1,1,4.4667194250003206e-05,4.4667194250003206e-05,7,6,0,0,0,,,,on front,on front
+ns,923301,guided_swap,full,0,0,,,0,0,,,9,7,7,6,0,,1,0.11757041697183689,never scored,shortlisted but not selected
+ns,923301,guided_swap,full,1,1,2524,2718,1,1,,,0,0,0,0,0,,,,on front,on front
+ns,923301,guided_swap,full,2,1,921,1004,1,1,0.00020946946577715675,0.00020946946577715675,0,0,0,0,0,,,,on front,on front
+ns,923301,guided_swap,total,0,0,,,0,0,,,8,6,6,5,0,,1,0.11531715119825593,never scored,shortlisted but not selected
+ns,923301,guided_swap,total,1,1,2524,2718,1,1,,,0,0,0,0,0,,,,on front,on front
+ns,923301,guided_swap,total,2,1,921,1004,1,1,0.00020946946577715675,0.00020946946577715675,0,0,0,0,0,,,,on front,on front
+ns,923302,native,full,0,0,,,0,0,,,1,0,0,0,0,,,,never scored,wrong outgoing term
+ns,923302,native,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923302,native,full,2,1,1493,1493,1,1,0.0017887209772364798,0.0017887209772364798,2,1,0,0,0,,,,on front,on front
+ns,923302,native,total,0,0,,,0,0,,,1,0,0,0,0,,,,never scored,wrong outgoing term
+ns,923302,native,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923302,native,total,2,1,1493,1493,1,1,0.0017887209772364798,0.0017887209772364798,2,1,0,0,0,,,,on front,on front
+ns,923302,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923302,guided_swap,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923302,guided_swap,full,2,1,1036,1118,1,1,0.0017887209772364798,0.0017887209772364798,6,6,6,6,1,1966,1,0.15801180797304606,on front,on front
+ns,923302,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923302,guided_swap,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923302,guided_swap,total,2,1,1036,1118,1,1,0.0017887209772364798,0.0017887209772364798,6,6,6,6,1,1966,1,0.15801180797304606,on front,on front
+ns,923303,native,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,native,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,native,full,2,1,1058,1058,1,1,0.0006192764197054945,0.0006192764197054945,0,0,0,0,0,,,,on front,on front
+ns,923303,native,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,native,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,native,total,2,1,1058,1058,1,1,0.0006192764197054945,0.0006192764197054945,0,0,0,0,0,,,,on front,on front
+ns,923303,guided_swap,full,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,full,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,full,2,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,total,1,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ns,923303,guided_swap,total,2,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+ode,923301,native,full,0,0,,,0,0,,,38,11,0,0,0,,,,never scored,ordinary draw did not complete
+ode,923301,native,total,0,0,,,0,0,,,38,11,0,0,0,,,,never scored,ordinary draw did not complete
+ode,923301,guided_swap,full,0,0,,,0,0,,,43,27,27,0,0,,,0.0,never scored,replacement outside shortlist
+ode,923301,guided_swap,total,0,0,,,0,0,,,40,26,26,0,0,,,0.0,never scored,replacement outside shortlist
+ode,923302,native,full,0,0,,,0,0,,,50,20,0,0,0,,,,never scored,ordinary draw did not complete
+ode,923302,native,total,0,0,,,0,0,,,50,20,0,0,0,,,,never scored,ordinary draw did not complete
+ode,923302,guided_swap,full,0,0,,,0,0,,,55,44,44,0,0,,,0.0,never scored,replacement outside shortlist
+ode,923302,guided_swap,total,0,0,,,0,0,,,51,41,41,0,0,,,0.0,never scored,replacement outside shortlist
+ode,923303,native,full,0,0,,,0,0,,,24,4,0,0,0,,,,never scored,ordinary draw did not complete
+ode,923303,native,total,0,0,,,0,0,,,24,4,0,0,0,,,,never scored,ordinary draw did not complete
+ode,923303,guided_swap,full,0,0,,,0,0,,,47,39,39,0,0,,,0.0,never scored,replacement outside shortlist
+ode,923303,guided_swap,total,0,0,,,0,0,,,39,31,31,0,0,,,0.0,never scored,replacement outside shortlist
+pde_compound,923301,native,full,0,1,123,123,1,0,0.00364139790570118,,8,5,0,0,0,,,,dominated,dominated
+pde_compound,923301,native,total,0,1,123,123,1,0,0.00364139790570118,,8,5,0,0,0,,,,dominated,dominated
+pde_compound,923301,guided_swap,full,0,1,52,54,1,0,0.00364139790570118,,5,1,1,1,0,,1,0.14083381789102262,dominated,dominated
+pde_compound,923301,guided_swap,total,0,1,52,54,1,0,0.00364139790570118,,5,1,1,1,0,,1,0.14083381789102262,dominated,dominated
+pde_compound,923302,native,full,0,1,289,289,1,1,0.007510372824621635,0.007510372824621635,5,1,0,0,0,,,,on front,on front
+pde_compound,923302,native,total,0,1,289,289,1,1,0.007510372824621635,0.007510372824621635,5,1,0,0,0,,,,on front,on front
+pde_compound,923302,guided_swap,full,0,1,161,181,1,1,0.007510372824621635,0.007510372824621635,16,9,9,9,1,2117,1,0.14184777226675535,on front,on front
+pde_compound,923302,guided_swap,total,0,1,161,181,1,1,0.007510372824621635,0.007510372824621635,15,9,9,9,1,2117,1,0.14184777226675535,on front,on front
+pde_compound,923303,native,full,0,0,,,0,0,,,2,0,0,0,0,,,,never scored,wrong outgoing term
+pde_compound,923303,native,total,0,0,,,0,0,,,2,0,0,0,0,,,,never scored,wrong outgoing term
+pde_compound,923303,guided_swap,full,0,0,,,0,0,,,1,0,0,0,0,,,,never scored,wrong outgoing term
+pde_compound,923303,guided_swap,total,0,0,,,0,0,,,0,0,0,0,0,,,,never scored,no suitable swap parent
+pde_divide,923301,native,full,0,1,1338,1338,1,1,0.0015174092738422212,0.0015174092738422212,3,1,0,0,0,,,,on front,on front
+pde_divide,923301,native,total,0,1,1338,1338,1,1,0.0015174092738422212,0.0015174092738422212,3,1,0,0,0,,,,on front,on front
+pde_divide,923301,guided_swap,full,0,1,186,206,1,1,0.0015174092738422212,0.0015174092738422212,9,4,4,4,0,,1,0.13611590894470488,on front,on front
+pde_divide,923301,guided_swap,total,0,1,186,206,1,1,0.0015174092738422212,0.0015174092738422212,8,3,3,3,0,,1,0.1344352974021873,on front,on front
+pde_divide,923302,native,full,0,1,689,689,1,1,0.0020564168800976533,0.0020564168800976533,2,1,0,0,0,,,,on front,on front
+pde_divide,923302,native,total,0,1,689,689,1,1,0.0020564168800976533,0.0020564168800976533,2,1,0,0,0,,,,on front,on front
+pde_divide,923302,guided_swap,full,0,1,261,290,1,1,0.0020564168800976533,0.0020564168800976533,8,5,5,5,1,957,1,0.1356184947471249,on front,on front
+pde_divide,923302,guided_swap,total,0,1,261,290,1,1,0.0020564168800976533,0.0020564168800976533,8,5,5,5,1,957,1,0.1356184947471249,on front,on front
+pde_divide,923303,native,full,0,1,1149,1149,1,1,0.008608597917758247,0.008608597917758247,5,1,0,0,0,,,,on front,on front
+pde_divide,923303,native,total,0,1,1149,1149,1,1,0.008608597917758247,0.008608597917758247,5,1,0,0,0,,,,on front,on front
+pde_divide,923303,guided_swap,full,0,0,,,0,0,,,2,1,1,1,0,,1,0.14419886716841424,never scored,shortlisted but not selected
+pde_divide,923303,guided_swap,total,0,0,,,0,0,,,2,1,1,1,0,,1,0.14419886716841424,never scored,shortlisted but not selected
+vdp,923301,native,full,0,1,659,659,0,1,0.03816684461505368,0.03816684461505368,28,7,0,0,0,,,,on front,on front
+vdp,923301,native,total,0,1,659,659,0,1,0.03816684461505368,0.03816684461505368,28,7,0,0,0,,,,on front,on front
+vdp,923301,guided_swap,full,0,1,1029,1093,0,1,0.03816684461505368,0.03816684461505368,30,19,19,15,1,1052,1,0.11876075640627373,on front,on front
+vdp,923301,guided_swap,total,0,1,1029,1093,0,1,0.03816684461505368,0.03816684461505368,29,18,18,14,1,1052,1,0.1171973755068426,on front,on front
+vdp,923302,native,full,0,1,396,396,1,1,0.01099878832911304,0.010998788329113286,30,8,0,0,0,,,,on front,on front
+vdp,923302,native,total,0,1,396,396,1,1,0.01099878832911304,0.010998788329113286,30,8,0,0,0,,,,on front,on front
+vdp,923302,guided_swap,full,0,1,489,541,0,1,0.01099878832911304,0.010998788329113367,25,17,17,16,4,504,1,0.20096995502581882,on front,on front
+vdp,923302,guided_swap,total,0,1,489,541,0,1,0.01099878832911304,0.010998788329113367,22,15,15,15,4,504,1,0.21479888535124908,on front,on front
+vdp,923303,native,full,0,1,1082,1082,0,0,0.1771827248476292,,44,20,0,0,1,1081,,,dominated,dominated
+vdp,923303,native,total,0,1,1082,1082,0,0,0.1771827248476292,,44,20,0,0,1,1081,,,dominated,dominated
+vdp,923303,guided_swap,full,0,1,165,177,0,0,0.17718272484762937,,42,33,33,5,0,,1,0.03540121980863233,dominated,dominated
+vdp,923303,guided_swap,total,0,1,165,177,0,0,0.17718272484762937,,41,32,32,5,0,,1,0.036507507927652096,dominated,dominated
+wave,923301,native,full,0,1,2354,2354,0,0,0.2253162956631992,,0,0,0,0,0,,,,outside held WAPE cutoff,outside held WAPE cutoff
+wave,923301,native,total,0,1,2354,2354,0,0,0.2253162956631992,,0,0,0,0,0,,,,outside held WAPE cutoff,outside held WAPE cutoff
+wave,923301,guided_swap,full,0,0,,,0,0,,,61,61,61,2,0,,7,0.0028306810909320373,never scored,shortlisted but not selected
+wave,923301,guided_swap,total,0,0,,,0,0,,,60,60,60,2,0,,7,0.0028778591091142376,never scored,shortlisted but not selected
+wave,923302,native,full,0,1,1260,1260,0,0,0.6046588059373101,,63,60,0,0,6,1259,,,dominated,dominated
+wave,923302,native,total,0,1,1260,1260,0,0,0.6046588059373101,,63,60,0,0,6,1259,,,dominated,dominated
+wave,923302,guided_swap,full,0,0,,,0,0,,,78,78,78,0,0,,,0.0,never scored,replacement outside shortlist
+wave,923302,guided_swap,total,0,0,,,0,0,,,74,74,74,0,0,,,0.0,never scored,replacement outside shortlist
+wave,923303,native,full,0,1,50,50,0,0,0.9860440606613743,,57,56,0,0,5,49,,,dominated,dominated
+wave,923303,native,total,0,1,50,50,0,0,0.9860440606613743,,57,56,0,0,5,49,,,dominated,dominated
+wave,923303,guided_swap,full,0,1,1942,2101,0,0,0.9860440606613743,,66,66,66,0,0,,,0.0,dominated,dominated
+wave,923303,guided_swap,total,0,1,1942,2101,0,0,0.9860440606613743,,59,59,59,0,0,,,0.0,dominated,dominated
+ode_simple,923301,native,full,0,1,159,159,1,1,0.018117903642892674,0.018117903642892674,38,36,0,0,1,1915,,,on front,on front
+ode_simple,923301,native,total,0,1,159,159,1,1,0.018117903642892674,0.018117903642892674,38,36,0,0,1,1915,,,on front,on front
+ode_simple,923301,guided_swap,full,0,1,67,74,1,1,0.018117903642892674,0.018117903642892674,55,55,55,55,14,719,1,0.17441699861475005,on front,on front
+ode_simple,923301,guided_swap,total,0,1,67,74,1,1,0.018117903642892674,0.018117903642892674,51,51,51,51,13,719,1,0.17454647355106495,on front,on front
+ode_simple,923302,native,full,0,1,348,348,1,1,0.018241623327382328,0.018241623327382328,20,20,0,0,1,2472,,,on front,on front
+ode_simple,923302,native,total,0,1,348,348,1,1,0.018241623327382328,0.018241623327382328,20,20,0,0,1,2472,,,on front,on front
+ode_simple,923302,guided_swap,full,0,1,386,441,1,1,0.018241623327382328,0.018241623327382328,35,35,35,35,5,445,1,0.1780078974859591,on front,on front
+ode_simple,923302,guided_swap,total,0,1,386,441,1,1,0.018241623327382328,0.018241623327382328,31,31,31,31,4,445,1,0.1779383122034757,on front,on front
+ode_simple,923303,native,full,0,1,333,333,1,1,0.028527933627614743,0.028527933627614743,13,12,0,0,4,753,,,on front,on front
+ode_simple,923303,native,total,0,1,333,333,1,1,0.028527933627614743,0.028527933627614743,13,12,0,0,4,753,,,on front,on front
+ode_simple,923303,guided_swap,full,0,1,1084,1171,1,1,0.028527933627614743,0.028527933627614743,15,15,15,15,4,1083,1,0.18045206129559943,on front,on front
+ode_simple,923303,guided_swap,total,0,1,1084,1171,1,1,0.028527933627614743,0.028527933627614743,14,14,14,14,4,1083,1,0.18063572241945192,on front,on front

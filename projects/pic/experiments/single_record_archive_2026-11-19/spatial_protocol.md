@@ -1,0 +1,3 @@
+# Wave spatial holdout
+
+After evaluating both temporal directions, repeat the six wave seeds with left and right spatial halves. Keep every time observation in the discovery and validation rectangles and omit the center spatial column. Use the same raw noisy fields and search seeds as in the temporal comparison. Reuse the WAPE–dyad objectives, both frozen-fit validation scores, candidate sources, window-selection rule and exact-support endpoint. Use the native discovery window on the held-out half with no post hoc widening. Tabulate each spatial direction separately. These are additional discovery runs on an alternative partition of the six benchmark fields.

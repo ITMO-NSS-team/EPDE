@@ -1,0 +1,4 @@
+system,seed,outer_seed,training,candidate,strategy,status,iterations
+kdv_cossin,6,9,1,e0:reference,local_irls,nonconverged,100
+kdv_cossin,8,11,1,e0:reference,local_irls,nonconverged,100
+wave,7,10,0,e0:equivalent_3,local_irls,nonconverged,100

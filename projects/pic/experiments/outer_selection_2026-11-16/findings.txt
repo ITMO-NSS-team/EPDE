@@ -1,0 +1,211 @@
+Outer measurement validation and coefficient sensitivity, 2026-11-16
+
+Automatic local/broad selection fails the new-seed test. It improves forced
+KdV relative to fixed mixed fitting, but worsens AC, wave and KS in all
+three records each. The selected KS fit has median frozen clean residual
+energy 0.510217 versus 4.71233e-5 for fixed mixed fitting. The independent
+outer score can barely distinguish seriously inaccurate KS fits, and a
+clean broad score also misranks one observed comparison. A new noise split
+alone cannot repair the score's inadequate sensitivity to the desired
+equation accuracy. Do not promote this selector.
+
+Forced KdV has a separate fitting problem: conditional uncertainty is much
+smaller than the actual dispersion/forcing coefficient errors, and the
+pilot already has inaccurate coefficients. Conditional bootstrap drift is
+consistent with an errors-in-variables bias left by covariance-reweighted
+least squares. This motivates a controlled correction of the fitting normal
+equations, rather than more tuning of the broad validation selector.
+
+Study design
+
+Twelve runs on AC, forced KdV, wave and KS. Training and inner selection use
+fresh 5% Gaussian noise seeds 6/7/8; paired independent outer measurement
+records use 9/10/11. These are independent noise realizations on the SAME
+four clean benchmark fields, not independent trajectories. Three rotated
+interleaved groups per record: one fits, the other two supply signed inner
+cross residuals. Outer evaluation uses the corresponding two groups from
+the independent noise record. Folds overlap and are not independent samples.
+
+Known equation supports only: 12 reference/seed cases, 24 registered-
+equation/seed cases including four wave equivalents. No 15-system rerun,
+structural discovery count or candidate equation solve is claimed.
+
+Geometries are unchanged from native_moments seed 3, which froze them from
+historical geometry and coordinates. Native local, broad and stacked mixed
+fits use corrected OLS and the unchanged 512-draw residual-covariance IRLS.
+The two selection rules choose ONLY between local and broad IRLS:
+  Primary: native broad whitened signed inner cross residual.
+  Comparator: prior interpolated broad whitened signed inner cross residual.
+Mixed and OLS fits are fixed controls, not extra choices. Ties choose local;
+if only one fit converges, selection is explicitly forced. Weights are
+training-only and common to all fitted equations. No refit after selection.
+
+For each run, coefficients, weight diagnostics and inner decisions were saved
+and hashed BEFORE generating its outer record. Clean spectral scoring and exact
+coefficient errors were calculated only after these decisions. The frozen
+JSON files contain no outer or clean evaluation fields. The completion audit
+replays every choice and verifies that outer evaluation changes no fit.
+Serialization detail relative to the protocol: full weight matrices remain
+fixed in memory; the frozen JSON stores their covariance/rank diagnostics,
+not the matrices themselves. They are never re-estimated on outer data.
+Raw operator corrections use each measurement group's own estimated noise,
+while fitting/selection never use the outer record's noise estimates.
+
+Accuracy on the fixed clean spectral evaluation bank
+
+Entries are medians across three records of three-fold mean residual energy.
+Lower is better; this is not coefficient error or solved-trajectory error.
+All comparisons below are paired on the NEW seeds, without mixing in an
+old-seed baseline.
+
+System       Fixed local    Fixed broad    Fixed mixed    Select native
+AC           2.824138e-4     2.881079e-4     1.464063e-4    2.868730e-4
+Forced KdV   incomplete     7.749500e-2     1.099909e-1    7.749500e-2
+Wave         2.099175e-1     7.305671e-3     8.544356e-3    1.221407e-2
+KS           8.922011e-5     1.743717        4.712332e-5    5.102166e-1
+
+The interpolated-score selector has identical AC, forced-KdV and KS results;
+its wave median is 1.096429e-2. Native selection versus fixed mixed improves
+all three forced-KdV records and worsens all nine other records. Native
+selection versus fixed broad improves AC seed 6 slightly, matches AC seeds
+7/8 and every forced-KdV case, worsens wave seed 7 by 7.08 times, matches
+wave seeds 6/8, and improves all KS records while retaining two large errors.
+
+Forced-KdV local IRLS converges in 7/9 folds, leaving only one complete
+three-fold record; no three-record median is computed. All selection rules
+and fixed broad/mixed reference fits produce complete cases.
+
+Independent outer evaluation and why it does not rescue selection
+
+The primary selector chooses the more accurate available fit by frozen
+clean energy in 25/36 reference folds, including two forced choices. The
+comparator succeeds in 26/36. These fold counts are descriptive, not 36
+independent tests. The independent outer score agrees with the chosen bank
+in 24/36 and 25/36 respectively. All signed cross scores, including negative
+ones, are retained. With three outer records per system this is a limited
+reliability test, not a precise estimate of selector performance.
+
+The KS failure is concrete. On seed 7, training fold 0:
+  Local: coefficients (-0.99970, -0.99742, -0.99764), energy 3.13975e-5.
+  Broad: coefficients (-0.99776, -0.98029, -0.58529), energy 3.48943.
+  Exact coefficients: (-1, -1, -1).
+The independent native outer scores are -6.27539e-6 and -6.25653e-6. Their
+difference is only 1.89e-8 despite a greater than 100,000-fold difference in
+the frozen clean residual energy. These scores use a different metric and
+normalization, so their absolute scale cannot be compared directly with
+spectral residual energy; their near equality is the relevant observation.
+
+There is also deterministic metric mismatch. For KS seed 6, fold 2, the
+clean native broad score prefers the broad fit (8.13439e-7) to local
+(1.08638e-5), while frozen clean energy prefers local (3.14954e-5) over
+broad (1.96996e-2). Thus noise reduction alone does not make the current
+broad metric agree with the accuracy target. Broad-only weighting is too
+insensitive to some coefficient directions in these data.
+
+Wave shows large common fluctuations in absolute cross scores: the primary
+selector's record scores are inner (-3.17288, 1.83855, -1.29801) versus
+outer (6.81147, 3.88486, -5.48959), while its clean native validation scores
+are (0.007442, 0.057126, 0.013169). Shared fluctuations can cancel in paired
+fit comparisons, so absolute score variation alone does not establish how
+uncertain a particular ranking is. The wrong choices and outer comparisons
+are reported directly in decisions.csv and per_case.csv.
+
+Forced-KdV coefficient sensitivity
+
+Coefficient order is u*u_x, u_xxx, cos(t)*sin(x); exact values (-6,-1,1).
+Coordinate-wise medians over the nine broad reference fits:
+  Observed broad IRLS:       (-0.492258, -0.450943, 0.373867)
+  Noiseless pilot IRLS:      (-1.046829, -0.493602, 0.432136)
+  Clean native OLS control:  (-6.016944, -1.000271, 1.000190)
+These medians are diagnostics, not an averaged fitted equation.
+
+Linearized conditional standard deviations for broad IRLS have coordinate
+medians (2.84245, 0.055745, 0.067350). Median signed actual errors in units
+of each fit's own conditional SD are (1.856, 9.849, -9.297). Dispersion and
+forcing errors exceed three such SDs in every broad reference fold. These
+conditional SDs hold the pilot, noise model and weights fixed; they are
+not calibrated unconditional confidence intervals. They demonstrate that
+the current conditional uncertainty model does not account for the full
+error, rather than proving a formal significance level.
+
+Normalized weighted-design eigenvalue ratios have medians 0.2136 (local,
+seven converged fits), 0.00765 (broad) and 0.01319 (mixed). The broad weak
+direction mixes the nonlinear, dispersion and forcing coefficients. Near-
+singularity alone is not a sufficient explanation: local fits can have
+an apparently adequate normalized design and still be seriously biased.
+
+64 independent pilot-noise refits per bank/fold, using the separate frozen
+512-draw covariance model, give broad bootstrap SD medians
+(2.40856, 0.060549, 0.073073). These are still small relative to the actual
+dispersion/forcing errors. Broad bootstrap mean displacement from noiseless
+pilot IRLS has median (1.08164, 0.149484, -0.178196). The pilot's relation is
+already wrong; conditional resampling around it cannot establish that the
+original equation has been recovered. This diagnostic does not by itself
+prove that pilot reconstruction causes the observed raw-fit error, because
+the raw fit uses the pilot to estimate covariance rather than as its target.
+
+Post-hoc normal-equation diagnosis (not a new estimator test)
+
+The existing IRLS step holds its current residual covariance fixed and
+solves weighted least squares. It does not subtract predictor/target noise
+cross moments from the normal equations. At the noiseless pilot solution
+c0, centered joint operator draws estimate the expected normal-score term
+E[delta_X^T W (delta_y - delta_X*c0)], with W the fixed inverse residual
+covariance. This term need not be zero even when mean operator corrections
+are accurate. Covariance weighting alone therefore leaves an EIV bias.
+
+Using the pilot signal Gram plus predictor-noise Gram, the predicted
+fixed-weight coefficient displacement has broad median
+(0.84647, 0.136442, -0.162841), compared with the actual iterated bootstrap
+displacement (1.08164, 0.149484, -0.178196). They agree in direction and
+rough scale, not exactly: the latter also updates the weights. The largest
+generalized predictor-noise/signal Gram ratio has median 0.493 for broad,
+1.564 for local and 0.695 for mixed. Thus predictor noise is not negligible
+in the most affected direction. This analysis was added after outcomes and
+changes no fit or selector; it is a causal hypothesis supported by a
+conditional model, not a validated production fix.
+
+Convergence and audits
+
+Main study: 213/216 IRLS fits converge and all 216 OLS fits succeed. The
+three IRLS failures are forced KdV seeds 6 and 8, training fold 1, local;
+and wave seed 7, training fold 0, local equivalent_3. Both selectors mark
+the corresponding broad choices as forced. No failed fit is averaged away.
+
+Conditional bootstrap: 3,456 total refits. All 1,728 OLS fits succeed.
+IRLS succeeds in 435/576 local, 575/576 broad and 551/576 mixed refits
+(1,561/1,728 overall). Summaries of successful bootstrap coefficients are
+explicitly conditional on convergence; especially local results can be
+affected by the 141 failures. Full status counts and samples are retained.
+
+Checks pass for selection isolation, deterministic ties/failure behavior,
+signed-score algebra, linearized covariance consistency and feature-unit
+invariance. The main audit verifies fresh noise replay; disjoint seed/group
+sets; fixed source/input hashes; unchanged geometries/registered supports;
+frozen selection replay; unchanged coefficients after outer access; feasible
+validation weights; finite scores; and all bootstrap outcomes. Constant
+columns are checked during every run. The prior three ODE_simple identity
+controls are inherited with a recorded hash; no new ODE_simple search is
+claimed. Report-level aggregation and artifact hashes are recorded separately.
+
+Next experimental decision
+
+Keep fixed mixed fitting as a research control and reject automatic broad-
+score selection for now. A useful next fitting ablation is a noise-corrected
+joint normal-equation step on the same frozen training moments, checked first
+against conditional bootstrap bias and then on fresh records. Such correction
+can yield indefinite or weak information matrices; retain those failures
+explicitly rather than insert a tuned ridge. This is related to the earlier
+CLSM work, but needs a matched test with the current native moments and joint
+predictor/target covariance, not an assumption that it will solve the problem.
+Separately, validation needs sensitivity to the coefficient directions that
+broad moments miss. Neither proposed change is implemented or validated here.
+
+Artifacts: protocol.txt; frozen/ and results/; training_arrays/; sensitivity/;
+per_fold.csv; per_case.csv; decisions.csv; failed_fits.csv; summary.csv/json;
+coefficient_sensitivity.csv; sensitivity_summary.csv;
+eiv_normal_score_diagnostic.json; comparison.png/svg; checks.json;
+sensitivity_checks.json; completion_audit.json; report_audit.json.
+
+All runs have finished. No candidate ODE/PDE solves, PINNs, production edits
+or commits were made. Existing unrelated workspace changes remain intact.

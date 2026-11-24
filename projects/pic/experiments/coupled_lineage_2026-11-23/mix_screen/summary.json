@@ -1,0 +1,20 @@
+{
+  "full": {
+    "gains": [],
+    "losses": [],
+    "native": 19,
+    "mix": 19
+  },
+  "total": {
+    "gains": [],
+    "losses": [],
+    "native": 19,
+    "mix": 19
+  },
+  "positive_balance": false,
+  "extra_fits": 3641,
+  "control_held": {
+    "native": 3,
+    "mix": 3
+  }
+}

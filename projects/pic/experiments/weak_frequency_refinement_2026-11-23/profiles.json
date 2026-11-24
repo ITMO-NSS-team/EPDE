@@ -1,0 +1,5600 @@
+[
+  {
+    "dataset": "ac",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 61.59689568141994,
+    "installed": 61.59689568141994,
+    "lower": 58.51690288378289,
+    "upper": 64.67688847905698,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "u^3",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.11784126131587844,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 60.462119322519186,
+    "profile_fits": 12,
+    "initial_sse": 0.1714958619676718,
+    "proposed_sse": 0.15866897151463039,
+    "initial_blocks": [
+      0.06608981602505148,
+      0.037362748582237704
+    ],
+    "proposed_blocks": [
+      0.06722436614822236,
+      0.03588795913674455
+    ],
+    "bic_gain": 3.7136857447633584,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 117.31884678604197,
+    "installed": 119.90006230647366,
+    "lower": 114.23885398840493,
+    "upper": 120.39883958367902,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.1836128755050423,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 119.90006230647366,
+    "profile_fits": 14,
+    "initial_sse": 437.0415067724447,
+    "proposed_sse": 348.6903875264424,
+    "initial_blocks": [
+      207.68653520868975,
+      55.397558008679
+    ],
+    "proposed_blocks": [
+      158.81907710214435,
+      52.218952541873335
+    ],
+    "bic_gain": 19.708997558984404,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 131.79598016017442,
+    "installed": 131.79598016017442,
+    "lower": 128.65438750658464,
+    "upper": 134.9375728137642,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.02946292556012311,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 132.91214114136204,
+    "profile_fits": 11,
+    "initial_sse": 519.5635411988225,
+    "proposed_sse": 506.096534648691,
+    "initial_blocks": [
+      193.20534396997698,
+      118.72805199201235
+    ],
+    "proposed_blocks": [
+      180.4588642046635,
+      118.35804407113913
+    ],
+    "bic_gain": -1.8458693279767693,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 157.06207457814486,
+    "installed": 157.06207457814486,
+    "lower": 153.92048192455508,
+    "upper": 160.20366723173464,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^2",
+      "1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.042616201753743095,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 157.2099854779591,
+    "profile_fits": 11,
+    "initial_sse": 512.5221174989936,
+    "proposed_sse": 512.2754694279607,
+    "initial_blocks": [
+      178.99746444476284,
+      117.06533990978396
+    ],
+    "proposed_blocks": [
+      177.96823010583162,
+      117.17627496650306
+    ],
+    "bic_gain": -4.630144390844131,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 79.98280056703213,
+    "installed": 78.589343002143,
+    "lower": 76.90280776939508,
+    "upper": 83.06279336466918,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.08503850834441422,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 78.589343002143,
+    "profile_fits": 11,
+    "initial_sse": 456.8611428086765,
+    "proposed_sse": 434.4945125922253,
+    "initial_blocks": [
+      221.35826367518703,
+      87.13077327552595
+    ],
+    "proposed_blocks": [
+      219.82426616469883,
+      68.29424420429882
+    ],
+    "bic_gain": 0.739056675929783,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 110.94259682813953,
+    "installed": 110.94259682813953,
+    "lower": 107.86260403050248,
+    "upper": 114.02258962577658,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.08903396661549462,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 110.52015133683986,
+    "profile_fits": 13,
+    "initial_sse": 454.86611935859963,
+    "proposed_sse": 451.20822693734897,
+    "initial_blocks": [
+      265.7077814053801,
+      67.19335801970674
+    ],
+    "proposed_blocks": [
+      264.8559959524913,
+      65.31926483170986
+    ],
+    "bic_gain": -3.8101177343720245,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 144.19258237603944,
+    "installed": 144.19258237603944,
+    "lower": 141.05098972244966,
+    "upper": 147.33417502962922,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "u^3",
+      "D1^2(u)"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.030752628402173108,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 144.22288300189953,
+    "profile_fits": 12,
+    "initial_sse": 0.15744880396952193,
+    "proposed_sse": 0.1574473162281206,
+    "initial_blocks": [
+      0.03405380078306498,
+      0.0728293095996456
+    ],
+    "proposed_blocks": [
+      0.03398000578569573,
+      0.07282046001694795
+    ],
+    "bic_gain": -4.681110725053606,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 188.38094111160117,
+    "installed": 188.38094111160117,
+    "lower": 185.2393484580114,
+    "upper": 191.52253376519096,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.0860963236448509,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 188.9427405409813,
+    "profile_fits": 13,
+    "initial_sse": 456.3329515006866,
+    "proposed_sse": 450.5739150707914,
+    "initial_blocks": [
+      163.29556945966442,
+      97.13991476025792
+    ],
+    "proposed_blocks": [
+      166.0608470668471,
+      92.03973358706962
+    ],
+    "bic_gain": -3.3104704360365496,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 49.342207659508674,
+    "installed": 49.342207659508674,
+    "lower": 46.26221486187163,
+    "upper": 52.42220045714572,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "x0^2",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.13145263386474174,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 48.58283096368664,
+    "profile_fits": 11,
+    "initial_sse": 430.95023899737066,
+    "proposed_sse": 423.3595630135423,
+    "initial_blocks": [
+      214.19218379780108,
+      37.00866307480924
+    ],
+    "proposed_blocks": [
+      224.4720990425982,
+      38.88772183279028
+    ],
+    "bic_gain": -2.762886994009244,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 73.93001689043174,
+    "installed": 73.93001689043174,
+    "lower": 70.8500240927947,
+    "upper": 77.01000968806879,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "x0^2",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.09325718341847572,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 74.72009251189367,
+    "profile_fits": 11,
+    "initial_sse": 449.90181163488074,
+    "proposed_sse": 444.36640994675986,
+    "initial_blocks": [
+      233.98797160003537,
+      59.663629725712156
+    ],
+    "proposed_blocks": [
+      250.3325067297155,
+      48.04909373626904
+    ],
+    "bic_gain": -3.3451027983867965,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 138.17038799710622,
+    "installed": 138.17038799710622,
+    "lower": 135.02879534351644,
+    "upper": 141.311980650696,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "x0^2",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.05447880384536693,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 138.88834397425828,
+    "profile_fits": 12,
+    "initial_sse": 469.14261829269464,
+    "proposed_sse": 457.4595539850163,
+    "initial_blocks": [
+      104.91347011442554,
+      156.37543485544552
+    ],
+    "proposed_blocks": [
+      99.97934166643813,
+      156.06022465738286
+    ],
+    "bic_gain": -1.9585507037707317,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ac",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 157.000543170278,
+    "installed": 157.000543170278,
+    "lower": 153.85895051668822,
+    "upper": 160.1421358238678,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "u^3",
+      "x1^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.05416859601248544,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 157.36727807919132,
+    "profile_fits": 12,
+    "initial_sse": 0.1484800197365905,
+    "proposed_sse": 0.1481219244288658,
+    "initial_blocks": [
+      0.05163646081773353,
+      0.06201216216120778
+    ],
+    "proposed_blocks": [
+      0.05195848589779632,
+      0.06123816786575194
+    ],
+    "bic_gain": -4.421348634251316,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 9.942657182016777,
+    "installed": 9.942657182016777,
+    "lower": 9.63160840443363,
+    "upper": 10.253705959599925,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.24291852068198405,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 20.52790559146983,
+    "installed": 20.52790559146983,
+    "lower": 20.21685681388668,
+    "upper": 20.838954369052978,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "x0^2"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.18183112899518197,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 22.011370419135925,
+    "installed": 22.011370419135925,
+    "lower": 21.618671337437203,
+    "upper": 22.404069500834648,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "x0^2"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.11777831442990538,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 21.835796064098968,
+    "profile_fits": 13,
+    "initial_sse": 0.0021402204561852913,
+    "proposed_sse": 0.002064653483116527,
+    "initial_blocks": [
+      0.00025656673441130126,
+      0.0016338631652320548
+    ],
+    "proposed_blocks": [
+      0.0002697289315910085,
+      0.0016529311780370205
+    ],
+    "bic_gain": -0.47391977187581436,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 49.46786577326689,
+    "installed": 49.46786577326689,
+    "lower": 49.075166691568164,
+    "upper": 49.86056485496561,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.23391909442454598,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 49.41437557790831,
+    "profile_fits": 13,
+    "initial_sse": 0.00038954314608708097,
+    "proposed_sse": 0.0003838419758682734,
+    "initial_blocks": [
+      5.0776395843246185e-05,
+      0.0002823970307617883
+    ],
+    "proposed_blocks": [
+      3.966619694429706e-05,
+      0.0002885241762322991
+    ],
+    "bic_gain": -3.01824948616109,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 4.973585325354781,
+    "installed": 4.973585325354781,
+    "lower": 4.662536547771634,
+    "upper": 5.284634102937929,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.0626360209993091,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 5.284634102937929,
+    "profile_fits": 12,
+    "initial_sse": 0.0016418620123412444,
+    "proposed_sse": 0.0015379003839310866,
+    "initial_blocks": [
+      0.0007869004791205058,
+      0.00020705005092844103
+    ],
+    "proposed_blocks": [
+      0.0008392846466635806,
+      0.0002063756675960074
+    ],
+    "bic_gain": 2.382458954920284,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 11.215890735792744,
+    "installed": 11.215890735792744,
+    "lower": 10.904841958209596,
+    "upper": 11.526939513375892,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.035234285102543034,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 11.233161096785217,
+    "profile_fits": 14,
+    "initial_sse": 0.0016898581699160964,
+    "proposed_sse": 0.001689645836991786,
+    "initial_blocks": [
+      0.00093025674591057,
+      0.0001802714447215509
+    ],
+    "proposed_blocks": [
+      0.00093163420682013,
+      0.0001787921878026627
+    ],
+    "bic_gain": -4.668560030990803,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 8.632120626842074,
+    "installed": 9.024819708540798,
+    "lower": 8.23942154514335,
+    "upper": 9.024819708540798,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "D1^1(u)",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.19865037260699292,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 9.024819708540798,
+    "profile_fits": 23,
+    "initial_sse": 0.0037822606131357283,
+    "proposed_sse": 0.003543863189242316,
+    "initial_blocks": [
+      0.0005377985519040774,
+      0.0021940056869383887
+    ],
+    "proposed_blocks": [
+      0.0004888700901431427,
+      0.002073721481794852
+    ],
+    "bic_gain": 2.3491491747719353,
+    "decision": "installed"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 14.13401729527016,
+    "installed": 14.13401729527016,
+    "lower": 13.741318213571436,
+    "upper": 14.526716376968885,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.201700178983801,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 14.23365147125925,
+    "profile_fits": 13,
+    "initial_sse": 0.0013982809025610582,
+    "proposed_sse": 0.0013777514100244673,
+    "initial_blocks": [
+      0.00025344678690987607,
+      0.000876598669734068
+    ],
+    "proposed_blocks": [
+      0.0003041631433471266,
+      0.0008451551104470224
+    ],
+    "bic_gain": -3.0847250265818396,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 23.631077975800864,
+    "installed": 23.631077975800864,
+    "lower": 23.320029198217714,
+    "upper": 23.942126753384013,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.08129527207631192,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 25.49100659745597,
+    "installed": 25.49100659745597,
+    "lower": 25.179957819872822,
+    "upper": 25.80205537503912,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.1690120295723235,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 22.029130906808597,
+    "installed": 22.029130906808597,
+    "lower": 21.636431825109874,
+    "upper": 22.42182998850732,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^2",
+      "D1^3(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.14957160322488458,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 21.636431825109874,
+    "profile_fits": 15,
+    "initial_sse": 0.0004082194363354704,
+    "proposed_sse": 0.0003904100745234222,
+    "initial_blocks": [
+      5.3439107065389765e-05,
+      0.0003172697622872953
+    ],
+    "proposed_blocks": [
+      7.145444957405586e-05,
+      0.0002486850295172982
+    ],
+    "bic_gain": 0.5653727526722303,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "burgers",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 33.778270777683794,
+    "installed": 33.778270777683794,
+    "lower": 33.38557169598507,
+    "upper": 34.17096985938252,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "D1^3(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.17681795816790563,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 33.743194614466404,
+    "profile_fits": 15,
+    "initial_sse": 0.001910873171988273,
+    "proposed_sse": 0.0019032400220944645,
+    "initial_blocks": [
+      0.00024220628355437523,
+      0.0014284319440269707
+    ],
+    "proposed_blocks": [
+      0.00021828849340799862,
+      0.001416226652666018
+    ],
+    "bic_gain": -4.30718129391437,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 213.7445827726975,
+    "installed": 213.7445827726975,
+    "lower": 207.4613974655179,
+    "upper": 220.0277680798771,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "D1^4(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.033895871500902015,
+    "block_rows": [
+      66,
+      44
+    ],
+    "proposed": 215.42773935817692,
+    "profile_fits": 12,
+    "initial_sse": 137174238.55047163,
+    "proposed_sse": 136777859.96282187,
+    "initial_blocks": [
+      47984190.03613064,
+      20901964.24471683
+    ],
+    "proposed_blocks": [
+      46354175.54201275,
+      22074270.127091717
+    ],
+    "bic_gain": -4.7152981390639885,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 238.4260513518428,
+    "installed": 238.4260513518428,
+    "lower": 232.1428660446632,
+    "upper": 244.7092366590224,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "x1^1",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.02967928960616628,
+    "block_rows": [
+      66,
+      44
+    ],
+    "proposed": 236.84751627912019,
+    "profile_fits": 11,
+    "initial_sse": 99187.18716463223,
+    "proposed_sse": 98589.26765852016,
+    "initial_blocks": [
+      33058.6737744766,
+      22422.707933002428
+    ],
+    "proposed_blocks": [
+      33707.581528229915,
+      20900.199404079787
+    ],
+    "bic_gain": -4.091072723629582,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 0.09966304283246018,
+    "installed": 0.09966304283246018,
+    "lower": 0.0965525550566287,
+    "upper": 0.10277353060829165,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "D1^4(u)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.012400469816553648,
+    "block_rows": [
+      81,
+      81
+    ],
+    "proposed": 0.09734265595462883,
+    "profile_fits": 13,
+    "initial_sse": 140226306.40879655,
+    "proposed_sse": 138213450.16380745,
+    "initial_blocks": [
+      73276600.3982479,
+      54530002.83750205
+    ],
+    "proposed_blocks": [
+      69564517.16241595,
+      54181051.4288953
+    ],
+    "bic_gain": -2.4255114803181885,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 0.13695827972835495,
+    "installed": 0.13695827972835495,
+    "lower": 0.13384779195252347,
+    "upper": 0.14006876750418643,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "D1^4(u)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.024204467014176025,
+    "block_rows": [
+      81,
+      81
+    ],
+    "proposed": 0.13384779195252347,
+    "profile_fits": 11,
+    "initial_sse": 138550292.1162675,
+    "proposed_sse": 136366323.2978506,
+    "initial_blocks": [
+      65112559.37325181,
+      60774396.46214353
+    ],
+    "proposed_blocks": [
+      69295817.51000361,
+      54947013.69382885
+    ],
+    "bic_gain": -2.1423318722475386,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 50.22055228675253,
+    "installed": 50.22055228675253,
+    "lower": 43.93736697957295,
+    "upper": 56.50373759393211,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D1^4(u)",
+      "x1^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.11654245805291352,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 51.26686782748683,
+    "profile_fits": 12,
+    "initial_sse": 76576228.16427493,
+    "proposed_sse": 75692704.92757216,
+    "initial_blocks": [
+      20677496.258134708,
+      16617259.081240244
+    ],
+    "proposed_blocks": [
+      21230314.266120564,
+      16419655.823697278
+    ],
+    "bic_gain": -3.4544519552035586,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 201.19600800179086,
+    "installed": 201.19600800179086,
+    "lower": 194.91282269461126,
+    "upper": 207.47919330897045,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "x1^1",
+      "D1^1(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.03784554997429549,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 201.67219594573092,
+    "profile_fits": 12,
+    "initial_sse": 44755.93839785547,
+    "proposed_sse": 44708.043042113095,
+    "initial_blocks": [
+      8666.078449725721,
+      13091.042018920714
+    ],
+    "proposed_blocks": [
+      8671.343333793637,
+      12896.431260542247
+    ],
+    "bic_gain": -4.307720973714569,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 0.23643336635951664,
+    "installed": 0.23643336635951664,
+    "lower": 0.23332287858368517,
+    "upper": 0.23954385413534812,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D1^4(u)",
+      "x1^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.06258833068863502,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 0.23593628508229245,
+    "profile_fits": 12,
+    "initial_sse": 81252857.6244135,
+    "proposed_sse": 80198452.0953341,
+    "initial_blocks": [
+      14583417.650198396,
+      14100015.345967904
+    ],
+    "proposed_blocks": [
+      13059067.232237525,
+      14414772.327884464
+    ],
+    "bic_gain": -3.336445199520067,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 0.2738146370178055,
+    "installed": 0.2738146370178055,
+    "lower": 0.270704149241974,
+    "upper": 0.276925124793637,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D1^4(u)",
+      "x1^1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.15562913229383657,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 0.27334424190840084,
+    "profile_fits": 12,
+    "initial_sse": 73188278.04472648,
+    "proposed_sse": 72650208.1232226,
+    "initial_blocks": [
+      14687533.097406829,
+      13359695.355949027
+    ],
+    "proposed_blocks": [
+      15158501.280808954,
+      13517806.445810683
+    ],
+    "bic_gain": -3.796748745852435,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 188.52252328460762,
+    "installed": 188.52252328460762,
+    "lower": 182.23933797742802,
+    "upper": 194.8057085917872,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.0510239051007802,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 191.31139603441665,
+    "profile_fits": 12,
+    "initial_sse": 74255.39827847332,
+    "proposed_sse": 72216.74322037147,
+    "initial_blocks": [
+      19989.366673386816,
+      18858.80350393949
+    ],
+    "proposed_blocks": [
+      21146.333568766062,
+      17799.78227939869
+    ],
+    "bic_gain": -2.1395258307973126,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 213.52749734041137,
+    "installed": 213.52749734041137,
+    "lower": 207.24431203323178,
+    "upper": 219.81068264759097,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.08284376191609605,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 213.90078910305067,
+    "profile_fits": 12,
+    "initial_sse": 71765.5609119839,
+    "proposed_sse": 71687.35199538607,
+    "initial_blocks": [
+      18251.557974824937,
+      10223.000313763261
+    ],
+    "proposed_blocks": [
+      18386.773845939406,
+      9818.485566958165
+    ],
+    "bic_gain": -4.306128565795168,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 0.03708546698671514,
+    "installed": 0.03708546698671514,
+    "lower": 0.03397497921088366,
+    "upper": 0.040195954762546615,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D1^4(u)",
+      "u^2"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.019099776413584464,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 0.03629465527285635,
+    "profile_fits": 15,
+    "initial_sse": 138233516.9362036,
+    "proposed_sse": 137940351.0042071,
+    "initial_blocks": [
+      24285204.773288444,
+      29001823.40454264
+    ],
+    "proposed_blocks": [
+      24170071.73919988,
+      29041363.700393096
+    ],
+    "bic_gain": -4.222481766242206,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "burgers_inviscid",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 0.26159870683640146,
+    "installed": 0.26159870683640146,
+    "lower": 0.25848821906056996,
+    "upper": 0.26470919461223297,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D1^4(u)",
+      "u^2"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.0552077078414074,
+    "block_rows": [
+      27,
+      18
+    ],
+    "proposed": 0.26176131250396173,
+    "profile_fits": 12,
+    "initial_sse": 133145001.07032917,
+    "proposed_sse": 133093471.91085981,
+    "initial_blocks": [
+      19416270.752064522,
+      31393098.5792679
+    ],
+    "proposed_blocks": [
+      19294192.515811723,
+      31220768.795241643
+    ],
+    "bic_gain": -4.363094843461146,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 1.076480301289793,
+    "installed": 0.9688406109525938,
+    "lower": 0.7623210359308139,
+    "upper": 1.390639566648772,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.8435042247715133,
+    "block_rows": [
+      31,
+      30
+    ],
+    "proposed": 0.9688406109525938,
+    "profile_fits": 13,
+    "initial_sse": 1.6905986228305399,
+    "proposed_sse": 0.27542571224488677,
+    "initial_blocks": [
+      0.39981854401669054,
+      0.7309439248388877
+    ],
+    "proposed_blocks": [
+      0.0958850075789486,
+      0.11906687713768571
+    ],
+    "bic_gain": 164.21776187235298,
+    "decision": "installed"
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 80.84750998444383,
+    "installed": 81.05411381141262,
+    "lower": 80.53335071908485,
+    "upper": 81.16166924980281,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.3648142884685792,
+    "block_rows": [
+      31,
+      30
+    ],
+    "proposed": 81.05411381141262,
+    "profile_fits": 14,
+    "initial_sse": 0.2221641883255616,
+    "proposed_sse": 0.06712984687198069,
+    "initial_blocks": [
+      0.08857623460558597,
+      0.11885107192290588
+    ],
+    "proposed_blocks": [
+      0.038628856784772764,
+      0.025174967377531693
+    ],
+    "bic_gain": 106.76867880440714,
+    "decision": "installed"
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 1.0772721648366934,
+    "installed": 0.971639774481339,
+    "lower": 0.7631128994777143,
+    "upper": 1.3914314301956725,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.8468981324107852,
+    "block_rows": [
+      31,
+      30
+    ],
+    "proposed": 0.971639774481339,
+    "profile_fits": 13,
+    "initial_sse": 1.4703914337430102,
+    "proposed_sse": 0.23883162817252865,
+    "initial_blocks": [
+      0.34536881128220065,
+      0.6198279471513995
+    ],
+    "proposed_blocks": [
+      0.08288418659090314,
+      0.09824549840572636
+    ],
+    "bic_gain": 164.49723543479797,
+    "decision": "installed"
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 19.972224991074764,
+    "installed": 20.28638425643374,
+    "lower": 19.658065725715787,
+    "upper": 20.28638425643374,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.3856063240888255,
+    "block_rows": [
+      31,
+      30
+    ],
+    "proposed": 20.28638425643374,
+    "profile_fits": 11,
+    "initial_sse": 5.900641267352572,
+    "proposed_sse": 2.943703092095968,
+    "initial_blocks": [
+      3.1278367655581554,
+      0.463935156449536
+    ],
+    "proposed_blocks": [
+      1.0256455620613834,
+      0.2570220872525541
+    ],
+    "bic_gain": 60.13892072111854,
+    "decision": "installed"
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 1.0796960984456938,
+    "installed": 0.9734965272808382,
+    "lower": 0.7655368330867147,
+    "upper": 1.393855363804673,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.8427247449062553,
+    "block_rows": [
+      31,
+      30
+    ],
+    "proposed": 0.9734965272808382,
+    "profile_fits": 13,
+    "initial_sse": 1.708699247751547,
+    "proposed_sse": 0.27587453404738743,
+    "initial_blocks": [
+      0.3982394782994752,
+      0.7235373361261553
+    ],
+    "proposed_blocks": [
+      0.09752531830286487,
+      0.10724215791314516
+    ],
+    "bic_gain": 165.05676099558917,
+    "decision": "installed"
+  },
+  {
+    "dataset": "duffing",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 134.41260538488166,
+    "installed": 134.41260538488166,
+    "lower": 134.0984461195227,
+    "upper": 134.72676465024063,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.1632786075917306,
+    "block_rows": [
+      31,
+      30
+    ],
+    "proposed": 134.72676465024063,
+    "profile_fits": 12,
+    "initial_sse": 9.090465076234999,
+    "proposed_sse": 5.9581023034844405,
+    "initial_blocks": [
+      2.624458726333701,
+      1.152315982794442
+    ],
+    "proposed_blocks": [
+      3.3372360886568617,
+      2.1474240021263964
+    ],
+    "bic_gain": 34.75748673489946,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 9.379519887066236,
+    "installed": 9.379519887066236,
+    "lower": 9.223221745096595,
+    "upper": 9.535818029035877,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "D1^3(u)",
+      "u^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.005069660900451079,
+    "block_rows": [
+      108,
+      108
+    ],
+    "proposed": 9.535818029035877,
+    "profile_fits": 12,
+    "initial_sse": 1.4809762866779336e-05,
+    "proposed_sse": 1.451933620823202e-05,
+    "initial_blocks": [
+      6.393301052614597e-06,
+      6.6260720806984425e-06
+    ],
+    "proposed_blocks": [
+      6.165040824463087e-06,
+      6.568943176776985e-06
+    ],
+    "bic_gain": -0.34734362254234785,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 10.624452038951327,
+    "installed": 10.624452038951327,
+    "lower": 10.468153896981686,
+    "upper": 10.780750180920968,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.024149488142756154,
+    "block_rows": [
+      108,
+      108
+    ],
+    "proposed": 10.556178967200367,
+    "profile_fits": 12,
+    "initial_sse": 4.015405032713026e-05,
+    "proposed_sse": 3.9810745338676865e-05,
+    "initial_blocks": [
+      1.414535778864506e-05,
+      1.9023293187978958e-05
+    ],
+    "proposed_blocks": [
+      1.4200740954196619e-05,
+      1.8881355588358025e-05
+    ],
+    "bic_gain": -3.3091247328289515,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 9.217656940223666,
+    "installed": 9.217656940223666,
+    "lower": 9.112937185104006,
+    "upper": 9.322376695343326,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "D1^3(u)",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.03257243789220381,
+    "block_rows": [
+      88,
+      88
+    ],
+    "proposed": 9.23108602032636,
+    "profile_fits": 12,
+    "initial_sse": 1.4400377817978424e-05,
+    "proposed_sse": 1.4378642426823254e-05,
+    "initial_blocks": [
+      4.405129276824937e-06,
+      5.277348700472287e-06
+    ],
+    "proposed_blocks": [
+      4.37957659366854e-06,
+      5.255603148020413e-06
+    ],
+    "bic_gain": -5.177176364729514,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 26.594772529915016,
+    "installed": 26.594772529915016,
+    "lower": 26.490052774795355,
+    "upper": 26.699492285034676,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "D1^3(u)",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.007129724448845986,
+    "block_rows": [
+      88,
+      88
+    ],
+    "proposed": 26.61069434900138,
+    "profile_fits": 12,
+    "initial_sse": 1.4779098355463058e-05,
+    "proposed_sse": 1.4768528291991779e-05,
+    "initial_blocks": [
+      4.392054157154918e-06,
+      5.2948515159013365e-06
+    ],
+    "proposed_blocks": [
+      4.368506498838676e-06,
+      5.306714244432519e-06
+    ],
+    "bic_gain": -5.3870678160808065,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 21.87123448604526,
+    "installed": 21.87123448604526,
+    "lower": 21.714936344075618,
+    "upper": 22.027532628014903,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "u^2",
+      "1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.0903157416021324,
+    "block_rows": [
+      108,
+      108
+    ],
+    "proposed": 21.893382575681873,
+    "profile_fits": 12,
+    "initial_sse": 1.5155395852791747e-05,
+    "proposed_sse": 1.5076389087007489e-05,
+    "initial_blocks": [
+      4.2398369698290015e-06,
+      7.745617204889334e-06
+    ],
+    "proposed_blocks": [
+      4.209445874854568e-06,
+      7.769091703752801e-06
+    ],
+    "bic_gain": -4.196087894630601,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 29.07348618046897,
+    "installed": 29.07348618046897,
+    "lower": 28.917188038499326,
+    "upper": 29.22978432243861,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "1",
+      "x1^1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.023992160318190712,
+    "block_rows": [
+      108,
+      108
+    ],
+    "proposed": 29.06916008180327,
+    "profile_fits": 13,
+    "initial_sse": 3.46031206114055e-05,
+    "proposed_sse": 3.460203360565084e-05,
+    "initial_blocks": [
+      9.90701884387719e-06,
+      1.8781230364131893e-05
+    ],
+    "proposed_blocks": [
+      9.910877758266392e-06,
+      1.875514393511049e-05
+    ],
+    "bic_gain": -5.5676558041138495,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 18.642315698770773,
+    "installed": 18.642315698770773,
+    "lower": 18.537595943651112,
+    "upper": 18.747035453890433,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "u^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.00849621376504664,
+    "block_rows": [
+      88,
+      88
+    ],
+    "proposed": 18.67927559917147,
+    "profile_fits": 11,
+    "initial_sse": 1.6518514233056392e-05,
+    "proposed_sse": 1.640043224274099e-05,
+    "initial_blocks": [
+      4.236538883147563e-06,
+      6.7040529555753815e-06
+    ],
+    "proposed_blocks": [
+      4.1018208186379795e-06,
+      6.7558171454901394e-06
+    ],
+    "bic_gain": -3.6819772428730952,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 25.133260106462924,
+    "installed": 25.133260106462924,
+    "lower": 25.028540351343263,
+    "upper": 25.237979861582584,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "1",
+      "x1^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.03312732705524799,
+    "block_rows": [
+      88,
+      88
+    ],
+    "proposed": 25.152027014722474,
+    "profile_fits": 12,
+    "initial_sse": 3.427924485594975e-05,
+    "proposed_sse": 3.4051715623352904e-05,
+    "initial_blocks": [
+      1.1544049833533725e-05,
+      1.3314763225068903e-05
+    ],
+    "proposed_blocks": [
+      1.1825837899941938e-05,
+      1.3234402521830285e-05
+    ],
+    "bic_gain": -3.8178020205091983,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 3.4402987345081226,
+    "installed": 3.4402987345081226,
+    "lower": 3.2840005925384808,
+    "upper": 3.5965968764777645,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "x1^2",
+      "x1^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.05268498816616017,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 3.4551740591433053,
+    "profile_fits": 12,
+    "initial_sse": 2.9802560475861146e-06,
+    "proposed_sse": 2.9766207255396046e-06,
+    "initial_blocks": [
+      9.442968319686332e-07,
+      9.029910871379617e-07
+    ],
+    "proposed_blocks": [
+      9.38768517130807e-07,
+      9.146380890522225e-07
+    ],
+    "bic_gain": -4.55031220695067,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 25.94349007662435,
+    "installed": 25.94349007662435,
+    "lower": 25.787191934654707,
+    "upper": 26.099788218593993,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "D1^3(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.047641753781948806,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 25.9128878918458,
+    "profile_fits": 12,
+    "initial_sse": 2.7698731691258656e-06,
+    "proposed_sse": 2.748172928448583e-06,
+    "initial_blocks": [
+      7.823140915053972e-07,
+      7.083033709509906e-07
+    ],
+    "proposed_blocks": [
+      7.840932857733131e-07,
+      7.007326253194803e-07
+    ],
+    "bic_gain": -3.8326863209216175,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 6.492268880789872,
+    "installed": 6.492268880789872,
+    "lower": 6.387549125670213,
+    "upper": 6.596988635909532,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "x1^2",
+      "x1^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.026462944557168102,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 6.488092269850031,
+    "profile_fits": 12,
+    "initial_sse": 3.0627506803846423e-06,
+    "proposed_sse": 3.062147444216873e-06,
+    "initial_blocks": [
+      8.99962337232619e-07,
+      1.28045398486511e-06
+    ],
+    "proposed_blocks": [
+      9.007869816984139e-07,
+      1.2833778191695582e-06
+    ],
+    "bic_gain": -4.660857565096087,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 13.610585013663195,
+    "installed": 13.610585013663195,
+    "lower": 13.505865258543535,
+    "upper": 13.715304768782856,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^1(u)",
+      "x1^2",
+      "x1^1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.022519051885898495,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 13.650855878058325,
+    "profile_fits": 12,
+    "initial_sse": 3.0751581793029043e-06,
+    "proposed_sse": 3.017554441798224e-06,
+    "initial_blocks": [
+      1.0857732498969457e-06,
+      1.2527076957961637e-06
+    ],
+    "proposed_blocks": [
+      1.0464222431958643e-06,
+      1.253202194031728e-06
+    ],
+    "bic_gain": -2.639891779889764,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 87.94321801170453,
+    "installed": 82.27704264988046,
+    "lower": 81.66003270452495,
+    "upper": 94.22640331888411,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "D1^1(u)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.052458223271239,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 82.27704264988046,
+    "profile_fits": 13,
+    "initial_sse": 28.255269053960433,
+    "proposed_sse": 26.044685235880753,
+    "initial_blocks": [
+      8.287793382493499,
+      13.026329845752619
+    ],
+    "proposed_blocks": [
+      7.653250604609054,
+      12.000613834010432
+    ],
+    "bic_gain": 4.4057188502013505,
+    "decision": "installed"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 226.23905063618474,
+    "installed": 231.48476323309674,
+    "lower": 219.95586532900515,
+    "upper": 232.52223594336434,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.12196884390571171,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 231.48476323309674,
+    "profile_fits": 12,
+    "initial_sse": 0.6665772476695824,
+    "proposed_sse": 0.4414369679880846,
+    "initial_blocks": [
+      0.31605540596993126,
+      0.270224010094976
+    ],
+    "proposed_blocks": [
+      0.28941721859159303,
+      0.11159434127626211
+    ],
+    "bic_gain": 41.43902976489002,
+    "decision": "installed"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 93.14960389014219,
+    "installed": 93.14960389014219,
+    "lower": 90.04679633104116,
+    "upper": 96.25241144924321,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.07065351393141804,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 92.2846071814487,
+    "profile_fits": 11,
+    "initial_sse": 0.7055344431860566,
+    "proposed_sse": 0.683316396350288,
+    "initial_blocks": [
+      0.09473030859762999,
+      0.2607134704828141
+    ],
+    "proposed_blocks": [
+      0.10064382267830846,
+      0.24848891145658308
+    ],
+    "bic_gain": -1.134768373411112,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 105.33867518427513,
+    "installed": 105.33867518427513,
+    "lower": 102.23586762517411,
+    "upper": 108.44148274337616,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.047924824653385246,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 103.46821006751827,
+    "profile_fits": 12,
+    "initial_sse": 0.7227894426663499,
+    "proposed_sse": 0.6912407354655452,
+    "initial_blocks": [
+      0.08783632101188868,
+      0.2902384357068199
+    ],
+    "proposed_blocks": [
+      0.08038642556051898,
+      0.30294317387340924
+    ],
+    "bic_gain": 0.2800389845689031,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 150.74717660349643,
+    "installed": 150.74717660349643,
+    "lower": 144.46399129631683,
+    "upper": 157.03036191067602,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "D1^2(u)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.05390009146589205,
+    "block_rows": [
+      32,
+      32
+    ],
+    "proposed": 144.46399129631683,
+    "profile_fits": 23,
+    "initial_sse": 540.6744783808844,
+    "proposed_sse": 516.8912668341654,
+    "initial_blocks": [
+      115.732179678091,
+      278.2936847363743
+    ],
+    "proposed_blocks": [
+      111.57752363228562,
+      285.78118725870337
+    ],
+    "bic_gain": -1.0377563851266056,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 175.5813995200423,
+    "installed": 175.5813995200423,
+    "lower": 169.29821421286272,
+    "upper": 181.8645848272219,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "D1^2(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.03330880344456512,
+    "block_rows": [
+      32,
+      32
+    ],
+    "proposed": 177.54716536650318,
+    "profile_fits": 11,
+    "initial_sse": 552.4419289531729,
+    "proposed_sse": 539.7449165732959,
+    "initial_blocks": [
+      137.9560795419543,
+      225.7870377444981
+    ],
+    "proposed_blocks": [
+      134.093213284582,
+      202.29723726012665
+    ],
+    "bic_gain": -2.602545831236268,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 179.7983080685633,
+    "installed": 179.7983080685633,
+    "lower": 176.69550050946228,
+    "upper": 182.90111562766432,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "u^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.0958084572109194,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 223.7002852398614,
+    "installed": 223.7002852398614,
+    "lower": 220.59747768076036,
+    "upper": 226.8030927989624,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.11782888256908657,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 100.718885889471,
+    "installed": 100.718885889471,
+    "lower": 94.43570058229142,
+    "upper": 107.00207119665058,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "D1^1(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.1031207468870867,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 100.72325895144976,
+    "profile_fits": 12,
+    "initial_sse": 22.238644646445266,
+    "proposed_sse": 22.238640310483035,
+    "initial_blocks": [
+      10.458213574788122,
+      8.730225009016975
+    ],
+    "proposed_blocks": [
+      10.458324312373849,
+      8.730003815223174
+    ],
+    "bic_gain": -4.71847703418114,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 162.62690033445017,
+    "installed": 162.62690033445017,
+    "lower": 156.34371502727058,
+    "upper": 168.91008564162976,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.02116690115905776,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 166.07225971333824,
+    "profile_fits": 12,
+    "initial_sse": 0.7587415171624975,
+    "proposed_sse": 0.7521905972953998,
+    "initial_blocks": [
+      0.4457972563262868,
+      0.20779999111741662
+    ],
+    "proposed_blocks": [
+      0.4388995300502936,
+      0.2029201808588188
+    ],
+    "bic_gain": -3.747300211128664,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 49.21922475858501,
+    "installed": 49.21922475858501,
+    "lower": 46.116417199483976,
+    "upper": 52.32203231768604,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "D1^1(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.0594130596566883,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 49.936764248227114,
+    "profile_fits": 11,
+    "initial_sse": 23.32240226628223,
+    "proposed_sse": 23.104558784650855,
+    "initial_blocks": [
+      4.077111021299023,
+      4.5631249444923085
+    ],
+    "proposed_blocks": [
+      4.1299953349174885,
+      4.298132251762419
+    ],
+    "bic_gain": -3.667443689166803,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "kdv_cossin",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 68.4065811749069,
+    "installed": 68.4065811749069,
+    "lower": 65.30377361580588,
+    "upper": 71.50938873400793,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x1^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.6129810367746437,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 68.51993157334938,
+    "profile_fits": 15,
+    "initial_sse": 0.2999973700071831,
+    "proposed_sse": 0.2989674366196052,
+    "initial_blocks": [
+      0.1262347821713486,
+      0.07312791247763392
+    ],
+    "proposed_blocks": [
+      0.1232568939968228,
+      0.07502443063947595
+    ],
+    "bic_gain": -4.333325479394558,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 0.3078893875686056,
+    "installed": 0.3078893875686056,
+    "lower": 0.27659862408663544,
+    "upper": 0.3391801510505758,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.04138645502258626,
+    "block_rows": [
+      84,
+      84
+    ],
+    "proposed": 0.2985072454255802,
+    "profile_fits": 11,
+    "initial_sse": 0.20463358508211985,
+    "proposed_sse": 0.1984396571706874,
+    "initial_blocks": [
+      0.014969302383614722,
+      0.16407214737619666
+    ],
+    "proposed_blocks": [
+      0.0166378566183126,
+      0.15821300350063777
+    ],
+    "bic_gain": 0.7461276596831778,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 6.008974113428863,
+    "installed": 6.008974113428863,
+    "lower": 5.977683349946893,
+    "upper": 6.040264876910833,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^4(u)",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.002652178934531789,
+    "block_rows": [
+      84,
+      84
+    ],
+    "proposed": 6.040264876910833,
+    "profile_fits": 12,
+    "initial_sse": 4.210628067997473,
+    "proposed_sse": 4.192916078591647,
+    "initial_blocks": [
+      0.2518146024665368,
+      3.1144720485231803
+    ],
+    "proposed_blocks": [
+      0.2785291051576607,
+      3.114262685960308
+    ],
+    "bic_gain": -4.451902526926371,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 0.7354994540704416,
+    "installed": 0.7354994540704416,
+    "lower": 0.6729994540704414,
+    "upper": 0.7979994540704418,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.05265181219095053,
+    "block_rows": [
+      84,
+      84
+    ],
+    "proposed": 0.7438305835485495,
+    "profile_fits": 11,
+    "initial_sse": 0.20222878865850238,
+    "proposed_sse": 0.20148946866102982,
+    "initial_blocks": [
+      0.10096462039385527,
+      0.09536150025790656
+    ],
+    "proposed_blocks": [
+      0.09999853008926711,
+      0.09633376447780305
+    ],
+    "bic_gain": -4.560253235512551,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 30.877295317942576,
+    "installed": 30.877295317942576,
+    "lower": 30.814795317942576,
+    "upper": 30.939795317942576,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.021865924833424658,
+    "block_rows": [
+      84,
+      84
+    ],
+    "proposed": 30.8859466289375,
+    "profile_fits": 16,
+    "initial_sse": 0.20880059909547388,
+    "proposed_sse": 0.2085471911482734,
+    "initial_blocks": [
+      0.10066372808512591,
+      0.10260275669410969
+    ],
+    "proposed_blocks": [
+      0.10108293103144222,
+      0.10129092367600012
+    ],
+    "bic_gain": -5.040097519012412,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 0.3079017140353208,
+    "installed": 0.3079017140353208,
+    "lower": 0.2766109505533506,
+    "upper": 0.339192477517291,
+    "target": "D0^1(u)",
+    "background": [
+      "x1^2",
+      "1",
+      "u^3"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.18482236495907822,
+    "block_rows": [
+      28,
+      28
+    ],
+    "proposed": 0.31034783261497073,
+    "profile_fits": 13,
+    "initial_sse": 0.16303568249515446,
+    "proposed_sse": 0.16191966247798326,
+    "initial_blocks": [
+      0.005866206971169075,
+      0.06931720611541466
+    ],
+    "proposed_blocks": [
+      0.005554442541637593,
+      0.07050942790051393
+    ],
+    "bic_gain": -3.8538387526544358,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 2.69036856810038,
+    "installed": 2.69036856810038,
+    "lower": 2.6590778046184096,
+    "upper": 2.7216593315823503,
+    "target": "D0^1(u)",
+    "background": [
+      "x1^2",
+      "1",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.02956852496156815,
+    "block_rows": [
+      28,
+      28
+    ],
+    "proposed": 2.700940540596352,
+    "profile_fits": 12,
+    "initial_sse": 0.1940864801077716,
+    "proposed_sse": 0.19016378846998003,
+    "initial_blocks": [
+      0.006272840533968253,
+      0.09504021762436024
+    ],
+    "proposed_blocks": [
+      0.007167916722649051,
+      0.08721120263895782
+    ],
+    "bic_gain": -2.7156973988776016,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 0.7354469279235143,
+    "installed": 0.7354469279235143,
+    "lower": 0.6729469279235141,
+    "upper": 0.7979469279235145,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "D1^4(u)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.04942074133712712,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 0.751824463725753,
+    "profile_fits": 11,
+    "initial_sse": 0.008015558631216889,
+    "proposed_sse": 0.007902377884978256,
+    "initial_blocks": [
+      0.00411961986329809,
+      0.0034755328656414265
+    ],
+    "proposed_blocks": [
+      0.004148570780001676,
+      0.0033624435527636965
+    ],
+    "bic_gain": -3.2362721549623727,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 3.501324636340709,
+    "installed": 3.501324636340709,
+    "lower": 3.438824636340709,
+    "upper": 3.563824636340709,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "D1^4(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.07765160352595298,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 3.4921730631451697,
+    "profile_fits": 11,
+    "initial_sse": 0.007777507854259435,
+    "proposed_sse": 0.007712732272305008,
+    "initial_blocks": [
+      0.0039910026058260885,
+      0.003466807719166119
+    ],
+    "proposed_blocks": [
+      0.0039608956692764015,
+      0.0033844592081105776
+    ],
+    "bic_gain": -3.7282866177939225,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 0.30791652296640654,
+    "installed": 0.30791652296640654,
+    "lower": 0.27662575948443635,
+    "upper": 0.3392072864483767,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "u^3",
+      "D1^4(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.014317566923416134,
+    "block_rows": [
+      196,
+      196
+    ],
+    "proposed": 0.3392072864483767,
+    "profile_fits": 12,
+    "initial_sse": 1.0286441305124563,
+    "proposed_sse": 1.0212306203381616,
+    "initial_blocks": [
+      0.05915546781409568,
+      0.8372908027510263
+    ],
+    "proposed_blocks": [
+      0.06042757897978036,
+      0.8428424978534172
+    ],
+    "bic_gain": -3.0023248600208543,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 6.821098848521022,
+    "installed": 6.821098848521022,
+    "lower": 6.789808085039052,
+    "upper": 6.852389612002993,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^4(u)",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.012870109015227935,
+    "block_rows": [
+      196,
+      196
+    ],
+    "proposed": 6.813617934542088,
+    "profile_fits": 11,
+    "initial_sse": 10.371067987822322,
+    "proposed_sse": 10.312357394289444,
+    "initial_blocks": [
+      1.0343561568272401,
+      8.36841819001884
+    ],
+    "proposed_blocks": [
+      1.0635089535386673,
+      8.28574539198049
+    ],
+    "bic_gain": -3.655880261186169,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 0.7354713627046585,
+    "installed": 0.7354713627046585,
+    "lower": 0.6729713627046583,
+    "upper": 0.7979713627046587,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "u^3",
+      "D1^4(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.04636473524418663,
+    "block_rows": [
+      180,
+      180
+    ],
+    "proposed": 0.7491424451175991,
+    "profile_fits": 11,
+    "initial_sse": 0.995200162672011,
+    "proposed_sse": 0.9863681069569163,
+    "initial_blocks": [
+      0.5736211292654085,
+      0.39400418767477163
+    ],
+    "proposed_blocks": [
+      0.5694719527845166,
+      0.3954068109326861
+    ],
+    "bic_gain": -2.296262620491517,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ks",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 15.623741565190228,
+    "installed": 15.623741565190228,
+    "lower": 15.561241565190228,
+    "upper": 15.686241565190228,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "u^3",
+      "D1^4(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.005732180685224756,
+    "block_rows": [
+      180,
+      180
+    ],
+    "proposed": 15.611359279511891,
+    "profile_fits": 11,
+    "initial_sse": 1.0376037171559287,
+    "proposed_sse": 1.0368568377720124,
+    "initial_blocks": [
+      0.5933212890702064,
+      0.421697678382946
+    ],
+    "proposed_blocks": [
+      0.5927558713668436,
+      0.421236413987881
+    ],
+    "bic_gain": -5.737824902184405,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "lorenz",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 3.862535586282267,
+    "installed": 3.862535586282267,
+    "lower": 2.654230719516722,
+    "upper": 5.070840453047812,
+    "target": "D0^2(w)",
+    "background": [
+      "w^3",
+      "w^2",
+      "v^2"
+    ],
+    "phase": "cos",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.5792900464253126,
+    "block_rows": [
+      49,
+      49
+    ],
+    "proposed": 3.9755887354975723,
+    "profile_fits": 13,
+    "initial_sse": 3088734.5622413536,
+    "proposed_sse": 2976941.64174073,
+    "initial_blocks": [
+      1956252.2003410833,
+      998354.7089188088
+    ],
+    "proposed_blocks": [
+      1861665.805680797,
+      981295.2729806689
+    ],
+    "bic_gain": -0.5335882831496299,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "lorenz",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 8.209536880688734,
+    "installed": 8.081754250788423,
+    "lower": 7.001232013923189,
+    "upper": 9.417841747454279,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^1",
+      "v*w"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.8976597442342811,
+    "block_rows": [
+      49,
+      49
+    ],
+    "proposed": 8.081754250788423,
+    "profile_fits": 13,
+    "initial_sse": 77843.71565426984,
+    "proposed_sse": 63027.22668814149,
+    "initial_blocks": [
+      40596.99100306351,
+      30103.220965795106
+    ],
+    "proposed_blocks": [
+      34097.76869804051,
+      22422.057820472095
+    ],
+    "bic_gain": 19.33334756772782,
+    "decision": "installed"
+  },
+  {
+    "dataset": "lorenz",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 3.8614023975695497,
+    "installed": 4.019961718535383,
+    "lower": 2.653097530804004,
+    "upper": 5.069707264335095,
+    "target": "D0^1(w)",
+    "background": [
+      "v^2",
+      "1",
+      "w^1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.655891988894045,
+    "block_rows": [
+      49,
+      49
+    ],
+    "proposed": 4.019961718535383,
+    "profile_fits": 12,
+    "initial_sse": 3988.870298876841,
+    "proposed_sse": 3765.813141343368,
+    "initial_blocks": [
+      2912.2746479514876,
+      1042.6592104907045
+    ],
+    "proposed_blocks": [
+      2843.7019821678005,
+      862.9091513309749
+    ],
+    "bic_gain": 1.8238455920940568,
+    "decision": "installed"
+  },
+  {
+    "dataset": "lorenz",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 8.193031407071407,
+    "installed": 8.065285821632067,
+    "lower": 6.984726540305862,
+    "upper": 9.401336273836952,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "u^1",
+      "v*w"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.8629597480175025,
+    "block_rows": [
+      49,
+      49
+    ],
+    "proposed": 8.065285821632067,
+    "profile_fits": 13,
+    "initial_sse": 118877.49237157809,
+    "proposed_sse": 104723.88579308569,
+    "initial_blocks": [
+      50946.86739556368,
+      51663.29276250872
+    ],
+    "proposed_blocks": [
+      42428.457029248515,
+      44533.966485123856
+    ],
+    "bic_gain": 9.71515514043072,
+    "decision": "installed"
+  },
+  {
+    "dataset": "lorenz",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 3.8656320571408886,
+    "installed": 3.8656320571408886,
+    "lower": 2.6573271903753435,
+    "upper": 5.073936923906434,
+    "target": "D0^1(w)",
+    "background": [
+      "v^2",
+      "1",
+      "w^1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.32667768928126156,
+    "block_rows": [
+      57,
+      57
+    ],
+    "proposed": 4.004898533624962,
+    "profile_fits": 13,
+    "initial_sse": 16781.68122386894,
+    "proposed_sse": 16582.161382071758,
+    "initial_blocks": [
+      10697.913483364015,
+      5883.824648942416
+    ],
+    "proposed_blocks": [
+      10804.58335353478,
+      5568.46644539932
+    ],
+    "bic_gain": -3.3448539363291205,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "lorenz",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 8.189891509102702,
+    "installed": 8.094392310266787,
+    "lower": 6.981586642337157,
+    "upper": 9.398196375868247,
+    "target": "D0^2(w)",
+    "background": [
+      "w^3",
+      "w^2",
+      "v^2"
+    ],
+    "phase": "sin",
+    "modulator": "D0(w)",
+    "initial_fraction_explained": 0.7120520338452031,
+    "block_rows": [
+      57,
+      57
+    ],
+    "proposed": 8.094392310266787,
+    "profile_fits": 15,
+    "initial_sse": 7269738.274844316,
+    "proposed_sse": 6914255.116131402,
+    "initial_blocks": [
+      2636295.690961288,
+      4391798.22134915
+    ],
+    "proposed_blocks": [
+      2460404.6416991153,
+      4067858.677468818
+    ],
+    "bic_gain": 1.3124551630696075,
+    "decision": "installed"
+  },
+  {
+    "dataset": "lv",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 35.54111483218064,
+    "installed": 35.54111483218064,
+    "lower": 29.236985573977122,
+    "upper": 41.845244090384156,
+    "target": "D0^1(u)",
+    "background": [
+      "u*v",
+      "u^1",
+      "v^2"
+    ],
+    "phase": "sin",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.3338382748026498,
+    "block_rows": [
+      30,
+      29
+    ],
+    "proposed": 36.27421999904064,
+    "profile_fits": 12,
+    "initial_sse": 40.25529673664302,
+    "proposed_sse": 39.91595072067895,
+    "initial_blocks": [
+      17.847548654264326,
+      11.539293267972388
+    ],
+    "proposed_blocks": [
+      17.270455884785527,
+      11.81554113771101
+    ],
+    "bic_gain": -3.637498779332945,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "lv",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 123.25834489302872,
+    "installed": 121.3890483248276,
+    "lower": 116.9542156348252,
+    "upper": 129.56247415123224,
+    "target": "D0^2(v)",
+    "background": [
+      "v^3",
+      "v^1",
+      "u^3"
+    ],
+    "phase": "cos",
+    "modulator": "v",
+    "initial_fraction_explained": 0.4966629198306676,
+    "block_rows": [
+      30,
+      29
+    ],
+    "proposed": 121.3890483248276,
+    "profile_fits": 13,
+    "initial_sse": 12768254.091867667,
+    "proposed_sse": 8054680.815143654,
+    "initial_blocks": [
+      6167670.394140753,
+      6222879.150846396
+    ],
+    "proposed_blocks": [
+      4550984.2841095785,
+      3212327.706682906
+    ],
+    "bic_gain": 26.66278029928175,
+    "decision": "installed"
+  },
+  {
+    "dataset": "lv",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 101.63653229871426,
+    "installed": 101.63653229871426,
+    "lower": 95.33240304051074,
+    "upper": 107.94066155691777,
+    "target": "D0^2(v)",
+    "background": [
+      "v^3",
+      "v^2",
+      "u^3"
+    ],
+    "phase": "cos",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.41273800721441284,
+    "block_rows": [
+      30,
+      29
+    ],
+    "proposed": 100.69366957603278,
+    "profile_fits": 15,
+    "initial_sse": 12546542.463572992,
+    "proposed_sse": 11930246.375904728,
+    "initial_blocks": [
+      4241015.624379507,
+      8232058.017673578
+    ],
+    "proposed_blocks": [
+      4245215.269835384,
+      7609074.6923626885
+    ],
+    "bic_gain": -0.8300206051076482,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "lv",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 835.4335505101603,
+    "installed": 835.4335505101603,
+    "lower": 829.1294212519568,
+    "upper": 841.7376797683638,
+    "target": "D0^2(v)",
+    "background": [
+      "v^3",
+      "v^2",
+      "u^3"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.14547721478721867,
+    "block_rows": [
+      30,
+      29
+    ],
+    "proposed": 835.8388563522236,
+    "profile_fits": 13,
+    "initial_sse": 18256428.208316267,
+    "proposed_sse": 18120399.191351924,
+    "initial_blocks": [
+      6530032.627889367,
+      11452614.281135093
+    ],
+    "proposed_blocks": [
+      6397480.372233429,
+      11401936.07102742
+    ],
+    "bic_gain": -3.703605126619256,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "lv",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 97.23086021601553,
+    "installed": 103.53498947421905,
+    "lower": 90.92673095781201,
+    "upper": 103.53498947421905,
+    "target": "D0^2(u)",
+    "background": [
+      "v^3",
+      "u^3",
+      "u^2"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.20943005952637983,
+    "block_rows": [
+      34,
+      33
+    ],
+    "proposed": 103.53498947421905,
+    "profile_fits": 12,
+    "initial_sse": 84671479.1203127,
+    "proposed_sse": 73320097.53767781,
+    "initial_blocks": [
+      40743801.331620894,
+      42776187.679958016
+    ],
+    "proposed_blocks": [
+      30147813.191014305,
+      42002807.84462091
+    ],
+    "bic_gain": 5.95734862911947,
+    "decision": "installed"
+  },
+  {
+    "dataset": "lv",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 121.7693039552586,
+    "installed": 121.7693039552586,
+    "lower": 115.46517469705508,
+    "upper": 128.07343321346212,
+    "target": "D0^2(v)",
+    "background": [
+      "v^3",
+      "v^1",
+      "D0(u)"
+    ],
+    "phase": "cos",
+    "modulator": "v",
+    "initial_fraction_explained": 0.25741680629796454,
+    "block_rows": [
+      34,
+      33
+    ],
+    "proposed": 121.37607455172646,
+    "profile_fits": 12,
+    "initial_sse": 86914374.46397856,
+    "proposed_sse": 86353760.00470105,
+    "initial_blocks": [
+      38972710.297666915,
+      45768564.35491152
+    ],
+    "proposed_blocks": [
+      37490035.41780173,
+      46688784.944373034
+    ],
+    "bic_gain": -3.8032328398980884,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 15.105218020291359,
+    "installed": 15.105218020291359,
+    "lower": 13.848580958855441,
+    "upper": 16.361855081727274,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.08450508194639954,
+    "block_rows": [
+      60,
+      90
+    ],
+    "proposed": 15.060630279660623,
+    "profile_fits": 12,
+    "initial_sse": 0.0544319095912235,
+    "proposed_sse": 0.054405317644964826,
+    "initial_blocks": [
+      0.0074229766094657135,
+      0.027127839870628126
+    ],
+    "proposed_blocks": [
+      0.007467368036503194,
+      0.0270947635037335
+    ],
+    "bic_gain": -5.4664850139836005,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 22.60622978310967,
+    "installed": 22.974794086511974,
+    "lower": 21.34959272167375,
+    "upper": 23.862866844545586,
+    "target": "D0^1(u)",
+    "background": [
+      "D2^3(u)",
+      "D1^1(v)",
+      "D2^1(p)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.07296214564624182,
+    "block_rows": [
+      60,
+      90
+    ],
+    "proposed": 22.974794086511974,
+    "profile_fits": 11,
+    "initial_sse": 1.0566290867109083,
+    "proposed_sse": 1.0322496179523992,
+    "initial_blocks": [
+      0.2544500585420331,
+      0.35125462374567307
+    ],
+    "proposed_blocks": [
+      0.2458459755711969,
+      0.32914414976400347
+    ],
+    "bic_gain": 0.7042469790999952,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 11.39698308178172,
+    "installed": 11.39698308178172,
+    "lower": 10.434870331619845,
+    "upper": 12.359095831943595,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.09631033437860041,
+    "block_rows": [
+      45,
+      45
+    ],
+    "proposed": 11.096123976642756,
+    "profile_fits": 12,
+    "initial_sse": 0.05373001335955758,
+    "proposed_sse": 0.05317567573012376,
+    "initial_blocks": [
+      0.00740421207507816,
+      0.01849099078519622
+    ],
+    "proposed_blocks": [
+      0.006432711780995583,
+      0.017326384106017532
+    ],
+    "bic_gain": -2.7983370867952164,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 15.402608226390402,
+    "installed": 15.402608226390402,
+    "lower": 14.440495476228527,
+    "upper": 16.364720976552277,
+    "target": "D0^1(u)",
+    "background": [
+      "D2^3(u)",
+      "D1^1(v)",
+      "D2^1(p)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.2930847916136458,
+    "block_rows": [
+      45,
+      45
+    ],
+    "proposed": 16.364720976552277,
+    "profile_fits": 23,
+    "initial_sse": 0.8057353510553509,
+    "proposed_sse": 0.7090612048419401,
+    "initial_blocks": [
+      0.0891080327868665,
+      0.1943759778958391
+    ],
+    "proposed_blocks": [
+      0.07407683868427385,
+      0.20573756192553952
+    ],
+    "bic_gain": 28.911220780431012,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923301,
+    "axis": 2,
+    "initial": 14.814872731822495,
+    "installed": 14.814872731822495,
+    "lower": 14.197774174867357,
+    "upper": 15.431971288777634,
+    "target": "D0^1(v)",
+    "background": [
+      "D2^1(v)",
+      "p^2",
+      "D1^1(p)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.12831334665031183,
+    "block_rows": [
+      54,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923301,
+    "axis": 2,
+    "initial": 19.735219266452905,
+    "installed": 19.735219266452905,
+    "lower": 19.118120709497767,
+    "upper": 20.352317823408043,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.14944548763795845,
+    "block_rows": [
+      54,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 17.611389725792034,
+    "installed": 17.611389725792034,
+    "lower": 16.354752664356116,
+    "upper": 18.86802678722795,
+    "target": "D0^1(u)",
+    "background": [
+      "D2^3(u)",
+      "D2^1(u)",
+      "D2^1(p)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.04021164687231215,
+    "block_rows": [
+      60,
+      90
+    ],
+    "proposed": 17.951734400587313,
+    "profile_fits": 11,
+    "initial_sse": 1.117142186876762,
+    "proposed_sse": 1.1047708190108503,
+    "initial_blocks": [
+      0.27390420339347465,
+      0.3201658420311205
+    ],
+    "proposed_blocks": [
+      0.26839170154630254,
+      0.3217162963625727
+    ],
+    "bic_gain": -2.591730127891706,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 25.127005114665913,
+    "installed": 25.127005114665913,
+    "lower": 23.870368053229996,
+    "upper": 26.38364217610183,
+    "target": "D0^2(v)",
+    "background": [
+      "D2^2(v)",
+      "p^1",
+      "D1^1(u)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(v)",
+    "initial_fraction_explained": 0.11567378215290966,
+    "block_rows": [
+      60,
+      90
+    ],
+    "proposed": 25.23449227765365,
+    "profile_fits": 13,
+    "initial_sse": 2.7165980623721238,
+    "proposed_sse": 2.7118291277880573,
+    "initial_blocks": [
+      1.0878864345803643,
+      0.8677445017661043
+    ],
+    "proposed_blocks": [
+      1.08730478335717,
+      0.8595299005213223
+    ],
+    "bic_gain": -5.124025739303632,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 11.411022254742079,
+    "installed": 11.411022254742079,
+    "lower": 10.448909504580204,
+    "upper": 12.373135004903954,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.08670039835415429,
+    "block_rows": [
+      45,
+      45
+    ],
+    "proposed": 11.112583651926764,
+    "profile_fits": 12,
+    "initial_sse": 0.056014489493698374,
+    "proposed_sse": 0.05552443781385221,
+    "initial_blocks": [
+      0.007928248222048911,
+      0.019317265148407866
+    ],
+    "proposed_blocks": [
+      0.0070232890122106035,
+      0.018198426754700424
+    ],
+    "bic_gain": -3.2258905365401827,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 15.409268760138945,
+    "installed": 15.409268760138945,
+    "lower": 14.44715600997707,
+    "upper": 16.371381510300818,
+    "target": "D0^1(u)",
+    "background": [
+      "D2^3(u)",
+      "D2^1(u)",
+      "D2^1(p)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.30122434536945597,
+    "block_rows": [
+      45,
+      45
+    ],
+    "proposed": 16.371381510300818,
+    "profile_fits": 23,
+    "initial_sse": 0.8133373992363433,
+    "proposed_sse": 0.7139978742189342,
+    "initial_blocks": [
+      0.09442799277039032,
+      0.1948947902460113
+    ],
+    "proposed_blocks": [
+      0.0780440219174029,
+      0.2069161912849166
+    ],
+    "bic_gain": 29.573409817584594,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923302,
+    "axis": 2,
+    "initial": 13.565100483044011,
+    "installed": 13.565100483044011,
+    "lower": 12.948001926088873,
+    "upper": 14.18219903999915,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.25036736168414075,
+    "block_rows": [
+      54,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923302,
+    "axis": 2,
+    "initial": 19.75535119804734,
+    "installed": 19.75535119804734,
+    "lower": 19.1382526410922,
+    "upper": 20.372449755002478,
+    "target": "D0^1(u)",
+    "background": [
+      "D2^3(u)",
+      "D2^1(u)",
+      "D2^1(p)"
+    ],
+    "phase": "cos",
+    "modulator": "v",
+    "initial_fraction_explained": 0.12982009025560862,
+    "block_rows": [
+      54,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 17.597987735346987,
+    "installed": 17.597987735346987,
+    "lower": 16.34135067391107,
+    "upper": 18.854624796782904,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.05971784793835356,
+    "block_rows": [
+      60,
+      90
+    ],
+    "proposed": 17.572335844139772,
+    "profile_fits": 11,
+    "initial_sse": 0.07127042956392327,
+    "proposed_sse": 0.0712613162171569,
+    "initial_blocks": [
+      0.012096947027235138,
+      0.03141447077958669
+    ],
+    "proposed_blocks": [
+      0.012108095709907483,
+      0.031416483810722054
+    ],
+    "bic_gain": -5.563894863062141,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 27.653840176705323,
+    "installed": 28.26751554392246,
+    "lower": 26.397203115269406,
+    "upper": 28.91047723814124,
+    "target": "D0^1(v)",
+    "background": [
+      "D2^1(v)",
+      "p^2",
+      "D1^1(p)"
+    ],
+    "phase": "sin",
+    "modulator": "p",
+    "initial_fraction_explained": 0.11922122252784753,
+    "block_rows": [
+      60,
+      90
+    ],
+    "proposed": 28.26751554392246,
+    "profile_fits": 12,
+    "initial_sse": 0.3521147754021547,
+    "proposed_sse": 0.3215571333551668,
+    "initial_blocks": [
+      0.14299742266714177,
+      0.10934501249219139
+    ],
+    "proposed_blocks": [
+      0.13214925774040823,
+      0.08838571572671051
+    ],
+    "bic_gain": 18.912705167070232,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 11.37065823927649,
+    "installed": 11.37065823927649,
+    "lower": 10.408545489114616,
+    "upper": 12.332770989438366,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.04029637760904276,
+    "block_rows": [
+      45,
+      45
+    ],
+    "proposed": 11.339145843215482,
+    "profile_fits": 12,
+    "initial_sse": 0.0727425159266156,
+    "proposed_sse": 0.07273719592960928,
+    "initial_blocks": [
+      0.008446721523081922,
+      0.027202636747818282
+    ],
+    "proposed_blocks": [
+      0.008336746910366412,
+      0.027180377989441108
+    ],
+    "bic_gain": -5.578674886722529,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 15.395723680873767,
+    "installed": 16.35783643103564,
+    "lower": 14.433610930711891,
+    "upper": 16.35783643103564,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.07370262268969935,
+    "block_rows": [
+      45,
+      45
+    ],
+    "proposed": 16.35783643103564,
+    "profile_fits": 23,
+    "initial_sse": 0.07021042762546491,
+    "proposed_sse": 0.06515203149365932,
+    "initial_blocks": [
+      0.01044025452935926,
+      0.022028907931397782
+    ],
+    "proposed_blocks": [
+      0.007795996975111844,
+      0.021017260399247964
+    ],
+    "bic_gain": 14.590384376594987,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923303,
+    "axis": 2,
+    "initial": 17.273512087814545,
+    "installed": 17.273512087814545,
+    "lower": 16.656413530859407,
+    "upper": 17.890610644769684,
+    "target": "D0^1(v)",
+    "background": [
+      "D2^1(v)",
+      "p^2",
+      "D1^1(p)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.15053963055571276,
+    "block_rows": [
+      54,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "ns",
+    "seed": 923303,
+    "axis": 2,
+    "initial": 19.7493345027846,
+    "installed": 19.7493345027846,
+    "lower": 19.13223594582946,
+    "upper": 20.366433059739737,
+    "target": "D0^1(p)",
+    "background": [
+      "D2^1(p)",
+      "p^1",
+      "D2^2(v)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.12808988463515752,
+    "block_rows": [
+      54,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "ode",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 2.0540386120499,
+    "installed": 2.0540386120499,
+    "lower": 1.6613395303511744,
+    "upper": 2.4467376937486254,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "1",
+      "x0^2"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.6705508456165418,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 2.1538710402011128,
+    "profile_fits": 11,
+    "initial_sse": 38.76243656668131,
+    "proposed_sse": 16.3736100777259,
+    "initial_blocks": [
+      11.257946635618689,
+      12.149691617168084
+    ],
+    "proposed_blocks": [
+      12.288478771378811,
+      2.1219815152236876
+    ],
+    "bic_gain": 50.99508496752494,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "ode",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 15.709554461033182,
+    "installed": 16.10225354273191,
+    "lower": 15.316855379334456,
+    "upper": 16.10225354273191,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "x0^2",
+      "u^2"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.3743688061794298,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 16.10225354273191,
+    "profile_fits": 23,
+    "initial_sse": 36.149106610634725,
+    "proposed_sse": 18.191257913811533,
+    "initial_blocks": [
+      18.873706105959972,
+      13.152561205167123
+    ],
+    "proposed_blocks": [
+      11.509839817342451,
+      1.2783140805412827
+    ],
+    "bic_gain": 39.790626716407694,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ode",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 2.0624736066021807,
+    "installed": 2.2619709478557395,
+    "lower": 1.6697745249034552,
+    "upper": 2.455172688300906,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "u^3",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.8338203525079984,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 2.2619709478557395,
+    "profile_fits": 15,
+    "initial_sse": 20.15650347842301,
+    "proposed_sse": 11.752226689967905,
+    "initial_blocks": [
+      11.49664682743135,
+      2.450742973210194
+    ],
+    "proposed_blocks": [
+      9.764316209362544,
+      0.8963850779587419
+    ],
+    "bic_gain": 30.368109647854777,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ode",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 28.108876428223322,
+    "installed": 27.9635622658527,
+    "lower": 27.716177346524596,
+    "upper": 28.50157550992205,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "x0^2",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.6583673500702237,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 27.9635622658527,
+    "profile_fits": 12,
+    "initial_sse": 20.915600049952214,
+    "proposed_sse": 14.345218510751112,
+    "initial_blocks": [
+      8.39013579318415,
+      4.896399373388739
+    ],
+    "proposed_blocks": [
+      7.794180082659157,
+      3.3969287226132763
+    ],
+    "bic_gain": 19.974148120539247,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ode",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 2.059415080535508,
+    "installed": 2.1641238602282886,
+    "lower": 1.6667159988367826,
+    "upper": 2.4521141622342335,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^1",
+      "x0^2",
+      "1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.6778249544399747,
+    "block_rows": [
+      32,
+      32
+    ],
+    "proposed": 2.1641238602282886,
+    "profile_fits": 12,
+    "initial_sse": 57.06070064573455,
+    "proposed_sse": 25.895907983983,
+    "initial_blocks": [
+      21.487306814046143,
+      15.95574639666144
+    ],
+    "proposed_blocks": [
+      15.301270018890463,
+      6.675925018479355
+    ],
+    "bic_gain": 52.6055415081295,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ode",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 56.627128818664914,
+    "installed": 56.627128818664914,
+    "lower": 56.23442973696619,
+    "upper": 57.01982790036364,
+    "target": "D0^2(u)",
+    "background": [
+      "u^3",
+      "x0^2",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.2379283517500412,
+    "block_rows": [
+      32,
+      32
+    ],
+    "proposed": 56.52810521072319,
+    "profile_fits": 10,
+    "initial_sse": 125.12550162877689,
+    "proposed_sse": 122.17694162617089,
+    "initial_blocks": [
+      84.80677332044175,
+      31.978936500741604
+    ],
+    "proposed_blocks": [
+      84.49505733527742,
+      26.251893308094544
+    ],
+    "bic_gain": -2.559688494894096,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 477.35216205767824,
+    "installed": 477.35216205767824,
+    "lower": 464.78579144331906,
+    "upper": 489.91853267203743,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.047852116412795485,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 471.9191214836754,
+    "profile_fits": 12,
+    "initial_sse": 2.624485709013979,
+    "proposed_sse": 2.547527858013172,
+    "initial_blocks": [
+      1.921792085505967,
+      0.15829236563310647
+    ],
+    "proposed_blocks": [
+      1.871827690471825,
+      0.10763075908378744
+    ],
+    "bic_gain": -1.4678854486313613,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 979.6267765776872,
+    "installed": 979.6267765776872,
+    "lower": 967.0604059633281,
+    "upper": 992.1931471920464,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.16102956621298867,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 976.361421361134,
+    "profile_fits": 11,
+    "initial_sse": 1907.0547780621353,
+    "proposed_sse": 1842.720471747794,
+    "initial_blocks": [
+      675.0451972970512,
+      732.8468722835462
+    ],
+    "proposed_blocks": [
+      668.9803502738744,
+      708.0531543227439
+    ],
+    "bic_gain": -0.9758893959727968,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 136.93716378518613,
+    "installed": 136.93716378518613,
+    "lower": 133.82698705813226,
+    "upper": 140.04734051224,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.03752107534322936,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 136.4773662464195,
+    "profile_fits": 12,
+    "initial_sse": 2187.800616245289,
+    "proposed_sse": 2141.32879538912,
+    "initial_blocks": [
+      686.9904522437816,
+      729.9277784757766
+    ],
+    "proposed_blocks": [
+      693.9693045696655,
+      677.1623129277215
+    ],
+    "bic_gain": -2.363351180465828,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 286.0828332032717,
+    "installed": 286.0828332032717,
+    "lower": 282.9726564762178,
+    "upper": 289.1930099303256,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.048361253014774425,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 286.2703082692884,
+    "profile_fits": 15,
+    "initial_sse": 2.623082332753985,
+    "proposed_sse": 2.6101020812107945,
+    "initial_blocks": [
+      1.6440552169575025,
+      0.816410375660688
+    ],
+    "proposed_blocks": [
+      1.6393374040166286,
+      0.809001523104564
+    ],
+    "bic_gain": -4.146369468828646,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 402.34157215528836,
+    "installed": 402.34157215528836,
+    "lower": 389.7752015409292,
+    "upper": 414.90794276964755,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.2249245116237555,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 404.60599300944165,
+    "profile_fits": 13,
+    "initial_sse": 2.1747291873231185,
+    "proposed_sse": 1.7830632631929537,
+    "initial_blocks": [
+      1.6092101780120052,
+      0.152685356436232
+    ],
+    "proposed_blocks": [
+      1.3931829366154633,
+      0.18352701887944428
+    ],
+    "bic_gain": 16.763571942173314,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 1181.0505411916045,
+    "installed": 1193.6169118059636,
+    "lower": 1168.4841705772453,
+    "upper": 1193.6169118059636,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.19415501606207172,
+    "block_rows": [
+      36,
+      36
+    ],
+    "proposed": 1193.6169118059636,
+    "profile_fits": 11,
+    "initial_sse": 1109.546489414517,
+    "proposed_sse": 832.5164158235086,
+    "initial_blocks": [
+      488.02997022285393,
+      435.0023708888137
+    ],
+    "proposed_blocks": [
+      432.54106662435316,
+      286.26452061191804
+    ],
+    "bic_gain": 26.341268627492287,
+    "decision": "installed"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 87.13936380637865,
+    "installed": 86.60856137561345,
+    "lower": 84.02918707932479,
+    "upper": 90.24954053343252,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.1723302695945809,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 86.60856137561345,
+    "profile_fits": 13,
+    "initial_sse": 1139.5964013802552,
+    "proposed_sse": 920.6968162387215,
+    "initial_blocks": [
+      501.61169652807195,
+      258.5120052446934
+    ],
+    "proposed_blocks": [
+      439.38100044661655,
+      227.85853545537057
+    ],
+    "bic_gain": 18.354123244817245,
+    "decision": "installed"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 124.43390567567222,
+    "installed": 124.43390567567222,
+    "lower": 121.32372894861835,
+    "upper": 127.54408240272609,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.05123995120329516,
+    "block_rows": [
+      36,
+      24
+    ],
+    "proposed": 124.73277414386436,
+    "profile_fits": 13,
+    "initial_sse": 2.6620583424807207,
+    "proposed_sse": 2.63509955969562,
+    "initial_blocks": [
+      1.561968473241262,
+      0.9027432679727878
+    ],
+    "proposed_blocks": [
+      1.469985542817832,
+      0.9564155325073967
+    ],
+    "bic_gain": -3.582834686532099,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 301.8929174310619,
+    "installed": 313.00910632977804,
+    "lower": 289.3265468167027,
+    "upper": 314.4592880454211,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.03932007590041052,
+    "block_rows": [
+      84,
+      84
+    ],
+    "proposed": 313.00910632977804,
+    "profile_fits": 13,
+    "initial_sse": 13.471385598362424,
+    "proposed_sse": 12.949907032671733,
+    "initial_blocks": [
+      11.075897395965491,
+      0.7152850867511404
+    ],
+    "proposed_blocks": [
+      10.737657102573396,
+      0.32068461855549063
+    ],
+    "bic_gain": 4.419339760967232,
+    "decision": "installed"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 1281.848871341569,
+    "installed": 1281.848871341569,
+    "lower": 1269.28250072721,
+    "upper": 1294.4152419559282,
+    "target": "D0^1(u)",
+    "background": [
+      "u^2",
+      "u^3",
+      "u^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.03350764130175662,
+    "block_rows": [
+      84,
+      84
+    ],
+    "proposed": 1292.603021956583,
+    "profile_fits": 14,
+    "initial_sse": 13.552891983350246,
+    "proposed_sse": 13.438660246162051,
+    "initial_blocks": [
+      11.833994324154004,
+      0.37543436220781295
+    ],
+    "proposed_blocks": [
+      11.72988255611302,
+      0.42310755367431463
+    ],
+    "bic_gain": -3.396423220186844,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 80.77870727107478,
+    "installed": 80.77870727107478,
+    "lower": 77.66853054402091,
+    "upper": 83.88888399812865,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.0029722215274466043,
+    "block_rows": [
+      108,
+      96
+    ],
+    "proposed": 80.77870727107478,
+    "profile_fits": 15,
+    "initial_sse": 6436.103696744964,
+    "proposed_sse": 6436.103696744964,
+    "initial_blocks": [
+      2951.38485606371,
+      2523.320944935548
+    ],
+    "proposed_blocks": [
+      2951.38485606371,
+      2523.320944935548
+    ],
+    "bic_gain": -5.529429087511423,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_compound",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 217.63425721081984,
+    "installed": 218.17484601568069,
+    "lower": 214.52408048376597,
+    "upper": 220.7444339378737,
+    "target": "D0^2(u)",
+    "background": [
+      "D0(u)",
+      "u^1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.018729515421949627,
+    "block_rows": [
+      108,
+      96
+    ],
+    "proposed": 218.17484601568069,
+    "profile_fits": 13,
+    "initial_sse": 6334.3857911110035,
+    "proposed_sse": 6195.261142979514,
+    "initial_blocks": [
+      2906.4556040795305,
+      2456.15819791196
+    ],
+    "proposed_blocks": [
+      2869.445170122939,
+      2342.905693963071
+    ],
+    "bic_gain": 0.067033838196501,
+    "decision": "installed"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 477.34882676670554,
+    "installed": 477.34882676670554,
+    "lower": 464.78245615234636,
+    "upper": 489.91519738106473,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^3(u)",
+      "D1^4(u)",
+      "x1^1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.03915460736164179,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 478.8775437966079,
+    "profile_fits": 11,
+    "initial_sse": 1300.3585724175148,
+    "proposed_sse": 1296.176804445823,
+    "initial_blocks": [
+      395.5486728484593,
+      362.2191763010738
+    ],
+    "proposed_blocks": [
+      392.2253828087626,
+      382.23824013998376
+    ],
+    "bic_gain": -4.4009669952767405,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 979.6263885753094,
+    "installed": 979.6263885753094,
+    "lower": 967.0600179609503,
+    "upper": 992.1927591896685,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "D1^1(u)",
+      "D1^2(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.09657488172986174,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 982.2338173661249,
+    "profile_fits": 13,
+    "initial_sse": 0.3723073467720496,
+    "proposed_sse": 0.36391550510908793,
+    "initial_blocks": [
+      0.2007167977254729,
+      0.07227967090258487
+    ],
+    "proposed_blocks": [
+      0.20189012417270066,
+      0.06930825475132099
+    ],
+    "bic_gain": -2.0517314682678025,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 142.8670151896712,
+    "installed": 142.8670151896712,
+    "lower": 139.75683846261734,
+    "upper": 145.97719191672508,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "D1^1(u)",
+      "D1^2(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.7168788405921749,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 286.0827880028252,
+    "installed": 286.0827880028252,
+    "lower": 282.9726112757713,
+    "upper": 289.1929647298791,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "D1^1(u)",
+      "D1^2(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.22965199841503264,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 402.34616846302714,
+    "installed": 402.34616846302714,
+    "lower": 389.77979784866795,
+    "upper": 414.9125390773863,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^3(u)",
+      "D1^4(u)",
+      "D1^2(u)"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.05259852613518507,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 394.05032879620524,
+    "profile_fits": 13,
+    "initial_sse": 631.3697491496245,
+    "proposed_sse": 611.0562125411722,
+    "initial_blocks": [
+      122.73799695098604,
+      312.6005250091786
+    ],
+    "proposed_blocks": [
+      125.27873650083832,
+      315.45932810122144
+    ],
+    "bic_gain": -0.8631667352415979,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 1181.0505426852728,
+    "installed": 1181.0505426852728,
+    "lower": 1168.4841720709137,
+    "upper": 1193.616913299632,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "D1^1(u)",
+      "D1^2(u)"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.08250054129323099,
+    "block_rows": [
+      40,
+      40
+    ],
+    "proposed": 1189.0887897364078,
+    "profile_fits": 16,
+    "initial_sse": 0.36366528560066275,
+    "proposed_sse": 0.3583813356843647,
+    "initial_blocks": [
+      0.16110557959791724,
+      0.09440847633534173
+    ],
+    "proposed_blocks": [
+      0.16009217121572888,
+      0.0882086230488312
+    ],
+    "bic_gain": -3.0311361542008277,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 87.14018392084282,
+    "installed": 87.14018392084282,
+    "lower": 84.03000719378895,
+    "upper": 90.25036064789668,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "D1^1(u)",
+      "D1^2(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.6268100122703073,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 124.43398327739523,
+    "installed": 124.43398327739523,
+    "lower": 121.32380655034136,
+    "upper": 127.5441600044491,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^3(u)",
+      "D1^4(u)",
+      "D1^2(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.11605816959826998,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 301.8902539824488,
+    "installed": 301.8902539824488,
+    "lower": 289.32388336808964,
+    "upper": 314.456624596808,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^3(u)",
+      "x0^1",
+      "D1^4(u)"
+    ],
+    "phase": "sin",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.025907692954078576,
+    "block_rows": [
+      115,
+      120
+    ],
+    "proposed": 300.1588156040685,
+    "profile_fits": 12,
+    "initial_sse": 36483.845719448575,
+    "proposed_sse": 36407.14331602884,
+    "initial_blocks": [
+      17399.162386784974,
+      11648.222561085942
+    ],
+    "proposed_blocks": [
+      17447.061304127285,
+      11281.126265560324
+    ],
+    "bic_gain": -5.0380118023100735,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 1281.8488247612386,
+    "installed": 1281.8488247612386,
+    "lower": 1269.2824541468794,
+    "upper": 1294.4151953755977,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^3(u)",
+      "x0^1",
+      "D1^4(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.09370666697506456,
+    "block_rows": [
+      115,
+      120
+    ],
+    "proposed": 1280.9504409895778,
+    "profile_fits": 12,
+    "initial_sse": 33944.4895514279,
+    "proposed_sse": 33877.669221698416,
+    "initial_blocks": [
+      16908.493780342553,
+      9975.578928601553
+    ],
+    "proposed_blocks": [
+      16966.317134044748,
+      10098.591083648816
+    ],
+    "bic_gain": -5.074895198886743,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 80.78461914918368,
+    "installed": 80.78461914918368,
+    "lower": 77.67444242212981,
+    "upper": 83.89479587623755,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^3(u)",
+      "x0^1",
+      "D1^4(u)"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.11425659060455144,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "pde_divide",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 217.6340281152221,
+    "installed": 217.6340281152221,
+    "lower": 214.52385138816823,
+    "upper": 220.74420484227596,
+    "target": "D0^1(u)",
+    "background": [
+      "u^1",
+      "D1^1(u)",
+      "D1^2(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.22417749376650187,
+    "block_rows": [
+      0,
+      0
+    ],
+    "decision": "too few disjoint block rows"
+  },
+  {
+    "dataset": "vdp",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 15.709765951646856,
+    "installed": 15.709765951646856,
+    "lower": 15.31706686994813,
+    "upper": 16.10246503334558,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "u^2",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.18091172960220178,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 16.10246503334558,
+    "profile_fits": 24,
+    "initial_sse": 17.043217740423863,
+    "proposed_sse": 15.758849857442597,
+    "initial_blocks": [
+      10.912632313661714,
+      3.5283333745661647
+    ],
+    "proposed_blocks": [
+      8.67621280327435,
+      4.087192498004709
+    ],
+    "bic_gain": 0.8555319520382056,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "vdp",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 59.57547396253075,
+    "installed": 59.57547396253075,
+    "lower": 59.18277488083203,
+    "upper": 59.968173044229474,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "u^3"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.5001362656044839,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 59.59048654566124,
+    "profile_fits": 15,
+    "initial_sse": 0.23991016294565556,
+    "proposed_sse": 0.23906034939216927,
+    "initial_blocks": [
+      0.07465236711416824,
+      0.1048310577543577
+    ],
+    "proposed_blocks": [
+      0.07232548073660999,
+      0.10367139771288567
+    ],
+    "bic_gain": -3.9317788124586324,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "vdp",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 20.429074729808484,
+    "installed": 20.661932422790333,
+    "lower": 20.036375648109757,
+    "upper": 20.82177381150721,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "u^2",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.19265833944254207,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 20.661932422790333,
+    "profile_fits": 13,
+    "initial_sse": 16.955768937853556,
+    "proposed_sse": 9.44886555478887,
+    "initial_blocks": [
+      11.076188794754467,
+      5.024711122167213
+    ],
+    "proposed_blocks": [
+      6.453994508438961,
+      2.1245277679398673
+    ],
+    "bic_gain": 33.2627770157854,
+    "decision": "installed"
+  },
+  {
+    "dataset": "vdp",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 28.108831808331633,
+    "installed": 27.78297031512246,
+    "lower": 27.716132726632907,
+    "upper": 28.50153089003036,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "u^2",
+      "u^3"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.3456097702501725,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 27.78297031512246,
+    "profile_fits": 13,
+    "initial_sse": 13.743486893969473,
+    "proposed_sse": 7.614647070286096,
+    "initial_blocks": [
+      5.40868145797743,
+      3.744362481270813
+    ],
+    "proposed_blocks": [
+      3.210974478010484,
+      2.3404159302426297
+    ],
+    "bic_gain": 33.63256605747219,
+    "decision": "installed"
+  },
+  {
+    "dataset": "vdp",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 52.63470706604783,
+    "installed": 52.388829813693185,
+    "lower": 52.24200798434911,
+    "upper": 53.027406147746554,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "u^2",
+      "u^3"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.16105485149762044,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 52.388829813693185,
+    "profile_fits": 13,
+    "initial_sse": 18.38883885358619,
+    "proposed_sse": 13.252231166480527,
+    "initial_blocks": [
+      12.047720976298313,
+      4.134709572384559
+    ],
+    "proposed_blocks": [
+      8.169114179722975,
+      3.175604352471659
+    ],
+    "bic_gain": 16.806106890712737,
+    "decision": "installed"
+  },
+  {
+    "dataset": "vdp",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 56.627129274329306,
+    "installed": 56.627129274329306,
+    "lower": 56.23443019263058,
+    "upper": 57.01982835602803,
+    "target": "D0^2(u)",
+    "background": [
+      "u^1",
+      "D0(u)",
+      "u^2"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.22619886711348142,
+    "block_rows": [
+      24,
+      24
+    ],
+    "proposed": 56.6146790726599,
+    "profile_fits": 12,
+    "initial_sse": 0.3706714395129296,
+    "proposed_sse": 0.3702464865862035,
+    "initial_blocks": [
+      0.20021138465935648,
+      0.12276257571273848
+    ],
+    "proposed_blocks": [
+      0.19863576915673103,
+      0.12485873415377588
+    ],
+    "bic_gain": -4.0854687702902455,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 88.06437542106117,
+    "installed": 88.06437542106117,
+    "lower": 81.78119011388159,
+    "upper": 94.34756072824075,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^4(u)",
+      "x0^2",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.032789160296772,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 88.6118831046832,
+    "profile_fits": 12,
+    "initial_sse": 62692.37097643773,
+    "proposed_sse": 62628.0848623376,
+    "initial_blocks": [
+      14987.813181284646,
+      29900.3114132069
+    ],
+    "proposed_blocks": [
+      14858.890182514797,
+      30047.497174826494
+    ],
+    "bic_gain": -4.603592723490747,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 226.2397954264045,
+    "installed": 226.2397954264045,
+    "lower": 219.9566101192249,
+    "upper": 232.5229807335841,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^2(u)",
+      "u^2",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.07306611688058998,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 226.5723938951069,
+    "profile_fits": 12,
+    "initial_sse": 20.363052755021172,
+    "proposed_sse": 20.345003744691297,
+    "initial_blocks": [
+      6.914354836308525,
+      9.071982950729042
+    ],
+    "proposed_blocks": [
+      6.926953514635275,
+      9.066144512113397
+    ],
+    "bic_gain": -4.619182447804149,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 93.16329154092253,
+    "installed": 93.16329154092253,
+    "lower": 90.0604839818215,
+    "upper": 96.26609910002355,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^4(u)",
+      "x0^2",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.011492656870635587,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 91.18800512643614,
+    "profile_fits": 12,
+    "initial_sse": 64072.7611028573,
+    "proposed_sse": 63612.014809773784,
+    "initial_blocks": [
+      15183.310826700224,
+      10137.1191842578
+    ],
+    "proposed_blocks": [
+      14677.538838480763,
+      10219.920927433093
+    ],
+    "bic_gain": -3.9101987676123686,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923301,
+    "axis": 1,
+    "initial": 105.34241055418876,
+    "installed": 105.34241055418876,
+    "lower": 102.23960299508774,
+    "upper": 108.44521811328978,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^2(u)",
+      "u^2",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.08322359837057303,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 105.57196242239367,
+    "profile_fits": 11,
+    "initial_sse": 20.139911347413324,
+    "proposed_sse": 20.09910595823696,
+    "initial_blocks": [
+      4.1325844968542835,
+      4.023634338063161
+    ],
+    "proposed_blocks": [
+      4.075859876892564,
+      4.055736639968941
+    ],
+    "bic_gain": -4.4913459505551945,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 150.75279393797956,
+    "installed": 154.542532214345,
+    "lower": 144.46960863079997,
+    "upper": 157.03597924515915,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^2(u)",
+      "D0(u)",
+      "u^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.010156156865398246,
+    "block_rows": [
+      26,
+      26
+    ],
+    "proposed": 154.542532214345,
+    "profile_fits": 13,
+    "initial_sse": 1401.328360100211,
+    "proposed_sse": 1330.7866614079053,
+    "initial_blocks": [
+      427.7191593367113,
+      157.81660325774934
+    ],
+    "proposed_blocks": [
+      342.1012993982999,
+      80.2292954019079
+    ],
+    "bic_gain": 3.0076022254679904,
+    "decision": "installed"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 175.5832214397933,
+    "installed": 175.5832214397933,
+    "lower": 169.3000361326137,
+    "upper": 181.8664067469729,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^2(u)",
+      "1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.0335686070918892,
+    "block_rows": [
+      26,
+      26
+    ],
+    "proposed": 178.99447884034376,
+    "profile_fits": 14,
+    "initial_sse": 4.796086822548844,
+    "proposed_sse": 4.74946518267585,
+    "initial_blocks": [
+      2.2158884847832785,
+      0.6227833411693475
+    ],
+    "proposed_blocks": [
+      2.21038349169935,
+      0.6574854498481083
+    ],
+    "bic_gain": -3.525997848296013,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 179.79837013374228,
+    "installed": 179.79837013374228,
+    "lower": 176.69556257464126,
+    "upper": 182.9011776928433,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^2(u)",
+      "1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.1300363945921112,
+    "block_rows": [
+      24,
+      36
+    ],
+    "proposed": 179.06919351790413,
+    "profile_fits": 11,
+    "initial_sse": 4.31734835458783,
+    "proposed_sse": 4.166291972336918,
+    "initial_blocks": [
+      1.3277098587630876,
+      0.33453453803342614
+    ],
+    "proposed_blocks": [
+      1.4001314433287921,
+      0.36655339739774756
+    ],
+    "bic_gain": 0.5060811900174444,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923302,
+    "axis": 1,
+    "initial": 223.69988688798423,
+    "installed": 223.69988688798423,
+    "lower": 220.5970793288832,
+    "upper": 226.80269444708526,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^2(u)",
+      "1",
+      "x0^1"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.24315205226682848,
+    "block_rows": [
+      24,
+      36
+    ],
+    "proposed": 223.27070177710024,
+    "profile_fits": 13,
+    "initial_sse": 3.755991884611032,
+    "proposed_sse": 3.6277667554907387,
+    "initial_blocks": [
+      1.0018422797503628,
+      0.8327474276228561
+    ],
+    "proposed_blocks": [
+      1.0554003347081835,
+      0.6589489634724033
+    ],
+    "bic_gain": 0.36882904917298376,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 50.00864429987395,
+    "installed": 50.00864429987395,
+    "lower": 43.72545899269437,
+    "upper": 56.29182960705353,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^4(u)",
+      "D1^1(u)",
+      "D0(u)"
+    ],
+    "phase": "cos",
+    "modulator": "constant",
+    "initial_fraction_explained": 0.09333462901108311,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 49.33158912924077,
+    "profile_fits": 11,
+    "initial_sse": 54118.70330300489,
+    "proposed_sse": 53835.844457164174,
+    "initial_blocks": [
+      27005.71615989954,
+      20411.352545874757
+    ],
+    "proposed_blocks": [
+      26873.22125671379,
+      20478.150214978632
+    ],
+    "bic_gain": -4.131580322897639,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 162.62760672063206,
+    "installed": 162.62760672063206,
+    "lower": 156.34442141345247,
+    "upper": 168.91079202781165,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^4(u)",
+      "D1^1(u)",
+      "D0(u)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.03917460341539875,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 160.41826763923956,
+    "profile_fits": 11,
+    "initial_sse": 57351.50610973283,
+    "proposed_sse": 56685.241970172996,
+    "initial_blocks": [
+      25654.679382298953,
+      24472.877716105155
+    ],
+    "proposed_blocks": [
+      25654.00655967624,
+      24177.9606389294
+    ],
+    "bic_gain": -3.409755260480274,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 49.17415753641863,
+    "installed": 49.17415753641863,
+    "lower": 46.0713499773176,
+    "upper": 52.276965095519664,
+    "target": "D0^2(u)",
+    "background": [
+      "D1^4(u)",
+      "D1^1(u)",
+      "D0(u)"
+    ],
+    "phase": "cos",
+    "modulator": "D0(u)",
+    "initial_fraction_explained": 0.03132163129531431,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 47.27198876554517,
+    "profile_fits": 12,
+    "initial_sse": 57820.248693063295,
+    "proposed_sse": 56714.158233463546,
+    "initial_blocks": [
+      8089.531220545205,
+      11810.276253504391
+    ],
+    "proposed_blocks": [
+      7846.567714136649,
+      11660.641379662346
+    ],
+    "bic_gain": -2.555201636494799,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "wave",
+    "seed": 923303,
+    "axis": 1,
+    "initial": 68.41984369941558,
+    "installed": 68.41984369941558,
+    "lower": 65.31703614031456,
+    "upper": 71.5226512585166,
+    "target": "D0^1(u)",
+    "background": [
+      "D1^2(u)",
+      "1",
+      "x0^1"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.007563603696253849,
+    "block_rows": [
+      16,
+      32
+    ],
+    "proposed": 65.8883148698378,
+    "profile_fits": 13,
+    "initial_sse": 21.31750692010744,
+    "proposed_sse": 20.620953279190488,
+    "initial_blocks": [
+      4.104496961741721,
+      4.885745414609879
+    ],
+    "proposed_blocks": [
+      4.241113358663614,
+      4.508891691267888
+    ],
+    "bic_gain": -0.9977527031132092,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ode_simple",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 24.793048989148893,
+    "installed": 24.793048989148893,
+    "lower": 24.29554898914889,
+    "upper": 25.290548989148895,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x0^1",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.04980744478065955,
+    "block_rows": [
+      34,
+      34
+    ],
+    "proposed": 24.690932374039612,
+    "profile_fits": 12,
+    "initial_sse": 6.897515972419372,
+    "proposed_sse": 6.698375029572757,
+    "initial_blocks": [
+      0.3985535551020509,
+      5.956428038821026
+    ],
+    "proposed_blocks": [
+      0.3151690923626348,
+      5.638852829688532
+    ],
+    "bic_gain": -1.969920987408813,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ode_simple",
+    "seed": 923301,
+    "axis": 0,
+    "initial": 29.50584037710967,
+    "installed": 29.50584037710967,
+    "lower": 29.00834037710967,
+    "upper": 30.003340377109673,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x0^1",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.07965396703239253,
+    "block_rows": [
+      34,
+      34
+    ],
+    "proposed": 29.608076052082133,
+    "profile_fits": 11,
+    "initial_sse": 6.680857924719794,
+    "proposed_sse": 6.5286135004838375,
+    "initial_blocks": [
+      0.4497677150756093,
+      5.279868523623859
+    ],
+    "proposed_blocks": [
+      0.4699421168196502,
+      5.129556337248178
+    ],
+    "bic_gain": -2.4944640829233222,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ode_simple",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 27.0384514803647,
+    "installed": 27.0384514803647,
+    "lower": 26.540951480364697,
+    "upper": 27.5359514803647,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x0^1",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.07159331115824652,
+    "block_rows": [
+      34,
+      34
+    ],
+    "proposed": 26.981843966823075,
+    "profile_fits": 12,
+    "initial_sse": 5.944933778087195,
+    "proposed_sse": 5.929578792381436,
+    "initial_blocks": [
+      0.41898124327651487,
+      5.200331378278426
+    ],
+    "proposed_blocks": [
+      0.4125984378135438,
+      5.177829322304526
+    ],
+    "bic_gain": -4.213575120830784,
+    "decision": "BIC penalty"
+  },
+  {
+    "dataset": "ode_simple",
+    "seed": 923302,
+    "axis": 0,
+    "initial": 44.00504765449601,
+    "installed": 44.00504765449601,
+    "lower": 43.50754765449601,
+    "upper": 44.50254765449601,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x0^1",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.3679680591759856,
+    "block_rows": [
+      34,
+      34
+    ],
+    "proposed": 44.11022543410484,
+    "profile_fits": 11,
+    "initial_sse": 4.047135893131351,
+    "proposed_sse": 3.7069108199457874,
+    "initial_blocks": [
+      1.3790963161178238,
+      2.47063037946326
+    ],
+    "proposed_blocks": [
+      1.4095918151279616,
+      2.0467320142519974
+    ],
+    "bic_gain": 2.945271701682646,
+    "decision": "training blocks disagree"
+  },
+  {
+    "dataset": "ode_simple",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 41.7264139693849,
+    "installed": 41.2289139693849,
+    "lower": 41.2289139693849,
+    "upper": 42.2239139693849,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x0^1",
+      "u^2"
+    ],
+    "phase": "sin",
+    "modulator": "u",
+    "initial_fraction_explained": 0.05527992783598498,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 41.2289139693849,
+    "profile_fits": 11,
+    "initial_sse": 16.91793403740115,
+    "proposed_sse": 13.017875558656783,
+    "initial_blocks": [
+      3.6901432179882456,
+      12.452032423059292
+    ],
+    "proposed_blocks": [
+      3.149551124251859,
+      9.529143322892782
+    ],
+    "bic_gain": 19.586884009601413,
+    "decision": "installed"
+  },
+  {
+    "dataset": "ode_simple",
+    "seed": 923303,
+    "axis": 0,
+    "initial": 44.83768487057566,
+    "installed": 44.83768487057566,
+    "lower": 44.340184870575655,
+    "upper": 45.33518487057566,
+    "target": "D0^1(u)",
+    "background": [
+      "x0^2",
+      "x0^1",
+      "u^2"
+    ],
+    "phase": "cos",
+    "modulator": "u",
+    "initial_fraction_explained": 0.013953463711086288,
+    "block_rows": [
+      42,
+      42
+    ],
+    "proposed": 45.33518487057566,
+    "profile_fits": 12,
+    "initial_sse": 17.658003413150244,
+    "proposed_sse": 17.30635435565308,
+    "initial_blocks": [
+      3.0336986354571644,
+      14.100766694376812
+    ],
+    "proposed_blocks": [
+      3.302210686585411,
+      13.561711993253716
+    ],
+    "bic_gain": -2.6711723371271408,
+    "decision": "BIC penalty"
+  }
+]

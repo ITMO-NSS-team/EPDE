@@ -1,0 +1,29 @@
+Exploratory follow-ups to the residual-product protocol
+2026-11-16
+
+These checks were added AFTER inspecting the initial GCV-based experiment.
+They are not presented as preregistered successes.
+
+1. Exact leave-one-out bandwidth sensitivity
+The seed-1/group-0 training GCV selected 498 modes out of 500 observations
+(499 fitted degrees of freedom). This makes the discrepancy sensitive to an
+almost saturated field-prediction fit. Evaluate exactly the same nested DCT
+projection family by leave-one-out error instead:
+  mean_i [(y_i - fitted_i)/(1 - H_ii)]^2.
+Apply this selection rule to EVERY training group, using only its observations.
+Keep coefficients, bootstrap fields, bias correction, dyad, and all other
+settings the same. Save separately as residual_product_results_loo.
+Validate the formula against explicit omitted-observation refits.
+
+2. Monte Carlo check of the smallest observed margin
+At 128 bootstrap draws the exact-LOO variant makes the reference nondominated
+in all three seeds, but seed 1 has a margin of only 0.000142 over family A.
+Extend that seed's three independent bootstrap streams from 128 to 256 draws,
+without replacing the existing first 128. Recompute the same fits/corrections
+and scores. No other setting changes. Save as residual_product_mc_check.
+Report a sign change if it occurs; do not select the draw count by the desired
+ranking. More bootstrap draws reduce Monte Carlo error, not record noise.
+
+Conditional uncertainty remains broad in the initial experiment. Neither a
+positive point margin nor unchanged Monte Carlo ranks establishes reliable
+separation. The fixed-archive, three-seed feasibility scope remains unchanged.

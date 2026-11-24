@@ -1,0 +1,410 @@
+[
+  {
+    "profile": "iid",
+    "seed": 4705,
+    "by_bank": {
+      "whole_local": {
+        "clean": 8.40316345300159e-06,
+        "observed": 0.061700503688075864
+      },
+      "whole_broad": {
+        "clean": 0.10874567988804577,
+        "observed": 0.2432583095883693
+      },
+      "whole_selected": {
+        "clean": 0.002410858567526323,
+        "observed": 0.05815496357458537
+      },
+      "projected_local": {
+        "clean": 0.0011829864029298815,
+        "observed": 0.0005904111448444486
+      },
+      "projected_broad": {
+        "clean": 2.1197936964707993,
+        "observed": 3.0803075721355406
+      },
+      "projected_selected": {
+        "clean": 2.0404227127286925,
+        "observed": 2.9289738187737986
+      }
+    },
+    "maximum": {
+      "clean": 2.1197936964707993,
+      "observed": 3.0803075721355406
+    }
+  },
+  {
+    "profile": "iid",
+    "seed": 4706,
+    "by_bank": {
+      "whole_local": {
+        "clean": 1.1071385036955662e-05,
+        "observed": 0.09314347648327936
+      },
+      "whole_broad": {
+        "clean": 0.1993992259378573,
+        "observed": 0.5028391505761343
+      },
+      "whole_selected": {
+        "clean": 0.003500249429446279,
+        "observed": 0.26123143239586527
+      },
+      "projected_local": {
+        "clean": 0.0011338220659277796,
+        "observed": 0.016408072828867408
+      },
+      "projected_broad": {
+        "clean": 5.135600616276649,
+        "observed": 6.783761736114496
+      },
+      "projected_selected": {
+        "clean": 5.00891213731188,
+        "observed": 6.559157462440052
+      }
+    },
+    "maximum": {
+      "clean": 5.135600616276649,
+      "observed": 6.783761736114496
+    }
+  },
+  {
+    "profile": "iid",
+    "seed": 4707,
+    "by_bank": {
+      "whole_local": {
+        "clean": 7.876374879707403e-06,
+        "observed": 0.06701546311404025
+      },
+      "whole_broad": {
+        "clean": 0.11853307424446378,
+        "observed": 0.1206284441658428
+      },
+      "whole_selected": {
+        "clean": 0.0023327683361214708,
+        "observed": 0.06953184820316986
+      },
+      "projected_local": {
+        "clean": 0.0009661317645557785,
+        "observed": 0.0007618353242441026
+      },
+      "projected_broad": {
+        "clean": 4.552436455357573,
+        "observed": 2.432950492927004
+      },
+      "projected_selected": {
+        "clean": 4.4031564531621195,
+        "observed": 2.342936753028032
+      }
+    },
+    "maximum": {
+      "clean": 4.552436455357573,
+      "observed": 2.432950492927004
+    }
+  },
+  {
+    "profile": "iid",
+    "seed": 4708,
+    "by_bank": {
+      "whole_local": {
+        "clean": 6.304573975958104e-06,
+        "observed": 0.050202772714123954
+      },
+      "whole_broad": {
+        "clean": 0.0759201977412171,
+        "observed": 0.0910345037618997
+      },
+      "whole_selected": {
+        "clean": 0.0015846262118610578,
+        "observed": 0.03061082015939859
+      },
+      "projected_local": {
+        "clean": 0.0012097092024217664,
+        "observed": 0.09438106571590035
+      },
+      "projected_broad": {
+        "clean": 1.7684649754045523,
+        "observed": 1.8135771392633149
+      },
+      "projected_selected": {
+        "clean": 1.7407668700507113,
+        "observed": 1.8164744780810598
+      }
+    },
+    "maximum": {
+      "clean": 1.7684649754045523,
+      "observed": 1.8164744780810598
+    }
+  },
+  {
+    "profile": "negative",
+    "seed": 4705,
+    "by_bank": {
+      "whole_local": {
+        "clean": 3.861293554412325e-05,
+        "observed": 0.08241240122578357
+      },
+      "whole_broad": {
+        "clean": 0.747772653739535,
+        "observed": 0.8287482594573025
+      },
+      "whole_selected": {
+        "clean": 0.014295961411166853,
+        "observed": 0.10298602874508754
+      },
+      "projected_local": {
+        "clean": 0.006482599531652869,
+        "observed": 0.41579765236363436
+      },
+      "projected_broad": {
+        "clean": 14.47988756691665,
+        "observed": 14.607545034359815
+      },
+      "projected_selected": {
+        "clean": 14.490189258099058,
+        "observed": 14.602774966624196
+      }
+    },
+    "maximum": {
+      "clean": 14.490189258099058,
+      "observed": 14.607545034359815
+    }
+  },
+  {
+    "profile": "negative",
+    "seed": 4706,
+    "by_bank": {
+      "whole_local": {
+        "clean": 3.730485290115334e-05,
+        "observed": 0.07229444004307148
+      },
+      "whole_broad": {
+        "clean": 0.6582928297259567,
+        "observed": 0.7649809921348221
+      },
+      "whole_selected": {
+        "clean": 0.011283217947892379,
+        "observed": 0.04033998417692036
+      },
+      "projected_local": {
+        "clean": 0.00432511914702978,
+        "observed": 9.09353493931891e-06
+      },
+      "projected_broad": {
+        "clean": 18.72366568467267,
+        "observed": 20.963454426999327
+      },
+      "projected_selected": {
+        "clean": 18.48253982885947,
+        "observed": 20.748737363733344
+      }
+    },
+    "maximum": {
+      "clean": 18.72366568467267,
+      "observed": 20.963454426999327
+    }
+  },
+  {
+    "profile": "negative",
+    "seed": 4707,
+    "by_bank": {
+      "whole_local": {
+        "clean": 3.828678061959092e-05,
+        "observed": 0.07189268089735013
+      },
+      "whole_broad": {
+        "clean": 0.6839362586291636,
+        "observed": 0.8022695925212081
+      },
+      "whole_selected": {
+        "clean": 0.014288103867440267,
+        "observed": 0.08961703494013754
+      },
+      "projected_local": {
+        "clean": 0.005805301191053073,
+        "observed": 0.012760108276477323
+      },
+      "projected_broad": {
+        "clean": 23.553305615758546,
+        "observed": 24.81146363714763
+      },
+      "projected_selected": {
+        "clean": 22.992148268416113,
+        "observed": 24.087327148592802
+      }
+    },
+    "maximum": {
+      "clean": 23.553305615758546,
+      "observed": 24.81146363714763
+    }
+  },
+  {
+    "profile": "negative",
+    "seed": 4708,
+    "by_bank": {
+      "whole_local": {
+        "clean": 3.596689512663408e-05,
+        "observed": 0.05647854187899718
+      },
+      "whole_broad": {
+        "clean": 0.732254675208407,
+        "observed": 0.7471461991006285
+      },
+      "whole_selected": {
+        "clean": 0.012189343570995683,
+        "observed": 0.11103305967268269
+      },
+      "projected_local": {
+        "clean": 0.0035761428996916858,
+        "observed": 0.05917995129734771
+      },
+      "projected_broad": {
+        "clean": 17.178719591239197,
+        "observed": 16.118440844963988
+      },
+      "projected_selected": {
+        "clean": 16.638998604500117,
+        "observed": 15.440568956530068
+      }
+    },
+    "maximum": {
+      "clean": 17.178719591239197,
+      "observed": 16.118440844963988
+    }
+  },
+  {
+    "profile": "positive",
+    "seed": 4705,
+    "by_bank": {
+      "whole_local": {
+        "clean": 3.717696594591597e-06,
+        "observed": 0.06870590609522557
+      },
+      "whole_broad": {
+        "clean": 0.024162418951974147,
+        "observed": 0.033621103296486106
+      },
+      "whole_selected": {
+        "clean": 0.000556802817735969,
+        "observed": 0.12978424456561183
+      },
+      "projected_local": {
+        "clean": 0.0004773944731673161,
+        "observed": 0.08847848146122618
+      },
+      "projected_broad": {
+        "clean": 0.648418713917483,
+        "observed": 0.11166673432040757
+      },
+      "projected_selected": {
+        "clean": 0.6471248588808118,
+        "observed": 0.11164659029245276
+      }
+    },
+    "maximum": {
+      "clean": 0.648418713917483,
+      "observed": 0.12978424456561183
+    }
+  },
+  {
+    "profile": "positive",
+    "seed": 4706,
+    "by_bank": {
+      "whole_local": {
+        "clean": 3.260012908930491e-06,
+        "observed": 0.05888079601712756
+      },
+      "whole_broad": {
+        "clean": 0.022808161669883052,
+        "observed": 0.04316591066519399
+      },
+      "whole_selected": {
+        "clean": 0.0005510058006074713,
+        "observed": 0.06003596195671072
+      },
+      "projected_local": {
+        "clean": 0.0003195077167530644,
+        "observed": 0.3111591569535631
+      },
+      "projected_broad": {
+        "clean": 0.49893086811559473,
+        "observed": 0.43648682513750736
+      },
+      "projected_selected": {
+        "clean": 0.4812954601389273,
+        "observed": 0.4190536734505383
+      }
+    },
+    "maximum": {
+      "clean": 0.49893086811559473,
+      "observed": 0.43648682513750736
+    }
+  },
+  {
+    "profile": "positive",
+    "seed": 4707,
+    "by_bank": {
+      "whole_local": {
+        "clean": 5.193634141639955e-06,
+        "observed": 0.0915107479288278
+      },
+      "whole_broad": {
+        "clean": 0.03143497196926289,
+        "observed": 0.06062961830162256
+      },
+      "whole_selected": {
+        "clean": 0.0008558421137099982,
+        "observed": 0.119847701182673
+      },
+      "projected_local": {
+        "clean": 0.00046151329435834953,
+        "observed": 0.05605785302277353
+      },
+      "projected_broad": {
+        "clean": 0.7730559838839426,
+        "observed": 0.7441873485711255
+      },
+      "projected_selected": {
+        "clean": 0.7700338390935609,
+        "observed": 0.7133048760087585
+      }
+    },
+    "maximum": {
+      "clean": 0.7730559838839426,
+      "observed": 0.7441873485711255
+    }
+  },
+  {
+    "profile": "positive",
+    "seed": 4708,
+    "by_bank": {
+      "whole_local": {
+        "clean": 2.8077682835883354e-06,
+        "observed": 0.044796992357045276
+      },
+      "whole_broad": {
+        "clean": 0.01842164170079448,
+        "observed": 0.07764444287803517
+      },
+      "whole_selected": {
+        "clean": 0.00042033392261468626,
+        "observed": 0.05007252846969553
+      },
+      "projected_local": {
+        "clean": 0.0003933430160195564,
+        "observed": 0.01829379607984854
+      },
+      "projected_broad": {
+        "clean": 0.45480401491759653,
+        "observed": 0.5281932448815283
+      },
+      "projected_selected": {
+        "clean": 0.4362707635837376,
+        "observed": 0.48108758811510555
+      }
+    },
+    "maximum": {
+      "clean": 0.45480401491759653,
+      "observed": 0.5281932448815283
+    }
+  }
+]

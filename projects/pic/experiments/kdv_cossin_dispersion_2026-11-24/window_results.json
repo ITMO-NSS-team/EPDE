@@ -1,0 +1,2635 @@
+{
+  "forced_plan": {
+    "q": [
+      2,
+      4
+    ],
+    "ms": [
+      16,
+      16
+    ],
+    "ss": [
+      4,
+      4
+    ],
+    "cut": [
+      0,
+      0
+    ],
+    "shape": [
+      13,
+      13
+    ]
+  },
+  "unforced_plan": {
+    "q": [
+      2,
+      4
+    ],
+    "ms": [
+      16,
+      32
+    ],
+    "ss": [
+      16,
+      32
+    ],
+    "cut": [
+      0,
+      0
+    ],
+    "shape": [
+      11,
+      14
+    ]
+  },
+  "designs": {
+    "native": [
+      [
+        16
+      ],
+      [
+        [
+          0,
+          0
+        ]
+      ]
+    ],
+    "stagger": [
+      [
+        16
+      ],
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    ],
+    "wide": [
+      [
+        24,
+        32
+      ],
+      [
+        [
+          0,
+          0
+        ]
+      ]
+    ],
+    "wide_stagger": [
+      [
+        24,
+        32
+      ],
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    ]
+  },
+  "common_validation_widths": [
+    16,
+    24,
+    32
+  ],
+  "common_validation_offsets": [
+    [
+      2,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      3,
+      3
+    ]
+  ],
+  "cases": [
+    {
+      "seed": 0,
+      "unforced_seed": 10000,
+      "validation_seed": 20000,
+      "noise_percent": 0,
+      "unforced_coefficients": [
+        -6.000012087792876,
+        -1.0000201062569107
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            -6.001393929698232,
+            -0.9997147360150057,
+            1.000040486633073
+          ],
+          "frequencies": [
+            0.9994968843837657,
+            0.9992157254904419
+          ],
+          "clean_held_residual": 0.0003086607569152858,
+          "noisy_held_residual": 0.0003086607569152858,
+          "dispersion_column_error": 0.0,
+          "shifted_center_refit": {
+            "coefficients": [
+              -6.002163965269759,
+              -0.9997572391503886,
+              1.0000595103974574
+            ],
+            "frequencies": [
+              0.9994716986610475,
+              0.9992557195340493
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.000012087792876,
+            -1.0000201062569107,
+            0.9999862500378986
+          ],
+          "frequencies": [
+            0.9994869382703242,
+            0.9997057209074954
+          ],
+          "clean_held_residual": 0.0003337963668109772,
+          "noisy_held_residual": 0.0003337963668109772,
+          "dispersion_column_error": 0.0
+        },
+        "stagger_free": {
+          "coefficients": [
+            -6.001531285301926,
+            -0.999724930645923,
+            1.000059583627095
+          ],
+          "frequencies": [
+            0.999463925118514,
+            0.9992027700477606
+          ],
+          "clean_held_residual": 0.0003026511333452577,
+          "noisy_held_residual": 0.0003026511333452577,
+          "dispersion_column_error": 0.0,
+          "shifted_center_refit": {
+            "coefficients": [
+              -6.002464459472562,
+              -0.9997778604710368,
+              1.0000511847817095
+            ],
+            "frequencies": [
+              0.9994974687423158,
+              0.9993022544437472
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.000012087792876,
+            -1.0000201062569107,
+            0.9999751279010672
+          ],
+          "frequencies": [
+            0.9994528662424627,
+            0.9997126103182761
+          ],
+          "clean_held_residual": 0.0003307088560874931,
+          "noisy_held_residual": 0.0003307088560874931,
+          "dispersion_column_error": 0.0
+        },
+        "wide_free": {
+          "coefficients": [
+            -6.007156263230047,
+            -0.9993096553723765,
+            1.000482502527833
+          ],
+          "frequencies": [
+            0.9995331279994183,
+            0.9981758123995611
+          ],
+          "clean_held_residual": 0.0003143784822900439,
+          "noisy_held_residual": 0.0003143784822900439,
+          "dispersion_column_error": 0.0,
+          "shifted_center_refit": {
+            "coefficients": [
+              -6.009054616974447,
+              -0.9991869554166954,
+              -94705.13100569553
+            ],
+            "frequencies": [
+              250.32790427073706,
+              0.9978820881014925
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.000012087792876,
+            -1.0000201062569107,
+            0.9999886488010865
+          ],
+          "frequencies": [
+            0.9994449770190567,
+            0.9996875583038661
+          ],
+          "clean_held_residual": 0.0003343965042107453,
+          "noisy_held_residual": 0.0003343965042107453,
+          "dispersion_column_error": 0.0
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            -6.007554898360381,
+            -0.9992957525363219,
+            1.0005615368754484
+          ],
+          "frequencies": [
+            0.9995069880516146,
+            0.9980652971103918
+          ],
+          "clean_held_residual": 0.0003213800479186347,
+          "noisy_held_residual": 0.0003213800479186347,
+          "dispersion_column_error": 0.0,
+          "shifted_center_refit": {
+            "coefficients": [
+              -6.009617752936604,
+              -0.9991651248962122,
+              1.000531242521827
+            ],
+            "frequencies": [
+              0.999526013195517,
+              0.9979267568884594
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.000012087792876,
+            -1.0000201062569107,
+            0.9999745846149161
+          ],
+          "frequencies": [
+            0.9994105582871969,
+            0.9996979679339087
+          ],
+          "clean_held_residual": 0.00033465516750987994,
+          "noisy_held_residual": 0.00033465516750987994,
+          "dispersion_column_error": 0.0
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 0.0008495726429326917,
+        "dispersion_noise_over_forcing": {
+          "native": 0.0,
+          "stagger": 0.0,
+          "wide": 0.0,
+          "wide_stagger": 0.0
+        }
+      }
+    },
+    {
+      "seed": 923701,
+      "unforced_seed": 933701,
+      "validation_seed": 943701,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.990202930091367,
+        -0.9961064497260804
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.860718323723009,
+            -0.0033444133673968812,
+            -0.13924973424997908
+          ],
+          "frequencies": [
+            1.5099393021399257,
+            3.027426788231085
+          ],
+          "clean_held_residual": 0.18030168164957824,
+          "noisy_held_residual": 0.1819130416185144,
+          "dispersion_column_error": 0.8688246052151105,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6541358536803201,
+              -0.002914567849962385,
+              -0.15008016406639824
+            ],
+            "frequencies": [
+              1.5829178593121458,
+              3.0176017976444958
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.990202930091367,
+            -0.9961064497260804,
+            122693973409.11053
+          ],
+          "frequencies": [
+            1.229135400561575,
+            8.294401766166613e-12
+          ],
+          "clean_held_residual": 0.270755477947891,
+          "noisy_held_residual": 2.1908922741073527,
+          "dispersion_column_error": 0.8688246052151105
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.8912033785695759,
+            -0.0036204714184251835,
+            -0.1422313971876574
+          ],
+          "frequencies": [
+            1.5378687834277927,
+            3.054291018908287
+          ],
+          "clean_held_residual": 0.1784965306254625,
+          "noisy_held_residual": 0.18022374469454414,
+          "dispersion_column_error": 0.8469879975270987,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.5586348705543311,
+              -0.0022580231690641633,
+              -0.15196496026671422
+            ],
+            "frequencies": [
+              1.5864346157013476,
+              2.9788738943665756
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.990202930091367,
+            -0.9961064497260804,
+            2969370332.469763
+          ],
+          "frequencies": [
+            1.144485981190322,
+            3.2877161247352876e-10
+          ],
+          "clean_held_residual": 0.17802837737307992,
+          "noisy_held_residual": 2.1796257826251635,
+          "dispersion_column_error": 0.8469879975270987
+        },
+        "wide_free": {
+          "coefficients": [
+            0.236981047061101,
+            -0.11285781664287986,
+            -0.08703576709584726
+          ],
+          "frequencies": [
+            1.8704397834343447,
+            4.339558635052112
+          ],
+          "clean_held_residual": 0.1567592830255747,
+          "noisy_held_residual": 0.30027161465748625,
+          "dispersion_column_error": 0.14307961217240248,
+          "shifted_center_refit": {
+            "coefficients": [
+              0.5460186678286212,
+              -0.042756480433668545,
+              -0.12255567245443255
+            ],
+            "frequencies": [
+              1.6273187369588864,
+              3.430399771422885
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.990202930091367,
+            -0.9961064497260804,
+            -6.320217403317615e+18
+          ],
+          "frequencies": [
+            250.44094795435362,
+            1.3089662503067702e-14
+          ],
+          "clean_held_residual": 6.140852535708051,
+          "noisy_held_residual": 6.511948308181169,
+          "dispersion_column_error": 0.14307961217240248
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            0.2980907347488486,
+            -0.09945454057960362,
+            -0.09270676629295693
+          ],
+          "frequencies": [
+            1.8013844355850979,
+            4.10377682746211
+          ],
+          "clean_held_residual": 0.1580710384958991,
+          "noisy_held_residual": 0.2772958197245885,
+          "dispersion_column_error": 0.13784498362671546,
+          "shifted_center_refit": {
+            "coefficients": [
+              0.3779508318741403,
+              -0.0366272946520127,
+              -0.12683675922854493
+            ],
+            "frequencies": [
+              1.6133054499729416,
+              3.3514925750676348
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.990202930091367,
+            -0.9961064497260804,
+            2637587172352.1025
+          ],
+          "frequencies": [
+            0.8737555937231667,
+            3.323896876055582e-13
+          ],
+          "clean_held_residual": 0.1973436409988287,
+          "noisy_held_residual": 2.177052183903865,
+          "dispersion_column_error": 0.13784498362671546
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.1848322620641247,
+        "dispersion_noise_over_forcing": {
+          "native": 1.0497578114951105,
+          "stagger": 1.0291279526354404,
+          "wide": 0.17452137786514185,
+          "wide_stagger": 0.16910829725105467
+        }
+      }
+    },
+    {
+      "seed": 925701,
+      "unforced_seed": 935701,
+      "validation_seed": 945701,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.996161803561298,
+        -0.9959158178144706
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.9221872699935576,
+            -0.003813236357777361,
+            -0.13824711254516914
+          ],
+          "frequencies": [
+            1.499571594757356,
+            3.028590590421183
+          ],
+          "clean_held_residual": 0.18098449861448015,
+          "noisy_held_residual": 0.18584557248170888,
+          "dispersion_column_error": 0.7385555904697101,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6203700068932703,
+              -0.00020506019410740373,
+              -0.15074233617910998
+            ],
+            "frequencies": [
+              1.5635796184262154,
+              3.008940973941016
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.996161803561298,
+            -0.9959158178144706,
+            0.6558814798945054
+          ],
+          "frequencies": [
+            0.9136747471456106,
+            1.4752899199207286
+          ],
+          "clean_held_residual": 0.3432794029816377,
+          "noisy_held_residual": 2.238567086295208,
+          "dispersion_column_error": 0.7385555904697101
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.9323610269727887,
+            -0.002605214773793413,
+            -0.14204858773748513
+          ],
+          "frequencies": [
+            1.5240119661685978,
+            3.049138262522786
+          ],
+          "clean_held_residual": 0.17932149222506982,
+          "noisy_held_residual": 0.18360258874099353,
+          "dispersion_column_error": 0.7629854851832981,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.5061788823119864,
+              5.4990135063825996e-05,
+              -0.1524343415429773
+            ],
+            "frequencies": [
+              1.5676979519531038,
+              2.9742904112709203
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.996161803561298,
+            -0.9959158178144706,
+            0.6832803237245116
+          ],
+          "frequencies": [
+            0.8855920393714918,
+            1.3766542627314466
+          ],
+          "clean_held_residual": 0.3547708062750353,
+          "noisy_held_residual": 2.240164753090037,
+          "dispersion_column_error": 0.7629854851832981
+        },
+        "wide_free": {
+          "coefficients": [
+            7.748644717759182,
+            -0.1524274467940257,
+            0.0749426849915891
+          ],
+          "frequencies": [
+            8.434916687417717,
+            4.585585934416818
+          ],
+          "clean_held_residual": 0.16838348003651418,
+          "noisy_held_residual": 0.364310698481093,
+          "dispersion_column_error": 0.1741844239712391,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6269340672755108,
+              -0.03205879016410171,
+              -0.12503059626711877
+            ],
+            "frequencies": [
+              1.6140611313089608,
+              3.259211483431447
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.996161803561298,
+            -0.9959158178144706,
+            0.6561622066605972
+          ],
+          "frequencies": [
+            1.0199586605908812,
+            1.7252807590102066
+          ],
+          "clean_held_residual": 0.20397433478850147,
+          "noisy_held_residual": 2.225859160855511,
+          "dispersion_column_error": 0.1741844239712391
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            7.79193137948521,
+            -0.1548985813936612,
+            0.07672811896206869
+          ],
+          "frequencies": [
+            8.48932543121988,
+            4.6902492639114
+          ],
+          "clean_held_residual": 0.17195102056756661,
+          "noisy_held_residual": 0.36988627009713615,
+          "dispersion_column_error": 0.16884842321483767,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.2145069273101872,
+              -0.022766587002696667,
+              -0.13158428476801037
+            ],
+            "frequencies": [
+              1.5826774751855008,
+              3.172140013111866
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.996161803561298,
+            -0.9959158178144706,
+            0.6864789111029183
+          ],
+          "frequencies": [
+            1.0089231913728678,
+            1.6191475711366403
+          ],
+          "clean_held_residual": 0.1717482755436433,
+          "noisy_held_residual": 2.224112658520213,
+          "dispersion_column_error": 0.16884842321483767
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.2322274485167695,
+        "dispersion_noise_over_forcing": {
+          "native": 0.8923602021227355,
+          "stagger": 0.9270611774308214,
+          "wide": 0.21246147660421252,
+          "wide_stagger": 0.20714333298272244
+        }
+      }
+    },
+    {
+      "seed": 925702,
+      "unforced_seed": 935702,
+      "validation_seed": 945702,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -6.002568322192184,
+        -0.9991084999332482
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            2.0298136258089197,
+            -0.013569814145804548,
+            -0.13189705015988457
+          ],
+          "frequencies": [
+            1.53017531638964,
+            3.0885399448144835
+          ],
+          "clean_held_residual": 0.17927893942152726,
+          "noisy_held_residual": 0.18696952784974086,
+          "dispersion_column_error": 0.7541704262469153,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6777384774622375,
+              -0.010576780474705186,
+              -0.143763237004017
+            ],
+            "frequencies": [
+              1.5868784090457206,
+              3.0580879753360257
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.002568322192184,
+            -0.9991084999332482,
+            28978.876328762006
+          ],
+          "frequencies": [
+            0.16774900745496849,
+            3.0371031683702656e-05
+          ],
+          "clean_held_residual": 0.5660150320377197,
+          "noisy_held_residual": 2.3673392911029913,
+          "dispersion_column_error": 0.7541704262469153
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.9960468458698448,
+            -0.0122411112878818,
+            -0.13572052971096485
+          ],
+          "frequencies": [
+            1.5492874314393383,
+            3.10297918941002
+          ],
+          "clean_held_residual": 0.17737771402956026,
+          "noisy_held_residual": 0.1845151024589621,
+          "dispersion_column_error": 0.7630830028806077,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.5658353960622557,
+              -0.01077630236809654,
+              -0.14491875446590688
+            ],
+            "frequencies": [
+              1.591706557722607,
+              3.026275765018124
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.002568322192184,
+            -0.9991084999332482,
+            39136387903.7346
+          ],
+          "frequencies": [
+            0.0002184735247292499,
+            2.2370198453086908e-11
+          ],
+          "clean_held_residual": 0.5712306799028563,
+          "noisy_held_residual": 2.367886859666018,
+          "dispersion_column_error": 0.7630830028806077
+        },
+        "wide_free": {
+          "coefficients": [
+            6.289994387345913,
+            -0.15457496919103889,
+            0.049897372085689506
+          ],
+          "frequencies": [
+            8.346837794355102,
+            3.7828536530506964
+          ],
+          "clean_held_residual": 0.15045979224260367,
+          "noisy_held_residual": 0.39858300287556475,
+          "dispersion_column_error": 0.11490729238097562,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.621356659639575,
+              -0.10636365873300094,
+              -0.08733976680124246
+            ],
+            "frequencies": [
+              1.9070442417066589,
+              3.9617608392585706
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.002568322192184,
+            -0.9991084999332482,
+            1.8499086185653961
+          ],
+          "frequencies": [
+            0.9241350506701477,
+            0.5134747309775822
+          ],
+          "clean_held_residual": 0.1197396064781392,
+          "noisy_held_residual": 2.2791313733949403,
+          "dispersion_column_error": 0.11490729238097562
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            6.272100497882516,
+            -0.15924326554228901,
+            0.04962811032998059
+          ],
+          "frequencies": [
+            8.461272654357323,
+            3.8900938740820474
+          ],
+          "clean_held_residual": 0.14554733259820088,
+          "noisy_held_residual": 0.4064537349643554,
+          "dispersion_column_error": 0.11291731511128847,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6571215697831976,
+              -0.09928141013524518,
+              -0.09226076062439251
+            ],
+            "frequencies": [
+              1.8826553233308865,
+              3.842096855817027
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.002568322192184,
+            -0.9991084999332482,
+            1.7784484092127437
+          ],
+          "frequencies": [
+            0.9541894402635355,
+            0.5372535723968135
+          ],
+          "clean_held_residual": 0.09489229053820356,
+          "noisy_held_residual": 2.2763519710006523,
+          "dispersion_column_error": 0.11291731511128847
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.265401109443393,
+        "dispersion_noise_over_forcing": {
+          "native": 0.9112268361176098,
+          "stagger": 0.9271796657547067,
+          "wide": 0.14015818668083166,
+          "wide_stagger": 0.13852702061571404
+        }
+      }
+    },
+    {
+      "seed": 925703,
+      "unforced_seed": 935703,
+      "validation_seed": 945703,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -6.006405734489205,
+        -1.0033642339260773
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.9396791345195923,
+            9.86616536625129e-05,
+            -0.1412047627170534
+          ],
+          "frequencies": [
+            1.4995411719324307,
+            3.0114635763195086
+          ],
+          "clean_held_residual": 0.18149050649410786,
+          "noisy_held_residual": 0.18201041401030493,
+          "dispersion_column_error": 0.6597475756328387,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.7258455779379989,
+              -0.0005807337011336788,
+              -0.1513764327959982
+            ],
+            "frequencies": [
+              1.5763026979346961,
+              3.0079369070962976
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.006405734489205,
+            -1.0033642339260773,
+            0.6389459948189762
+          ],
+          "frequencies": [
+            0.9366168757962179,
+            1.631809531747043
+          ],
+          "clean_held_residual": 0.260442874424137,
+          "noisy_held_residual": 2.10033812843741,
+          "dispersion_column_error": 0.6597475756328387
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.966418166899347,
+            -0.00028224484811480155,
+            -0.1440882368599501
+          ],
+          "frequencies": [
+            1.527797309955868,
+            3.0385724309711155
+          ],
+          "clean_held_residual": 0.17958577128829817,
+          "noisy_held_residual": 0.1803091269637774,
+          "dispersion_column_error": 0.6489529085002018,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6338614103726183,
+              -0.0013991395714645916,
+              -0.1524259346319201
+            ],
+            "frequencies": [
+              1.5835010131633784,
+              2.976442956613677
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.006405734489205,
+            -1.0033642339260773,
+            0.6685533092331657
+          ],
+          "frequencies": [
+            0.9944578415410033,
+            1.583124790333325
+          ],
+          "clean_held_residual": 0.21859880466565978,
+          "noisy_held_residual": 2.096683417358589,
+          "dispersion_column_error": 0.6489529085002018
+        },
+        "wide_free": {
+          "coefficients": [
+            8.266814011472146,
+            -0.15051219709188587,
+            0.056184070329590885
+          ],
+          "frequencies": [
+            8.30728653557155,
+            3.9260456084538804
+          ],
+          "clean_held_residual": 0.16283516370184178,
+          "noisy_held_residual": 0.37101428473508324,
+          "dispersion_column_error": 0.1355780270821248,
+          "shifted_center_refit": {
+            "coefficients": [
+              4.267320373529981,
+              -0.09758533349596839,
+              -0.09089086893361374
+            ],
+            "frequencies": [
+              1.9770114764517346,
+              3.7157137561655773
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.006405734489205,
+            -1.0033642339260773,
+            1.1068963403238372
+          ],
+          "frequencies": [
+            1.0545315481464468,
+            0.9306321712165228
+          ],
+          "clean_held_residual": 0.09510802483179281,
+          "noisy_held_residual": 2.0960928686688725,
+          "dispersion_column_error": 0.1355780270821248
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            8.312062422321743,
+            -0.15347907989303172,
+            0.05508755323140306
+          ],
+          "frequencies": [
+            8.354229255171262,
+            3.958438140407615
+          ],
+          "clean_held_residual": 0.1603418628634198,
+          "noisy_held_residual": 0.3747365321971714,
+          "dispersion_column_error": 0.1333425907706924,
+          "shifted_center_refit": {
+            "coefficients": [
+              8.767844964707791,
+              -0.1578056658290619,
+              0.05135498530365197
+            ],
+            "frequencies": [
+              8.44379652704837,
+              3.814307053795965
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.006405734489205,
+            -1.0033642339260773,
+            1.3353066793986421
+          ],
+          "frequencies": [
+            1.087143227930373,
+            0.7692772755803126
+          ],
+          "clean_held_residual": 0.13383996517576896,
+          "noisy_held_residual": 2.0972011370553547,
+          "dispersion_column_error": 0.1333425907706924
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.0831149185620674,
+        "dispersion_noise_over_forcing": {
+          "native": 0.7971403744534381,
+          "stagger": 0.7885065432231931,
+          "wide": 0.16537131835456412,
+          "wide_stagger": 0.1635847593651986
+        }
+      }
+    },
+    {
+      "seed": 925704,
+      "unforced_seed": 935704,
+      "validation_seed": 945704,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.996366548931966,
+        -0.9981378436441166
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            2.293281326285323,
+            -0.008745091094065932,
+            -0.1351562346902407
+          ],
+          "frequencies": [
+            1.5274234352982599,
+            3.0616918800407116
+          ],
+          "clean_held_residual": 0.18086007020272132,
+          "noisy_held_residual": 0.1806110721725877,
+          "dispersion_column_error": 1.009438545121679,
+          "shifted_center_refit": {
+            "coefficients": [
+              2.020485504950107,
+              -0.004821568102831436,
+              -0.14782026339852558
+            ],
+            "frequencies": [
+              1.5870628369921143,
+              3.0273809865071577
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.996366548931966,
+            -0.9981378436441166,
+            1288519.061567316
+          ],
+          "frequencies": [
+            0.8369121986197944,
+            7.21649879551181e-07
+          ],
+          "clean_held_residual": 0.22661517100902398,
+          "noisy_held_residual": 2.4143136620439276,
+          "dispersion_column_error": 1.009438545121679
+        },
+        "stagger_free": {
+          "coefficients": [
+            2.3105737983016574,
+            -0.007240702537561344,
+            -0.13906979453681953
+          ],
+          "frequencies": [
+            1.5494478673055652,
+            3.0754057570624598
+          ],
+          "clean_held_residual": 0.17915655979618275,
+          "noisy_held_residual": 0.17846262255856712,
+          "dispersion_column_error": 1.0330946955936202,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.880374810829261,
+              -0.003667171634493649,
+              -0.14989506626574436
+            ],
+            "frequencies": [
+              1.5865327569443377,
+              2.9874472387956
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.996366548931966,
+            -0.9981378436441166,
+            173058.82160472497
+          ],
+          "frequencies": [
+            0.6755591304892005,
+            5.219023470412967e-06
+          ],
+          "clean_held_residual": 0.3220358080476521,
+          "noisy_held_residual": 2.4192934994167965,
+          "dispersion_column_error": 1.0330946955936202
+        },
+        "wide_free": {
+          "coefficients": [
+            8.43110655601972,
+            -0.1483245366854343,
+            0.053271682413289
+          ],
+          "frequencies": [
+            8.479613222074589,
+            3.6947670171689477
+          ],
+          "clean_held_residual": 0.1689620912118977,
+          "noisy_held_residual": 0.40686985951803234,
+          "dispersion_column_error": 0.173605854402772,
+          "shifted_center_refit": {
+            "coefficients": [
+              3.18496884073727,
+              -0.06676455787493547,
+              -0.1031797641364362
+            ],
+            "frequencies": [
+              1.7872186387582936,
+              3.328468251948523
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.996366548931966,
+            -0.9981378436441166,
+            0.7995191098861804
+          ],
+          "frequencies": [
+            0.973271853436113,
+            1.3399654152528644
+          ],
+          "clean_held_residual": 0.16335195823200377,
+          "noisy_held_residual": 2.424443895613124,
+          "dispersion_column_error": 0.173605854402772
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            8.388351929256286,
+            -0.1517949275458643,
+            0.05112125578339828
+          ],
+          "frequencies": [
+            8.570033522337921,
+            3.6260324449190917
+          ],
+          "clean_held_residual": 0.16634059085848613,
+          "noisy_held_residual": 0.41259996755719924,
+          "dispersion_column_error": 0.17126467443211868,
+          "shifted_center_refit": {
+            "coefficients": [
+              2.7294942981923422,
+              -0.06013219433434801,
+              -0.10825787015645563
+            ],
+            "frequencies": [
+              1.751074398275634,
+              3.2776865034410188
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.996366548931966,
+            -0.9981378436441166,
+            0.7161688947951789
+          ],
+          "frequencies": [
+            1.009550415692991,
+            1.5689124017736686
+          ],
+          "clean_held_residual": 0.1951658393501365,
+          "noisy_held_residual": 2.431657797496712,
+          "dispersion_column_error": 0.17126467443211868
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.420520837218125,
+        "dispersion_noise_over_forcing": {
+          "native": 1.2196546824354515,
+          "stagger": 1.255255838404936,
+          "wide": 0.21175576628848947,
+          "wide_stagger": 0.21010759122654576
+        }
+      }
+    },
+    {
+      "seed": 925705,
+      "unforced_seed": 935705,
+      "validation_seed": 945705,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.992336166111657,
+        -0.9956466806871516
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.899912061337248,
+            0.003540159432816936,
+            -0.14217329201120868
+          ],
+          "frequencies": [
+            1.4791471773075362,
+            2.9915869175092724
+          ],
+          "clean_held_residual": 0.18333701493147697,
+          "noisy_held_residual": 0.18333912062202104,
+          "dispersion_column_error": 0.9976877368957517,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6033718532076724,
+              0.0032871765840944978,
+              -0.15256670074952636
+            ],
+            "frequencies": [
+              1.5558720000613506,
+              2.991921012116235
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.992336166111657,
+            -0.9956466806871516,
+            0.8585036391861918
+          ],
+          "frequencies": [
+            0.9329744786158629,
+            1.122191120251005
+          ],
+          "clean_held_residual": 0.13819126347098518,
+          "noisy_held_residual": 3.6417412926690984,
+          "dispersion_column_error": 0.9976877368957517
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.891769085428269,
+            0.0042907566615216775,
+            -0.14572530368570125
+          ],
+          "frequencies": [
+            1.5047885710405535,
+            3.016394439125319
+          ],
+          "clean_held_residual": 0.1813328346802471,
+          "noisy_held_residual": 0.1811632749412932,
+          "dispersion_column_error": 1.0177199816910854,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.517786800496503,
+              0.0020811685382886025,
+              -0.15340355443225473
+            ],
+            "frequencies": [
+              1.563960221670247,
+              2.963313321915978
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.992336166111657,
+            -0.9956466806871516,
+            0.7120996839337754
+          ],
+          "frequencies": [
+            0.9806115109814694,
+            1.4238663995523422
+          ],
+          "clean_held_residual": 0.18995782560845922,
+          "noisy_held_residual": 3.6356537891740373,
+          "dispersion_column_error": 1.0177199816910854
+        },
+        "wide_free": {
+          "coefficients": [
+            9.589378187562831,
+            -0.14780686434701645,
+            0.07535355484466062
+          ],
+          "frequencies": [
+            8.587199633983499,
+            4.504662890440048
+          ],
+          "clean_held_residual": 0.179600911387758,
+          "noisy_held_residual": 0.5725376547430066,
+          "dispersion_column_error": 0.1456798883784394,
+          "shifted_center_refit": {
+            "coefficients": [
+              4.102981794367343,
+              -0.12693482724480032,
+              -0.10176127141664333
+            ],
+            "frequencies": [
+              2.253117709440526,
+              4.689128410164873
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.992336166111657,
+            -0.9956466806871516,
+            541949864712.0704
+          ],
+          "frequencies": [
+            1.0639219272056764,
+            1.8421232745131546e-12
+          ],
+          "clean_held_residual": 0.22961606158976702,
+          "noisy_held_residual": 3.6668554793738743,
+          "dispersion_column_error": 0.1456798883784394
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            9.915363640102571,
+            -0.15079618142337037,
+            0.07703542176228213
+          ],
+          "frequencies": [
+            8.68630963134707,
+            4.593995225678516
+          ],
+          "clean_held_residual": 0.18147113873241114,
+          "noisy_held_residual": 0.5832487273371555,
+          "dispersion_column_error": 0.14600727792808615,
+          "shifted_center_refit": {
+            "coefficients": [
+              3.8998063186365353,
+              -0.12320961620955168,
+              -0.10181654983284057
+            ],
+            "frequencies": [
+              2.2082001693103033,
+              4.567372185813614
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.992336166111657,
+            -0.9956466806871516,
+            4434812.9356668
+          ],
+          "frequencies": [
+            1.0602095801379512,
+            2.2576416726135446e-07
+          ],
+          "clean_held_residual": 0.24504372953237458,
+          "noisy_held_residual": 3.66821920028431,
+          "dispersion_column_error": 0.14600727792808615
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 3.660589455844862,
+        "dispersion_noise_over_forcing": {
+          "native": 1.20545676187415,
+          "stagger": 1.236574879658097,
+          "wide": 0.17769306514760874,
+          "wide_stagger": 0.17912180412414244
+        }
+      }
+    },
+    {
+      "seed": 925706,
+      "unforced_seed": 935706,
+      "validation_seed": 945706,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.9941593301239084,
+        -0.9989426940171817
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.9784647031185683,
+            -0.0033783025468526184,
+            -0.13845015832009785
+          ],
+          "frequencies": [
+            1.4974722451070492,
+            3.0359673307158883
+          ],
+          "clean_held_residual": 0.18146049334008618,
+          "noisy_held_residual": 0.18402541225903588,
+          "dispersion_column_error": 0.853831282709055,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6861584833695578,
+              0.0005358468726781307,
+              -0.15156346748588118
+            ],
+            "frequencies": [
+              1.5649574916949531,
+              3.0106037571256894
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.9941593301239084,
+            -0.9989426940171817,
+            3262828786.696991
+          ],
+          "frequencies": [
+            1.4367740454103357,
+            3.3669442123132436e-10
+          ],
+          "clean_held_residual": 0.5595886633664395,
+          "noisy_held_residual": 2.9512860396481213,
+          "dispersion_column_error": 0.853831282709055
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.9749620022085463,
+            -0.0005186305596687479,
+            -0.1433972089261552
+          ],
+          "frequencies": [
+            1.5192629631077286,
+            3.0434567872489944
+          ],
+          "clean_held_residual": 0.17998704372194896,
+          "noisy_held_residual": 0.18240083457066122,
+          "dispersion_column_error": 0.855915121715817,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.632486300993678,
+              -0.001340979494263289,
+              -0.15181505760586492
+            ],
+            "frequencies": [
+              1.5740229400834282,
+              2.9838614350183317
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.9941593301239084,
+            -0.9989426940171817,
+            1.0894487718459887
+          ],
+          "frequencies": [
+            1.4789816269081673,
+            1.0352165807788671
+          ],
+          "clean_held_residual": 0.6532789043489512,
+          "noisy_held_residual": 2.9859428817426252,
+          "dispersion_column_error": 0.855915121715817
+        },
+        "wide_free": {
+          "coefficients": [
+            6.778019633128125,
+            -0.15350599270709414,
+            0.05933976508083913
+          ],
+          "frequencies": [
+            8.502878861232633,
+            4.243495936306803
+          ],
+          "clean_held_residual": 0.1489323863986695,
+          "noisy_held_residual": 0.48346841791915796,
+          "dispersion_column_error": 0.15401288274968733,
+          "shifted_center_refit": {
+            "coefficients": [
+              5.972464392193111,
+              -0.16082817769511049,
+              0.0572140026369108
+            ],
+            "frequencies": [
+              8.600981473284323,
+              4.2471057162359145
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.9941593301239084,
+            -0.9989426940171817,
+            0.6292438934533207
+          ],
+          "frequencies": [
+            1.039436551557184,
+            1.9092723238052105
+          ],
+          "clean_held_residual": 0.28433206540132056,
+          "noisy_held_residual": 2.9635168611149587,
+          "dispersion_column_error": 0.15401288274968733
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            4.684619466132834,
+            -0.1625464848853257,
+            -0.09629290493373939
+          ],
+          "frequencies": [
+            8.440129736194448,
+            9.80224572623994
+          ],
+          "clean_held_residual": 0.279991139212916,
+          "noisy_held_residual": 0.5894114582278738,
+          "dispersion_column_error": 0.14868391662782926,
+          "shifted_center_refit": {
+            "coefficients": [
+              5.878600665350203,
+              -0.16077547443198992,
+              0.05830698937950238
+            ],
+            "frequencies": [
+              8.565981922362536,
+              4.280116800126917
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.9941593301239084,
+            -0.9989426940171817,
+            0.6059490351948174
+          ],
+          "frequencies": [
+            0.9907611213632341,
+            1.9833605445859408
+          ],
+          "clean_held_residual": 0.3109939084293153,
+          "noisy_held_residual": 2.970574928829716,
+          "dispersion_column_error": 0.14868391662782926
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.9115725848657354,
+        "dispersion_noise_over_forcing": {
+          "native": 1.031642121255076,
+          "stagger": 1.0399748041446486,
+          "wide": 0.18785723625019973,
+          "wide_stagger": 0.18240550586620644
+        }
+      }
+    },
+    {
+      "seed": 925707,
+      "unforced_seed": 935707,
+      "validation_seed": 945707,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -6.0017375209393045,
+        -1.0002943046384958
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.8126923728626108,
+            -0.015257351876087899,
+            -0.13180368823611188
+          ],
+          "frequencies": [
+            1.527622968619502,
+            3.1094438019637245
+          ],
+          "clean_held_residual": 0.17773345030370682,
+          "noisy_held_residual": 0.185030893405269,
+          "dispersion_column_error": 0.5887089059301155,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6604604795712665,
+              -0.005992750836540536,
+              -0.14740673068818874
+            ],
+            "frequencies": [
+              1.5783762165623656,
+              3.0347823617733902
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.0017375209393045,
+            -1.0002943046384958,
+            -2181639218.4674907
+          ],
+          "frequencies": [
+            250.439325519306,
+            3.806120869054046e-05
+          ],
+          "clean_held_residual": 6.1661674721103585,
+          "noisy_held_residual": 6.447541535584334,
+          "dispersion_column_error": 0.5887089059301155
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.898329878081746,
+            -0.010754472351367991,
+            -0.1370406237681842
+          ],
+          "frequencies": [
+            1.5402842878332896,
+            3.089215434717197
+          ],
+          "clean_held_residual": 0.17721748819077046,
+          "noisy_held_residual": 0.18251580072575313,
+          "dispersion_column_error": 0.5902680171135185,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.528175226555509,
+              -0.007880121969332493,
+              -0.14782615306541133
+            ],
+            "frequencies": [
+              1.5865110503951438,
+              3.0136258167743946
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.0017375209393045,
+            -1.0002943046384958,
+            0.6439177012420008
+          ],
+          "frequencies": [
+            0.9876622933490421,
+            1.6570168122712836
+          ],
+          "clean_held_residual": 0.23826969184525243,
+          "noisy_held_residual": 2.1092191383900127,
+          "dispersion_column_error": 0.5902680171135185
+        },
+        "wide_free": {
+          "coefficients": [
+            6.231431484527444,
+            -0.1565673834623788,
+            0.051502044256774446
+          ],
+          "frequencies": [
+            8.05664852072129,
+            3.8978256118520735
+          ],
+          "clean_held_residual": 0.15258924684068287,
+          "noisy_held_residual": 0.38531714181307175,
+          "dispersion_column_error": 0.10403837250284412,
+          "shifted_center_refit": {
+            "coefficients": [
+              5.897800485179302,
+              -0.16549233754624385,
+              0.0501517124288533
+            ],
+            "frequencies": [
+              8.192884344381433,
+              4.101342829794173
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.0017375209393045,
+            -1.0002943046384958,
+            0.7693762746057569
+          ],
+          "frequencies": [
+            1.094717592046168,
+            1.3741167209486385
+          ],
+          "clean_held_residual": 0.1756604789262533,
+          "noisy_held_residual": 2.113222233638548,
+          "dispersion_column_error": 0.10403837250284412
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            6.068432406835958,
+            -0.1602133327809668,
+            0.051452900551754485
+          ],
+          "frequencies": [
+            8.119955563232331,
+            4.034071734368833
+          ],
+          "clean_held_residual": 0.14925211027824978,
+          "noisy_held_residual": 0.38976413396367476,
+          "dispersion_column_error": 0.10381276369961574,
+          "shifted_center_refit": {
+            "coefficients": [
+              6.075972010282357,
+              -0.16569300164701528,
+              0.04957011945552253
+            ],
+            "frequencies": [
+              8.185631131727497,
+              4.0379711382117085
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.0017375209393045,
+            -1.0002943046384958,
+            0.7272864526226349
+          ],
+          "frequencies": [
+            1.1443594826671368,
+            1.505728127088484
+          ],
+          "clean_held_residual": 0.2378615266223932,
+          "noisy_held_residual": 2.1203175122410016,
+          "dispersion_column_error": 0.10381276369961574
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.107608770000006,
+        "dispersion_noise_over_forcing": {
+          "native": 0.7113078623548756,
+          "stagger": 0.7172017994727029,
+          "wide": 0.12690082007047396,
+          "wide_stagger": 0.12735755223206904
+        }
+      }
+    },
+    {
+      "seed": 925708,
+      "unforced_seed": 935708,
+      "validation_seed": 945708,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -6.003250721714562,
+        -1.0017908460855296
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.7117861056558816,
+            -0.008909953192054551,
+            -0.13512981391840667
+          ],
+          "frequencies": [
+            1.5089705621599734,
+            3.0799446231242453
+          ],
+          "clean_held_residual": 0.17968161914461236,
+          "noisy_held_residual": 0.1770634100635615,
+          "dispersion_column_error": 0.7522237137221248,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6754809304042035,
+              -0.004648309892830077,
+              -0.14772991764109358
+            ],
+            "frequencies": [
+              1.5753731320646616,
+              3.0234035362264975
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.003250721714562,
+            -1.0017908460855296,
+            354814.04782341846
+          ],
+          "frequencies": [
+            0.7564816511572298,
+            2.6491292294678657e-06
+          ],
+          "clean_held_residual": 0.3492803207862164,
+          "noisy_held_residual": 2.440465627829188,
+          "dispersion_column_error": 0.7522237137221248
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.8370329455384313,
+            -0.0066217642078570255,
+            -0.13934367501667266
+          ],
+          "frequencies": [
+            1.5312744104398912,
+            3.0745157423805156
+          ],
+          "clean_held_residual": 0.17837336670673978,
+          "noisy_held_residual": 0.17591945845271298,
+          "dispersion_column_error": 0.7313527506633771,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.5650153273743703,
+              -0.006011911419103649,
+              -0.14847067830578242
+            ],
+            "frequencies": [
+              1.5834523032821788,
+              3.0013204301504963
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.003250721714562,
+            -1.0017908460855296,
+            30464308.047474448
+          ],
+          "frequencies": [
+            0.744542416388436,
+            2.9428178061497584e-08
+          ],
+          "clean_held_residual": 0.23332528381782777,
+          "noisy_held_residual": 2.452461788024645,
+          "dispersion_column_error": 0.7313527506633771
+        },
+        "wide_free": {
+          "coefficients": [
+            7.869863198899657,
+            -0.15422464117188792,
+            0.058353218051083774
+          ],
+          "frequencies": [
+            8.433412092540628,
+            4.111748322136378
+          ],
+          "clean_held_residual": 0.153308884964453,
+          "noisy_held_residual": 0.40245187524060094,
+          "dispersion_column_error": 0.12024492935773373,
+          "shifted_center_refit": {
+            "coefficients": [
+              4.4128734300735895,
+              -0.11907571010220142,
+              -0.08972957534916731
+            ],
+            "frequencies": [
+              2.1538574250577645,
+              4.172893930834886
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.003250721714562,
+            -1.0017908460855296,
+            55634063011791.17
+          ],
+          "frequencies": [
+            1.0144260229205089,
+            1.7106661309121852e-14
+          ],
+          "clean_held_residual": 0.09893651980785938,
+          "noisy_held_residual": 2.4293856264117326,
+          "dispersion_column_error": 0.12024492935773373
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            8.211114967842377,
+            -0.15824242206833938,
+            0.05970838749500054
+          ],
+          "frequencies": [
+            8.588421567510366,
+            4.244867534848104
+          ],
+          "clean_held_residual": 0.15244714924920616,
+          "noisy_held_residual": 0.412223725861548,
+          "dispersion_column_error": 0.12123703655258176,
+          "shifted_center_refit": {
+            "coefficients": [
+              4.162216481359387,
+              -0.10963071137703534,
+              -0.0938980889800035
+            ],
+            "frequencies": [
+              2.072649836002586,
+              3.998760820644483
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.003250721714562,
+            -1.0017908460855296,
+            19801670544.383472
+          ],
+          "frequencies": [
+            1.0399299499286057,
+            4.843131776698095e-11
+          ],
+          "clean_held_residual": 0.10535176721699059,
+          "noisy_held_residual": 2.427524927277788,
+          "dispersion_column_error": 0.12123703655258176
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.428467571629036,
+        "dispersion_noise_over_forcing": {
+          "native": 0.9088747196290025,
+          "stagger": 0.8886260031334369,
+          "wide": 0.14666877016358051,
+          "wide_stagger": 0.14873365918553083
+        }
+      }
+    },
+    {
+      "seed": 925709,
+      "unforced_seed": 935709,
+      "validation_seed": 945709,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.996637473941407,
+        -0.9972007335893459
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            2.125811380744472,
+            -0.011591824694610148,
+            -0.13323311382700911
+          ],
+          "frequencies": [
+            1.523955924461903,
+            3.0894461475899937
+          ],
+          "clean_held_residual": 0.1801442938715761,
+          "noisy_held_residual": 0.18079140242917485,
+          "dispersion_column_error": 0.7583402561289044,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.7061613290159494,
+              -0.0070022172798131915,
+              -0.14553091839808902
+            ],
+            "frequencies": [
+              1.573432384960569,
+              3.0538963952623175
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.996637473941407,
+            -0.9972007335893459,
+            9653989.680305906
+          ],
+          "frequencies": [
+            0.8264837736076948,
+            9.660582076955382e-08
+          ],
+          "clean_held_residual": 0.25256629786564133,
+          "noisy_held_residual": 2.3423626361105208,
+          "dispersion_column_error": 0.7583402561289044
+        },
+        "stagger_free": {
+          "coefficients": [
+            2.082046554729375,
+            -0.009665831927085172,
+            -0.13704055038903187
+          ],
+          "frequencies": [
+            1.5375113894399384,
+            3.101270417817171
+          ],
+          "clean_held_residual": 0.17870124967552312,
+          "noisy_held_residual": 0.17900693182392735,
+          "dispersion_column_error": 0.740467552540064,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.6147370870728073,
+              -0.006497536822253153,
+              -0.14742816505788583
+            ],
+            "frequencies": [
+              1.5795559453980488,
+              3.0149986673241163
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.996637473941407,
+            -0.9972007335893459,
+            732915301501.7452
+          ],
+          "frequencies": [
+            1.0759266606512226,
+            1.360636085840527e-12
+          ],
+          "clean_held_residual": 0.20786670043023472,
+          "noisy_held_residual": 2.317042929898106,
+          "dispersion_column_error": 0.740467552540064
+        },
+        "wide_free": {
+          "coefficients": [
+            8.32413949515593,
+            -0.15384324009002404,
+            0.06792657390247045
+          ],
+          "frequencies": [
+            8.607853057298215,
+            4.3411640321552305
+          ],
+          "clean_held_residual": 0.15676971323270178,
+          "noisy_held_residual": 0.416899567395944,
+          "dispersion_column_error": 0.10819261022014323,
+          "shifted_center_refit": {
+            "coefficients": [
+              3.644136176771695,
+              -0.13739118503737274,
+              -0.09277528288026471
+            ],
+            "frequencies": [
+              2.365537767574321,
+              4.590990299945252
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.996637473941407,
+            -0.9972007335893459,
+            566993.8675406668
+          ],
+          "frequencies": [
+            0.9585107399738251,
+            1.6598864069070025e-06
+          ],
+          "clean_held_residual": 0.12129562499657313,
+          "noisy_held_residual": 2.336776484899495,
+          "dispersion_column_error": 0.10819261022014323
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            8.19097320179688,
+            -0.1586391084229858,
+            0.06787320986346479
+          ],
+          "frequencies": [
+            8.711777804554048,
+            4.419181086878088
+          ],
+          "clean_held_residual": 0.15366658161849073,
+          "noisy_held_residual": 0.4275007838248809,
+          "dispersion_column_error": 0.10470330621522704,
+          "shifted_center_refit": {
+            "coefficients": [
+              3.212131732889851,
+              -0.13311364141308507,
+              -0.09404614684578028
+            ],
+            "frequencies": [
+              2.300236928647027,
+              4.4873941396062
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.996637473941407,
+            -0.9972007335893459,
+            566472.8682535357
+          ],
+          "frequencies": [
+            0.9420864630235057,
+            1.6483893231509632e-06
+          ],
+          "clean_held_residual": 0.11947994001803461,
+          "noisy_held_residual": 2.340165821956642,
+          "dispersion_column_error": 0.10470330621522704
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.360326929872472,
+        "dispersion_noise_over_forcing": {
+          "native": 0.9162650353870009,
+          "stagger": 0.8997008913507666,
+          "wide": 0.13196795213348791,
+          "wide_stagger": 0.12845007025109625
+        }
+      }
+    },
+    {
+      "seed": 925710,
+      "unforced_seed": 935710,
+      "validation_seed": 945710,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -5.999854719273674,
+        -0.999205904162728
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            2.0071700533624113,
+            -0.002350688283002278,
+            -0.1389824647524719
+          ],
+          "frequencies": [
+            1.4983799244211236,
+            3.0195127029193913
+          ],
+          "clean_held_residual": 0.18165057951096,
+          "noisy_held_residual": 0.18618794827999602,
+          "dispersion_column_error": 0.7297862199886834,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.706868970317148,
+              0.00045433532437894053,
+              -0.1508001094908407
+            ],
+            "frequencies": [
+              1.561373321021874,
+              2.993878879378687
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -5.999854719273674,
+            -0.999205904162728,
+            2655543818.0599313
+          ],
+          "frequencies": [
+            5.602541818311899e-06,
+            3.0181023565398386e-10
+          ],
+          "clean_held_residual": 0.43944358104699993,
+          "noisy_held_residual": 2.6918417722664985,
+          "dispersion_column_error": 0.7297862199886834
+        },
+        "stagger_free": {
+          "coefficients": [
+            2.0226343246739087,
+            -0.0019209662956662377,
+            -0.14218955324946198
+          ],
+          "frequencies": [
+            1.5230222995621203,
+            3.039466385655797
+          ],
+          "clean_held_residual": 0.17972985158064697,
+          "noisy_held_residual": 0.18386231504005898,
+          "dispersion_column_error": 0.7240374883856685,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.619903687813483,
+              0.00013020683484749052,
+              -0.15220618254735618
+            ],
+            "frequencies": [
+              1.5680234763946919,
+              2.9614795511020446
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -5.999854719273674,
+            -0.999205904162728,
+            594495904.3722847
+          ],
+          "frequencies": [
+            0.0008424507497396816,
+            1.3330723277907384e-09
+          ],
+          "clean_held_residual": 0.4461761604863016,
+          "noisy_held_residual": 2.6916251101994435,
+          "dispersion_column_error": 0.7240374883856685
+        },
+        "wide_free": {
+          "coefficients": [
+            11.019076529972079,
+            -0.14904661323017904,
+            0.07221091755240774
+          ],
+          "frequencies": [
+            8.708042084928916,
+            4.27835965572196
+          ],
+          "clean_held_residual": 0.18229763044113292,
+          "noisy_held_residual": 0.43371068431194854,
+          "dispersion_column_error": 0.20312421559675478,
+          "shifted_center_refit": {
+            "coefficients": [
+              2.5125261596583823,
+              -0.02334914231182858,
+              -0.1308059300124258
+            ],
+            "frequencies": [
+              1.6167751828307135,
+              3.1608697520410036
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -5.999854719273674,
+            -0.999205904162728,
+            0.768703883577246
+          ],
+          "frequencies": [
+            1.0206827997523464,
+            1.3765845525170732
+          ],
+          "clean_held_residual": 0.09217400668890226,
+          "noisy_held_residual": 2.621370783202822,
+          "dispersion_column_error": 0.20312421559675478
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            11.484104419705545,
+            -0.15192325243930718,
+            0.0756175365066801
+          ],
+          "frequencies": [
+            8.872870528816666,
+            4.4716119056018515
+          ],
+          "clean_held_residual": 0.18823667542946818,
+          "noisy_held_residual": 0.44236758112994407,
+          "dispersion_column_error": 0.2035457201279767,
+          "shifted_center_refit": {
+            "coefficients": [
+              2.1064677721598137,
+              -0.019035019865902003,
+              -0.13457179495614874
+            ],
+            "frequencies": [
+              1.6010871376527278,
+              3.104950352923337
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -5.999854719273674,
+            -0.999205904162728,
+            0.8083839269160392
+          ],
+          "frequencies": [
+            1.0705495770422049,
+            1.3305730219123975
+          ],
+          "clean_held_residual": 0.10755937600693946,
+          "noisy_held_residual": 2.623584206292719,
+          "dispersion_column_error": 0.2035457201279767
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.636646452767915,
+        "dispersion_noise_over_forcing": {
+          "native": 0.8817646053715672,
+          "stagger": 0.8797376352783673,
+          "wide": 0.24776079167035486,
+          "wide_stagger": 0.24970999479237305
+        }
+      }
+    },
+    {
+      "seed": 925711,
+      "unforced_seed": 935711,
+      "validation_seed": 945711,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -6.0011688300268125,
+        -1.003400997467659
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.9250194525323474,
+            -0.004615475969860838,
+            -0.13793885198479008
+          ],
+          "frequencies": [
+            1.5084523782191754,
+            3.0388089546561443
+          ],
+          "clean_held_residual": 0.18066754349713934,
+          "noisy_held_residual": 0.1810707158909275,
+          "dispersion_column_error": 0.631072973636948,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.7263563432219862,
+              -0.0021427601467478713,
+              -0.15019389548811118
+            ],
+            "frequencies": [
+              1.5792832907713592,
+              3.01755773175568
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.0011688300268125,
+            -1.003400997467659,
+            2.306826722037846
+          ],
+          "frequencies": [
+            1.0446459105475208,
+            0.4259077292531005
+          ],
+          "clean_held_residual": 0.1103890914902296,
+          "noisy_held_residual": 2.953824722301387,
+          "dispersion_column_error": 0.631072973636948
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.9564619361172575,
+            -0.005961812999526209,
+            -0.14017351241877046
+          ],
+          "frequencies": [
+            1.5390571018174788,
+            3.0683597069908024
+          ],
+          "clean_held_residual": 0.17842657100025078,
+          "noisy_held_residual": 0.17904632734994977,
+          "dispersion_column_error": 0.6165427874191938,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.636681470042892,
+              -0.0027815415350820882,
+              -0.1513615466685438
+            ],
+            "frequencies": [
+              1.586168498098501,
+              2.9872519021102084
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.0011688300268125,
+            -1.003400997467659,
+            0.9000440126098537
+          ],
+          "frequencies": [
+            1.019663117176102,
+            1.1635208009043945
+          ],
+          "clean_held_residual": 0.07783638754404469,
+          "noisy_held_residual": 2.9624024340376875,
+          "dispersion_column_error": 0.6165427874191938
+        },
+        "wide_free": {
+          "coefficients": [
+            5.693092936817238,
+            -0.15662414724770468,
+            0.0476437930683517
+          ],
+          "frequencies": [
+            8.37670146796136,
+            4.033232154486579
+          ],
+          "clean_held_residual": 0.14706150004688637,
+          "noisy_held_residual": 0.5200358444872027,
+          "dispersion_column_error": 0.11053580610998193,
+          "shifted_center_refit": {
+            "coefficients": [
+              4.6242249160920625,
+              -0.166603658561111,
+              0.04244080593606467
+            ],
+            "frequencies": [
+              8.659052861957305,
+              4.1450502302966115
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.0011688300268125,
+            -1.003400997467659,
+            0.6229297188401018
+          ],
+          "frequencies": [
+            1.1494480610548026,
+            2.0725028505507685
+          ],
+          "clean_held_residual": 0.38222132063627134,
+          "noisy_held_residual": 3.021784347153898,
+          "dispersion_column_error": 0.11053580610998193
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            5.580921215394339,
+            -0.16079779827902932,
+            0.047094347006371426
+          ],
+          "frequencies": [
+            8.555681914836674,
+            4.17841015690407
+          ],
+          "clean_held_residual": 0.14526303116997324,
+          "noisy_held_residual": 0.532486824158585,
+          "dispersion_column_error": 0.11284544765306467,
+          "shifted_center_refit": {
+            "coefficients": [
+              4.238946560108225,
+              -0.16657955170824412,
+              0.040423621898004705
+            ],
+            "frequencies": [
+              8.566059485525036,
+              4.04309138839715
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.0011688300268125,
+            -1.003400997467659,
+            0.6084659058624158
+          ],
+          "frequencies": [
+            1.1767419573632572,
+            2.20824256013375
+          ],
+          "clean_held_residual": 0.4552202023080323,
+          "noisy_held_residual": 3.040006341697858,
+          "dispersion_column_error": 0.11284544765306467
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.95158841640031,
+        "dispersion_noise_over_forcing": {
+          "native": 0.7624942706759711,
+          "stagger": 0.7491268098029479,
+          "wide": 0.1348260656626876,
+          "wide_stagger": 0.1384388535807721
+        }
+      }
+    },
+    {
+      "seed": 925712,
+      "unforced_seed": 935712,
+      "validation_seed": 945712,
+      "noise_percent": 5,
+      "unforced_coefficients": [
+        -6.000985645725455,
+        -0.9985189591046785
+      ],
+      "arms": {
+        "native_free": {
+          "coefficients": [
+            1.8695317486557588,
+            -0.0020378089991178044,
+            -0.13872705349043857
+          ],
+          "frequencies": [
+            1.4934693129204626,
+            3.02374091773067
+          ],
+          "clean_held_residual": 0.1819356934508505,
+          "noisy_held_residual": 0.18128645077662764,
+          "dispersion_column_error": 0.746492434581238,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.8107373793807575,
+              0.004489566147317395,
+              -0.15295607791114965
+            ],
+            "frequencies": [
+              1.5537069344869734,
+              2.9805705627541625
+            ]
+          }
+        },
+        "native_staged": {
+          "coefficients": [
+            -6.000985645725455,
+            -0.9985189591046785,
+            1.1976991444805976
+          ],
+          "frequencies": [
+            0.3950518632343038,
+            0.7348225567322667
+          ],
+          "clean_held_residual": 0.3911984135814871,
+          "noisy_held_residual": 2.2602973585282107,
+          "dispersion_column_error": 0.746492434581238
+        },
+        "stagger_free": {
+          "coefficients": [
+            1.9437619915475743,
+            0.0009461307481368614,
+            -0.14355318900776537
+          ],
+          "frequencies": [
+            1.5141928561718556,
+            3.0326202142721934
+          ],
+          "clean_held_residual": 0.1806711761055278,
+          "noisy_held_residual": 0.17963422559207623,
+          "dispersion_column_error": 0.7465221069476472,
+          "shifted_center_refit": {
+            "coefficients": [
+              1.7167935556438891,
+              0.003978695080724209,
+              -0.15428782007528258
+            ],
+            "frequencies": [
+              1.5607039343861215,
+              2.9485899696751177
+            ]
+          }
+        },
+        "stagger_staged": {
+          "coefficients": [
+            -6.000985645725455,
+            -0.9985189591046785,
+            0.7197883978557752
+          ],
+          "frequencies": [
+            0.5078773053242778,
+            1.3372294094304524
+          ],
+          "clean_held_residual": 0.35726089174486125,
+          "noisy_held_residual": 2.237600462624766,
+          "dispersion_column_error": 0.7465221069476472
+        },
+        "wide_free": {
+          "coefficients": [
+            4.856947279051216,
+            -0.15784947514334396,
+            0.05770196980136018
+          ],
+          "frequencies": [
+            8.503437698623662,
+            4.253068379463927
+          ],
+          "clean_held_residual": 0.14392233293100445,
+          "noisy_held_residual": 0.3826384291914357,
+          "dispersion_column_error": 0.13011589977505655,
+          "shifted_center_refit": {
+            "coefficients": [
+              3.6134735313474455,
+              -0.16767889671317296,
+              0.05057314845538484
+            ],
+            "frequencies": [
+              8.542290098140938,
+              4.283431735893201
+            ]
+          }
+        },
+        "wide_staged": {
+          "coefficients": [
+            -6.000985645725455,
+            -0.9985189591046785,
+            0.590118947900102
+          ],
+          "frequencies": [
+            0.9627211186165566,
+            1.9751689434085438
+          ],
+          "clean_held_residual": 0.30641588666980607,
+          "noisy_held_residual": 2.21055212409916,
+          "dispersion_column_error": 0.13011589977505655
+        },
+        "wide_stagger_free": {
+          "coefficients": [
+            4.578014877157619,
+            -0.16227849877104766,
+            0.05771310422597392
+          ],
+          "frequencies": [
+            8.592292966507511,
+            4.386634954144446
+          ],
+          "clean_held_residual": 0.14309256970312986,
+          "noisy_held_residual": 0.38976987179182826,
+          "dispersion_column_error": 0.13020397986661977,
+          "shifted_center_refit": {
+            "coefficients": [
+              3.52738447612053,
+              -0.1673532508815496,
+              0.04834401057511202
+            ],
+            "frequencies": [
+              8.480045715272382,
+              4.175213571774469
+            ]
+          }
+        },
+        "wide_stagger_staged": {
+          "coefficients": [
+            -6.000985645725455,
+            -0.9985189591046785,
+            0.5646240808122535
+          ],
+          "frequencies": [
+            0.9781396964165008,
+            2.1436288342156358
+          ],
+          "clean_held_residual": 0.3877951366590531,
+          "noisy_held_residual": 2.2134618545298204,
+          "dispersion_column_error": 0.13020397986661977
+        }
+      },
+      "physical_reference": {
+        "clean_residual": 0.0008495726429326917,
+        "noisy_residual": 2.2384021382934516,
+        "dispersion_noise_over_forcing": {
+          "native": 0.9019498984258607,
+          "stagger": 0.9070574432733298,
+          "wide": 0.15870888777321931,
+          "wide_stagger": 0.15973430988378234
+        }
+      }
+    }
+  ]
+}

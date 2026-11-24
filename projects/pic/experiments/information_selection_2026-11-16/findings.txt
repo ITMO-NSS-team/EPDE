@@ -1,0 +1,71 @@
+Feature-information selection: failed criterion, with an error diagnosis
+2026-11-16; ac/wave/forced-KdV/KS, three seeds each; all 12 cases completed.
+
+Minimizing the worst predictor-noise direction does not solve weak fitting.
+It selects broad banks for KS and inherits their catastrophic coefficient
+errors. It helps wave but overlooks target-moment error and its amplification
+through regression. No version of this selector should be promoted.
+
+Median frozen clean residual energies of selected fits:
+  System       Existing CLSM     Selected OLS     Selected CLSM
+  AC              1.3676e-4        9.3764e-4        2.8505e-4
+  wave            7.7635e-2        7.4087e-4        1.5098e-2
+  forced KdV      1.4693e-1        1.7067e-1        1.4693e-1
+  KS              4.9519e-5        8.5307e+1        3.7970e+1
+
+Retained registered supports among these 12 cases:
+  Existing CLSM: spectral 7, local 6.
+  Selected CLSM: spectral 4, local 6 (half covariance budget: local 5).
+  Selected OLS:  spectral 4, local 4.
+Matching the local 6 count despite very bad KS coefficients is another
+example of why structural retention alone is an insufficient success metric.
+
+There were no infeasible selections. Half/full covariance budgets change
+53/576 candidate/fold bank choices. Feature-unit rescaling invariance and
+explicit numerical-rank failure checks pass. All input/source hashes and
+finite score checks pass. No held-out or clean fields selected a bank.
+
+Post-selection error decomposition:
+diagnose_error_budget.py covers all 12 cases and all three banks/folds, using
+saved clean fields only as controls. It decomposes the actual corrected-fit
+coefficient error into target-moment error, predictor-moment error, clean
+discretization residual, and covariance correction. Their coefficient-vector
+sum matches the actual error to maximum absolute error 2.17e-12. Their squared
+clean-energy impacts are NOT additive because components can cancel.
+
+KS seed 0, training fold 0:
+  Local fit: [-1.00006,-1.00219,-1.00383].
+  Broad q-min fit: [-1.00197,-1.00848,-1.33782].
+  Broad target moments have only 0.608% relative error, but their contribution
+  to the fourth-derivative coefficient error is -0.34273. The predictor error
+  contributes +0.01137. On the local bank, the target contribution is only
+  -0.000809. Thus even small target errors become large coefficient errors
+  in the broad representation. Its predictor-only noise ratio looks better
+  (7.53e-5 versus 5.23e-4 locally) and therefore selects the wrong bank.
+
+Wave seed 0, fold 0:
+  Local target-moment relative error is 27.3%, versus 7.4% for its predictor.
+  The coefficient error contributions are +0.008881 from the target,
+  -0.000751 from the predictor, and +0.0000369 from covariance correction.
+  The resulting coefficient is 0.04817 instead of 0.04. Predictor stability
+  alone cannot judge this regression accurately.
+
+Forced KdV seed 0, fold 0:
+  The dispersive predictor has 166% relative error, while the target error
+  is 2.04%. In the convective coefficient, predictor error contributes about
+  -478.80 and covariance correction +489.82; the remaining coefficient is
+  +5.04 instead of -6. These are large opposing error contributions, not a
+  trustworthy physical estimate. This differs from the wave/KS target issue.
+
+Implication:
+The next fitting criterion must include BOTH target and predictor errors,
+their correlations, and amplification into prediction error on a common
+weak validation representation. A feature-only SNR criterion, numerical
+rank, or coefficient stability can all prefer a precise-looking wrong fit.
+Covariance-aware multiscale fitting is a plausible next direction, but its
+joint error model and bias control need derivation and validation. It has
+not been implemented or claimed as a successful fix in this study.
+
+No production changes were made. These are targeted reused-data experiments,
+not independent-system validation. See protocol.txt, per_case.csv,
+selected_banks.csv, error_budget/*.json, checks.json and audit.json.

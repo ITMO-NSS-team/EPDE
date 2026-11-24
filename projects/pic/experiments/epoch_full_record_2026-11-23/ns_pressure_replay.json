@@ -1,0 +1,910 @@
+[
+  {
+    "seed": 923701,
+    "baseline_complete": 0,
+    "baseline_front": 393,
+    "original_velocity_pairs": 33,
+    "donor_structures": 7,
+    "recorded_systems": 99066,
+    "distinct_fits": 37,
+    "archived_parity_checks": 14,
+    "max_scaled_score_error": [
+      8.816297271905638e-16,
+      2.3080915654606125e-12
+    ],
+    "direct": {
+      "proposed_systems": 198,
+      "complete": 0,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 0,
+      "complete_on_pressure_gradient_front": 0,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": null,
+      "dominance_witness": []
+    },
+    "exchange": {
+      "proposed_systems": 33,
+      "complete": 2,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 2,
+      "complete_on_pressure_gradient_front": 2,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": null,
+      "dominance_witness": [
+        {
+          "candidate": [
+            135,
+            1475,
+            51522
+          ],
+          "rival": [
+            135,
+            1475,
+            2535
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00031036519457223457,
+              0.003969402721197745
+            ]
+          ],
+          "rival_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "dv/dx1*u"
+            ],
+            "wape": 0.00031036519457223457,
+            "instability": 0.003969402721197745
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    "exchange_and_reassign": {
+      "proposed_systems": 18,
+      "complete": 6,
+      "unbeaten_by_original": 4,
+      "complete_nondominated": 4,
+      "unbeaten_with_same_pressure_target": 6,
+      "complete_on_pressure_gradient_front": 6,
+      "proposed_on_global_front": 11,
+      "proposed_on_pressure_gradient_front": 17,
+      "example": {
+        "point_ids": [
+          51518,
+          51533,
+          51530
+        ],
+        "pressure_wape": 0.00047907572193707114,
+        "pressure_instability": 0.005118108427806424,
+        "system": [
+          {
+            "target": "d^2u/dx1^2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.005450695275642068,
+            "instability": 0.015473456159431576
+          },
+          {
+            "target": "dv/dx1",
+            "terms": [
+              "du/dx2",
+              "dv/dx1"
+            ],
+            "wape": 2.4309384158905537e-05,
+            "instability": 4.7024447994774314e-06
+          },
+          {
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          }
+        ]
+      },
+      "dominance_witness": [
+        {
+          "candidate": [
+            51532,
+            51529,
+            51522
+          ],
+          "rival": [
+            135,
+            1475,
+            2535
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392200004,
+              0.004861891851180018
+            ],
+            [
+              0.00031036519457223457,
+              0.003969402721197745
+            ]
+          ],
+          "rival_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "dv/dx1*u"
+            ],
+            "wape": 0.00031036519457223457,
+            "instability": 0.003969402721197745
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    "combined": {
+      "proposed_systems": 249,
+      "complete": 8,
+      "unbeaten_by_original": 4,
+      "complete_nondominated": 4,
+      "unbeaten_with_same_pressure_target": 8,
+      "complete_on_pressure_gradient_front": 8,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": {
+        "point_ids": [
+          51518,
+          51533,
+          51530
+        ],
+        "pressure_wape": 0.00047907572193707114,
+        "pressure_instability": 0.005118108427806424,
+        "system": [
+          {
+            "target": "d^2u/dx1^2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.005450695275642068,
+            "instability": 0.015473456159431576
+          },
+          {
+            "target": "dv/dx1",
+            "terms": [
+              "du/dx2",
+              "dv/dx1"
+            ],
+            "wape": 2.4309384158905537e-05,
+            "instability": 4.7024447994774314e-06
+          },
+          {
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          }
+        ]
+      },
+      "dominance_witness": [
+        {
+          "candidate": [
+            135,
+            1475,
+            51522
+          ],
+          "rival": [
+            135,
+            1475,
+            2535
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00031036519457223457,
+              0.003969402721197745
+            ]
+          ],
+          "rival_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "dv/dx1*u"
+            ],
+            "wape": 0.00031036519457223457,
+            "instability": 0.003969402721197745
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    }
+  },
+  {
+    "seed": 923702,
+    "baseline_complete": 0,
+    "baseline_front": 918,
+    "original_velocity_pairs": 222,
+    "donor_structures": 52,
+    "recorded_systems": 179328,
+    "distinct_fits": 283,
+    "archived_parity_checks": 154,
+    "max_scaled_score_error": [
+      7.07395646620762e-14,
+      8.239543237218027e-10
+    ],
+    "direct": {
+      "proposed_systems": 11338,
+      "complete": 8,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 8,
+      "complete_on_pressure_gradient_front": 4,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": null,
+      "dominance_witness": [
+        {
+          "candidate": [
+            1519,
+            1626,
+            103514
+          ],
+          "rival": [
+            1519,
+            1626,
+            692
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.0003075634130040097,
+              0.004536181778720151
+            ]
+          ],
+          "rival_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.0003075634130040097,
+            "instability": 0.004536181778720151
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    "exchange": {
+      "proposed_systems": 206,
+      "complete": 4,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 4,
+      "complete_on_pressure_gradient_front": 4,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": null,
+      "dominance_witness": [
+        {
+          "candidate": [
+            1519,
+            1626,
+            103534
+          ],
+          "rival": [
+            1519,
+            1626,
+            692
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00031036519457223457,
+              0.003969402721197745
+            ]
+          ],
+          "rival_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "dv/dx1*u"
+            ],
+            "wape": 0.00031036519457223457,
+            "instability": 0.003969402721197745
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    "exchange_and_reassign": {
+      "proposed_systems": 87,
+      "complete": 6,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 6,
+      "complete_on_pressure_gradient_front": 6,
+      "proposed_on_global_front": 3,
+      "proposed_on_pressure_gradient_front": 77,
+      "example": null,
+      "dominance_witness": [
+        {
+          "candidate": [
+            103513,
+            103649,
+            103640
+          ],
+          "rival": [
+            35254,
+            2252,
+            692
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              0.005450695275642068,
+              0.015473456159431576
+            ],
+            [
+              2.4309384158905537e-05,
+              4.7024447994774314e-06
+            ],
+            [
+              0.00047907572193707114,
+              0.005118108427806424
+            ]
+          ],
+          "rival_scores": [
+            [
+              0.00018521787082045717,
+              0.004362305259466549
+            ],
+            [
+              2.4309384158905537e-05,
+              4.7024447994774314e-06
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    "combined": {
+      "proposed_systems": 11583,
+      "complete": 14,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 12,
+      "complete_on_pressure_gradient_front": 6,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": null,
+      "dominance_witness": [
+        {
+          "candidate": [
+            1519,
+            1626,
+            103514
+          ],
+          "rival": [
+            1519,
+            1626,
+            692
+          ],
+          "rival_is_original": true,
+          "candidate_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.0003075634130040097,
+              0.004536181778720151
+            ]
+          ],
+          "rival_scores": [
+            [
+              2.430933077503177e-05,
+              4.702366333228849e-06
+            ],
+            [
+              0.00020352093392268797,
+              0.004861891851192578
+            ],
+            [
+              0.00014442144493541798,
+              7.716641772484407e-05
+            ]
+          ],
+          "same_slot_structures": [
+            true,
+            true,
+            false
+          ],
+          "candidate_pressure": {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.0003075634130040097,
+            "instability": 0.004536181778720151
+          },
+          "rival_pressure": {
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    }
+  },
+  {
+    "seed": 923703,
+    "baseline_complete": 4,
+    "baseline_front": 1307,
+    "original_velocity_pairs": 536,
+    "donor_structures": 37,
+    "recorded_systems": 97515,
+    "distinct_fits": 227,
+    "archived_parity_checks": 142,
+    "max_scaled_score_error": [
+      2.4033566220780713e-15,
+      3.292385656252169e-08
+    ],
+    "direct": {
+      "proposed_systems": 18650,
+      "complete": 0,
+      "unbeaten_by_original": 0,
+      "complete_nondominated": 0,
+      "unbeaten_with_same_pressure_target": 0,
+      "complete_on_pressure_gradient_front": 0,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": null,
+      "dominance_witness": []
+    },
+    "exchange": {
+      "proposed_systems": 110,
+      "complete": 2,
+      "unbeaten_by_original": 2,
+      "complete_nondominated": 2,
+      "unbeaten_with_same_pressure_target": 2,
+      "complete_on_pressure_gradient_front": 2,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": {
+        "point_ids": [
+          535,
+          1399,
+          63921
+        ],
+        "pressure_wape": 0.0003075634130040097,
+        "pressure_instability": 0.004536181778720151,
+        "system": [
+          {
+            "target": "du/dx2",
+            "terms": [
+              "du/dx2",
+              "dv/dx1"
+            ],
+            "wape": 2.430933077503177e-05,
+            "instability": 4.702366333228849e-06
+          },
+          {
+            "target": "dv/dx0",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00020303846466157604,
+            "instability": 0.004924052203068169
+          },
+          {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.0003075634130040097,
+            "instability": 0.004536181778720151
+          }
+        ]
+      },
+      "dominance_witness": []
+    },
+    "exchange_and_reassign": {
+      "proposed_systems": 119,
+      "complete": 6,
+      "unbeaten_by_original": 6,
+      "complete_nondominated": 6,
+      "unbeaten_with_same_pressure_target": 6,
+      "complete_on_pressure_gradient_front": 6,
+      "proposed_on_global_front": 55,
+      "proposed_on_pressure_gradient_front": 55,
+      "example": {
+        "point_ids": [
+          63920,
+          64025,
+          64012
+        ],
+        "pressure_wape": 0.00047907572193707114,
+        "pressure_instability": 0.005118108427806424,
+        "system": [
+          {
+            "target": "d^2u/dx1^2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.005450695275642068,
+            "instability": 0.015473456159431576
+          },
+          {
+            "target": "dv/dx1",
+            "terms": [
+              "du/dx2",
+              "dv/dx1"
+            ],
+            "wape": 2.4309384158905537e-05,
+            "instability": 4.7024447994774314e-06
+          },
+          {
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          }
+        ]
+      },
+      "dominance_witness": []
+    },
+    "combined": {
+      "proposed_systems": 18879,
+      "complete": 8,
+      "unbeaten_by_original": 8,
+      "complete_nondominated": 8,
+      "unbeaten_with_same_pressure_target": 8,
+      "complete_on_pressure_gradient_front": 8,
+      "proposed_on_global_front": null,
+      "proposed_on_pressure_gradient_front": null,
+      "example": {
+        "point_ids": [
+          535,
+          1399,
+          63921
+        ],
+        "pressure_wape": 0.0003075634130040097,
+        "pressure_instability": 0.004536181778720151,
+        "system": [
+          {
+            "target": "du/dx2",
+            "terms": [
+              "du/dx2",
+              "dv/dx1"
+            ],
+            "wape": 2.430933077503177e-05,
+            "instability": 4.702366333228849e-06
+          },
+          {
+            "target": "dv/dx0",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00020303846466157604,
+            "instability": 0.004924052203068169
+          },
+          {
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.0003075634130040097,
+            "instability": 0.004536181778720151
+          }
+        ]
+      },
+      "dominance_witness": []
+    }
+  }
+]

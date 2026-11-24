@@ -1,0 +1,793 @@
+{
+  "post_hoc": true,
+  "no_refitting_or_selection": true,
+  "description": "Conditional fixed-weight expected normal-equation displacement; dynamic IRLS bootstrap may differ.",
+  "rows": [
+    {
+      "seed": 6,
+      "training": 0,
+      "bank": "local",
+      "pilot_coefficients": [
+        3.6158274215425674,
+        -0.024380006936679993,
+        -0.06543177425416044
+      ],
+      "conditional_expected_normal_score": [
+        0.004308709852233175,
+        810.4938559479805,
+        3.485957506310509e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.1995710003984963,
+        0.0128538169362583,
+        -0.02349363318278553
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.7620822007342518,
+        0.009135444381716538,
+        -0.017142463833686256
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        1.334816133515083e-16,
+        0.00022694246910809113,
+        1.118815931965523
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 0,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -1.0468289125028156,
+        -0.44763117286185145,
+        0.3797538203132799
+      ],
+      "conditional_expected_normal_score": [
+        0.001046328226797722,
+        55.75969020766707,
+        -3.2192865816337255e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.8464686575264256,
+        0.1058882402240645,
+        -0.11990053884190406
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.0691684566737771,
+        0.098793651373148,
+        -0.1132405302760271
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -1.0896231833978457e-17,
+        7.576500396850249e-05,
+        0.3102045836158827
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 0,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        0.3682745597845423,
+        -0.3494073158741641,
+        0.2694540407705084
+      ],
+      "conditional_expected_normal_score": [
+        0.0018305762564918312,
+        128.5835711698963,
+        -5.422681856296061e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.7082019212727492,
+        0.104596318305428,
+        -0.11848595241257195
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.3528502895190155,
+        0.12737027551474348,
+        -0.14892093119183364
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        5.644387660927673e-17,
+        7.755176648084825e-05,
+        0.42771049986852877
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 1,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -0.9051874266142835,
+        -0.49360187287369267,
+        0.4321356277451906
+      ],
+      "conditional_expected_normal_score": [
+        0.001467841166866967,
+        50.547866191972844,
+        -4.43990850476014e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.7977703462359234,
+        0.13644246044481403,
+        -0.16284054789514038
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.1511853671364904,
+        0.1313689662163493,
+        -0.15541553379456452
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        2.4394548880813138e-17,
+        7.108298406127094e-05,
+        0.3819850117537301
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 1,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        -0.7578927747679866,
+        -0.35890403327214004,
+        0.26981418854545863
+      ],
+      "conditional_expected_normal_score": [
+        0.0029925235144055997,
+        203.1572592769413,
+        -5.516329000926002e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.2669805500174651,
+        0.1579727655569157,
+        -0.18728387620238968
+      ],
+      "actual_bootstrap_mean_shift": [
+        2.258522810919805,
+        0.20548867945546456,
+        -0.247911977869334
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        3.617169497954641e-17,
+        7.477463168075847e-05,
+        0.786538165766434
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 2,
+      "bank": "local",
+      "pilot_coefficients": [
+        2.709428731268111,
+        -0.024731964415250905,
+        -0.09721068380622659
+      ],
+      "conditional_expected_normal_score": [
+        0.006837523446157522,
+        797.6198128932435,
+        7.426892932533857e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.724834719606812,
+        0.018605923453885558,
+        -0.0253706315508282
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.8226147015053358,
+        0.013293234165718846,
+        -0.019426835758107303
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -5.407522478679695e-17,
+        0.0001750116844875983,
+        3.086570080338305
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 2,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -0.2782411288420041,
+        -0.5177856583991616,
+        0.45744769859720463
+      ],
+      "conditional_expected_normal_score": [
+        0.001447268989976549,
+        48.19553141642237,
+        -5.469442196237884e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.5082963845861181,
+        0.2091078750340966,
+        -0.2528418701328878
+      ],
+      "actual_bootstrap_mean_shift": [
+        -0.0914902671910996,
+        0.2002972807786086,
+        -0.24139751200667708
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -1.6968879305751694e-17,
+        8.591042197230566e-05,
+        0.6772120135782632
+      ]
+    },
+    {
+      "seed": 6,
+      "training": 2,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        -0.7674372146497271,
+        -0.41361014044803984,
+        0.32726060155969205
+      ],
+      "conditional_expected_normal_score": [
+        0.002275749496904995,
+        108.63410397913941,
+        -8.660780068940864e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.9440939666161106,
+        0.19713869695703892,
+        -0.23530946195359972
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.46865821241312733,
+        0.21158677025347572,
+        -0.25325176988114395
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        6.957867441925425e-17,
+        8.624872210907286e-05,
+        0.9106817418136008
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 0,
+      "bank": "local",
+      "pilot_coefficients": [
+        3.305280495960588,
+        -0.019602581012781256,
+        -0.08155023653965988
+      ],
+      "conditional_expected_normal_score": [
+        0.005455240857881105,
+        1003.9507663548615,
+        4.1430591889948255e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.1080233512596818,
+        0.012213600834993356,
+        -0.01888149523433481
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.0177684076933282,
+        0.012000474651982009,
+        -0.022070228453471993
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -1.2191070179421622e-16,
+        0.000389907370349318,
+        1.6765421679158246
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 0,
+      "bank": "broad",
+      "pilot_coefficients": [
+        9.819831021294963,
+        -0.5945508423024282,
+        0.5570196518092788
+      ],
+      "conditional_expected_normal_score": [
+        0.0009637515858014785,
+        42.021618007963575,
+        -2.169771460241693e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        -2.852256384662472,
+        0.281576278705858,
+        -0.3259366895159954
+      ],
+      "actual_bootstrap_mean_shift": [
+        -2.7628071195111907,
+        0.25522999698471527,
+        -0.29690619281787234
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        1.12350450123752e-17,
+        0.00010698207220436767,
+        0.9002573071821386
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 0,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        7.186762400463795,
+        -0.36811761926154174,
+        0.29246265750831724
+      ],
+      "conditional_expected_normal_score": [
+        0.002019371583576363,
+        122.10570568092417,
+        -5.2254600844521815e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        -1.8386855200873358,
+        0.18155248029520132,
+        -0.20951924149182588
+      ],
+      "actual_bootstrap_mean_shift": [
+        -2.3994474911163852,
+        0.18811334705122654,
+        -0.22437224977770776
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        1.7236104037087907e-16,
+        0.0001081197156481473,
+        0.9741500651212185
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 1,
+      "bank": "local",
+      "pilot_coefficients": [
+        2.306049365996193,
+        -0.007736705060276557,
+        -0.11309500859511117
+      ],
+      "conditional_expected_normal_score": [
+        0.039259601002954045,
+        5379.325422326633,
+        5.527018236005248e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.9798622566050609,
+        0.004915943596929534,
+        -0.001133538038952485
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.2926565533224186,
+        0.005081892346343513,
+        -0.009453390378008741
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        1.1326873666784178e-18,
+        0.0008825751102140914,
+        1.8500877665625803
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 1,
+      "bank": "broad",
+      "pilot_coefficients": [
+        0.7067270386253629,
+        -0.46968231985169795,
+        0.39972209693242516
+      ],
+      "conditional_expected_normal_score": [
+        0.001340915571529947,
+        53.149060026643895,
+        -5.769100412579066e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.7416655063466921,
+        0.11546214290493359,
+        -0.13556119080933332
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.7707197048639755,
+        0.10960261976137231,
+        -0.1291352658313586
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        5.2583805362702906e-18,
+        7.060922827806933e-05,
+        0.3262527905051801
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 1,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        1.0813659068687482,
+        -0.33124730913939693,
+        0.2373077332607706
+      ],
+      "conditional_expected_normal_score": [
+        0.0028989922451879277,
+        220.1344908270576,
+        -7.125213503265107e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.8653723905694517,
+        0.12631893999281163,
+        -0.14871053567470752
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.3293553370319338,
+        0.15655807227612611,
+        -0.18486305485529517
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        5.812678897237399e-17,
+        7.187102561610107e-05,
+        0.6169413962011189
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 2,
+      "bank": "local",
+      "pilot_coefficients": [
+        4.813840169887442,
+        -0.03440192099186807,
+        -0.11228427214058158
+      ],
+      "conditional_expected_normal_score": [
+        0.004611287198610193,
+        576.7329134528992,
+        6.803652679672398e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.29195242934822063,
+        0.017513864034721827,
+        -0.014475451041949982
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.2069767128032094,
+        0.01411577280953507,
+        -0.010804781930156201
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -3.724741198197592e-17,
+        0.00012024537009427043,
+        1.040021655776359
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 2,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -5.574487288681502,
+        -0.4088617843392308,
+        0.3258776780333718
+      ],
+      "conditional_expected_normal_score": [
+        0.001945642673186688,
+        60.97998119248933,
+        -9.512045892425388e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.646482523140356,
+        0.1350203158310828,
+        -0.16131572793618185
+      ],
+      "actual_bootstrap_mean_shift": [
+        2.0896967516840883,
+        0.14948430236650118,
+        -0.17819613315548377
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        3.4342103813454194e-17,
+        6.414252930885691e-05,
+        0.49319393168605674
+      ]
+    },
+    {
+      "seed": 7,
+      "training": 2,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        -4.662319851802473,
+        -0.335426479885035,
+        0.24213849786144337
+      ],
+      "conditional_expected_normal_score": [
+        0.0029546550646457914,
+        133.8712230580222,
+        -1.6114849336847541e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.6330874520171124,
+        0.1278529629390321,
+        -0.1517793403357524
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.9441857220733425,
+        0.14673595219651347,
+        -0.1747327156400672
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        4.800305118678989e-17,
+        6.421003580736739e-05,
+        0.6162723929635805
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 0,
+      "bank": "local",
+      "pilot_coefficients": [
+        5.721044281484774,
+        0.02715849663488559,
+        -0.1478996805487103
+      ],
+      "conditional_expected_normal_score": [
+        -0.004047388359614096,
+        -727.739886539648,
+        5.902438221431305e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        -1.4144220811478105,
+        -0.016093081097922842,
+        0.015257022710112799
+      ],
+      "actual_bootstrap_mean_shift": [
+        -0.9093999646165116,
+        -0.011957450670915753,
+        0.011377335365969715
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        4.078863552631912e-17,
+        0.0002545420147555005,
+        1.451949621241396
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 0,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -12.322863746077001,
+        -0.549836142020217,
+        0.4343678410780542
+      ],
+      "conditional_expected_normal_score": [
+        0.0010385872759495706,
+        45.38185337925542,
+        -2.7384676162278716e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        4.576821222477529,
+        0.18687189487001551,
+        -0.19361563461284279
+      ],
+      "actual_bootstrap_mean_shift": [
+        4.2811764127126875,
+        0.1921004060708567,
+        -0.20296104693104164
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        5.502326025355978e-18,
+        7.027126971506198e-05,
+        0.5148467217296623
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 0,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        -10.495992738680853,
+        -0.4702610216730338,
+        0.349257471834271
+      ],
+      "conditional_expected_normal_score": [
+        0.0015630298071496753,
+        95.56828582743022,
+        -5.078381584513462e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        4.862529505550427,
+        0.192800613212302,
+        -0.19944971006290135
+      ],
+      "actual_bootstrap_mean_shift": [
+        4.79507435787981,
+        0.20551544765728275,
+        -0.21594223333004334
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -4.5143467956866725e-17,
+        7.278056372213439e-05,
+        0.6951314645753554
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 1,
+      "bank": "local",
+      "pilot_coefficients": [
+        3.7913542362972406,
+        -0.002384175754509961,
+        -0.12343429433222297
+      ],
+      "conditional_expected_normal_score": [
+        0.06633001440282321,
+        10175.293778232213,
+        2.5751645476698306e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.04542925725854742,
+        0.001466594610017537,
+        -0.000999931224866895
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.34809376379067913,
+        0.0011543276716448829,
+        0.0037587530141439673
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        4.172558222830635e-18,
+        0.0007235564371442172,
+        1.844528962133109
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 1,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -1.0967756163445141,
+        -0.5595103476048188,
+        0.4870271283665319
+      ],
+      "conditional_expected_normal_score": [
+        0.001081209357632071,
+        44.66301106481355,
+        -4.0977265174779494e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.5907809085190099,
+        0.2089093145778373,
+        -0.2353683079551329
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.0816376849025446,
+        0.19185848343603856,
+        -0.21431564784979157
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        3.7310107260563793e-17,
+        0.00010420251624705544,
+        0.5969165599766636
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 1,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        0.6631386735418632,
+        -0.3627448262133328,
+        0.26681148480777456
+      ],
+      "conditional_expected_normal_score": [
+        0.002460396082621629,
+        201.10938420315108,
+        -6.310717304765263e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.1405412019344943,
+        0.18180638271099114,
+        -0.20546766624242133
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.5346559717391473,
+        0.20929356901634855,
+        -0.24070540679847446
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -2.2742525777334834e-16,
+        0.00010777862347697884,
+        1.0061391932270938
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 2,
+      "bank": "local",
+      "pilot_coefficients": [
+        5.482974826905696,
+        -0.015077237416918543,
+        -0.11125522354285683
+      ],
+      "conditional_expected_normal_score": [
+        0.010152024029835588,
+        1271.7468829682186,
+        3.961474585428905e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        -0.19325204048513686,
+        0.008552607658358097,
+        -0.014603660421583892
+      ],
+      "actual_bootstrap_mean_shift": [
+        0.21225355805689716,
+        0.0023939790244719827,
+        -0.001834371483195485
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        -7.913460064569769e-17,
+        0.00010153203408779687,
+        1.3269192708141648
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 2,
+      "bank": "broad",
+      "pilot_coefficients": [
+        -6.186331751406183,
+        -0.47378830273147154,
+        0.3826623809348048
+      ],
+      "conditional_expected_normal_score": [
+        0.001656488237061981,
+        52.674784233866305,
+        -7.53160796547755e-26
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        1.0965868487573505,
+        0.12225259220328398,
+        -0.13913531025336998
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.4229517261483888,
+        0.10496214238600216,
+        -0.11902271301304912
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        3.293264098846317e-18,
+        6.290441948586336e-05,
+        0.34801347892059226
+      ]
+    },
+    {
+      "seed": 8,
+      "training": 2,
+      "bank": "mixed",
+      "pilot_coefficients": [
+        -4.169631751682894,
+        -0.3821135996451397,
+        0.28235689302948674
+      ],
+      "conditional_expected_normal_score": [
+        0.002593364489298885,
+        117.60925277833852,
+        -1.2666867069636275e-25
+      ],
+      "fixed_weight_expected_coefficient_shift": [
+        0.7209275101486362,
+        0.12528883819693146,
+        -0.1436065055366762
+      ],
+      "actual_bootstrap_mean_shift": [
+        1.5601439263743924,
+        0.13598784414549295,
+        -0.1569343957435809
+      ],
+      "generalized_noise_to_signal_eigenvalues": [
+        5.662245845804429e-17,
+        6.459284086178952e-05,
+        0.4882675174333451
+      ]
+    }
+  ],
+  "source_sha256": "22a253a231ec215c52fbea871fe18697cdb7bd6d59971ba0350c01da9dbf1fbe",
+  "input_sha256": {
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\outer_selection_2026-11-16\\sensitivity\\seed6.json": "6838c801cd507cd042f7883ce097a4526a6ed5df1dfab7d174fee9cec1c7c852",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\outer_selection_2026-11-16\\sensitivity\\seed7.json": "94077348747340d524f7b63f96820823e713a8ffd23361c46d0f61866f475c71",
+    "C:\\Users\\NSSLab\\PycharmProjects\\EPDE\\projects\\pic\\experiments\\outer_selection_2026-11-16\\sensitivity\\seed8.json": "ca0e5a29f634daf52a385f740e2ac26bee3a4c31c616e264c75a9182d31d69d5"
+  }
+}

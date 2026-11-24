@@ -1,0 +1,272 @@
+[
+  {
+    "system": "ac",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.560860100027639
+  },
+  {
+    "system": "duffing",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.708437799999956
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.803216700034682
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.820289900002535
+  },
+  {
+    "system": "burgers",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.91229479998583
+  },
+  {
+    "system": "kdv",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.974506200000178
+  },
+  {
+    "system": "ks",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 8.116786199971102
+  },
+  {
+    "system": "lorenz",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.972090600000229
+  },
+  {
+    "system": "ode",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.727160700014792
+  },
+  {
+    "system": "lv",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.850329400040209
+  },
+  {
+    "system": "pde_compound",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.7450413999613374
+  },
+  {
+    "system": "pde_divide",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.745407700014766
+  },
+  {
+    "system": "vdp",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.785718599974643
+  },
+  {
+    "system": "ns",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 8.22283540002536
+  },
+  {
+    "system": "ac",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.643308600003365
+  },
+  {
+    "system": "wave",
+    "seed": 0,
+    "exit_code": 0,
+    "seconds": 7.731387900013942
+  },
+  {
+    "system": "burgers",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.730172500014305
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.7064004999701865
+  },
+  {
+    "system": "duffing",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.647542099992279
+  },
+  {
+    "system": "kdv",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.779130700044334
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.679611200001091
+  },
+  {
+    "system": "ode",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.660246699990239
+  },
+  {
+    "system": "lv",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.808462999993935
+  },
+  {
+    "system": "lorenz",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.909523400012404
+  },
+  {
+    "system": "ks",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 8.091649100009818
+  },
+  {
+    "system": "pde_divide",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.737274199957028
+  },
+  {
+    "system": "pde_compound",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.879140300035942
+  },
+  {
+    "system": "ns",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 8.306434700032696
+  },
+  {
+    "system": "vdp",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.879339899984188
+  },
+  {
+    "system": "wave",
+    "seed": 1,
+    "exit_code": 0,
+    "seconds": 7.962446600024123
+  },
+  {
+    "system": "ac",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 8.006933299999218
+  },
+  {
+    "system": "burgers",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.978766900021583
+  },
+  {
+    "system": "burgers_inviscid",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.835134900000412
+  },
+  {
+    "system": "duffing",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.860124300001189
+  },
+  {
+    "system": "kdv",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 8.040986299980432
+  },
+  {
+    "system": "kdv_cossin",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.756116000004113
+  },
+  {
+    "system": "lv",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.774803599982988
+  },
+  {
+    "system": "lorenz",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.878614699991886
+  },
+  {
+    "system": "ks",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 8.051984500023536
+  },
+  {
+    "system": "ode",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.689751899975818
+  },
+  {
+    "system": "pde_compound",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 7.74075629998697
+  },
+  {
+    "system": "ns",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 8.217930600047112
+  },
+  {
+    "system": "pde_divide",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 6.459553399996366
+  },
+  {
+    "system": "vdp",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 6.258277299988549
+  },
+  {
+    "system": "wave",
+    "seed": 2,
+    "exit_code": 0,
+    "seconds": 6.30609969998477
+  }
+]

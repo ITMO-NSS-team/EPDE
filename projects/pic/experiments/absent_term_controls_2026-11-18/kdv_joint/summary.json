@@ -1,0 +1,99 @@
+{
+  "arms": {
+    "single": {
+      "add_wins": 116,
+      "comparisons": 128,
+      "add_results": {
+        "e0:add_0": {
+          "wins": 16,
+          "median": 0.10222268380050259
+        },
+        "e0:add_1": {
+          "wins": 15,
+          "median": 0.08066049831919184
+        },
+        "e0:add_2": {
+          "wins": 15,
+          "median": 0.07059185823830615
+        },
+        "e0:add_3": {
+          "wins": 16,
+          "median": 0.09072826133005638
+        },
+        "e0:add_4": {
+          "wins": 12,
+          "median": 0.023226473423235347
+        },
+        "e0:add_5": {
+          "wins": 13,
+          "median": 0.024094617935284814
+        },
+        "e0:add_6": {
+          "wins": 14,
+          "median": 0.03793636984767371
+        },
+        "e0:add_7": {
+          "wins": 15,
+          "median": 0.07455201852193905
+        }
+      },
+      "reference_medians": [
+        3.2375502992722778,
+        0.0036942119815926372,
+        -0.22389792199901248
+      ],
+      "ref_median_score": 0.11466207629035667,
+      "physical_median_score": -0.00047583053381680353,
+      "ref_minus_physical_median": 0.11316124148931625
+    },
+    "joint": {
+      "add_wins": 86,
+      "comparisons": 128,
+      "add_results": {
+        "e0:add_0": {
+          "wins": 15,
+          "median": 0.07669223613532741
+        },
+        "e0:add_1": {
+          "wins": 13,
+          "median": 0.02603562999700014
+        },
+        "e0:add_2": {
+          "wins": 12,
+          "median": 0.02578961980106865
+        },
+        "e0:add_3": {
+          "wins": 14,
+          "median": 0.033747327072616094
+        },
+        "e0:add_4": {
+          "wins": 12,
+          "median": 0.013844043109683093
+        },
+        "e0:add_5": {
+          "wins": 0,
+          "median": -0.025395668403330497
+        },
+        "e0:add_6": {
+          "wins": 15,
+          "median": 0.03113920655921406
+        },
+        "e0:add_7": {
+          "wins": 5,
+          "median": -0.0034243919617175968
+        }
+      },
+      "reference_medians": [
+        -4.148195863719785,
+        0.002223652448948625,
+        -0.2342299419059672
+      ],
+      "ref_median_score": 0.10453923530885731,
+      "physical_median_score": -0.00047583053381680353,
+      "ref_minus_physical_median": 0.10301672327045897
+    }
+  },
+  "fields": 16,
+  "joint_reference_improves": 13,
+  "protocol": "9dadc24c32cce20cc29ad4a9e326cabe7ccaa324225c4e1ae251dea23a1fe5c3"
+}

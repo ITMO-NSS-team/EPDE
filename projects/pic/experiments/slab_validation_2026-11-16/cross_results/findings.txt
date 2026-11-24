@@ -1,0 +1,97 @@
+Cross-reconstruction discrepancy: solver-free test, 2026-11-16
+
+User constraint: keep the EPDE approach solver-free. The earlier suggestion
+to evaluate trajectories with candidate-equation solvers was rejected. This
+experiment uses GCV signal reconstruction, weak integrals and linear algebra;
+no candidate ODE/PDE solve or PINN is used.
+
+Outcome
+The crossed discrepancy removes the Cauchy noise-carrier dominator in all
+three seeds, with the saved coefficients and dyad scores frozen. It does not
+resolve Kepler or improve the main rational archive's Pareto ranking. This
+supports the common-noise-cancellation diagnosis, not a universal replacement
+discrepancy or a demonstrated evolutionary-search improvement.
+
+Protocol
+Split raw observations into even and odd samples. Fit separate GCV smoothing
+splines to each group, with no shared tuning, then reconstruct on the original
+grid and rebuild all derivatives, products, inverse and trig terms. Retain
+each record's original frequencies, supports, fitted coefficients and dyad.
+
+For plain WAPE, score
+  D_cross = (||y_A-X_B c-b||_1 + ||y_B-X_A c-b||_1)
+            / (||y_A||_1 + ||y_B||_1).
+
+The matched control is
+  D_within = (||y_A-X_A c-b||_1 + ||y_B-X_B c-b||_1)
+             / (||y_A||_1 + ||y_B||_1).
+
+The historical capped rational arm retains its capped denominator. Plain WAPE
+is also saved for every model. All arms use the same interior weak rows; one
+initial row per record is excluded so neither weak windows nor derivative
+stencils touch spline extrapolation. Reference dominance counts are unchanged
+by this row restriction. No noise-support cutoff or term removal is applied.
+
+Counts of archived candidates dominating the reference (seeds 0,1,2)
+Saved RAW coefficients and saved RAW dyad held fixed:
+Case                       Original     Within       Crossed
+Rational, main             1, 0, 1      1, 0, 1      1, 0, 1
+Kepler                    11,10,10     12,11,11     12,11,11
+Rational, capped/no-trig    4, 2, 0      1, 0, 0      0, 0, 0
+Cauchy                     1, 1, 1      1, 1, 1      0, 0, 0
+
+The capped/no-trig archive is a historical diagnostic; no new trig restriction
+was introduced. In Kepler, the extra dominator already appears in the within
+control: crossing itself does not change the counts.
+
+Saved SMOOTHED coefficients and saved SMOOTHED dyad held fixed:
+Case                       Original     Within       Crossed
+Rational, main             0, 0, 0      0, 0, 0      0, 0, 0
+Kepler                    10,11,10     10,11,10     10,11,10
+Rational, capped/no-trig    0, 0, 0      0, 0, 0      0, 0, 0
+Cauchy                     1, 1, 1      1, 1, 1      0, 0, 0
+
+Cauchy isolates the effect
+Using raw fitted coefficients, paired-within -> crossed WAPE:
+seed 0: carrier 0.0072376 -> 1.130720; reference 0.0339698 -> 0.0384900
+seed 1: carrier 0.0145971 -> 1.401822; reference 0.0464835 -> 0.0499828
+seed 2: carrier 0.0174892 -> 1.377068; reference 0.0388177 -> 0.0403873
+
+The reference remains competitive while the carrier loses its matched-noise
+cancellation. The same qualitative result holds for smoothed coefficients.
+GCV reconstruction by itself is insufficient: all within controls still have
+the carrier as a dominator.
+
+Clean controls
+Refit structures on clean full-grid data, freeze those coefficients and dyad,
+then apply the identical clean even/odd reconstruction and paired scoring.
+All four archives across all three frequency-slot seeds remain nondominated
+for the reference (zero dominators). Splitting increases the clean Kepler
+reference D from about 1.27e-5 to 1.68e-4, still below its competitors.
+Clean data are never used to tune the noisy-data experiment.
+
+Limitations and decision
+This is an archived-candidate diagnostic with frozen, full-record-selected
+coefficients and frequencies, not independent validation or a new search.
+Only three noise seeds were tested. Even/odd observation noise is independent
+in these iid synthetic benchmarks; colored measurement noise needs a different
+sampling protocol. Half-density reconstruction changes the field estimator
+and can worsen nonlinear terms, as the Kepler controls demonstrate.
+
+Retain this as a promising mechanism-specific solver-free discrepancy probe.
+Do not make it the default on this evidence. Keep dyad unchanged. The remaining
+Kepler problem calls for investigating nonlinear column/state estimation,
+with any future experiment respecting the solver-free constraint.
+
+Validation
+All saved full-record discrepancies reproduced. Cross(A,A) matches ordinary
+WAPE/capped WAPE; swapping A/B preserves the score; Within(A,B) matches the
+ordinary score on concatenated rows. Both main stages retain exact saved
+dyad coordinates and coefficients. Complete run succeeded and plot inspected.
+
+Artifacts
+cross_reconstruction.json: every equation score, coefficient, dyad, directional
+residual, reconstruction difference, centre mask, source hashes and controls.
+cross_reconstruction.txt: per-record summaries and remaining dominator IDs.
+cross_reconstruction_counts.png/.svg: comparison of the primary raw-score arm.
+*_splits.npz: the reconstructed fields and disjoint raw training indices.

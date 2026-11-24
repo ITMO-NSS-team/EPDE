@@ -1,0 +1,37 @@
+Oscillating weak discrepancy experiment, fixed before scoring
+2026-11-16
+
+Primary question: with saved CLSM coefficients and dyad held fixed, do
+oscillating weak tests remove the four Kepler surrogate families as dominators?
+
+Primary arm: a smooth polynomial bump spanning the usable record, multiplied
+by complex Fourier exponentials. Its polynomial order equals the existing
+weak plan. Frequencies are the DCT-II grid k*pi/(N*h). Select maximum k by
+minimizing GCV=N*RSS/(N-k-1)^2 for raw-u orthonormal cosine projections,
+over k=0,...,N-2. Include every frequency up to the selected maximum.
+Selection uses observed u only, with no reference coefficients or rankings.
+
+Score the pooled complex magnitude of weak residuals divided by pooled
+target magnitudes, retaining the existing target cap in the historical capped
+case. Pool both even/odd crossed reconstruction directions. Frequencies of
+both signs count equally (weight 1 at zero, 2 at positive frequencies).
+Every model receives the same tests, weights, centres, and bandwidth.
+Interceptions transform as b*integral(psi), never a constant b per test.
+
+Controls: zero modulation vs all selected modes, original support vs full
+record support, full/within/crossed field reconstructions, raw/smoothed saved
+coefficient fits, clean saved fits with identical noisy-selected bandwidth.
+Keep the current integration-by-parts treatment of opaque derivative terms.
+
+Record all prefix scores to diagnose sensitivity, but do not select a cutoff
+from a favorable ranking. Validate zero-modulation reproduction, analytic
+sinusoid integration-by-parts, polynomial moments and intercept transformation.
+
+Run all archived Kepler candidates in the same matrix pass, reporting the
+four distinct representative families separately. All three noise seeds.
+If the primary arm consistently restores reference nondominance, extend the
+same protocol to the other archived cases. This is a finite candidate probe,
+not an evolutionary search rerun or a proposed production change.
+
+No candidate ODE/PDE solve, new measurement record, token restriction,
+complexity penalty, noise-normalized residual, or coefficient refit.

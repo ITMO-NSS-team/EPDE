@@ -1,0 +1,107 @@
+Noise-support follow-up, 2026-11-16
+
+Outcome
+The Cauchy carrier's low discrepancy is reproducible on pure noise. Kepler has
+a different failure: accurate-looking field estimates still distort the
+inverse-power balance. These results support investigating discrepancy and
+the construction of its columns while retaining production dyad. They do not
+establish a replacement objective or justify a universal signal/noise gate.
+
+Protocol
+64 independent artificial noise draws per observed record, three noise seeds
+for rational, Kepler and Cauchy (576 unique draws). Both rational archive arms
+use the same draws. Every archived structure is evaluated, 67 including the
+four references. The existing AR(1) model estimates sigma and rho from each
+observed field. Draws are added to its data-only GCV estimate; derivatives,
+inverse tokens and products are rebuilt jointly, with and without rerunning
+GCV. Frequencies, weak windows and fitted equation coefficients are frozen
+within each comparison. No new search, objective modification, or pruning.
+
+The covariance preserves common measurement noise across columns. It is an
+average of pointwise replicate covariances, not an independent-row model or
+a confidence test. Pure-noise controls contain no estimated or true signal.
+Known clean fields enter only the separately labelled oracle diagnostics.
+
+Cauchy: low weak residual on noise
+                  seed 0        seed 1        seed 2
+Carrier noise D   0.00420508    0.01100089    0.01288727
+Reference noise D 0.95163616    0.94797028    0.94649933
+Coefficient vs
+FD4 response      0.025748%     0.049740%     0.131064%
+Noise correlation
+between y and RHS 0.99999138    0.99994124    0.99991370
+
+Noise D is the median over 64 draws with the observed raw coefficients frozen.
+It is not a refitted residual. Archive_0 has the form
+
+    u'' sin(omega t) = c u' cos(omega t).
+
+For the nested central-fourth-order stencil, the Fourier derivative response is
+
+    omega_FD = (8 sin(omega h) - sin(2 omega h)) / (6 h).
+
+At seed 0, omega=80.541782 and omega_FD=69.369714, while c=-69.387576.
+The agreement across all seeds, low pure-noise residuals, and nearly perfectly
+correlated propagated columns support a derivative/window-induced relation.
+This is an approximate filtered relation, not an exact analytical law of u.
+The observed seed-0 smoothed carrier has weak WAPE 0.005563 but pointwise WAPE
+40.2957. This pointwise diagnostic is not proposed as a noise-robust objective.
+Clean frozen-coefficient WAPE also has a very small target denominator; it
+must not be interpreted as a large absolute physical error by itself.
+
+RMS estimated signal/noise for the raw carrier target is 0.000623, 0.002466,
+0.003899. After the smoothing pipeline it is 0.624, 1.007, 1.553. Thus even
+these diagnostic estimates do not consistently put the surviving smoothed
+carrier below a ratio of one. Shared-noise cancellation alone is not a
+universal invalidity test: real equations can also cancel correlated errors.
+
+Kepler: inverse-power balance remains inaccurate
+The reference and leading competitor have strongly supported weak columns.
+Their target signal/noise ratios are about 200-260; reference inverse-column
+ratios are about 78-170. A low-signal-column exclusion cannot separate them.
+
+With analytical reference coefficients (-1, 0.6), the smoothed reference's
+target errors are 0.538%, 0.470%, 0.491%, while combined RHS errors are 6.425%,
+7.107%, 9.606%. These are RMS errors normalized by clean target RMS. The
+oracle audit therefore locates most error in -u^-2 + 0.6 u^-3. Small field or
+individual-column errors need not imply an accurate difference of those terms.
+The analytical law's smoothed WAPE is 0.04863, 0.05426, 0.07262. Refitting
+partly absorbs these distortions, but the true structure remains dominated
+in the previously saved comparison.
+
+Interpretation and next experiment
+Keep dyad unchanged; it measures coefficient constancy and can consistently
+rate a preprocessing-induced relation as stable. Do not turn covariance or
+noise-support estimates into a production penalty from this experiment.
+
+The next useful falsification test is a common observation-space discrepancy
+for a small set of finalists: fit coefficients and any initial state using a
+training part of the same record, then compare predicted u on held-out parts.
+Hold preprocessing and initial-state inference inside training data; keep all
+time/trig terms. For these ODEs use converged numerical solves and report
+singular/failed equations explicitly. This is an untested proposal, not a
+claim that it will resolve Kepler or generalize directly to PDE candidates.
+The earlier PINN-loss issue in project_solver_discrepancy_broken.md makes
+solver convergence an essential check before interpreting prediction error.
+
+Artifacts
+noise_support.json/.txt: all columns, joint covariances, frozen-score draw
+distributions, noise model estimates, per-seed frequency mappings, provenance.
+noise_support.png/.svg: reference versus archive_0 diagnostic comparisons.
+oracle_column_errors.json/.txt: truth-only localization, analytical reference
+scores, and each observed coefficient vector reevaluated on clean columns.
+
+Validation
+Observed raw/smoothed scores reconstructed for all archived structures.
+Joint covariance projection agrees with direct residual perturbations.
+Linear Cauchy columns obey F(signal+noise)-F(signal)=F(noise) numerically.
+Full 64-draw run completed successfully; plot inspected. Production code was
+not edited. The parametric bootstrap remains conditional on the signal/noise
+estimates and on frequencies selected from the original observed record;
+it does not account for frequency-selection uncertainty or provide new data.
+
+Related primary literature (context, not evidence for the local results)
+WSINDy spectral test-function discussion:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC8570254/
+WENDy errors-in-variables estimation (parameter estimation, not proof of a
+structure-ranking objective): https://arxiv.org/abs/2302.13271

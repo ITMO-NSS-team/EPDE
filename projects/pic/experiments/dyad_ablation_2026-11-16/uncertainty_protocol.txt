@@ -1,0 +1,52 @@
+Stage 2: paired uncertainty on both Pareto coordinates
+Frozen after dyad ablation, before uncertainty outcomes, 2026-11-16.
+
+Keep production dyad: primary retention 56/60, no tested alternative better.
+Investigate AC, forced KdV, KS and wave at seeds 0/1/2, plus every additional
+record where a nontrivial alternative (excluding discrepancy_only) changes
+primary registered retention. This chooses diagnostic cases from stage 1;
+it is not an independent confirmatory sample. Save the resulting job list.
+
+For each case hold the full candidate panel, joint-risk coefficients,
+q0_white128 validation geometry/weights/normalization, Gaussian contraction
+corrections and full-record dyad plan fixed. Reproduce the saved discrepancy
+and both dyad statistics first. Compare production dyad_sum and the failed
+dyad_prediction alternative. Recompute their slab coefficient refits for
+each noisy measurement, rather than treating instability as deterministic.
+The same noise field enters both discrepancy and instability, preserving
+paired dependence across objectives, candidates and rotations.
+
+Ensemble A: 128 parametric measurements around a full-record reconstruction
+fitted to the observed record, using that record's estimated raw noise model.
+This is a plug-in bootstrap; no clean field selects its pilot/model.
+Ensemble B: 128 independent benchmark measurements of the saved clean field
+at the actual 5% iid Gaussian noise level, seeds 390000+1000*case_seed+b.
+They test how well the plug-in uncertainty describes real measurement
+variation. Benchmark clean data are used only for this calibration and
+noise-free diagnostic controls, never to tune a metric or bootstrap model.
+
+For each unregistered competitor/reference pair within an equation slot,
+record margins competitor minus reference on discrepancy and instability.
+Bootstrap error samples subtract the noise-free PILOT margins; benchmark
+errors subtract the noise-free CLEAN margins. Use the central 95% empirical
+bootstrap error range to assess coverage of benchmark errors. Also report
+SD ratios, bias, sign changes and joint domination frequencies. These are
+finite-simulation conditional calibration diagnostics, not posterior
+probabilities that an equation is true and not new significance gates.
+Retain nonfinite metric results as explicit failures, if any; do not clip
+scores, silently delete samples or invent a confidence penalty.
+
+This first uncertainty study includes observation noise, nonlinear raw
+operators and ALL dyad slab refits, but holds the main candidate coefficients,
+weights and selected geometry fixed. It does NOT estimate the uncertainty
+of the complete discovery pipeline or reselect/re-estimate the pilot/noise
+model in every bootstrap. Comparing with independent benchmark measurements
+tests the consequences of this plug-in model; it does not remove them.
+Neither actual measurement spread nor bootstrap spread proves structural
+correctness, especially where frozen coefficients remain biased.
+
+Report full candidate-pair tables and repeated-measurement Pareto retention;
+use previously closest dyad-eligible competitors as a compact example set.
+No decision rule is changed based on these results. Check shared-noise replay,
+frozen input hashes, saved-score reproduction, finite status counts and
+paired bootstrap coverage arithmetic. All methods remain solver-free.

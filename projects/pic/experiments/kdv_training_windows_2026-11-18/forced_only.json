@@ -1,0 +1,258 @@
+{
+  "788001": {
+    "baseline": {
+      "coefficients": [
+        3.4729156275525144,
+        0.0073874980949270854,
+        -0.22956901323069753
+      ],
+      "median_absolute_errors": [
+        9.472915627552513,
+        1.0073874980949271,
+        1.2295690132306976
+      ],
+      "fields_closer_than_baseline": [
+        0,
+        0,
+        0
+      ],
+      "extra_wins": 180,
+      "by_addition": [
+        24,
+        23,
+        23,
+        23,
+        20,
+        22,
+        22,
+        23
+      ],
+      "fields_beating_all_eleven": 0,
+      "fewer_equal_more_extra_wins": [
+        0,
+        24,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        5,
+        24,
+        24
+      ],
+      "median_score": 0.13343196108121883,
+      "improved_reference": 0
+    },
+    "wide": {
+      "coefficients": [
+        -0.09587286079254913,
+        -0.7524533113093691,
+        0.6963062005258902
+      ],
+      "median_absolute_errors": [
+        7.348861108300355,
+        0.3150032913799577,
+        0.3981381385769857
+      ],
+      "fields_closer_than_baseline": [
+        15,
+        17,
+        18
+      ],
+      "extra_wins": 92,
+      "by_addition": [
+        21,
+        13,
+        10,
+        17,
+        9,
+        7,
+        9,
+        6
+      ],
+      "fields_beating_all_eleven": 0,
+      "fewer_equal_more_extra_wins": [
+        23,
+        0,
+        1
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        8,
+        24,
+        24
+      ],
+      "median_score": 0.013815241337506643,
+      "improved_reference": 23
+    },
+    "projected": {
+      "coefficients": [
+        -4.756911735813361,
+        -0.9117159716490357,
+        0.9024152177625575
+      ],
+      "median_absolute_errors": [
+        5.22038556917317,
+        0.2687466501255856,
+        0.2948469304126769
+      ],
+      "fields_closer_than_baseline": [
+        19,
+        22,
+        21
+      ],
+      "extra_wins": 40,
+      "by_addition": [
+        13,
+        3,
+        6,
+        5,
+        4,
+        4,
+        5,
+        0
+      ],
+      "fields_beating_all_eleven": 2,
+      "fewer_equal_more_extra_wins": [
+        23,
+        0,
+        1
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        6,
+        24,
+        24
+      ],
+      "median_score": 0.004736354189175878,
+      "improved_reference": 24
+    }
+  },
+  "790001": {
+    "baseline": {
+      "coefficients": [
+        3.7324818998565004,
+        0.01486603219730255,
+        -0.2326555297910967
+      ],
+      "median_absolute_errors": [
+        9.810640565710584,
+        1.0148660321973026,
+        1.2326555297910966
+      ],
+      "fields_closer_than_baseline": [
+        0,
+        0,
+        0
+      ],
+      "extra_wins": 191,
+      "by_addition": [
+        24,
+        24,
+        24,
+        24,
+        23,
+        24,
+        24,
+        24
+      ],
+      "fields_beating_all_eleven": 0,
+      "fewer_equal_more_extra_wins": [
+        0,
+        24,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        1,
+        24,
+        23
+      ],
+      "median_score": 0.12593359271884536,
+      "improved_reference": 0
+    },
+    "wide": {
+      "coefficients": [
+        -2.0741637197802913,
+        -0.566814007299583,
+        0.42699520010929704
+      ],
+      "median_absolute_errors": [
+        7.375969090988689,
+        0.4704786454371893,
+        0.6317023085802121
+      ],
+      "fields_closer_than_baseline": [
+        13,
+        18,
+        18
+      ],
+      "extra_wins": 105,
+      "by_addition": [
+        22,
+        13,
+        13,
+        18,
+        11,
+        9,
+        11,
+        8
+      ],
+      "fields_beating_all_eleven": 0,
+      "fewer_equal_more_extra_wins": [
+        20,
+        4,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        7,
+        24,
+        24
+      ],
+      "median_score": 0.0177772856971914,
+      "improved_reference": 24
+    },
+    "projected": {
+      "coefficients": [
+        -3.847214341130819,
+        -0.9641840426960486,
+        0.9121216522368183
+      ],
+      "median_absolute_errors": [
+        6.58834624869385,
+        0.20845739074847375,
+        0.23578659485013903
+      ],
+      "fields_closer_than_baseline": [
+        17,
+        23,
+        22
+      ],
+      "extra_wins": 48,
+      "by_addition": [
+        15,
+        4,
+        5,
+        4,
+        5,
+        4,
+        6,
+        5
+      ],
+      "fields_beating_all_eleven": 2,
+      "fewer_equal_more_extra_wins": [
+        24,
+        0,
+        0
+      ],
+      "beats_fixed": 0,
+      "genuine_retained": [
+        4,
+        24,
+        24
+      ],
+      "median_score": 0.004555676759098106,
+      "improved_reference": 24
+    }
+  }
+}

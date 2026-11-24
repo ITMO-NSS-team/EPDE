@@ -1,0 +1,5 @@
+# Prospective extension with the archived pair-add operator
+
+Run the archived PVPA chooser on the six existing nonlinear-diffusion observations, in both time directions. Keep the same plain-mode search, training geometry, native coefficient fit, WAPE–dyad objectives, fill probability of 0.25 and ten-epoch limit. Use the two saved baseline arms. Match all three arms at the first 6000 full calls, reducing this uniformly if any new run is shorter. The main endpoints are exact support generation, and membership on the complete source and opposite-half archive fronts. Also report the actual returned front after ten epochs.
+
+Retain the archived pair probability of 0.5 on eligible ordinary additions, 10% ordinary exploration, initial shortlist of 64, and gain-weighted sampling among the best eight joint gains. Track the number of installed pairs, joint screening operations and elapsed time. Record the guide's current target, retained predictors, and chosen terms passively, to distinguish proposing the physical pair from producing the exact active equation. The fixed-budget endpoint counts full objective calls. Joint screening adds work.

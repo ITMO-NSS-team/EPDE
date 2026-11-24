@@ -1,0 +1,17 @@
+system,law_observations,generated_native,generated_guided,generated_gains,generated_losses,source_native,source_guided,source_gains,source_losses,held_native,held_guided,held_gains,held_losses
+ac,3,3,3,0,0,0,0,0,0,0,0,0,0
+burgers,3,3,3,0,0,2,2,0,0,3,3,0,0
+burgers_inviscid,3,1,0,0,1,1,0,0,1,1,0,0,1
+duffing,3,0,0,0,0,0,0,0,0,0,0,0,0
+kdv,3,3,3,0,0,1,1,0,0,3,3,0,0
+kdv_cossin,3,0,0,0,0,0,0,0,0,0,0,0,0
+ks,3,3,3,0,0,3,3,0,0,3,3,0,0
+lorenz,9,6,7,1,0,6,7,1,0,6,7,1,0
+lv,6,6,6,0,0,5,5,0,0,6,6,0,0
+ns,9,4,5,1,0,4,5,1,0,4,5,1,0
+ode,3,0,0,0,0,0,0,0,0,0,0,0,0
+ode_simple,3,3,3,0,0,3,3,0,0,3,3,0,0
+pde_compound,3,2,2,0,0,2,2,0,0,1,1,0,0
+pde_divide,3,3,3,0,0,3,3,0,0,3,3,0,0
+vdp,3,3,3,0,0,1,0,0,1,2,2,0,0
+wave,3,3,3,0,0,0,0,0,0,0,0,0,0

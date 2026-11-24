@@ -1,0 +1,137 @@
+Oscillating weak tests: completed Kepler experiment
+2026-11-16
+
+Outcome
+-------
+Partial improvement, not a solution. The primary spectral discrepancy reduces
+the number of archived dominators from 10 to 9 in all three noise seeds and
+both raw/smoothed coefficient-fit stages. In distinct algebraic families this
+is 4 to 3. Family C (u' = sinusoid/u) stops dominating; A, B and D remain.
+All 22 archived Kepler competitors were evaluated, not just the representatives.
+
+Counts with saved coefficients and dyad unchanged:
+                                    seed 0     seed 1     seed 2
+Existing crossed weak discrepancy      10         10         10
+Local oscillating weak tests            9          9          9
+Full-record oscillating tests           9          9          9
+Clean controls                         0          0          0
+
+The same nine remain for ordinary full-field, paired-within and crossed
+evaluations, using either raw or smoothed saved coefficients. This result is
+not solely caused by the crossed reconstruction protocol.
+
+Protocol
+--------
+Protocol was written in ../spectral_protocol.txt before scoring. Primary arm:
+full-record polynomial bump times exp(i*nu*t), with production q=3 and the
+same integration-by-parts semantics. Raw-u GCV selects the frequency range
+using nested orthonormal DCT-II projections. Include all frequencies from zero
+through the selected maximum, identically for every candidate. No clean data,
+reference coefficients, or equation rankings enter the bandwidth choice.
+
+GCV selected maximum DCT modes 99, 93, 93 (100, 94, 94 nonnegative frequencies),
+corresponding to maximum angular frequencies 10.3603, 9.73244, 9.73244.
+The full-record bump spans 29.7799 time units. It excludes boundary support
+needed for pointwise derivative stencils and split-spline extrapolation.
+
+Pool complex residual magnitudes across tests, divided by corresponding target
+magnitudes; count conjugate negative frequencies with equal weight. Pool both
+crossed reconstruction directions. Complex pooling is invariant to the phase
+origin. At zero modulation it exactly recovers the previous real weak WAPE.
+Oscillating tests are not divided by their near-zero signed mass. Constants
+transform as the fitted intercept times the test-function integral.
+
+Controls separate local/global window support, zero/nonzero modulation,
+full/within/crossed data evaluation, raw/smoothed fitted coefficients, and clean
+saved fits. No new coefficient or dyad fits, candidate solves, search reruns,
+library restrictions, or production changes were made.
+
+Example: seed 1, raw fitted coefficients, primary crossed spectral score
+------------------------------------------------------------------------
+                         Discrepancy           Frozen dyad
+Reference                  23.329%               0.012510
+A                          12.640%               0.004617
+B                          14.455%               0.008389
+C                          35.690%               0.002591
+D                          12.655%               0.006418
+
+The change exposes approximation error
+-------------------------------------
+With saved CLEAN fits, clean crossed spectral discrepancies for seed 1 are:
+reference 0.0180%; A 4.818%; B 8.132%; C 34.181%; D 4.884%.
+Thus the new tests recover information that the old window largely suppressed.
+In particular, family C's mismatch is now large enough to lose dominance.
+These scores use a different test bank from the previous WAPE; their absolute
+magnitudes should not be treated as identical physical accuracy units.
+
+Measurement/reconstruction error still decides the remaining rankings
+-------------------------------------------------------------------
+An additional oracle diagnostic holds the NOISY fitted coefficients and dyad
+fixed, replacing only evaluated fields with the saved clean field. Under the
+primary spectral score this removes all dominators in every seed and both
+coefficient-fit stages. This swap was added to diagnose the completed result;
+it does not tune the bank or score noisy candidates.
+
+Seed 1 raw coefficients, clean fields only:
+reference 0.1956%; A 5.110%; B 8.079%; C 34.307%; D 5.030%.
+The corresponding noisy crossed scores appear in the table above.
+This isolates field evaluation as sufficient to reverse the remaining ranking;
+coefficient estimation alone cannot explain this result.
+
+For the primary crossed tests, field-error magnitudes (relative to clean target
+spectral mass, same noisy coefficients) are:
+                       seed 0        seed 1        seed 2
+Reference target        23.44%        21.86%        21.05%
+Reference RHS            9.21%         9.11%        12.18%
+Reference residual      23.88%        24.51%        23.65%
+
+These are differences between reconstructed/noisy and clean weak quantities,
+including smoothing/interpolation bias and measurement noise. They are NOT
+independent variance components and do not add as percentages. Unlike the
+original low-pass window, the widened spectral bank is now more affected by
+error in the second-derivative target than by the inverse-power RHS.
+
+Bandwidth check
+---------------
+Every cumulative frequency prefix through the data-selected maximum was saved.
+No prefix of the full-record crossed score removes more than family C: at least
+nine candidates dominate in every seed. Selecting a favorable cutoff within
+this tested range would therefore not rescue the reference. This does not rule
+out different frequency subsets, weights, or test families.
+
+The global zero-frequency-only control performs poorly because the weighted
+mean derivative target is close to zero. It is a diagnostic of what a single
+very broad low-pass test loses, not a proposed alternative objective.
+
+Validation
+----------
+Existing crossed baseline objectives and dominance sets reproduced in every
+seed/stage. Maximum zero-frequency matrix difference: 3.64e-12. Polynomial
+integration-by-parts moment identities hold to 3.06e-15 in the standalone
+check. Analytic sinusoid derivative tests have absolute errors 3.33e-12 (first)
+and 1.69e-7 (second). Constant transformation, phase invariance, and identical-
+reconstruction crossing identities pass. Clean controls favor the reference.
+
+Interpretation and scope
+------------------------
+The spectral tests do expose structural mismatch, but this particular bandwidth
+selection and residual pooling do not resolve noisy Kepler dominance. The
+primary criterion failed, so the planned extension to other datasets was not
+triggered. Keep the result as a diagnostic, not a replacement production score.
+
+The next discrepancy idea would need to address error in the measured weak
+moments as well as preserving discriminating signal. This experiment does not
+validate any noise correction for the discrepancy, nor does it establish that
+all spectral weak methods fail. GCV optimized field prediction, not derivative
+accuracy; coefficients, candidate frequencies and supports came from the full
+record, so this is not independent held-out validation. Three synthetic noise
+seeds and a fixed archive do not establish general discovery performance.
+
+Files
+-----
+../spectral_weak_probe.py: runnable experiment
+../spectral_protocol.txt: protocol fixed before scoring
+spectral_weak_probe.json: full scores, frequency profiles, source hashes,
+  field-swap diagnostics and numerical checks
+spectral_weak_probe.txt: compact numerical summaries
+spectral_weak_profiles.png / .svg: reference and four representative profiles

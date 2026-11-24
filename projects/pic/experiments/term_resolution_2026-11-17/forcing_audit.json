@@ -1,0 +1,932 @@
+{
+  "status": "PASS",
+  "candidate_order": [
+    "physical",
+    "dispersion_only"
+  ],
+  "total": {
+    "whole": {
+      "accepted": [
+        11,
+        9
+      ],
+      "covered": [
+        11,
+        11
+      ]
+    },
+    "pilot": {
+      "accepted": [
+        11,
+        11
+      ],
+      "covered": [
+        11,
+        11
+      ]
+    },
+    "forcing": {
+      "accepted": [
+        12,
+        6
+      ],
+      "covered": [
+        12,
+        12
+      ]
+    }
+  },
+  "by_profile": {
+    "iid": {
+      "whole": {
+        "accepted": [
+          3,
+          3
+        ],
+        "covered": [
+          3,
+          3
+        ]
+      },
+      "pilot": {
+        "accepted": [
+          3,
+          3
+        ],
+        "covered": [
+          3,
+          3
+        ]
+      },
+      "forcing": {
+        "accepted": [
+          4,
+          2
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      }
+    },
+    "positive": {
+      "whole": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "pilot": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "forcing": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      }
+    },
+    "negative": {
+      "whole": {
+        "accepted": [
+          4,
+          2
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "pilot": {
+        "accepted": [
+          4,
+          4
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      },
+      "forcing": {
+        "accepted": [
+          4,
+          0
+        ],
+        "covered": [
+          4,
+          4
+        ]
+      }
+    }
+  },
+  "records": [
+    {
+      "seed": 4705,
+      "profile": "iid",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.6356805930643765,
+            0.7890405789824425
+          ],
+          "noise_ratios": [
+            0.635680316902614,
+            0.6351611486752667
+          ],
+          "cutoff": 2.08641371405259
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.2353824945279547,
+            0.23285204851894475
+          ],
+          "noise_ratios": [
+            0.23538159000542064,
+            0.23555475423718328
+          ],
+          "cutoff": 9.134945753464837
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.27826715976240074,
+            1.5546385151301607
+          ],
+          "noise_ratios": [
+            0.27852632207763856,
+            0.2727583462314455
+          ],
+          "cutoff": 4.74349260358743
+        }
+      },
+      "warnings": [],
+      "json_sha256": "5d8a88a2bded29dfdd9f0a98a49a5896a47a211648fea746e5f4db5221a5c529",
+      "array_sha256": "30ec4cfef42d8a06f1aadc7a57d7372e0df53df3846d7aa3f26ccf1eb084ef27"
+    },
+    {
+      "seed": 4706,
+      "profile": "iid",
+      "arms": {
+        "whole": {
+          "accepted": [
+            false,
+            false
+          ],
+          "covered": [
+            false,
+            false
+          ],
+          "ratios": [
+            1.0623964191996078,
+            1.159354355335858
+          ],
+          "noise_ratios": [
+            1.0623964543051114,
+            1.0653570420843903
+          ],
+          "cutoff": 2.7461111626793757
+        },
+        "pilot": {
+          "accepted": [
+            false,
+            false
+          ],
+          "covered": [
+            false,
+            false
+          ],
+          "ratios": [
+            1.3114856536538344,
+            1.3059227952185766
+          ],
+          "noise_ratios": [
+            1.3114829000739914,
+            1.3141640259314322
+          ],
+          "cutoff": 8.223049648214229
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.21610942125087235,
+            1.7889699129127827
+          ],
+          "noise_ratios": [
+            0.2163864353450312,
+            0.21243101592446256
+          ],
+          "cutoff": 6.01341429759088
+        }
+      },
+      "warnings": [],
+      "json_sha256": "8c93a88171991e5434872d2fd0bb94b4e65d052a4c617785a1bf19d29027aabe",
+      "array_sha256": "a5d7b80a9625c6a33e71e4f148dcc675dbcc784f947040b8d82bbba09a31c06f"
+    },
+    {
+      "seed": 4707,
+      "profile": "iid",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.4639400164274897,
+            0.4762079090044068
+          ],
+          "noise_ratios": [
+            0.463938751370292,
+            0.4616354039152534
+          ],
+          "cutoff": 2.496676032710138
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.2805614102029415,
+            0.2830898674648548
+          ],
+          "noise_ratios": [
+            0.2805626172887413,
+            0.2794676809587425
+          ],
+          "cutoff": 5.9074511424554705
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.6677885921709064,
+            0.0019657795214087564
+          ],
+          "noise_ratios": [
+            0.6673140789146137,
+            0.6621777951219341
+          ],
+          "cutoff": 8.349254445133594
+        }
+      },
+      "warnings": [],
+      "json_sha256": "9c2864c61c5663bfd569763e5b6fa3b1f51eabd933cb9ebb836fc59cc0309592",
+      "array_sha256": "5f16c7d520945728e349a8821611b23c5180e9604f1f6dc9ba2b593fa52a91e0"
+    },
+    {
+      "seed": 4708,
+      "profile": "iid",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.45794091742999493,
+            0.4577586834656392
+          ],
+          "noise_ratios": [
+            0.4579410410811243,
+            0.45792407143915137
+          ],
+          "cutoff": 2.1260801826305498
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.3113969631159473,
+            0.3068042153413729
+          ],
+          "noise_ratios": [
+            0.31139649278451975,
+            0.31198367196249105
+          ],
+          "cutoff": 3.9438369917511813
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.21378582853231504,
+            0.4551766666398453
+          ],
+          "noise_ratios": [
+            0.2137945871428457,
+            0.21366339514751487
+          ],
+          "cutoff": 6.746799094155268
+        }
+      },
+      "warnings": [],
+      "json_sha256": "c9c4433cf63ff4a40e095485e433a3a86a91f123a35eae91b9229f95fbe94a03",
+      "array_sha256": "5951bbd25da44b114486a1e68d50244ff295aef8258ce7d10ac63c2cfbccbde5"
+    },
+    {
+      "seed": 4705,
+      "profile": "negative",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.6898695778802412,
+            1.142056056807666
+          ],
+          "noise_ratios": [
+            0.6898688743932891,
+            0.6932463241576811
+          ],
+          "cutoff": 1.9877467002648532
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.08595229506405662,
+            0.08166766114940596
+          ],
+          "noise_ratios": [
+            0.08595189300131063,
+            0.08605395141389713
+          ],
+          "cutoff": 6.709105760697131
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.8775968874894942,
+            3.295353774932367
+          ],
+          "noise_ratios": [
+            0.8776370694843063,
+            0.8779739060019391
+          ],
+          "cutoff": 5.617143548460201
+        }
+      },
+      "warnings": [],
+      "json_sha256": "c41f47303cec291f9c5cebe914d6c064c0ff8d2276b84ffae26a11eb6317d823",
+      "array_sha256": "021a6e8895cdd5610a158b0ee56ee607a70e264f0bfde9733b6ec808b21744bf"
+    },
+    {
+      "seed": 4706,
+      "profile": "negative",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.5403889732804255,
+            0.8160850994534425
+          ],
+          "noise_ratios": [
+            0.5403896992236825,
+            0.5403304956352665
+          ],
+          "cutoff": 1.8666976302795273
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.18579467118956017,
+            0.19433325304375876
+          ],
+          "noise_ratios": [
+            0.18579540872341332,
+            0.18609195930305097
+          ],
+          "cutoff": 3.6635863437052043
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.20432077015495811,
+            6.844879796967265
+          ],
+          "noise_ratios": [
+            0.20497988682246998,
+            0.21818159548177185
+          ],
+          "cutoff": 4.456721277410863
+        }
+      },
+      "warnings": [],
+      "json_sha256": "e3fafb4d615b89d5885e30b85d19ce3a61107e3ede3d0d1a396609cea634eee7",
+      "array_sha256": "ee6ab860c6e2163f970bb15cd6bf4a284ee9d382886eb9df5fc2648a7782282b"
+    },
+    {
+      "seed": 4707,
+      "profile": "negative",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.527082240167883,
+            1.127315227438309
+          ],
+          "noise_ratios": [
+            0.5270629435939399,
+            0.5245927426057057
+          ],
+          "cutoff": 2.0583563976086254
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.1039929121940772,
+            0.14064446318781024
+          ],
+          "noise_ratios": [
+            0.10399246814343335,
+            0.10387776110541544
+          ],
+          "cutoff": 5.876214218407294
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.03810804916804348,
+            5.221947911022852
+          ],
+          "noise_ratios": [
+            0.038385980080518745,
+            0.0358164739200133
+          ],
+          "cutoff": 5.622948621334848
+        }
+      },
+      "warnings": [],
+      "json_sha256": "52ec14bedf3202b1ef816ca6d5918a2738777f42eba98471fa2efbbca336f623",
+      "array_sha256": "c2256856ca33159e28b5554eacbf09ca5bcf5a82968ccef2f4d3180cd207078a"
+    },
+    {
+      "seed": 4708,
+      "profile": "negative",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.6147095136115153,
+            0.7200016363879174
+          ],
+          "noise_ratios": [
+            0.6147094355551705,
+            0.612556452647014
+          ],
+          "cutoff": 2.195663092891349
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.798165756563681,
+            0.7841554416969514
+          ],
+          "noise_ratios": [
+            0.7981617047144858,
+            0.7962331878802071
+          ],
+          "cutoff": 8.155264836349415
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            false
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.2803674595066259,
+            3.307215903947897
+          ],
+          "noise_ratios": [
+            0.280349707999266,
+            0.2802789844178313
+          ],
+          "cutoff": 4.43364154181416
+        }
+      },
+      "warnings": [],
+      "json_sha256": "b5ca4b72b7a77391c467e8d6f82f2befc93f9d8eee4e52dd567ad80d392473b0",
+      "array_sha256": "97211707d2696afda4be92e33a8afa0e3c1a7152919fba1bb5c79d1c5177a321"
+    },
+    {
+      "seed": 4705,
+      "profile": "positive",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.7825529184791465,
+            0.7796777094961036
+          ],
+          "noise_ratios": [
+            0.7825524661723343,
+            0.77999055265431
+          ],
+          "cutoff": 2.0697253050103575
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.05833756477569438,
+            0.0571058090861455
+          ],
+          "noise_ratios": [
+            0.05833730538076128,
+            0.057877660664881564
+          ],
+          "cutoff": 8.422964420169569
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.4558561445250994,
+            0.19065255391882274
+          ],
+          "noise_ratios": [
+            0.4557071828594969,
+            0.44347175332588606
+          ],
+          "cutoff": 6.072816655251249
+        }
+      },
+      "warnings": [],
+      "json_sha256": "6521be3db4c75a1d901b196220929c35599eca612fbdd7a2df6128b4b2771fdc",
+      "array_sha256": "29e8dbe7e4498f224028432b1e58b214d902c64ef72db15e087f3d5eb5a383e4"
+    },
+    {
+      "seed": 4706,
+      "profile": "positive",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.3646999262409034,
+            0.36338100176968285
+          ],
+          "noise_ratios": [
+            0.36469961559706315,
+            0.36304130334464163
+          ],
+          "cutoff": 2.4052867405328087
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.2885741128497016,
+            0.28638453908862777
+          ],
+          "noise_ratios": [
+            0.2885735471831692,
+            0.2880746798330143
+          ],
+          "cutoff": 5.615799101550595
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.8594385992173607,
+            0.8242753366474955
+          ],
+          "noise_ratios": [
+            0.8594300362025715,
+            0.8593894986951568
+          ],
+          "cutoff": 5.679708867362206
+        }
+      },
+      "warnings": [],
+      "json_sha256": "4d79939bf3474f9e403c806081df0af599105499cf5cb16799c84f5d4467b988",
+      "array_sha256": "022801d289fe8a008989e1cb1b70850eb7885fda373cb82723d304e13e812ddc"
+    },
+    {
+      "seed": 4707,
+      "profile": "positive",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.6675933631435121,
+            0.6698934101632882
+          ],
+          "noise_ratios": [
+            0.667593332961738,
+            0.6705578275580361
+          ],
+          "cutoff": 1.8296765765167535
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.08576551724034796,
+            0.08443563140584334
+          ],
+          "noise_ratios": [
+            0.08576523044161768,
+            0.08529023970689434
+          ],
+          "cutoff": 6.612336173490239
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.2358350706288971,
+            0.2103623921560262
+          ],
+          "noise_ratios": [
+            0.23582877530035184,
+            0.23572044091099204
+          ],
+          "cutoff": 2.901433423631681
+        }
+      },
+      "warnings": [],
+      "json_sha256": "436efeb2fec3748e048e69e150a8fe5699b308d2784e1bb0628ca25dedd2fb8f",
+      "array_sha256": "93c96e708ad2eff7e1ee68692448741e07e1bb555ab4ff90b52ad61a3268d91e"
+    },
+    {
+      "seed": 4708,
+      "profile": "positive",
+      "arms": {
+        "whole": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.5072215475823859,
+            0.5092800442637507
+          ],
+          "noise_ratios": [
+            0.5072298492198585,
+            0.5025666081474361
+          ],
+          "cutoff": 1.888433053007499
+        },
+        "pilot": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.45010758730064687,
+            0.44750067960116874
+          ],
+          "noise_ratios": [
+            0.45010688529459775,
+            0.4496008477865119
+          ],
+          "cutoff": 4.411217377332838
+        },
+        "forcing": {
+          "accepted": [
+            true,
+            true
+          ],
+          "covered": [
+            true,
+            true
+          ],
+          "ratios": [
+            0.07566039486022295,
+            0.17535332337827655
+          ],
+          "noise_ratios": [
+            0.07565729009806499,
+            0.07570864411577682
+          ],
+          "cutoff": 5.4028471284631685
+        }
+      },
+      "warnings": [],
+      "json_sha256": "60639a0b79a3522b4d32e790a6dfb3dca7aa59872e1854d108f12d3afa2178a7",
+      "array_sha256": "182a55a5a9edc3d3adedd55972b279ddcc0d65c4d73401a266693b2ad0a91860"
+    }
+  ],
+  "source": "a7c4a3e51cac436d3d033a4ab11880ba8d04a46288b3081c33ae2c4308ce2c43"
+}
