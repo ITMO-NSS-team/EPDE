@@ -1,0 +1,166 @@
+[
+  {
+    "case": "reaction_diffusion",
+    "mode": "mean",
+    "held_out": "mixed",
+    "record_ranks": [
+      1,
+      1
+    ],
+    "columns": 2,
+    "train_ids": [
+      "k1",
+      "k2"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "identifiable": false
+  },
+  {
+    "case": "reaction_diffusion",
+    "mode": "joint",
+    "held_out": "mixed",
+    "record_ranks": [
+      1,
+      1
+    ],
+    "columns": 2,
+    "train_ids": [
+      "k1",
+      "k2"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "identifiable": true,
+    "heldout_relative_l2": 1.2530176390019849e-15,
+    "coefficients": {
+      "u": -0.19999999999999973,
+      "d^2u/dx1^2": 0.10000000000000024
+    },
+    "frequencies": {}
+  },
+  {
+    "case": "kdv",
+    "mode": "mean",
+    "held_out": "soliton_k0.91",
+    "record_ranks": [
+      2,
+      2
+    ],
+    "columns": 2,
+    "train_ids": [
+      "kdv_sindy",
+      "kdv_homogen"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "per_record_coefficients": {
+      "kdv_sindy": {
+        "du/dx1*u": -5.8866339408709685,
+        "d^3u/dx1^3": -0.9548754186254242
+      },
+      "kdv_homogen": {
+        "du/dx1*u": -6.000170482329554,
+        "d^3u/dx1^3": -1.0000732820480813
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.00914620768604375,
+    "coefficients": {
+      "du/dx1*u": -5.943402211600262,
+      "d^3u/dx1^3": -0.9774743503367528
+    },
+    "frequencies": {}
+  },
+  {
+    "case": "kdv",
+    "mode": "joint",
+    "held_out": "soliton_k0.91",
+    "record_ranks": [
+      2,
+      2
+    ],
+    "columns": 2,
+    "train_ids": [
+      "kdv_sindy",
+      "kdv_homogen"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "identifiable": true,
+    "heldout_relative_l2": 1.904267025233656e-05,
+    "coefficients": {
+      "du/dx1*u": -5.999877866918587,
+      "d^3u/dx1^3": -0.9999777456705485
+    },
+    "frequencies": {}
+  },
+  {
+    "case": "duffing",
+    "mode": "mean",
+    "held_out": "pic_duffing",
+    "record_ranks": [
+      4,
+      4
+    ],
+    "columns": 4,
+    "train_ids": [
+      "ic_a",
+      "ic_b"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "per_record_coefficients": {
+      "ic_a": {
+        "u": -0.22631942406608013,
+        "disp": -0.9882028881315137,
+        "disp3": -0.9864881060783511,
+        "cos": 0.29285484797671474
+      },
+      "ic_b": {
+        "u": -0.23532518588423582,
+        "disp": -1.0002346439299967,
+        "disp3": -0.9938867792881524,
+        "cos": 0.30321468182676414
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.009813903500058448,
+    "coefficients": {
+      "u": -0.230822304975158,
+      "disp": -0.9942187660307552,
+      "disp3": -0.9901874426832518,
+      "cos": 0.2980347649017394
+    },
+    "frequencies": {
+      "cos": 1.0025040799568952
+    }
+  },
+  {
+    "case": "duffing",
+    "mode": "joint",
+    "held_out": "pic_duffing",
+    "record_ranks": [
+      4,
+      4
+    ],
+    "columns": 4,
+    "train_ids": [
+      "ic_a",
+      "ic_b"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "identifiable": true,
+    "heldout_relative_l2": 0.008707033983141946,
+    "coefficients": {
+      "u": -0.23235350107743685,
+      "disp": -0.9991423364662788,
+      "disp3": -0.9934880211447238,
+      "cos": 0.30134059293083404
+    },
+    "frequencies": {
+      "cos": 1.0020306281645432
+    }
+  }
+]

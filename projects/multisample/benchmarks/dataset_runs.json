@@ -1,0 +1,1878 @@
+[
+  {
+    "case": "reaction_diffusion",
+    "mode": "mean",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "k1",
+      "k2"
+    ],
+    "train_shapes": [
+      [
+        31,
+        41
+      ],
+      [
+        23,
+        53
+      ]
+    ],
+    "held_out": "mixed",
+    "test_shape": [
+      29,
+      47
+    ],
+    "truth": {
+      "u": -0.2,
+      "d^2u/dx1^2": 0.1
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.3749999999999996,
+        "heldout_relative_l2": 0.5540284665140721,
+        "coefficients": {
+          "du/dx1": -6.204159683114792e-19,
+          "u": -0.44999999999999957
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-6.204159683114792e-19 * du/dx1{power: 1.0} + -0.44999999999999957 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.3749999999999996,
+        "heldout_relative_l2": 0.6577682122918176,
+        "coefficients": {
+          "du/dx1": -6.204159683114792e-19,
+          "d^2u/dx1^2": 0.22499999999999978
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-6.204159683114792e-19 * du/dx1{power: 1.0} + 0.22499999999999978 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.3750000000000002,
+        "heldout_relative_l2": 0.5540284665140726,
+        "coefficients": {
+          "u": -0.4500000000000003
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-0.4500000000000003 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.3750000000000002,
+        "heldout_relative_l2": 0.6577682122918199,
+        "coefficients": {
+          "d^2u/dx1^2": 0.2250000000000002
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.2250000000000002 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 43.35,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "reaction_diffusion",
+    "mode": "joint",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "k1",
+      "k2"
+    ],
+    "train_shapes": [
+      [
+        31,
+        41
+      ],
+      [
+        23,
+        53
+      ]
+    ],
+    "held_out": "mixed",
+    "test_shape": [
+      29,
+      47
+    ],
+    "truth": {
+      "u": -0.2,
+      "d^2u/dx1^2": 0.1
+    },
+    "front": [
+      {
+        "train_discrepancy": 3.0656015213016156e-16,
+        "heldout_relative_l2": 5.980732266281729e-16,
+        "coefficients": {
+          "du/dx1": -1.4136558043153848e-17,
+          "d^2u/dx1^2": 0.10000000000000012,
+          "u": -0.19999999999999987
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-1.4136558043153848e-17 * du/dx1{power: 1.0} + 0.10000000000000012 * d^2u/dx1^2{power: 1.0} + -0.19999999999999987 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 1.781992351757411e-15,
+        "heldout_relative_l2": 2.3168169960190618e-15,
+        "coefficients": {
+          "d^2u/dx1^2": 0.10000000000000035,
+          "u": -0.20000000000000007
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.10000000000000035 * d^2u/dx1^2{power: 1.0} + -0.20000000000000007 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.29329790309161685,
+        "heldout_relative_l2": 0.4287752728896326,
+        "coefficients": {
+          "d^2u/dx1^2": 0.17597874185497014
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.17597874185497014 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 47.47,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "reaction_diffusion",
+    "mode": "mean",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "k1",
+      "k2"
+    ],
+    "train_shapes": [
+      [
+        31,
+        41
+      ],
+      [
+        23,
+        53
+      ]
+    ],
+    "held_out": "mixed",
+    "test_shape": [
+      29,
+      47
+    ],
+    "truth": {
+      "u": -0.2,
+      "d^2u/dx1^2": 0.1
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.3749999999999996,
+        "heldout_relative_l2": 0.5540284665140721,
+        "coefficients": {
+          "du/dx1": -6.204159683114792e-19,
+          "u": -0.44999999999999957
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-6.204159683114792e-19 * du/dx1{power: 1.0} + -0.44999999999999957 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.3749999999999996,
+        "heldout_relative_l2": 0.6577682122918176,
+        "coefficients": {
+          "du/dx1": -6.204159683114792e-19,
+          "d^2u/dx1^2": 0.22499999999999978
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-6.204159683114792e-19 * du/dx1{power: 1.0} + 0.22499999999999978 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.3750000000000002,
+        "heldout_relative_l2": 0.5540284665140726,
+        "coefficients": {
+          "u": -0.4500000000000003
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-0.4500000000000003 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.3750000000000002,
+        "heldout_relative_l2": 0.6577682122918199,
+        "coefficients": {
+          "d^2u/dx1^2": 0.2250000000000002
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.2250000000000002 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 20.26,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "reaction_diffusion",
+    "mode": "joint",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "k1",
+      "k2"
+    ],
+    "train_shapes": [
+      [
+        31,
+        41
+      ],
+      [
+        23,
+        53
+      ]
+    ],
+    "held_out": "mixed",
+    "test_shape": [
+      29,
+      47
+    ],
+    "truth": {
+      "u": -0.2,
+      "d^2u/dx1^2": 0.1
+    },
+    "front": [
+      {
+        "train_discrepancy": 3.0656015213016156e-16,
+        "heldout_relative_l2": 5.980732266281729e-16,
+        "coefficients": {
+          "du/dx1": -1.4136558043153848e-17,
+          "d^2u/dx1^2": 0.10000000000000012,
+          "u": -0.19999999999999987
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-1.4136558043153848e-17 * du/dx1{power: 1.0} + 0.10000000000000012 * d^2u/dx1^2{power: 1.0} + -0.19999999999999987 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 3.938768232257488e-16,
+        "heldout_relative_l2": 6.661046865687642e-16,
+        "coefficients": {
+          "u": -0.19999999999999998,
+          "d^2u/dx1^2": 0.10000000000000012
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-0.19999999999999998 * u{power: 1.0} + 0.10000000000000012 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.29329790309161685,
+        "heldout_relative_l2": 0.4287752728896326,
+        "coefficients": {
+          "d^2u/dx1^2": 0.17597874185497014
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.17597874185497014 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 55.73,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "kdv",
+    "mode": "mean",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "kdv_sindy",
+      "kdv_homogen"
+    ],
+    "train_shapes": [
+      [
+        41,
+        257
+      ],
+      [
+        40,
+        160
+      ]
+    ],
+    "held_out": "soliton_k0.91",
+    "test_shape": [
+      39,
+      151
+    ],
+    "truth": {
+      "du/dx1*u": -6.0,
+      "d^3u/dx1^3": -1.0
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.08191262957313072,
+        "heldout_relative_l2": 0.009146207686043416,
+        "coefficients": {
+          "du/dx1*u": -5.943402211600263,
+          "d^3u/dx1^3": -0.9774743503367536
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-5.943402211600263 * du/dx1{power: 1.0} * u{power: 1.0} + -0.9774743503367536 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.44284660212773086,
+        "heldout_relative_l2": 0.3836799328057636,
+        "coefficients": {
+          "du/dx1*u": -3.22913720020955
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-3.22913720020955 * u{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.7872972588768961,
+        "heldout_relative_l2": 0.6151681889317612,
+        "coefficients": {
+          "du/dx1": -1.2747168909824342
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-1.2747168909824342 * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 20.78,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "kdv",
+    "mode": "joint",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "kdv_sindy",
+      "kdv_homogen"
+    ],
+    "train_shapes": [
+      [
+        41,
+        257
+      ],
+      [
+        40,
+        160
+      ]
+    ],
+    "held_out": "soliton_k0.91",
+    "test_shape": [
+      39,
+      151
+    ],
+    "truth": {
+      "du/dx1*u": -6.0,
+      "d^3u/dx1^3": -1.0
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.07863980461270685,
+        "heldout_relative_l2": 0.001169674113747355,
+        "coefficients": {
+          "d^3u/dx1^3": -0.9971578621608818,
+          "du/dx1*u": -5.982995441586433,
+          "du/dx1": -0.005494157321150512
+        },
+        "frequencies": {},
+        "intercept": -5.1601426151043935e-06,
+        "equation": "-0.9971578621608818 * d^3u/dx1^3{power: 1.0} + -5.982995441586433 * u{power: 1.0} * du/dx1{power: 1.0} + -0.005494157321150512 * du/dx1{power: 1.0} + -5.1601426151043935e-06 = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.07864200530304465,
+        "heldout_relative_l2": 0.0011655141357698757,
+        "coefficients": {
+          "du/dx1*u": -5.9830655688247765,
+          "d^3u/dx1^3": -0.9971726118716313,
+          "du/dx1": -0.005478041417619298,
+          "d^3u/dx1^3*du/dx1": 3.384200510273909e-05
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-5.9830655688247765 * u{power: 1.0} * du/dx1{power: 1.0} + -0.9971726118716313 * d^3u/dx1^3{power: 1.0} + -0.005478041417619298 * du/dx1{power: 1.0} + 3.384200510273909e-05 * d^3u/dx1^3{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.07877607930738334,
+        "heldout_relative_l2": 7.403386568957494e-05,
+        "coefficients": {
+          "d^3u/dx1^3": -0.9998961065932153,
+          "du/dx1*u": -5.999869073477951,
+          "d^3u/dx1^3*u": -0.00010228435010448717
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-0.9998961065932153 * d^3u/dx1^3{power: 1.0} + -5.999869073477951 * u{power: 1.0} * du/dx1{power: 1.0} + -0.00010228435010448717 * u{power: 1.0} * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.07878098155070097,
+        "heldout_relative_l2": 1.904267025315006e-05,
+        "coefficients": {
+          "du/dx1*u": -5.999877866918585,
+          "d^3u/dx1^3": -0.9999777456705486
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-5.999877866918585 * du/dx1{power: 1.0} * u{power: 1.0} + -0.9999777456705486 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.43234629319176177,
+        "heldout_relative_l2": 0.3774846255132461,
+        "coefficients": {
+          "du/dx1*u": -2.9435738714161754
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-2.9435738714161754 * du/dx1{power: 1.0} * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 19.58,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "kdv",
+    "mode": "mean",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "kdv_sindy",
+      "kdv_homogen"
+    ],
+    "train_shapes": [
+      [
+        41,
+        257
+      ],
+      [
+        40,
+        160
+      ]
+    ],
+    "held_out": "soliton_k0.91",
+    "test_shape": [
+      39,
+      151
+    ],
+    "truth": {
+      "du/dx1*u": -6.0,
+      "d^3u/dx1^3": -1.0
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.08191262957313068,
+        "heldout_relative_l2": 0.009146207686043366,
+        "coefficients": {
+          "d^3u/dx1^3": -0.9774743503367533,
+          "du/dx1*u": -5.943402211600262
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-0.9774743503367533 * d^3u/dx1^3{power: 1.0} + -5.943402211600262 * du/dx1{power: 1.0} * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.44284660212773086,
+        "heldout_relative_l2": 0.3836799328057636,
+        "coefficients": {
+          "du/dx1*u": -3.22913720020955
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-3.22913720020955 * du/dx1{power: 1.0} * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.7872972588768961,
+        "heldout_relative_l2": 0.6151681889317612,
+        "coefficients": {
+          "du/dx1": -1.2747168909824342
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-1.2747168909824342 * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 14.3,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "kdv",
+    "mode": "joint",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "kdv_sindy",
+      "kdv_homogen"
+    ],
+    "train_shapes": [
+      [
+        41,
+        257
+      ],
+      [
+        40,
+        160
+      ]
+    ],
+    "held_out": "soliton_k0.91",
+    "test_shape": [
+      39,
+      151
+    ],
+    "truth": {
+      "du/dx1*u": -6.0,
+      "d^3u/dx1^3": -1.0
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.07863980461270613,
+        "heldout_relative_l2": 0.0011696741137454355,
+        "coefficients": {
+          "du/dx1*u": -5.9829954415864375,
+          "d^3u/dx1^3": -0.997157862160883,
+          "du/dx1": -0.005494157321155586
+        },
+        "frequencies": {},
+        "intercept": -5.160142615201198e-06,
+        "equation": "-5.9829954415864375 * du/dx1{power: 1.0} * u{power: 1.0} + -0.997157862160883 * d^3u/dx1^3{power: 1.0} + -0.005494157321155586 * du/dx1{power: 1.0} + -5.160142615201198e-06 = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.07876562305367475,
+        "heldout_relative_l2": 0.00035444027113274655,
+        "coefficients": {
+          "d^2u/dx1^2*d^3u/dx1^3": -0.0005216285160129701,
+          "d^3u/dx1^3": -0.9994216231589694,
+          "du/dx1*u": -6.0002549603726605,
+          "d^3u/dx1^3*u": -0.0010945057457729074
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-0.0005216285160129701 * d^2u/dx1^2{power: 1.0} * d^3u/dx1^3{power: 1.0} + -0.9994216231589694 * d^3u/dx1^3{power: 1.0} + -6.0002549603726605 * u{power: 1.0} * du/dx1{power: 1.0} + -0.0010945057457729074 * u{power: 1.0} * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.07877607930738312,
+        "heldout_relative_l2": 7.403386568858473e-05,
+        "coefficients": {
+          "du/dx1*u": -5.999869073477959,
+          "d^3u/dx1^3": -0.999896106593218,
+          "d^3u/dx1^3*u": -0.00010228435010354853
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-5.999869073477959 * u{power: 1.0} * du/dx1{power: 1.0} + -0.999896106593218 * d^3u/dx1^3{power: 1.0} + -0.00010228435010354853 * u{power: 1.0} * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.07878098155070097,
+        "heldout_relative_l2": 1.904267025315006e-05,
+        "coefficients": {
+          "du/dx1*u": -5.999877866918585,
+          "d^3u/dx1^3": -0.9999777456705486
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-5.999877866918585 * u{power: 1.0} * du/dx1{power: 1.0} + -0.9999777456705486 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.43234629319176177,
+        "heldout_relative_l2": 0.3774846255132461,
+        "coefficients": {
+          "du/dx1*u": -2.9435738714161754
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-2.9435738714161754 * u{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 15.99,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "robot",
+    "mode": "mean",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "N40_PWM10_D40",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N30_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8738414529025977,
+        "heldout_relative_l2": 0.8516241519793001,
+        "coefficients": {
+          "heading_sin": -19.81040886774761,
+          "heading_cos": 25.596727121587136,
+          "previous_vx": 0.32857303937763815,
+          "u": -0.02141491293847461
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-19.81040886774761 * heading_sin{power: 1.0} + 25.596727121587136 * heading_cos{power: 1.0} + 0.32857303937763815 * previous_vx{power: 1.0} + -0.02141491293847461 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8749570793750905,
+        "heldout_relative_l2": 0.8508984225314402,
+        "coefficients": {
+          "heading_sin": -19.72580804542801,
+          "heading_cos": 25.911311946194477,
+          "previous_vx": 0.32664687572535034
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-19.72580804542801 * heading_sin{power: 1.0} + 25.911311946194477 * heading_cos{power: 1.0} + 0.32664687572535034 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8866434559292424,
+        "heldout_relative_l2": 0.8717835310124155,
+        "coefficients": {
+          "previous_vx": 0.39290900006368823,
+          "heading_cos": 25.74001862466542
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.39290900006368823 * previous_vx{power: 1.0} + 25.74001862466542 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9221545855032767,
+        "heldout_relative_l2": 0.9218033803664835,
+        "coefficients": {
+          "previous_vx": 0.39680383276742354
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.39680383276742354 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 18.48,
+    "persistence_relative_l2": 1.106212165411817
+  },
+  {
+    "case": "robot",
+    "mode": "joint",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "N40_PWM10_D40",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N30_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.873810913169679,
+        "heldout_relative_l2": 0.8515575000445904,
+        "coefficients": {
+          "heading_sin": -19.79420387122911,
+          "heading_cos": 25.535365684252763,
+          "previous_vx": 0.3281602591785623,
+          "u": -0.020471720579983352
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-19.79420387122911 * heading_sin{power: 1.0} + 25.535365684252763 * heading_cos{power: 1.0} + 0.3281602591785623 * previous_vx{power: 1.0} + -0.020471720579983352 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8749509787330496,
+        "heldout_relative_l2": 0.8509225101175208,
+        "coefficients": {
+          "heading_sin": -19.70201644801906,
+          "heading_cos": 25.852341590786722,
+          "previous_vx": 0.3263495458323846
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-19.70201644801906 * heading_sin{power: 1.0} + 25.852341590786722 * heading_cos{power: 1.0} + 0.3263495458323846 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8866305866815927,
+        "heldout_relative_l2": 0.871811951096283,
+        "coefficients": {
+          "previous_vx": 0.39266904531792085,
+          "heading_cos": 25.683307070744757
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.39266904531792085 * previous_vx{power: 1.0} + 25.683307070744757 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9221547822917155,
+        "heldout_relative_l2": 0.9217997698577526,
+        "coefficients": {
+          "previous_vx": 0.3964165921757947
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3964165921757947 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 21.41,
+    "persistence_relative_l2": 1.106212165411817
+  },
+  {
+    "case": "robot",
+    "mode": "mean",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "N40_PWM10_D40",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N30_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8738414529025977,
+        "heldout_relative_l2": 0.8516241519793001,
+        "coefficients": {
+          "previous_vx": 0.32857303937763815,
+          "u": -0.021414912938474605,
+          "heading_cos": 25.59672712158716,
+          "heading_sin": -19.810408867747622
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.32857303937763815 * previous_vx{power: 1.0} + -0.021414912938474605 * u{power: 1.0} + 25.59672712158716 * heading_cos{power: 1.0} + -19.810408867747622 * heading_sin{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8749570793750905,
+        "heldout_relative_l2": 0.8508984225314402,
+        "coefficients": {
+          "heading_cos": 25.91131194619448,
+          "heading_sin": -19.725808045427993,
+          "previous_vx": 0.3266468757253504
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "25.91131194619448 * heading_cos{power: 1.0} + -19.725808045427993 * heading_sin{power: 1.0} + 0.3266468757253504 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8866434559292424,
+        "heldout_relative_l2": 0.8717835310124155,
+        "coefficients": {
+          "heading_cos": 25.74001862466532,
+          "previous_vx": 0.39290900006368823
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "25.74001862466532 * heading_cos{power: 1.0} + 0.39290900006368823 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9221545855032767,
+        "heldout_relative_l2": 0.9218033803664835,
+        "coefficients": {
+          "previous_vx": 0.39680383276742354
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.39680383276742354 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 26.39,
+    "persistence_relative_l2": 1.106212165411817
+  },
+  {
+    "case": "robot",
+    "mode": "joint",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "N40_PWM10_D40",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N30_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8738109131696792,
+        "heldout_relative_l2": 0.8515575000445904,
+        "coefficients": {
+          "previous_vx": 0.32816025917856184,
+          "u": -0.02047172057998337,
+          "heading_cos": 25.535365684252753,
+          "heading_sin": -19.794203871229126
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.32816025917856184 * previous_vx{power: 1.0} + -0.02047172057998337 * u{power: 1.0} + 25.535365684252753 * heading_cos{power: 1.0} + -19.794203871229126 * heading_sin{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8749509787330496,
+        "heldout_relative_l2": 0.8509225101175208,
+        "coefficients": {
+          "heading_cos": 25.852341590786736,
+          "heading_sin": -19.702016448019062,
+          "previous_vx": 0.32634954583238446
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "25.852341590786736 * heading_cos{power: 1.0} + -19.702016448019062 * heading_sin{power: 1.0} + 0.32634954583238446 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8866305866815928,
+        "heldout_relative_l2": 0.8718119510962831,
+        "coefficients": {
+          "heading_cos": 25.683307070744785,
+          "previous_vx": 0.39266904531792185
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "25.683307070744785 * heading_cos{power: 1.0} + 0.39266904531792185 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9221547822917155,
+        "heldout_relative_l2": 0.9217997698577526,
+        "coefficients": {
+          "previous_vx": 0.3964165921757947
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3964165921757947 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 30.87,
+    "persistence_relative_l2": 1.106212165411817
+  },
+  {
+    "case": "robot",
+    "mode": "mean",
+    "seed": 0,
+    "fold": 1,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D40",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8567616514588248,
+        "heldout_relative_l2": 0.8751354427491128,
+        "coefficients": {
+          "heading_sin": -21.545707702273404,
+          "heading_cos": 27.76872985012638,
+          "previous_vx": 0.3163882573203203,
+          "u": -0.010417171064377088
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-21.545707702273404 * heading_sin{power: 1.0} + 27.76872985012638 * heading_cos{power: 1.0} + 0.3163882573203203 * previous_vx{power: 1.0} + -0.010417171064377088 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8570168022601753,
+        "heldout_relative_l2": 0.8761843861116705,
+        "coefficients": {
+          "heading_sin": -21.50386090191788,
+          "heading_cos": 27.953887802789716,
+          "previous_vx": 0.3152569669895168
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-21.50386090191788 * heading_sin{power: 1.0} + 27.953887802789716 * heading_cos{power: 1.0} + 0.3152569669895168 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8746928763828933,
+        "heldout_relative_l2": 0.8901015835066426,
+        "coefficients": {
+          "previous_vx": 0.39645038673755817,
+          "heading_cos": 27.67705243052162
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.39645038673755817 * previous_vx{power: 1.0} + 27.67705243052162 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9132129695982785,
+        "heldout_relative_l2": 0.926841238600901,
+        "coefficients": {
+          "previous_vx": 0.402462605289673
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.402462605289673 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.958680282191003,
+        "heldout_relative_l2": 0.9626658906702062,
+        "coefficients": {
+          "heading_cos": 28.41147712211778
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "28.41147712211778 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 23.2,
+    "persistence_relative_l2": 1.1163980423201734
+  },
+  {
+    "case": "robot",
+    "mode": "joint",
+    "seed": 0,
+    "fold": 1,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D40",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8565669261865492,
+        "heldout_relative_l2": 0.8750696824569147,
+        "coefficients": {
+          "heading_sin": -21.296330554870398,
+          "heading_cos": 27.659946603839952,
+          "previous_vx": 0.3190427478576117,
+          "u": -0.010790383402420283
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-21.296330554870398 * heading_sin{power: 1.0} + 27.659946603839952 * heading_cos{power: 1.0} + 0.3190427478576117 * previous_vx{power: 1.0} + -0.010790383402420283 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8568389974647684,
+        "heldout_relative_l2": 0.8761512847977595,
+        "coefficients": {
+          "heading_sin": -21.300837407836323,
+          "heading_cos": 27.828891268214644,
+          "previous_vx": 0.3174171425187813
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-21.300837407836323 * heading_sin{power: 1.0} + 27.828891268214644 * heading_cos{power: 1.0} + 0.3174171425187813 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8746587500741225,
+        "heldout_relative_l2": 0.8901316678528729,
+        "coefficients": {
+          "previous_vx": 0.3975455715911175,
+          "heading_cos": 27.58097450577893
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3975455715911175 * previous_vx{power: 1.0} + 27.58097450577893 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9132092189483263,
+        "heldout_relative_l2": 0.9268479372112183,
+        "coefficients": {
+          "previous_vx": 0.4027022509066843
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.4027022509066843 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.958672287331017,
+        "heldout_relative_l2": 0.9626661217924669,
+        "coefficients": {
+          "heading_cos": 28.35355136730941
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "28.35355136730941 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 21.37,
+    "persistence_relative_l2": 1.1163980423201734
+  },
+  {
+    "case": "robot",
+    "mode": "mean",
+    "seed": 1,
+    "fold": 1,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D40",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8567616514588248,
+        "heldout_relative_l2": 0.8751354427491128,
+        "coefficients": {
+          "previous_vx": 0.31638825732032017,
+          "u": -0.010417171064377086,
+          "heading_cos": 27.768729850126384,
+          "heading_sin": -21.54570770227343
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.31638825732032017 * previous_vx{power: 1.0} + -0.010417171064377086 * u{power: 1.0} + 27.768729850126384 * heading_cos{power: 1.0} + -21.54570770227343 * heading_sin{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8570168022601752,
+        "heldout_relative_l2": 0.8761843861116705,
+        "coefficients": {
+          "heading_cos": 27.953887802789772,
+          "heading_sin": -21.50386090191787,
+          "previous_vx": 0.3152569669895168
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "27.953887802789772 * heading_cos{power: 1.0} + -21.50386090191787 * heading_sin{power: 1.0} + 0.3152569669895168 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8746928763828933,
+        "heldout_relative_l2": 0.8901015835066426,
+        "coefficients": {
+          "heading_cos": 27.677052430521663,
+          "previous_vx": 0.39645038673755817
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "27.677052430521663 * heading_cos{power: 1.0} + 0.39645038673755817 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9132129695982785,
+        "heldout_relative_l2": 0.926841238600901,
+        "coefficients": {
+          "previous_vx": 0.402462605289673
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.402462605289673 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.958680282191003,
+        "heldout_relative_l2": 0.9626658906702062,
+        "coefficients": {
+          "heading_cos": 28.41147712211778
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "28.41147712211778 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 24.39,
+    "persistence_relative_l2": 1.1163980423201734
+  },
+  {
+    "case": "robot",
+    "mode": "joint",
+    "seed": 1,
+    "fold": 1,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D41"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D40",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8565669261865492,
+        "heldout_relative_l2": 0.875069682456915,
+        "coefficients": {
+          "previous_vx": 0.3190427478576112,
+          "u": -0.010790383402420327,
+          "heading_cos": 27.659946603839906,
+          "heading_sin": -21.29633055487038
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3190427478576112 * previous_vx{power: 1.0} + -0.010790383402420327 * u{power: 1.0} + 27.659946603839906 * heading_cos{power: 1.0} + -21.29633055487038 * heading_sin{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8568389974647684,
+        "heldout_relative_l2": 0.8761512847977595,
+        "coefficients": {
+          "heading_cos": 27.828891268214633,
+          "heading_sin": -21.30083740783632,
+          "previous_vx": 0.31741714251878117
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "27.828891268214633 * heading_cos{power: 1.0} + -21.30083740783632 * heading_sin{power: 1.0} + 0.31741714251878117 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8746587500741225,
+        "heldout_relative_l2": 0.8901316678528729,
+        "coefficients": {
+          "heading_cos": 27.580974505778958,
+          "previous_vx": 0.3975455715911176
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "27.580974505778958 * heading_cos{power: 1.0} + 0.3975455715911176 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9132092189483263,
+        "heldout_relative_l2": 0.9268479372112183,
+        "coefficients": {
+          "previous_vx": 0.4027022509066843
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.4027022509066843 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.958672287331017,
+        "heldout_relative_l2": 0.9626661217924669,
+        "coefficients": {
+          "heading_cos": 28.35355136730941
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "28.35355136730941 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 30.22,
+    "persistence_relative_l2": 1.1163980423201734
+  },
+  {
+    "case": "robot",
+    "mode": "mean",
+    "seed": 0,
+    "fold": 2,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D40"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8675295191157244,
+        "heldout_relative_l2": 0.8590299662045063,
+        "coefficients": {
+          "heading_sin": -19.954717504114925,
+          "heading_cos": 29.23492332783865,
+          "previous_vx": 0.29437888993671324
+        },
+        "frequencies": {},
+        "intercept": 0.5289102158718344,
+        "equation": "-19.954717504114925 * heading_sin{power: 1.0} + 29.23492332783865 * heading_cos{power: 1.0} + 0.29437888993671324 * previous_vx{power: 1.0} + 0.5289102158718344 = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8677853548538239,
+        "heldout_relative_l2": 0.8589911537450112,
+        "coefficients": {
+          "heading_sin": -19.933568452996596,
+          "heading_cos": 29.23537462904367,
+          "previous_vx": 0.29467823293135664
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-19.933568452996596 * heading_sin{power: 1.0} + 29.23537462904367 * heading_cos{power: 1.0} + 0.29467823293135664 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8837037279387625,
+        "heldout_relative_l2": 0.8795412040778673,
+        "coefficients": {
+          "previous_vx": 0.3719924819924042,
+          "heading_cos": 28.96350983966328
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3719924819924042 * previous_vx{power: 1.0} + 28.96350983966328 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9220618879247355,
+        "heldout_relative_l2": 0.9099926446164261,
+        "coefficients": {
+          "previous_vx": 0.38277413282739814
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.38277413282739814 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 20.09,
+    "persistence_relative_l2": 1.080721185213947
+  },
+  {
+    "case": "robot",
+    "mode": "joint",
+    "seed": 0,
+    "fold": 2,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D40"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8674910544776699,
+        "heldout_relative_l2": 0.8589516164608376,
+        "coefficients": {
+          "heading_sin": -19.864576309019487,
+          "heading_cos": 29.210303506210252,
+          "previous_vx": 0.29582998867490273
+        },
+        "frequencies": {},
+        "intercept": 0.5092970910975614,
+        "equation": "-19.864576309019487 * heading_sin{power: 1.0} + 29.210303506210252 * heading_cos{power: 1.0} + 0.29582998867490273 * previous_vx{power: 1.0} + 0.5092970910975614 = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8677419735376604,
+        "heldout_relative_l2": 0.858922868064045,
+        "coefficients": {
+          "heading_sin": -19.860502849426776,
+          "heading_cos": 29.21119120576179,
+          "previous_vx": 0.29592402371132165
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-19.860502849426776 * heading_sin{power: 1.0} + 29.21119120576179 * heading_cos{power: 1.0} + 0.29592402371132165 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8836998732050466,
+        "heldout_relative_l2": 0.8795387064741986,
+        "coefficients": {
+          "previous_vx": 0.3719340304250489,
+          "heading_cos": 28.952330686348585
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3719340304250489 * previous_vx{power: 1.0} + 28.952330686348585 * heading_cos{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9220633028202712,
+        "heldout_relative_l2": 0.9100002573674522,
+        "coefficients": {
+          "previous_vx": 0.3825662444817032
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3825662444817032 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 21.29,
+    "persistence_relative_l2": 1.080721185213947
+  },
+  {
+    "case": "robot",
+    "mode": "mean",
+    "seed": 1,
+    "fold": 2,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D40"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8675295191157244,
+        "heldout_relative_l2": 0.8590299662045063,
+        "coefficients": {
+          "previous_vx": 0.29437888993671313,
+          "heading_cos": 29.23492332783865,
+          "heading_sin": -19.95471750411494
+        },
+        "frequencies": {},
+        "intercept": 0.5289102158718346,
+        "equation": "0.29437888993671313 * previous_vx{power: 1.0} + 29.23492332783865 * heading_cos{power: 1.0} + -19.95471750411494 * heading_sin{power: 1.0} + 0.5289102158718346 = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8677853548538239,
+        "heldout_relative_l2": 0.8589911537450112,
+        "coefficients": {
+          "previous_vx": 0.29467823293135664,
+          "heading_cos": 29.23537462904367,
+          "heading_sin": -19.933568452996596
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.29467823293135664 * previous_vx{power: 1.0} + 29.23537462904367 * heading_cos{power: 1.0} + -19.933568452996596 * heading_sin{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8837037279387625,
+        "heldout_relative_l2": 0.8795412040778673,
+        "coefficients": {
+          "heading_cos": 28.963509839663224,
+          "previous_vx": 0.3719924819924042
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "28.963509839663224 * heading_cos{power: 1.0} + 0.3719924819924042 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9220618879247355,
+        "heldout_relative_l2": 0.9099926446164261,
+        "coefficients": {
+          "previous_vx": 0.38277413282739814
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.38277413282739814 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 23.73,
+    "persistence_relative_l2": 1.080721185213947
+  },
+  {
+    "case": "robot",
+    "mode": "joint",
+    "seed": 1,
+    "fold": 2,
+    "train_ids": [
+      "N30_PWM10_D41",
+      "N40_PWM10_D40"
+    ],
+    "train_shapes": [
+      [
+        1649
+      ],
+      [
+        1649
+      ]
+    ],
+    "held_out": "N40_PWM10_D41",
+    "test_shape": [
+      1648
+    ],
+    "truth": {},
+    "front": [
+      {
+        "train_discrepancy": 0.8674910544776699,
+        "heldout_relative_l2": 0.8589516164608376,
+        "coefficients": {
+          "previous_vx": 0.29582998867490307,
+          "heading_cos": 29.210303506210288,
+          "heading_sin": -19.86457630901946
+        },
+        "frequencies": {},
+        "intercept": 0.5092970910975733,
+        "equation": "0.29582998867490307 * previous_vx{power: 1.0} + 29.210303506210288 * heading_cos{power: 1.0} + -19.86457630901946 * heading_sin{power: 1.0} + 0.5092970910975733 = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8677419735376606,
+        "heldout_relative_l2": 0.858922868064045,
+        "coefficients": {
+          "previous_vx": 0.2959240237113217,
+          "heading_cos": 29.211191205761786,
+          "heading_sin": -19.86050284942677
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.2959240237113217 * previous_vx{power: 1.0} + 29.211191205761786 * heading_cos{power: 1.0} + -19.86050284942677 * heading_sin{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.8836998732050465,
+        "heldout_relative_l2": 0.8795387064741986,
+        "coefficients": {
+          "heading_cos": 28.952330686348596,
+          "previous_vx": 0.37193403042504863
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "28.952330686348596 * heading_cos{power: 1.0} + 0.37193403042504863 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      },
+      {
+        "train_discrepancy": 0.9220633028202712,
+        "heldout_relative_l2": 0.9100002573674522,
+        "coefficients": {
+          "previous_vx": 0.3825662444817032
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "0.3825662444817032 * previous_vx{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": null
+      }
+    ],
+    "wall_seconds": 25.52,
+    "persistence_relative_l2": 1.080721185213947
+  },
+  {
+    "case": "duffing",
+    "mode": "mean",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "ic_a",
+      "ic_b"
+    ],
+    "train_shapes": [
+      [
+        401
+      ],
+      [
+        451
+      ]
+    ],
+    "held_out": "pic_duffing",
+    "test_shape": [
+      500
+    ],
+    "truth": {
+      "u": -0.20000000298023224,
+      "disp": -1.0,
+      "disp3": -1.0,
+      "cos": 0.30000001192092896
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.010836134252761632,
+        "heldout_relative_l2": 0.009813903500058476,
+        "coefficients": {
+          "disp3": -0.9901874426832535,
+          "u": -0.23082230497515815,
+          "disp": -0.994218766030754,
+          "cos": 0.29803476490173975
+        },
+        "frequencies": {
+          "cos": 1.0025040799568952
+        },
+        "intercept": 0.0,
+        "equation": "-0.9901874426832535 * disp3{power: 1.0} + -0.23082230497515815 * u{power: 1.0} + -0.994218766030754 * disp{power: 1.0} + 0.29803476490173975 * cos{power: 1.0, freq: 1.0025040799568952, dim: 0.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.27460449682731075,
+        "heldout_relative_l2": 0.3261519604072695,
+        "coefficients": {
+          "disp3": -2.3762630258215367
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-2.3762630258215367 * disp3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 105.68,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "duffing",
+    "mode": "joint",
+    "seed": 0,
+    "fold": 0,
+    "train_ids": [
+      "ic_a",
+      "ic_b"
+    ],
+    "train_shapes": [
+      [
+        401
+      ],
+      [
+        451
+      ]
+    ],
+    "held_out": "pic_duffing",
+    "test_shape": [
+      500
+    ],
+    "truth": {
+      "u": -0.20000000298023224,
+      "disp": -1.0,
+      "disp3": -1.0,
+      "cos": 0.30000001192092896
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.11752444965669338,
+        "heldout_relative_l2": 0.10177754502275517,
+        "coefficients": {
+          "disp3": -1.1119402115462702,
+          "disp": -0.856524839196648,
+          "cos": 0.1859856904760002,
+          "disp2": -0.006899736418090999
+        },
+        "frequencies": {
+          "cos": 0.9549225723032823
+        },
+        "intercept": 0.0,
+        "equation": "-1.1119402115462702 * disp3{power: 1.0} + -0.856524839196648 * disp{power: 1.0} + 0.1859856904760002 * cos{power: 1.0, freq: 0.9549225723032823, dim: 0.0} + -0.006899736418090999 * disp2{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.11757167678315186,
+        "heldout_relative_l2": 0.10147687037978181,
+        "coefficients": {
+          "disp3": -1.1123635738907156,
+          "disp": -0.8565082299394627,
+          "cos": 0.18632796783252292
+        },
+        "frequencies": {
+          "cos": 0.9550021182587659
+        },
+        "intercept": -0.0002737238631676623,
+        "equation": "-1.1123635738907156 * disp3{power: 1.0} + -0.8565082299394627 * disp{power: 1.0} + 0.18632796783252292 * cos{power: 1.0, freq: 0.9550021182587659, dim: 0.0} + -0.0002737238631676623 = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.11757485907029516,
+        "heldout_relative_l2": 0.10145688126637614,
+        "coefficients": {
+          "disp3": -1.1124960048441663,
+          "disp": -0.8564408646535504,
+          "cos": 0.18635549744845775
+        },
+        "frequencies": {
+          "cos": 0.9550061151649881
+        },
+        "intercept": 0.0,
+        "equation": "-1.1124960048441663 * disp3{power: 1.0} + -0.8564408646535504 * disp{power: 1.0} + 0.18635549744845775 * cos{power: 1.0, freq: 0.9550061151649881, dim: 0.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.17401800765149825,
+        "heldout_relative_l2": 0.20479132714673087,
+        "coefficients": {
+          "disp3": -1.2713858833680993,
+          "disp": -0.5880486392691211
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-1.2713858833680993 * disp3{power: 1.0} + -0.5880486392691211 * disp{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.27641915734946065,
+        "heldout_relative_l2": 0.3279991935463952,
+        "coefficients": {
+          "disp3": -2.301633019988942
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-2.301633019988942 * disp3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 82.5,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "duffing",
+    "mode": "mean",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "ic_a",
+      "ic_b"
+    ],
+    "train_shapes": [
+      [
+        401
+      ],
+      [
+        451
+      ]
+    ],
+    "held_out": "pic_duffing",
+    "test_shape": [
+      500
+    ],
+    "truth": {
+      "u": -0.20000000298023224,
+      "disp": -1.0,
+      "disp3": -1.0,
+      "cos": 0.30000001192092896
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.010836134252761611,
+        "heldout_relative_l2": 0.00981390350005856,
+        "coefficients": {
+          "disp": -0.9942187660307535,
+          "cos": 0.2980347649017394,
+          "disp3": -0.9901874426832542,
+          "u": -0.230822304975158
+        },
+        "frequencies": {
+          "cos": 1.0025040799568952
+        },
+        "intercept": 0.0,
+        "equation": "-0.9942187660307535 * disp{power: 1.0} + 0.2980347649017394 * cos{power: 1.0, freq: 1.0025040799568952, dim: 0.0} + -0.9901874426832542 * disp3{power: 1.0} + -0.230822304975158 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.27460449682731075,
+        "heldout_relative_l2": 0.3261519604072695,
+        "coefficients": {
+          "disp3": -2.3762630258215367
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-2.3762630258215367 * disp3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 115.17,
+    "persistence_relative_l2": null
+  },
+  {
+    "case": "duffing",
+    "mode": "joint",
+    "seed": 1,
+    "fold": 0,
+    "train_ids": [
+      "ic_a",
+      "ic_b"
+    ],
+    "train_shapes": [
+      [
+        401
+      ],
+      [
+        451
+      ]
+    ],
+    "held_out": "pic_duffing",
+    "test_shape": [
+      500
+    ],
+    "truth": {
+      "u": -0.20000000298023224,
+      "disp": -1.0,
+      "disp3": -1.0,
+      "cos": 0.30000001192092896
+    },
+    "front": [
+      {
+        "train_discrepancy": 0.01073221929416722,
+        "heldout_relative_l2": 0.00870703398314199,
+        "coefficients": {
+          "disp3": -0.9934880211447235,
+          "disp": -0.9991423364662801,
+          "cos": 0.301340592930834,
+          "u": -0.23235350107743613
+        },
+        "frequencies": {
+          "cos": 1.0020306281645432
+        },
+        "intercept": 0.0,
+        "equation": "-0.9934880211447235 * disp3{power: 1.0} + -0.9991423364662801 * disp{power: 1.0} + 0.301340592930834 * cos{power: 1.0, freq: 1.0020306281645432, dim: 0.0} + -0.23235350107743613 * u{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": true
+      },
+      {
+        "train_discrepancy": 0.17401800765149825,
+        "heldout_relative_l2": 0.20479132714673087,
+        "coefficients": {
+          "disp3": -1.2713858833680993,
+          "disp": -0.5880486392691211
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-1.2713858833680993 * disp3{power: 1.0} + -0.5880486392691211 * disp{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      },
+      {
+        "train_discrepancy": 0.27641915734946065,
+        "heldout_relative_l2": 0.3279991935463952,
+        "coefficients": {
+          "disp3": -2.301633019988942
+        },
+        "frequencies": {},
+        "intercept": 0.0,
+        "equation": "-2.301633019988942 * disp3{power: 1.0} = du/dx0{power: 1.0}",
+        "exact_support": false
+      }
+    ],
+    "wall_seconds": 99.69,
+    "persistence_relative_l2": null
+  }
+]

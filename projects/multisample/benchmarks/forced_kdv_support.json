@@ -1,0 +1,394 @@
+[
+  {
+    "case": "forced_kdv",
+    "mode": "single",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": -6.00139392977208,
+        "d^3u/dx1^3": -0.9997147360176366,
+        "cos*sin": 1.0000404866400192
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.00046543106772527947,
+    "coefficients": {
+      "du/dx1*u": -6.00139392977208,
+      "d^3u/dx1^3": -0.9997147360176366,
+      "cos*sin": 1.0000404866400192
+    },
+    "frequencies": {
+      "cos": 0.9994968843885975,
+      "sin": 0.9992157254875292
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "mean",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": -6.005810950575559,
+        "d^3u/dx1^3": -1.0002003740234828,
+        "cos*sin": 1.0000144702732248
+      },
+      "new_forced_12": {
+        "du/dx1*u": -5.999941188788499,
+        "d^3u/dx1^3": -0.9999918617868384,
+        "cos*sin": 0.999935351261457
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.00019360197213777897,
+    "coefficients": {
+      "du/dx1*u": -6.00287606968203,
+      "d^3u/dx1^3": -1.0000961179051606,
+      "cos*sin": 0.9999749107673409
+    },
+    "frequencies": {
+      "cos": 0.9997544156511511,
+      "sin": 1.000004434597333
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "joint",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.0,
+    "noise_seed": null,
+    "identifiable": true,
+    "heldout_relative_l2": 3.174530636740006e-05,
+    "coefficients": {
+      "du/dx1*u": -6.000154668982206,
+      "d^3u/dx1^3": -1.0000260771445282,
+      "cos*sin": 0.9999036155069441
+    },
+    "frequencies": {
+      "cos": 0.9997499887458088,
+      "sin": 0.9999574640183617
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "single",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2401,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": 3.593459962601633,
+        "d^3u/dx1^3": -0.05871628629696058,
+        "cos*sin": 0.08869907151214007
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.9562202295580667,
+    "coefficients": {
+      "du/dx1*u": 3.593459962601633,
+      "d^3u/dx1^3": -0.05871628629696058,
+      "cos*sin": 0.08869907151214007
+    },
+    "frequencies": {
+      "cos": 6.274910601422067,
+      "sin": 1.9822889639623966
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "mean",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2401,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": 2.0773407855097528,
+        "d^3u/dx1^3": -0.01984550256693366,
+        "cos*sin": -0.07786698686836782
+      },
+      "new_forced_12": {
+        "du/dx1*u": -5.932194588216035,
+        "d^3u/dx1^3": -1.001544742306958,
+        "cos*sin": 1079.0316354260501
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 74.46030576952917,
+    "coefficients": {
+      "du/dx1*u": -1.927426901353141,
+      "d^3u/dx1^3": -0.5106951224369458,
+      "cos*sin": 539.4768842195908
+    },
+    "frequencies": {
+      "cos": 1.0493197922128725,
+      "sin": 3.3571341440449136
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "joint",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2401,
+    "identifiable": true,
+    "heldout_relative_l2": 0.41347464990392874,
+    "coefficients": {
+      "du/dx1*u": -4.0980455215953535,
+      "d^3u/dx1^3": -0.5990394014941303,
+      "cos*sin": 1.1783005159818796
+    },
+    "frequencies": {
+      "cos": 0.885450424535417,
+      "sin": 0.5088528017903122
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "single",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2402,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": -4.887701681393691,
+        "d^3u/dx1^3": -0.6135857261285284,
+        "cos*sin": 0.40672540869973933
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.42759292135153015,
+    "coefficients": {
+      "du/dx1*u": -4.887701681393691,
+      "d^3u/dx1^3": -0.6135857261285284,
+      "cos*sin": 0.40672540869973933
+    },
+    "frequencies": {
+      "cos": 1.2302542728943913,
+      "sin": 1.653974491928908
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "mean",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2402,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": 0.13723407320562997,
+        "d^3u/dx1^3": -0.6071342675827804,
+        "cos*sin": 0.5420450723043759
+      },
+      "new_forced_12": {
+        "du/dx1*u": -5.9241558872463855,
+        "d^3u/dx1^3": -0.9739684956906547,
+        "cos*sin": 1.0132538905462216
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.24088366305288278,
+    "coefficients": {
+      "du/dx1*u": -2.8934609070203776,
+      "d^3u/dx1^3": -0.7905513816367176,
+      "cos*sin": 0.7776494814252988
+    },
+    "frequencies": {
+      "cos": 1.0324483687921624,
+      "sin": 1.0534088180068562
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "joint",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2402,
+    "identifiable": true,
+    "heldout_relative_l2": 0.026114684034242042,
+    "coefficients": {
+      "du/dx1*u": -5.896495768412618,
+      "d^3u/dx1^3": -0.9750149514805727,
+      "cos*sin": 0.9879143043580804
+    },
+    "frequencies": {
+      "cos": 1.0277372275372114,
+      "sin": 1.0137033127309136
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "single",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2403,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": 1.0130622820478918,
+        "d^3u/dx1^3": -0.5405620344833864,
+        "cos*sin": 0.2959134139201086
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.5469732149572126,
+    "coefficients": {
+      "du/dx1*u": 1.0130622820478918,
+      "d^3u/dx1^3": -0.5405620344833864,
+      "cos*sin": 0.2959134139201086
+    },
+    "frequencies": {
+      "cos": 0.7260660731354288,
+      "sin": 1.5197905171306398
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "mean",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2403,
+    "per_record_coefficients": {
+      "pic_kdv_cossin": {
+        "du/dx1*u": 2.9058735375570475,
+        "d^3u/dx1^3": -0.5157645759701172,
+        "cos*sin": 0.33268947730486825
+      },
+      "new_forced_12": {
+        "du/dx1*u": -3.8344122323098424,
+        "d^3u/dx1^3": -0.6495815208204407,
+        "cos*sin": 0.9247182918930853
+      }
+    },
+    "identifiable": true,
+    "heldout_relative_l2": 0.4547049103956974,
+    "coefficients": {
+      "du/dx1*u": -0.46426934737639747,
+      "d^3u/dx1^3": -0.5826730483952789,
+      "cos*sin": 0.6287038845989767
+    },
+    "frequencies": {
+      "cos": 0.5083592028513351,
+      "sin": 1.1578411651047065
+    }
+  },
+  {
+    "case": "forced_kdv",
+    "mode": "joint",
+    "held_out": "new_forced_23",
+    "record_ranks": [
+      3,
+      3
+    ],
+    "columns": 3,
+    "train_ids": [
+      "pic_kdv_cossin",
+      "new_forced_12"
+    ],
+    "training_noise": 0.05,
+    "noise_seed": 2403,
+    "identifiable": true,
+    "heldout_relative_l2": 0.20972655631277584,
+    "coefficients": {
+      "du/dx1*u": -4.650036569558053,
+      "d^3u/dx1^3": -0.7882056815478881,
+      "cos*sin": 0.8638684568392972
+    },
+    "frequencies": {
+      "cos": 0.8842916570822852,
+      "sin": 1.0192623963580745
+    }
+  }
+]
