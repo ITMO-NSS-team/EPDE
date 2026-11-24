@@ -1,0 +1,21 @@
+recording,pilot_id,robot_id_a,robot_id_b,clip_start_frame,core_start_frame,core_end_frame,clip_end_frame,visual_label,example_clear_before_frame,example_apparent_contact_frame,example_clear_after_frame,core_apparent_contact_frame_examples,review_notes,track_minimum_gap_px,track_class
+N30_PWM10_D41,1,28,74,1274,1284,1296,1306,Visible gap,,,,,A thin floor-colored gap remains visible at closest approach.,7.378,Near miss
+N30_PWM10_D41,2,27,74,1464,1474,1483,1493,Apparent rim contact,1474,1476,1480,1476,The gap closes briefly. A dark seam makes the release time uncertain.,-12.354,Below diameter
+N30_PWM10_D41,3,27,74,1734,1744,1759,1769,Apparent rim contact,1751,1753,1754,"1744, 1753",The rims separate between the two closures. A further closure precedes the core at frame 1741.,-12.395,Below diameter
+N30_PWM10_D41,4,12,41,1961,1971,1981,1991,Uncertain,,,,,A narrow blue-gray seam persists. The two rim edges cannot be resolved.,10.34,Near miss
+N30_PWM10_D41,5,12,27,2250,2260,2270,2280,Apparent rim contact,2261,2262,2267,2262,The gap closes for one clear frame and reopens through shadow.,-11.932,Below diameter
+N30_PWM10_D41,6,12,27,2329,2339,2342,2352,Uncertain,,,,,A narrow seam at closest approach could be a shadow or a small gap.,9.011,Near miss
+N30_PWM10_D41,7,12,27,2460,2470,2474,2484,Apparent rim contact,2470,2471,2472,2471,Visible floor on both adjacent frames brackets one apparent contact frame.,-15.625,Below diameter
+N30_PWM10_D41,8,12,27,2693,2703,2705,2715,Uncertain,,,,,"A thin dark seam at frame 2703 is ambiguous. A separate apparent closure occurs at frame 2713, after the core.",9.747,Near miss
+N30_PWM10_D41,9,12,27,2823,2833,2855,2865,Apparent rim contact,2833,2835,2837,"2835, 2845",The pair separates and closes again. A later narrow seam is ambiguous.,-15.067,Below diameter
+N30_PWM10_D41,10,18,28,3888,3898,3901,3911,Uncertain,,,,,The closest pass shows a dark seam. The pair approaches again in the trailing frames.,5.039,Near miss
+N30_PWM10_D41,11,12,27,4013,4023,4032,4042,Apparent rim contact,4020,4024,4026,4024,The floor band disappears briefly and becomes visible again.,4.223,Near miss
+N30_PWM10_D41,12,12,74,4580,4590,4598,4608,Visible gap,,,,,A narrow floor-colored band continues between the two caps.,8.663,Near miss
+N30_PWM10_D41,13,41,65,4624,4634,4652,4662,Apparent rim contact,4637,4640,4644,"4639-4643, 4648","The rims meet for several frames, open visibly, and close again.",2.372,Near miss
+N30_PWM10_D41,14,27,74,4750,4760,4772,4782,Apparent rim contact,4760,4763,4770,4762-4763,Clear closure followed by a thin seam. The timing of release is ambiguous.,-12.489,Below diameter
+N30_PWM10_D41,15,65,77,4764,4774,4786,4796,Apparent rim contact,4773,4775,4778,"4775, 4777",The rim gap disappears at two sampled instants. Continuity between them is uncertain.,3.54,Near miss
+N30_PWM10_D41,16,65,77,4946,4956,4964,4974,Uncertain,,,,,Blur and blue edge shading obscure the narrow seam.,10.549,Near miss
+N30_PWM10_D41,17,18,65,6128,6138,6147,6157,Uncertain,,,,,Only a fine discolored seam remains at the narrowest point.,3.829,Near miss
+N30_PWM10_D41,18,12,65,6693,6703,6707,6717,Uncertain,,,,,The adjacent edges are shadowed and blue. A gap cannot be resolved confidently.,7.853,Near miss
+N30_PWM10_D41,19,65,77,6781,6791,6793,6803,Uncertain,,,,,The narrow gray seam fades for one frame. The edges are blurred.,9.767,Near miss
+N30_PWM10_D41,20,19,65,7837,7847,7865,7875,Apparent rim contact,7852,7857,7863,"7849, 7857, 7859-7860",The gap opens and closes repeatedly. The triplet describes one part of this encounter.,0.28,Borderline

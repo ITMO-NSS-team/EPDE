@@ -1,0 +1,46 @@
+recording,case,i,j,lo,hi,entry,release,review,before,contact,after,note
+N30_PWM10_D41,2,27,74,1467,1487,1476,1476,single,1474.0,1476.0,1480.0,The gap closes briefly. A dark seam makes the release time uncertain.
+N30_PWM10_D41,5,12,27,2254,2274,2262,2262,single,2261.0,2262.0,2267.0,The gap closes for one clear frame and reopens through shadow.
+N30_PWM10_D41,7,12,27,2463,2479,2471,2471,single,2470.0,2471.0,2472.0,Visible floor on both adjacent frames brackets one apparent contact frame.
+N30_PWM10_D41,11,12,27,4013,4033,4024,4024,single,4020.0,4024.0,4026.0,The floor band disappears briefly and becomes visible again.
+N30_PWM10_D41,14,27,74,4753,4777,4763,4763,single,4760.0,4763.0,4770.0,Clear closure followed by a thin seam. The timing of release is ambiguous.
+N40_PWM10_D40,1,27,60,411,431,419,423,uncertain,,,,A dark seam persists through frames 419-420.
+N40_PWM10_D40,2,72,77,1680,1697,1688,1689,single,1687.0,1688.0,1690.0,Brief closure followed by a visible gap.
+N40_PWM10_D40,3,77,78,2194,2211,2202,2203,complex,,,,Closure around 2200-2202. A prior near-closure at 2196 interrupts the incoming window.
+N40_PWM10_D40,4,27,52,2958,2975,2966,2967,single,2964.0,2966.0,2967.0,The facing rims merge briefly before the gap opens.
+N40_PWM10_D40,5,18,27,3420,3438,3428,3430,uncertain,,,,The narrow dark interface at 3428 remains unresolved.
+N40_PWM10_D40,6,72,77,4161,4180,4169,4172,complex,,,,Apparent closure at 4169 with earlier near-closures and no clean incoming window.
+N40_PWM10_D40,7,37,73,5188,5206,5196,5198,single,5195.0,5196.0,5198.0,One apparent rim closure at 5196.
+N40_PWM10_D40,8,60,77,5694,5715,5702,5707,complex,,,,Multiple closures and intervening dark seams around 5702-5704.
+N40_PWM10_D40,9,11,52,6773,6791,6781,6783,uncertain,,,,Blur and a gray edge persist at 6781.
+N40_PWM10_D40,10,53,56,8032,8051,8040,8043,complex,,,,The interface closes at 8040 and again at 8042.
+N40_PWM10_D41,1,36,65,679,702,687,694,complex,,,,The interface closes at 687 during a prolonged sequence with no clean bracketing gaps.
+N40_PWM10_D41,2,52,54,2006,2023,2014,2015,complex,,,,The rims close at 2014 and 2016 with a separating seam at 2015.
+N40_PWM10_D41,3,72,83,2586,2608,2594,2600,single,2592.0,2594.0,2600.0,The blue seam persists after apparent closure until the floor becomes visible.
+N40_PWM10_D41,4,27,29,3077,3094,3085,3086,single,3084.0,3085.0,3086.0,Visible gap on both sides of a single apparent closure.
+N40_PWM10_D41,5,50,54,4152,4169,4160,4161,single,4158.0,4160.0,4162.0,One closure with narrow shadow on the adjacent frames.
+N40_PWM10_D41,6,37,52,4567,4595,4575,4587,complex,,,,Several closure candidates over a prolonged interaction.
+N40_PWM10_D41,7,28,45,5246,5263,5254,5255,complex,,,,Apparent closure near 5253-5254 during repeated close approaches.
+N40_PWM10_D41,8,73,82,5804,5821,5812,5813,uncertain,,,,Blue marker and rim edges obscure whether a floor gap remains.
+N40_PWM10_D41,9,74,77,6284,6302,6292,6294,complex,,,,Several narrowings and apparent closures including the frames near 6290-6292.
+N40_PWM10_D41,10,28,45,7622,7640,7630,7632,single,7627.0,7630.0,7634.0,Marker corners approach closely. Broad floor gaps bracket the apparent rim closure.
+N40_PWM20_D40,1,18,53,895,913,903,905,uncertain,,,,A central gray seam remains at 903-904.
+N40_PWM20_D40,2,27,52,1323,1341,1331,1333,uncertain,,,,The interface is blue-gray at 1331.
+N40_PWM20_D40,3,53,66,2559,2577,2567,2569,complex,,,,Apparent closures at 2567 and 2571 interrupt the outgoing measurement window.
+N40_PWM20_D40,4,53,78,2911,2928,2919,2920,single,2918.0,2919.0,2920.0,A brief rim closure is bracketed by visible floor.
+N40_PWM20_D40,5,56,82,3352,3369,3360,3361,single,3359.0,3360.0,3361.0,The two rims merge briefly at 3360.
+N40_PWM20_D40,6,78,82,4209,4228,4217,4220,uncertain,,,,A narrow dark line remains at 4217-4219.
+N40_PWM20_D40,7,18,53,4709,4726,4717,4718,single,4716.0,4717.0,4718.0,Broad gap on either side of a single apparent closure.
+N40_PWM20_D40,8,34,84,5548,5565,5556,5557,single,5554.0,5556.0,5557.0,Bright bridge across the interface at 5556.
+N40_PWM20_D40,9,18,82,6274,6292,6282,6284,uncertain,,,,The compressed gray seam at 6282 is ambiguous.
+N40_PWM20_D40,10,79,82,7560,7577,7568,7569,single,7567.0,7568.0,7569.0,The rims meet for one frame and a gap opens.
+N40_PWM20_D41,1,31,37,500,518,508,510,uncertain,,,,Blue-gray edge affects frames 508 and 509.
+N40_PWM20_D41,2,28,38,1336,1354,1344,1346,single,1342.0,1344.0,1346.0,One apparent closure. Marker corners approach the rim interface.
+N40_PWM20_D41,3,28,38,2268,2285,2276,2277,uncertain,,,,A fine seam is visible at 2276.
+N40_PWM20_D41,4,28,72,3276,3294,3284,3286,uncertain,,,,A blue seam remains between the caps at 3284.
+N40_PWM20_D41,5,30,53,4604,4622,4612,4614,uncertain,,,,A narrow shadow persists through 4612-4613.
+N40_PWM20_D41,6,12,31,4892,4909,4900,4901,uncertain,,,,Strong blue shading at 4900 obscures the interface.
+N40_PWM20_D41,7,12,73,5648,5668,5656,5660,complex,,,,Multiple close approaches and apparent closures in the outgoing window.
+N40_PWM20_D41,8,29,44,6607,6624,6615,6616,single,6613.0,6615.0,6617.0,Bright single closure between visible gaps.
+N40_PWM20_D41,9,11,54,7320,7338,7328,7330,uncertain,,,,Dark marker edges persist at 7328-7329.
+N40_PWM20_D41,10,27,45,7764,7782,7772,7774,visible gap,,,,The floor-colored band narrows but remains visible at 7772-7773.

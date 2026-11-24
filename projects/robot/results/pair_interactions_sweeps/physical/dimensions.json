@@ -1,0 +1,9 @@
+{
+ "diameter_mm": 48.7,
+ "radius_mm": 24.35,
+ "height_mm": 19.2,
+ "nominal_diameter_original_px": 212.0,
+ "mm_per_original_px": 0.22971698113207548,
+ "arena_mm": 400.0,
+ "body_shape": "circular"
+}

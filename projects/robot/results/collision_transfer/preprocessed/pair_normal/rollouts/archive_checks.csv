@@ -1,0 +1,11 @@
+recording,model,verified_first_step_pairs
+N30_PWM10_D41,shared_free,937
+N30_PWM10_D41,shared_guarded,937
+N40_PWM10_D40,shared_free,2047
+N40_PWM10_D40,shared_guarded,2047
+N40_PWM10_D41,shared_free,1855
+N40_PWM10_D41,shared_guarded,1855
+N40_PWM20_D40,shared_free,2044
+N40_PWM20_D40,shared_guarded,2044
+N40_PWM20_D41,shared_free,1755
+N40_PWM20_D41,shared_guarded,1755

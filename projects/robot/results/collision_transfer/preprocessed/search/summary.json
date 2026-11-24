@@ -1,0 +1,64 @@
+{
+ "input_digest": "4bc5add7bd511a98c778af372b3a2c3ab8af103d147dd35bf2b4c9fc9d562591",
+ "seed": 923701,
+ "terms": 299,
+ "max_factors": 3,
+ "max_rhs": 10,
+ "evaluated_fold_structures": 24342,
+ "unique_structures": 14625,
+ "native_fold_library_structures": 7831,
+ "cross_recording_candidates": 20518,
+ "independent_proposal_front": 9,
+ "common_eligible": 18634,
+ "merged_front": 45,
+ "matched_counts": {
+  "N30_PWM10_D41": {
+   "robot_origins": 24568,
+   "pair_origins": 19172
+  },
+  "N40_PWM10_D40": {
+   "robot_origins": 32760,
+   "pair_origins": 40716
+  },
+  "N40_PWM10_D41": {
+   "robot_origins": 32756,
+   "pair_origins": 37073
+  },
+  "N40_PWM20_D40": {
+   "robot_origins": 32756,
+   "pair_origins": 41633
+  },
+  "N40_PWM20_D41": {
+   "robot_origins": 32758,
+   "pair_origins": 35526
+  }
+ },
+ "minimum_wape_terms": [
+  "C006",
+  "C082",
+  "C108",
+  "C109",
+  "C156",
+  "C173",
+  "C180",
+  "C181",
+  "C183",
+  "C020*Gspin"
+ ],
+ "pooled_coefficients": {
+  "C006": 0.015814361355984987,
+  "C082": 0.007155835760801108,
+  "C108": 0.47290098208544173,
+  "C109": 0.27884688965533205,
+  "C156": 15.306245416927375,
+  "C173": 0.20397687647595858,
+  "C180": 0.1171586913091302,
+  "C181": -0.2029324252068524,
+  "C183": -0.1329459423357674,
+  "C020*Gspin": 0.1344165416784451
+ },
+ "training": "Projected next-window component velocities. Raw gap sets contact onset, clearance and apparent overlap.",
+ "test": "Original observed next-window component velocities. Pair errors use raw neighbors and raw pair axes.",
+ "objectives": "Minimize mean training-screen WAPE and mean dyad coefficient instability. Equal recording weights.",
+ "selection": "Fold recommendations minimize validation RMSE on training recordings. Shared front is exploratory across five folds."
+}

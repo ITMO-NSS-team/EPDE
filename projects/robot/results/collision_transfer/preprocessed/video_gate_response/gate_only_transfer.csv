@@ -1,0 +1,145 @@
+horizon_ms,scope,target,model,held,n,rmse_px_s,r2
+40,reviewed clips,outgoing velocity,constant,balanced,190,162.2228181715282,-0.002304234874604072
+40,reviewed clips,outgoing velocity,constant,N30_PWM10_D41,37,171.99314019124404,-0.004242792309690824
+40,reviewed clips,outgoing velocity,constant,N40_PWM10_D40,44,139.57945017942703,-0.006371384240894118
+40,reviewed clips,outgoing velocity,constant,N40_PWM10_D41,28,145.95997942825883,-0.003437484366593191
+40,reviewed clips,outgoing velocity,constant,N40_PWM20_D40,48,189.81112570256974,-0.0032095156917879564
+40,reviewed clips,outgoing velocity,constant,N40_PWM20_D41,33,158.6964758813282,-0.016290836038319823
+40,reviewed clips,velocity change,constant,balanced,190,187.7012470884143,-0.028066497327811968
+40,reviewed clips,velocity change,constant,N30_PWM10_D41,37,207.90652763018113,-0.2991814508133879
+40,reviewed clips,velocity change,constant,N40_PWM10_D40,44,148.96721584865455,-0.06069356208563925
+40,reviewed clips,velocity change,constant,N40_PWM10_D41,28,162.83078857398144,-0.017203295455835876
+40,reviewed clips,velocity change,constant,N40_PWM20_D40,48,222.58552729307596,-0.03515972877120421
+40,reviewed clips,velocity change,constant,N40_PWM20_D41,33,186.23708678947284,-0.00010832919181402723
+40,reviewed clips,outgoing velocity,motion,balanced,190,163.2778395101692,-0.015383664209375203
+40,reviewed clips,outgoing velocity,motion,N30_PWM10_D41,37,171.81408299812847,-0.002152903209975854
+40,reviewed clips,outgoing velocity,motion,N40_PWM10_D40,44,139.8161219472301,-0.009787096564453979
+40,reviewed clips,outgoing velocity,motion,N40_PWM10_D41,28,147.81747014024185,-0.02913953888870502
+40,reviewed clips,outgoing velocity,motion,N40_PWM20_D40,48,192.74130860707376,-0.03442240795565521
+40,reviewed clips,outgoing velocity,motion,N40_PWM20_D41,33,158.8408662166757,-0.018141026231100144
+40,reviewed clips,velocity change,motion,balanced,190,163.2778395101692,0.22206845801023334
+40,reviewed clips,velocity change,motion,N30_PWM10_D41,37,171.81408299812847,0.1127396416603651
+40,reviewed clips,velocity change,motion,N40_PWM10_D40,44,139.8161219472301,0.06562107375502702
+40,reviewed clips,velocity change,motion,N40_PWM10_D41,28,147.81747014024188,0.16172553612099272
+40,reviewed clips,velocity change,motion,N40_PWM20_D40,48,192.74130860707376,0.22381878240709296
+40,reviewed clips,velocity change,motion,N40_PWM20_D41,33,158.8408662166757,0.27248961255284
+40,reviewed clips,outgoing velocity,motion + clearance,balanced,190,161.13754868618562,0.011061722220120251
+40,reviewed clips,outgoing velocity,motion + clearance,N30_PWM10_D41,37,166.32799137455655,0.06082362875334324
+40,reviewed clips,outgoing velocity,motion + clearance,N40_PWM10_D40,44,141.953219579883,-0.0408923262855696
+40,reviewed clips,outgoing velocity,motion + clearance,N40_PWM10_D41,28,150.49347137710043,-0.06673870613113841
+40,reviewed clips,outgoing velocity,motion + clearance,N40_PWM20_D40,48,188.86202685129783,0.006797953833580395
+40,reviewed clips,outgoing velocity,motion + clearance,N40_PWM20_D41,33,153.92751737640907,0.04387213764891151
+40,reviewed clips,velocity change,motion + clearance,balanced,190,161.13754868618557,0.2423294696541739
+40,reviewed clips,velocity change,motion + clearance,N30_PWM10_D41,37,166.32799137455655,0.16849618353913898
+40,reviewed clips,velocity change,motion + clearance,N40_PWM10_D40,44,141.953219579883,0.036838698493645294
+40,reviewed clips,velocity change,motion + clearance,N40_PWM10_D41,28,150.49347137710043,0.13109954171358484
+40,reviewed clips,velocity change,motion + clearance,N40_PWM20_D40,48,188.8620268512978,0.2547485750692804
+40,reviewed clips,velocity change,motion + clearance,N40_PWM20_D41,33,153.92751737640882,0.316800979759188
+40,all track crossings,outgoing velocity,constant,balanced,38352,152.35474738443384,-0.0038633117408826134
+40,all track crossings,outgoing velocity,constant,N30_PWM10_D41,4714,133.04777613109243,-0.0148789515743728
+40,all track crossings,outgoing velocity,constant,N40_PWM10_D40,6201,138.6008676331578,-0.08944785057090798
+40,all track crossings,outgoing velocity,constant,N40_PWM10_D41,5771,130.12352618360453,-0.02074143612734969
+40,all track crossings,outgoing velocity,constant,N40_PWM20_D40,10959,180.34116570855082,-0.00011975313003587118
+40,all track crossings,outgoing velocity,constant,N40_PWM20_D41,10707,172.31618001570726,-0.00021148588747155195
+40,all track crossings,velocity change,constant,balanced,38352,189.34931339072565,-0.005087100391743649
+40,all track crossings,velocity change,constant,N30_PWM10_D41,4714,164.32371327827894,-0.012981666948770343
+40,all track crossings,velocity change,constant,N40_PWM10_D40,6201,165.86971358481404,-0.0069539079947351645
+40,all track crossings,velocity change,constant,N40_PWM10_D41,5771,167.6818135658705,-0.0023614541090482
+40,all track crossings,velocity change,constant,N40_PWM20_D40,10959,223.7537943404684,-0.002654745301745809
+40,all track crossings,velocity change,constant,N40_PWM20_D41,10707,215.79577543346394,-0.013094352582119217
+40,all track crossings,outgoing velocity,motion,balanced,38352,153.26373938645543,-0.015877717150807102
+40,all track crossings,outgoing velocity,motion,N30_PWM10_D41,4714,132.99256077472188,-0.014036768760882667
+40,all track crossings,outgoing velocity,motion,N40_PWM10_D40,6201,138.73037542873354,-0.09148474845870491
+40,all track crossings,outgoing velocity,motion,N40_PWM10_D41,5771,130.83530691516935,-0.031938968497824405
+40,all track crossings,outgoing velocity,motion,N40_PWM20_D40,10959,182.77932004743303,-0.027345149054789797
+40,all track crossings,outgoing velocity,motion,N40_PWM20_D41,10707,173.1749791193656,-0.010206150878144804
+40,all track crossings,velocity change,motion,balanced,38352,153.26373938645543,0.34150108346982777
+40,all track crossings,velocity change,motion,N30_PWM10_D41,4714,132.99256077472185,0.336477274567645
+40,all track crossings,velocity change,motion,N40_PWM10_D40,6201,138.7303754287335,0.29560133311422077
+40,all track crossings,velocity change,motion,N40_PWM10_D41,5771,130.83530691516935,0.38975764465671847
+40,all track crossings,velocity change,motion,N40_PWM20_D40,10959,182.77932004743303,0.3309405472199999
+40,all track crossings,velocity change,motion,N40_PWM20_D41,10707,173.1749791193656,0.3475694246130351
+40,all track crossings,outgoing velocity,motion + clearance,balanced,38352,168.9562900171848,-0.23455751864386198
+40,all track crossings,outgoing velocity,motion + clearance,N30_PWM10_D41,4714,148.54825030076978,-0.265126891947697
+40,all track crossings,outgoing velocity,motion + clearance,N40_PWM10_D40,6201,144.8447546031814,-0.18981678995743168
+40,all track crossings,outgoing velocity,motion + clearance,N40_PWM10_D41,5771,143.35492592778385,-0.23888027711201176
+40,all track crossings,outgoing velocity,motion + clearance,N40_PWM20_D40,10959,199.38686773634316,-0.2225182795943894
+40,all track crossings,outgoing velocity,motion + clearance,N40_PWM20_D41,10707,198.4409137877291,-0.32648443109508807
+40,all track crossings,velocity change,motion + clearance,balanced,38352,168.95629001718459,0.199751333554966
+40,all track crossings,velocity change,motion + clearance,N30_PWM10_D41,4714,148.54825030076978,0.1721794818262189
+40,all track crossings,velocity change,motion + clearance,N40_PWM10_D40,6201,144.84475460318137,0.23214194072081384
+40,all track crossings,velocity change,motion + clearance,N40_PWM10_D41,5771,143.3549259277838,0.2673818497292605
+40,all track crossings,velocity change,motion + clearance,N40_PWM20_D40,10959,199.38686773634316,0.2038338703292525
+40,all track crossings,velocity change,motion + clearance,N40_PWM20_D41,10707,198.4409137877283,0.14330456227284938
+80,reviewed clips,outgoing velocity,constant,balanced,190,157.4901600610733,-0.01624568651118552
+80,reviewed clips,outgoing velocity,constant,N30_PWM10_D41,37,157.60086344694147,-0.005950395660379693
+80,reviewed clips,outgoing velocity,constant,N40_PWM10_D40,44,139.5596324205904,-0.005731608335934002
+80,reviewed clips,outgoing velocity,constant,N40_PWM10_D41,28,131.46356185088447,-0.06690155675409182
+80,reviewed clips,outgoing velocity,constant,N40_PWM20_D40,48,180.18797824830298,-0.14431138445721836
+80,reviewed clips,outgoing velocity,constant,N40_PWM20_D41,33,173.0619941523511,-0.0023682288278206176
+80,reviewed clips,velocity change,constant,balanced,190,188.2233656692657,-0.02989394990844052
+80,reviewed clips,velocity change,constant,N30_PWM10_D41,37,213.34241026751636,-0.1474159080285118
+80,reviewed clips,velocity change,constant,N40_PWM10_D40,44,159.7551751692474,-0.1474972541867683
+80,reviewed clips,velocity change,constant,N40_PWM10_D41,28,163.98454108813098,-0.17083507706538925
+80,reviewed clips,velocity change,constant,N40_PWM20_D40,48,198.98678277455113,-0.02953442403384976
+80,reviewed clips,velocity change,constant,N40_PWM20_D41,33,199.03971330457907,-0.0024013798302895406
+80,reviewed clips,outgoing velocity,motion,balanced,190,157.84552910692574,-0.0208370807923548
+80,reviewed clips,outgoing velocity,motion,N30_PWM10_D41,37,157.3542866665199,-0.0028051087129830066
+80,reviewed clips,outgoing velocity,motion,N40_PWM10_D40,44,139.85348371258482,-0.009971325242531082
+80,reviewed clips,outgoing velocity,motion,N40_PWM10_D41,28,131.58034976329031,-0.06879799938216258
+80,reviewed clips,outgoing velocity,motion,N40_PWM20_D40,48,180.73346489371124,-0.151250264852834
+80,reviewed clips,outgoing velocity,motion,N40_PWM20_D41,33,174.00779603234741,-0.013354261128595502
+80,reviewed clips,velocity change,motion,balanced,190,157.84552910692574,0.27571413846763215
+80,reviewed clips,velocity change,motion,N30_PWM10_D41,37,157.3542866665199,0.3758001942132909
+80,reviewed clips,velocity change,motion,N40_PWM10_D40,44,139.85348371258482,0.12059615228258003
+80,reviewed clips,velocity change,motion,N40_PWM10_D41,28,131.58034976329031,0.24617249358544824
+80,reviewed clips,velocity change,motion,N40_PWM20_D40,48,180.73346489371121,0.15068350066768943
+80,reviewed clips,velocity change,motion,N40_PWM20_D41,33,174.00779603234741,0.23387507203650093
+80,reviewed clips,outgoing velocity,motion + clearance,balanced,190,158.16805281152054,-0.02501306891300681
+80,reviewed clips,outgoing velocity,motion + clearance,N30_PWM10_D41,37,157.3723736031721,-0.003035654893435602
+80,reviewed clips,outgoing velocity,motion + clearance,N40_PWM10_D40,44,140.00100365469274,-0.01210312041280348
+80,reviewed clips,outgoing velocity,motion + clearance,N40_PWM10_D41,28,131.86182951859215,-0.0733756857494221
+80,reviewed clips,outgoing velocity,motion + clearance,N40_PWM20_D40,48,181.6611213379474,-0.1630987126887693
+80,reviewed clips,outgoing velocity,motion + clearance,N40_PWM20_D41,33,174.15801607554968,-0.015104663494184711
+80,reviewed clips,velocity change,motion + clearance,balanced,190,158.16805281152057,0.27275126690798235
+80,reviewed clips,velocity change,motion + clearance,N30_PWM10_D41,37,157.3723736031721,0.37565668987749
+80,reviewed clips,velocity change,motion + clearance,N40_PWM10_D40,44,140.0010036546927,0.11873995218221345
+80,reviewed clips,velocity change,motion + clearance,N40_PWM10_D41,28,131.86182951859212,0.2429438330702024
+80,reviewed clips,velocity change,motion + clearance,N40_PWM20_D40,48,181.6611213379474,0.14194249747684584
+80,reviewed clips,velocity change,motion + clearance,N40_PWM20_D41,33,174.1580160755497,0.23255171757134985
+80,all track crossings,outgoing velocity,constant,balanced,38352,120.24597498793364,-0.027719294971982444
+80,all track crossings,outgoing velocity,constant,N30_PWM10_D41,4714,116.54682021453542,-0.2516548185131118
+80,all track crossings,outgoing velocity,constant,N40_PWM10_D40,6201,99.40382144616467,-0.0029727191575925627
+80,all track crossings,outgoing velocity,constant,N40_PWM10_D41,5771,98.96515484835147,-0.07643295851540755
+80,all track crossings,outgoing velocity,constant,N40_PWM20_D40,10959,142.3226754743764,-0.004028598003981587
+80,all track crossings,outgoing velocity,constant,N40_PWM20_D41,10707,137.0450497297539,-0.0016232896024406251
+80,all track crossings,velocity change,constant,balanced,38352,173.2113689073948,-0.00850918570155157
+80,all track crossings,velocity change,constant,N30_PWM10_D41,4714,162.56392896170217,-0.011788286600650233
+80,all track crossings,velocity change,constant,N40_PWM10_D40,6201,147.86985292807412,-0.04703901536919841
+80,all track crossings,velocity change,constant,N40_PWM10_D41,5771,154.02580528982224,-0.06047329647618915
+80,all track crossings,velocity change,constant,N40_PWM20_D40,10959,199.8666985590845,-0.012838245907170087
+80,all track crossings,velocity change,constant,N40_PWM20_D41,10707,195.05825104656887,-0.012324246209710177
+80,all track crossings,outgoing velocity,motion,balanced,38352,119.99245869735823,-0.023390352908377432
+80,all track crossings,outgoing velocity,motion,N30_PWM10_D41,4714,116.8348462560928,-0.25784897552722996
+80,all track crossings,outgoing velocity,motion,N40_PWM10_D40,6201,98.73120360617659,0.010554626745808648
+80,all track crossings,outgoing velocity,motion,N40_PWM10_D41,5771,98.83598452256072,-0.0736248498258365
+80,all track crossings,outgoing velocity,motion,N40_PWM20_D40,10959,142.28977628946694,-0.0035644709125250973
+80,all track crossings,outgoing velocity,motion,N40_PWM20_D41,10707,136.3003543022782,0.009232668834758928
+80,all track crossings,velocity change,motion,balanced,38352,119.99245869735824,0.5160115754376884
+80,all track crossings,velocity change,motion,N30_PWM10_D41,4714,116.8348462560928,0.4773799634573743
+80,all track crossings,velocity change,motion,N40_PWM10_D40,6201,98.73120360617659,0.5332197783484447
+80,all track crossings,velocity change,motion,N40_PWM10_D41,5771,98.83598452256072,0.5633404665892034
+80,all track crossings,velocity change,motion,N40_PWM20_D40,10959,142.28977628946694,0.4866582248776957
+80,all track crossings,velocity change,motion,N40_PWM20_D41,10707,136.3003543022782,0.5057064350883861
+80,all track crossings,outgoing velocity,motion + clearance,balanced,38352,120.08516668899955,-0.024972337589923566
+80,all track crossings,outgoing velocity,motion + clearance,N30_PWM10_D41,4714,116.38558945985933,-0.248194137869568
+80,all track crossings,outgoing velocity,motion + clearance,N40_PWM10_D40,6201,98.2086369653069,0.02100082402634218
+80,all track crossings,outgoing velocity,motion + clearance,N40_PWM10_D41,5771,98.10302558562461,-0.05776008039200131
+80,all track crossings,outgoing velocity,motion + clearance,N40_PWM20_D40,10959,144.9697042647249,-0.041723329676351506
+80,all track crossings,outgoing velocity,motion + clearance,N40_PWM20_D41,10707,135.1712828283662,0.025579124675559783
+80,all track crossings,velocity change,motion + clearance,balanced,38352,120.08516668899955,0.5152634129486369
+80,all track crossings,velocity change,motion + clearance,N30_PWM10_D41,4714,116.38558945985939,0.48139142406006297
+80,all track crossings,velocity change,motion + clearance,N40_PWM10_D40,6201,98.20863696530685,0.5381478708069365
+80,all track crossings,velocity change,motion + clearance,N40_PWM10_D41,5771,98.10302558562462,0.569792909283476
+80,all track crossings,velocity change,motion + clearance,N40_PWM20_D40,10959,144.9697042647249,0.4671392633538264
+80,all track crossings,velocity change,motion + clearance,N40_PWM20_D41,10707,135.17128282836617,0.5138616776736629

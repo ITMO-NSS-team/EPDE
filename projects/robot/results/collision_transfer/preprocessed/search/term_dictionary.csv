@@ -1,0 +1,300 @@
+id,family,scope,weight,direction
+C001,Distance and contact state,Pair,1,n
+C002,Distance and contact state,Pair,q,n
+C003,Distance and contact state,Pair,q^2,n
+C004,Distance and contact state,Pair,q^3,n
+C005,Distance and contact state,Pair,q/(q+q0),n
+C006,Distance and contact state,Pair,exp(q/q0)-1,n
+C007,Distance and contact state,Pair,delta,n
+C008,Distance and contact state,Pair,delta^(3/2),n
+C009,Distance and contact state,Pair,sqrt(delta),n
+C010,Distance and contact state,Pair,Icap,n
+C011,Distance and contact state,Pair,q*Icap,n
+C012,Distance and contact state,Pair,1/rho-1/rhoc,n
+C013,Distance and contact state,Pair,"max(0,1.04-rho)",n
+C014,Distance and contact state,Pair,"max(0,0.98-rho)",n
+C015,Distance and contact state,Pair,B0,n
+C016,Distance and contact state,Pair,B1,n
+C017,Distance and contact state,Pair,B2,n
+C018,Distance and contact state,Pair,B3,n
+C019,Distance and contact state,Pair,B4,n
+C020,Approach and release,Pair,c,n
+C021,Approach and release,Pair,b,n
+C022,Approach and release,Pair,c^2,n
+C023,Approach and release,Pair,b^2,n
+C024,Approach and release,Pair,c/(c+c0),n
+C025,Approach and release,Pair,q*c,n
+C026,Approach and release,Pair,q*b,n
+C027,Approach and release,Pair,Icap*c,n
+C028,Approach and release,Pair,Icap*b,n
+C029,Approach and release,Pair,sqrt(delta)*c,n
+C030,Approach and release,Pair,delta*c,n
+C031,Approach and release,Pair,delta^(3/2)*c,n
+C032,Approach and release,Pair,q*c^2,n
+C033,Approach and release,Pair,c*(1+abs(s))^(-1),n
+C034,Approach and release,Pair,c^2/(c^2+s^2+eps^2),n
+C035,Tangential center motion,Pair,s,t
+C036,Tangential center motion,Pair,s*abs(s),t
+C037,Tangential center motion,Pair,tanh(s/s0),t
+C038,Tangential center motion,Pair,q*s,t
+C039,Tangential center motion,Pair,c*s,t
+C040,Tangential center motion,Pair,b*s,t
+C041,Tangential center motion,Pair,Icap*s,t
+C042,Tangential center motion,Pair,sqrt(delta)*s,t
+C043,Tangential center motion,Pair,q*tanh(s/s0),t
+C044,Tangential center motion,Pair,s/(1+c),t
+C045,Tangential center motion,Pair,abs(s),n
+C046,Tangential center motion,Pair,s^2/rho,n
+C047,Tangential center motion,Pair,c*abs(s),n
+C048,Spin direction and relative spin,Pair,Sigma,t
+C049,Spin direction and relative spin,Pair,OmegaDiff,t
+C050,Spin direction and relative spin,Pair,sign(Sigma),t
+C051,Spin direction and relative spin,Pair,q*Sigma,t
+C052,Spin direction and relative spin,Pair,Icap*Sigma,t
+C053,Spin direction and relative spin,Pair,c*Sigma,t
+C054,Spin direction and relative spin,Pair,b*Sigma,t
+C055,Spin direction and relative spin,Pair,q*OmegaDiff,t
+C056,Spin direction and relative spin,Pair,Sigma*abs(Sigma),t
+C057,Spin direction and relative spin,Pair,tanh(Sigma/s0),t
+C058,Spin direction and relative spin,Pair,Sigma*same,t
+C059,Spin direction and relative spin,Pair,OmegaDiff*opp,t
+C060,Spin direction and relative spin,Pair,wi*wj,n
+C061,Spin direction and relative spin,Pair,abs(Sigma),n
+C062,Spin direction and relative spin,Pair,abs(OmegaDiff),n
+C063,Spin direction and relative spin,Pair,s*Sigma,n
+C064,Spin direction and relative spin,Pair,c*same,n
+C065,Spin direction and relative spin,Pair,c*opp,n
+C066,Spin direction and relative spin,Pair,q*wi*wj,n
+C067,Rim slip and friction,Pair,z,t
+C068,Rim slip and friction,Pair,z*abs(z),t
+C069,Rim slip and friction,Pair,tanh(z/z0),t
+C070,Rim slip and friction,Pair,Icap*tanh(z/z0),t
+C071,Rim slip and friction,Pair,q*z,t
+C072,Rim slip and friction,Pair,c*tanh(z/z0),t
+C073,Rim slip and friction,Pair,sqrt(delta)*z,t
+C074,Rim slip and friction,Pair,delta^(3/2)*tanh(z/z0),t
+C075,Rim slip and friction,Pair,D_j*tanh(z/z0),t
+C076,Rim slip and friction,Pair,z*same,t
+C077,Rim slip and friction,Pair,z*opp,t
+C078,Rim slip and friction,Pair,abs(z),n
+C079,Rim slip and friction,Pair,q*z^2,n
+C080,Rim slip and friction,Pair,z*Sigma,n
+C081,Heading and orientation,Pair,h_i,n
+C082,Heading and orientation,Pair,h_j,n
+C083,Heading and orientation,Pair,pos(h_i),n
+C084,Heading and orientation,Pair,pos(h_j),n
+C085,Heading and orientation,Pair,h_i*h_j,n
+C086,Heading and orientation,Pair,h_i^2,n
+C087,Heading and orientation,Pair,h_j^2,n
+C088,Heading and orientation,Pair,ell_i*ell_j,n
+C089,Heading and orientation,Pair,align,n
+C090,Heading and orientation,Pair,q*h_i,n
+C091,Heading and orientation,Pair,c*h_j,n
+C092,Heading and orientation,Pair,pos(h_i)*pos(h_j),n
+C093,Heading and orientation,Pair,ell_i,t
+C094,Heading and orientation,Pair,ell_j,t
+C095,Heading and orientation,Pair,cross_e,t
+C096,Heading and orientation,Pair,q*cross_e,t
+C097,Heading and orientation,Pair,h_i*ell_j,t
+C098,Heading and orientation,Pair,h_j*ell_i,t
+C099,Heading and orientation,Pair,Sigma*align,t
+C100,Active propulsion,Pair,p_j,As written
+C101,Active propulsion,Pair,D_j,n
+C102,Active propulsion,Pair,D_i,n
+C103,Active propulsion,Pair,D_i*D_j,n
+C104,Active propulsion,Pair,D_j^2,n
+C105,Active propulsion,Pair,q*D_j,n
+C106,Active propulsion,Pair,Icap*D_j,n
+C107,Active propulsion,Pair,c*D_j,n
+C108,Active propulsion,Pair,"min(D_i,D_j)",n
+C109,Active propulsion,Pair,"max(D_i,D_j)",n
+C110,Active propulsion,Pair,T_j,t
+C111,Active propulsion,Pair,T_i,t
+C112,Active propulsion,Pair,q*T_j,t
+C113,Active propulsion,Pair,D_i*T_j,t
+C114,Active propulsion,Pair,(T_i-T_j)*D_j,t
+C115,Same-pair contact history,Pair,active_age,n
+C116,Same-pair contact history,Pair,log(1+active_age),n
+C117,Same-pair contact history,Pair,active_age*c,n
+C118,Same-pair contact history,Pair,active_age*D_j,n
+C119,Same-pair contact history,Pair,fresh*c_entry,n
+C120,Same-pair contact history,Pair,fresh*c_entry^2,n
+C121,Same-pair contact history,Pair,q_peak,n
+C122,Same-pair contact history,Pair,q_peak-q,n
+C123,Same-pair contact history,Pair,H_cap,n
+C124,Same-pair contact history,Pair,H_c,n
+C125,Same-pair contact history,Pair,repeat_count,n
+C126,Same-pair contact history,Pair,X_slip,t
+C127,Same-pair contact history,Pair,tanh(X_slip/x0),t
+C128,Same-pair contact history,Pair,q*X_slip,t
+C129,Same-pair contact history,Pair,H_spin,t
+C130,Same-pair contact history,Pair,X_slip*c,t
+C131,After release,Recent pair,relax_release*c_entry_last,n
+C132,After release,Recent pair,relax_release*X_last,t
+C133,Earlier hits from other robots,Pair,K_i,As written
+C134,Earlier hits from other robots,Pair,K_j,As written
+C135,Earlier hits from other robots,Pair,q*K_j,As written
+C136,Earlier hits from other robots,Pair,K_i-K_j,As written
+C137,Earlier hits from other robots,Pair,"pos(dot(K_j,n))",n
+C138,Earlier hits from other robots,Pair,"pos(-dot(K_i,n))",n
+C139,Earlier hits from other robots,Pair,"q*pos(dot(K_j,n))",n
+C140,Earlier hits from other robots,Pair,L_j,n
+C141,Earlier hits from other robots,Pair,L_i*c,n
+C142,Earlier hits from other robots,Pair,"dot(K_j,t)",t
+C143,Earlier hits from other robots,Pair,"dot(K_i,t)",t
+C144,Earlier hits from other robots,Pair,"q*dot(K_j,t)",t
+C145,Simultaneous neighbors,Pair,N_i,n
+C146,Simultaneous neighbors,Pair,N_j,n
+C147,Simultaneous neighbors,Pair,q*N_i,n
+C148,Simultaneous neighbors,Pair,q*N_j,n
+C149,Simultaneous neighbors,Pair,c*N_i,n
+C150,Simultaneous neighbors,Pair,c/(1+N_i),n
+C151,Simultaneous neighbors,Pair,D_j/(1+N_j),n
+C152,Simultaneous neighbors,Pair,rho_i,n
+C153,Simultaneous neighbors,Pair,rho_j,n
+C154,Simultaneous neighbors,Pair,"pos(dot(P_j,n))",n
+C155,Simultaneous neighbors,Pair,"pos(-dot(P_i,n))",n
+C156,Simultaneous neighbors,Pair,"q*pos(dot(P_j,n))",n
+C157,Simultaneous neighbors,Pair,"dot(n,F_i@n)",n
+C158,Simultaneous neighbors,Pair,"dot(n,F_j@n)",n
+C159,Simultaneous neighbors,Pair,"dot(P_j,t)",t
+C160,Simultaneous neighbors,Pair,"q*dot(P_i,t)",t
+C161,Simultaneous neighbors,Pair,"dot(t,F_i@n)",t
+C162,Simultaneous neighbors,Pair,"dot(t,F_j@n)",t
+C163,Simultaneous neighbors,Pair,N_i*z,t
+C164,Wall and wall-mediated contacts,Pair,w_i*q,n
+C165,Wall and wall-mediated contacts,Pair,w_i*c,n
+C166,Wall and wall-mediated contacts,Pair,w_j*D_j,n
+C167,Wall and wall-mediated contacts,Pair,"w_i*pos(-dot(n,m))",n
+C168,Wall and wall-mediated contacts,Pair,"w_i*c*pos(-dot(n,m))",n
+C169,Wall and wall-mediated contacts,Pair,w_i*z,t
+C170,Wall and wall-mediated contacts,Pair,"w_i*dot(m,t)",t
+C171,Wall and wall-mediated contacts,Pair,w_j*Sigma,t
+C172,Wall and wall-mediated contacts,Robot,w_i,m
+C173,Wall and wall-mediated contacts,Robot,w_i*c_w,m
+C174,Wall and wall-mediated contacts,Robot,w_i*c_w^2,m
+C175,Wall and wall-mediated contacts,Robot,w_i*abs(z_w),m
+C176,Wall and wall-mediated contacts,Robot,w_i*z_w,Jm
+C177,Wall and wall-mediated contacts,Robot,w_i*tanh(z_w/z0),Jm
+C178,Wall and wall-mediated contacts,Robot,w_i*wi,Jm
+C179,Free motion controls,Robot,v_old,As written
+C180,Free motion controls,Robot,v_old-v_older,As written
+C181,Free motion controls,Robot,p_i,As written
+C182,Free motion controls,Robot,wi*Jv_old,As written
+C183,Free motion controls,Robot,abs(wi)*v_old,As written
+C184,Free motion controls,Robot,v_old*norm(v_old),As written
+C185,Free motion controls,Robot,p_i-v_old,As written
+P001,Three-factor interactions,Pair,q*c*same,n
+P002,Three-factor interactions,Pair,q*c*opp,n
+P003,Three-factor interactions,Pair,q*c*N_i,n
+P004,Three-factor interactions,Pair,q*c*w_i,n
+P005,Three-factor interactions,Pair,q*c*h_i,n
+P006,Three-factor interactions,Pair,q*b*same,n
+P007,Three-factor interactions,Pair,q*b*opp,n
+P008,Three-factor interactions,Pair,q*b*N_i,n
+P009,Three-factor interactions,Pair,q*b*w_i,n
+P010,Three-factor interactions,Pair,q*b*h_i,n
+P011,Three-factor interactions,Pair,q*D_j*same,n
+P012,Three-factor interactions,Pair,q*D_j*opp,n
+P013,Three-factor interactions,Pair,q*D_j*N_i,n
+P014,Three-factor interactions,Pair,q*D_j*w_i,n
+P015,Three-factor interactions,Pair,q*D_j*h_i,n
+P016,Three-factor interactions,Pair,Icap*c*same,n
+P017,Three-factor interactions,Pair,Icap*c*opp,n
+P018,Three-factor interactions,Pair,Icap*c*N_i,n
+P019,Three-factor interactions,Pair,Icap*c*w_i,n
+P020,Three-factor interactions,Pair,Icap*c*h_i,n
+P021,Three-factor interactions,Pair,Icap*b*same,n
+P022,Three-factor interactions,Pair,Icap*b*opp,n
+P023,Three-factor interactions,Pair,Icap*b*N_i,n
+P024,Three-factor interactions,Pair,Icap*b*w_i,n
+P025,Three-factor interactions,Pair,Icap*b*h_i,n
+P026,Three-factor interactions,Pair,Icap*D_j*same,n
+P027,Three-factor interactions,Pair,Icap*D_j*opp,n
+P028,Three-factor interactions,Pair,Icap*D_j*N_i,n
+P029,Three-factor interactions,Pair,Icap*D_j*w_i,n
+P030,Three-factor interactions,Pair,Icap*D_j*h_i,n
+P031,Three-factor interactions,Pair,sqrt(delta)*c*same,n
+P032,Three-factor interactions,Pair,sqrt(delta)*c*opp,n
+P033,Three-factor interactions,Pair,sqrt(delta)*c*N_i,n
+P034,Three-factor interactions,Pair,sqrt(delta)*c*w_i,n
+P035,Three-factor interactions,Pair,sqrt(delta)*c*h_i,n
+P036,Three-factor interactions,Pair,sqrt(delta)*b*same,n
+P037,Three-factor interactions,Pair,sqrt(delta)*b*opp,n
+P038,Three-factor interactions,Pair,sqrt(delta)*b*N_i,n
+P039,Three-factor interactions,Pair,sqrt(delta)*b*w_i,n
+P040,Three-factor interactions,Pair,sqrt(delta)*b*h_i,n
+P041,Three-factor interactions,Pair,sqrt(delta)*D_j*same,n
+P042,Three-factor interactions,Pair,sqrt(delta)*D_j*opp,n
+P043,Three-factor interactions,Pair,sqrt(delta)*D_j*N_i,n
+P044,Three-factor interactions,Pair,sqrt(delta)*D_j*w_i,n
+P045,Three-factor interactions,Pair,sqrt(delta)*D_j*h_i,n
+P046,Three-factor interactions,Pair,q*c*Sigma,t
+P047,Three-factor interactions,Pair,q*c*z,t
+P048,Three-factor interactions,Pair,q*c*s,t
+P049,Three-factor interactions,Pair,q*c*ell_j,t
+P050,Three-factor interactions,Pair,q*b*Sigma,t
+P051,Three-factor interactions,Pair,q*b*z,t
+P052,Three-factor interactions,Pair,q*b*s,t
+P053,Three-factor interactions,Pair,q*b*ell_j,t
+P054,Three-factor interactions,Pair,q*D_j*Sigma,t
+P055,Three-factor interactions,Pair,q*D_j*z,t
+P056,Three-factor interactions,Pair,q*D_j*s,t
+P057,Three-factor interactions,Pair,q*D_j*ell_j,t
+P058,Three-factor interactions,Pair,Icap*c*Sigma,t
+P059,Three-factor interactions,Pair,Icap*c*z,t
+P060,Three-factor interactions,Pair,Icap*c*s,t
+P061,Three-factor interactions,Pair,Icap*c*ell_j,t
+P062,Three-factor interactions,Pair,Icap*b*Sigma,t
+P063,Three-factor interactions,Pair,Icap*b*z,t
+P064,Three-factor interactions,Pair,Icap*b*s,t
+P065,Three-factor interactions,Pair,Icap*b*ell_j,t
+P066,Three-factor interactions,Pair,Icap*D_j*Sigma,t
+P067,Three-factor interactions,Pair,Icap*D_j*z,t
+P068,Three-factor interactions,Pair,Icap*D_j*s,t
+P069,Three-factor interactions,Pair,Icap*D_j*ell_j,t
+P070,Three-factor interactions,Pair,sqrt(delta)*c*Sigma,t
+P071,Three-factor interactions,Pair,sqrt(delta)*c*z,t
+P072,Three-factor interactions,Pair,sqrt(delta)*c*s,t
+P073,Three-factor interactions,Pair,sqrt(delta)*c*ell_j,t
+P074,Three-factor interactions,Pair,sqrt(delta)*b*Sigma,t
+P075,Three-factor interactions,Pair,sqrt(delta)*b*z,t
+P076,Three-factor interactions,Pair,sqrt(delta)*b*s,t
+P077,Three-factor interactions,Pair,sqrt(delta)*b*ell_j,t
+P078,Three-factor interactions,Pair,sqrt(delta)*D_j*Sigma,t
+P079,Three-factor interactions,Pair,sqrt(delta)*D_j*z,t
+P080,Three-factor interactions,Pair,sqrt(delta)*D_j*s,t
+P081,Three-factor interactions,Pair,sqrt(delta)*D_j*ell_j,t
+C002*Gwall,Robot modulation of contact,Modulated vector,C002*Gwall,As written
+C002*Gspin,Robot modulation of contact,Modulated vector,C002*Gspin,As written
+C002*Gwall*Gspin,Robot modulation of contact,Modulated vector,C002*Gwall*Gspin,As written
+C020*Gwall,Robot modulation of contact,Modulated vector,C020*Gwall,As written
+C020*Gspin,Robot modulation of contact,Modulated vector,C020*Gspin,As written
+C020*Gwall*Gspin,Robot modulation of contact,Modulated vector,C020*Gwall*Gspin,As written
+C081*Gwall,Robot modulation of contact,Modulated vector,C081*Gwall,As written
+C081*Gspin,Robot modulation of contact,Modulated vector,C081*Gspin,As written
+C081*Gwall*Gspin,Robot modulation of contact,Modulated vector,C081*Gwall*Gspin,As written
+C101*Gwall,Robot modulation of contact,Modulated vector,C101*Gwall,As written
+C101*Gspin,Robot modulation of contact,Modulated vector,C101*Gspin,As written
+C101*Gwall*Gspin,Robot modulation of contact,Modulated vector,C101*Gwall*Gspin,As written
+C035*Gwall,Robot modulation of contact,Modulated vector,C035*Gwall,As written
+C035*Gspin,Robot modulation of contact,Modulated vector,C035*Gspin,As written
+C035*Gwall*Gspin,Robot modulation of contact,Modulated vector,C035*Gwall*Gspin,As written
+C051*Gwall,Robot modulation of contact,Modulated vector,C051*Gwall,As written
+C051*Gspin,Robot modulation of contact,Modulated vector,C051*Gspin,As written
+C051*Gwall*Gspin,Robot modulation of contact,Modulated vector,C051*Gwall*Gspin,As written
+C119*Gwall,Robot modulation of contact,Modulated vector,C119*Gwall,As written
+C119*Gspin,Robot modulation of contact,Modulated vector,C119*Gspin,As written
+C119*Gwall*Gspin,Robot modulation of contact,Modulated vector,C119*Gwall*Gspin,As written
+C123*Gwall,Robot modulation of contact,Modulated vector,C123*Gwall,As written
+C123*Gspin,Robot modulation of contact,Modulated vector,C123*Gspin,As written
+C123*Gwall*Gspin,Robot modulation of contact,Modulated vector,C123*Gwall*Gspin,As written
+C126*Gwall,Robot modulation of contact,Modulated vector,C126*Gwall,As written
+C126*Gspin,Robot modulation of contact,Modulated vector,C126*Gspin,As written
+C126*Gwall*Gspin,Robot modulation of contact,Modulated vector,C126*Gwall*Gspin,As written
+C137*Gwall,Robot modulation of contact,Modulated vector,C137*Gwall,As written
+C137*Gspin,Robot modulation of contact,Modulated vector,C137*Gspin,As written
+C137*Gwall*Gspin,Robot modulation of contact,Modulated vector,C137*Gwall*Gspin,As written
+C156*Gwall,Robot modulation of contact,Modulated vector,C156*Gwall,As written
+C156*Gspin,Robot modulation of contact,Modulated vector,C156*Gspin,As written
+C156*Gwall*Gspin,Robot modulation of contact,Modulated vector,C156*Gwall*Gspin,As written

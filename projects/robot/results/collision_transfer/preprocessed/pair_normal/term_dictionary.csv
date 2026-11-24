@@ -1,0 +1,127 @@
+term,definition
+bias,Constant 1
+gapSpeed,Projected clearance g / forecast interval T
+rawIndent,Positive observed overlap / T
+originShift,"Projected minus measured pair separation vector dotted with the observed normal, divided by T"
+near2,(D/T) Near²
+otherCount,"Number of other neighbors of either member, counted per robot"
+otherPush,Difference of the two other-neighbor loads projected on the pair normal. Each load sums proximity times positive six-frame closing speed times neighbor normal.
+u2,"Signed projected relative velocity, using the past 2 frames"
+opening2,"Positive part of signed normal speed, using the past 2 frames"
+closing2,"Positive part of negative normal speed, using the past 2 frames"
+limit2,"Maximum of u and −g/T, using the past 2 frames"
+bend2,"Relative tangential speed squared times T/(2r), using the past 2 frames"
+limitBend2,"Maximum of u and −g/T − bend, using the past 2 frames"
+rawU2,"Signed normal speed from measured center displacements, using the past 2 frames"
+turn2,"Normal projection after rotating each past velocity forward at its recent angular speed and applying the circular-arc mean-speed correction, using the past 2 frames"
+turnLimit2,"Maximum of turn and −g/T minus its tangential curvature term, using the past 2 frames"
+u3,"Signed projected relative velocity, using the past 3 frames"
+opening3,"Positive part of signed normal speed, using the past 3 frames"
+closing3,"Positive part of negative normal speed, using the past 3 frames"
+limit3,"Maximum of u and −g/T, using the past 3 frames"
+bend3,"Relative tangential speed squared times T/(2r), using the past 3 frames"
+limitBend3,"Maximum of u and −g/T − bend, using the past 3 frames"
+rawU3,"Signed normal speed from measured center displacements, using the past 3 frames"
+turn3,"Normal projection after rotating each past velocity forward at its recent angular speed and applying the circular-arc mean-speed correction, using the past 3 frames"
+turnLimit3,"Maximum of turn and −g/T minus its tangential curvature term, using the past 3 frames"
+u6,"Signed projected relative velocity, using the past 6 frames"
+opening6,"Positive part of signed normal speed, using the past 6 frames"
+closing6,"Positive part of negative normal speed, using the past 6 frames"
+limit6,"Maximum of u and −g/T, using the past 6 frames"
+bend6,"Relative tangential speed squared times T/(2r), using the past 6 frames"
+limitBend6,"Maximum of u and −g/T − bend, using the past 6 frames"
+rawU6,"Signed normal speed from measured center displacements, using the past 6 frames"
+turn6,"Normal projection after rotating each past velocity forward at its recent angular speed and applying the circular-arc mean-speed correction, using the past 6 frames"
+turnLimit6,"Maximum of turn and −g/T minus its tangential curvature term, using the past 6 frames"
+u10,"Signed projected relative velocity, using the past 10 frames"
+opening10,"Positive part of signed normal speed, using the past 10 frames"
+closing10,"Positive part of negative normal speed, using the past 10 frames"
+limit10,"Maximum of u and −g/T, using the past 10 frames"
+bend10,"Relative tangential speed squared times T/(2r), using the past 10 frames"
+limitBend10,"Maximum of u and −g/T − bend, using the past 10 frames"
+rawU10,"Signed normal speed from measured center displacements, using the past 10 frames"
+turn10,"Normal projection after rotating each past velocity forward at its recent angular speed and applying the circular-arc mean-speed correction, using the past 10 frames"
+turnLimit10,"Maximum of turn and −g/T minus its tangential curvature term, using the past 10 frames"
+u20,"Signed projected relative velocity, using the past 20 frames"
+opening20,"Positive part of signed normal speed, using the past 20 frames"
+closing20,"Positive part of negative normal speed, using the past 20 frames"
+limit20,"Maximum of u and −g/T, using the past 20 frames"
+bend20,"Relative tangential speed squared times T/(2r), using the past 20 frames"
+limitBend20,"Maximum of u and −g/T − bend, using the past 20 frames"
+rawU20,"Signed normal speed from measured center displacements, using the past 20 frames"
+turn20,"Normal projection after rotating each past velocity forward at its recent angular speed and applying the circular-arc mean-speed correction, using the past 20 frames"
+turnLimit20,"Maximum of turn and −g/T minus its tangential curvature term, using the past 20 frames"
+driveAlong,Difference of heading unit vectors projected on the normal
+facingIn,Sum of the positive inward heading projections
+headingAlign,Dot product of the two heading unit vectors
+spinMagnitude,Mean absolute ten-frame angular speed
+oppositeClosing,"Six-frame closing speed when the signed angular speeds are opposite, zero otherwise"
+active_age,Contact age in forecast intervals
+fresh,Exponential recency of the ongoing contact
+c_entry,Inward speed just before contact entry in D/T units
+H_cap,Fraction of recent frames measured inside the cap
+H_c,Recent average of dimensionless closing speed inside the measured cap
+H_spin,Recent average of the pair’s summed dimensionless spin inside the measured cap
+repeat_count,Number of contact entries during the last ten frames
+Near,"Projected (cutoff − distance) / (cutoff − D), clipped to [0,1]"
+Crowded,Indicator that either member has another observed neighbor inside the cutoff
+u3*Near,"Product of u3, Near"
+u3*Crowded,"Product of u3, Crowded"
+u3*Near*Crowded,"Product of u3, Near, Crowded"
+u6*Near,"Product of u6, Near"
+u6*Crowded,"Product of u6, Crowded"
+u6*Near*Crowded,"Product of u6, Near, Crowded"
+u10*Near,"Product of u10, Near"
+u10*Crowded,"Product of u10, Crowded"
+u10*Near*Crowded,"Product of u10, Near, Crowded"
+opening6*Near,"Product of opening6, Near"
+opening6*Crowded,"Product of opening6, Crowded"
+opening6*Near*Crowded,"Product of opening6, Near, Crowded"
+closing6*Near,"Product of closing6, Near"
+closing6*Crowded,"Product of closing6, Crowded"
+closing6*Near*Crowded,"Product of closing6, Near, Crowded"
+limit6*Near,"Product of limit6, Near"
+limit6*Crowded,"Product of limit6, Crowded"
+limit6*Near*Crowded,"Product of limit6, Near, Crowded"
+turn6*Near,"Product of turn6, Near"
+turn6*Crowded,"Product of turn6, Crowded"
+turn6*Near*Crowded,"Product of turn6, Near, Crowded"
+bend6*Near,"Product of bend6, Near"
+bend6*Crowded,"Product of bend6, Crowded"
+bend6*Near*Crowded,"Product of bend6, Near, Crowded"
+otherPush*Near,"Product of otherPush, Near"
+otherPush*Crowded,"Product of otherPush, Crowded"
+otherPush*Near*Crowded,"Product of otherPush, Near, Crowded"
+gapSpeed*Near,"Product of gapSpeed, Near"
+gapSpeed*Crowded,"Product of gapSpeed, Crowded"
+gapSpeed*Near*Crowded,"Product of gapSpeed, Near, Crowded"
+prior,"Previous Cartesian velocity law, differenced between the pair and dotted with the observed normal"
+priorOpening,Positive part of prior
+priorClosing,Positive part of −prior
+capCorrection,Positive part of −g/T − prior
+capCurvedCorrection,Positive part of −g/T − priorBend − prior
+priorBend,Prior relative tangential speed squared times T/(2r)
+freeNormal,Calibrated free-motion base velocity difference projected on the observed normal
+freeOpening,Positive part of freeNormal
+freeClosing,Positive part of −freeNormal
+driveNormal,Difference of calibrated propulsion velocities projected on the observed normal
+driveOpening,Positive part of driveNormal
+driveClosing,Positive part of −driveNormal
+driveCapCorrection,Positive part of −g/T − driveBend − driveNormal
+driveBend,Relative tangential propulsion speed squared times T/(2r)
+freeCapCorrection,Positive part of −g/T − freeNormal minus the free tangential curvature term
+individualIn,Sum of the positive inward projections of the individual calibrated propulsion vectors
+turnedDrive,driveNormal with each propulsion vector rotated by (current minus calibrated mean spin) times T/2
+turnedDriveCap,Positive part of −g/T minus turnedDrive and its tangential curvature term
+prior*Near,"Product of prior, Near"
+prior*Crowded,"Product of prior, Crowded"
+prior*Near*Crowded,"Product of prior, Near, Crowded"
+capCorrection*Near,"Product of capCorrection, Near"
+capCorrection*Crowded,"Product of capCorrection, Crowded"
+capCorrection*Near*Crowded,"Product of capCorrection, Near, Crowded"
+driveNormal*Near,"Product of driveNormal, Near"
+driveNormal*Crowded,"Product of driveNormal, Crowded"
+driveNormal*Near*Crowded,"Product of driveNormal, Near, Crowded"
+turnedDrive*Near,"Product of turnedDrive, Near"
+turnedDrive*Crowded,"Product of turnedDrive, Crowded"
+turnedDrive*Near*Crowded,"Product of turnedDrive, Near, Crowded"

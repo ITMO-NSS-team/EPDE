@@ -1,0 +1,21 @@
+held,model,structure,validation,pairs,rmse,mae,r2
+N30_PWM10_D41,residual_sparse,bias+otherCount+limit2+spinMagnitude+Near+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,48.97710260441038,19172,50.096442540175914,37.890027681908094,0.42161868999988916
+N30_PWM10_D41,residual_compact,bias+prior+capCorrection,50.45934537033407,19172,52.786804326347834,39.996564274219345,0.35782821671954235
+N30_PWM10_D41,residual_boosted,23 leaves,48.309478527868,19172,48.757199028892124,36.65836838296228,0.45212942714723625
+N40_PWM10_D40,residual_sparse,near2+limit2+turnLimit20+spinMagnitude+gapSpeed*Crowded+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,50.89173664299545,40716,41.26787452529243,30.50877712537103,0.2466399821164289
+N40_PWM10_D40,residual_compact,bias+prior+capCorrection,52.71972066219636,40716,42.4963406419872,31.883948438388725,0.2011202108617175
+N40_PWM10_D40,residual_boosted,23 leaves,50.10129088175958,40716,39.91739722124609,29.169993018876415,0.29514011220808456
+N40_PWM10_D41,residual_sparse,bias+otherCount+limit2+spinMagnitude+Near+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,50.22916022916146,37073,43.73118767275045,32.24384872315088,0.32385660034426433
+N40_PWM10_D41,residual_compact,bias+prior+capCorrection,51.92312650746299,37073,45.58232599531678,34.10611852957352,0.26540285875786584
+N40_PWM10_D41,residual_boosted,23 leaves,49.294397961975974,37073,42.64965007470855,31.077014912334786,0.3568871120378637
+N40_PWM20_D40,residual_sparse,near2+otherCount+limit2+turn20+spinMagnitude+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,48.575620735451864,41633,54.548527517273016,41.67380716687514,0.23458241648556777
+N40_PWM20_D40,residual_compact,bias+prior+capCorrection,50.59291376738551,41633,55.47914872955315,41.79961258978466,0.20824293266950622
+N40_PWM20_D40,residual_boosted,23 leaves,47.433862746052284,41633,53.98507985844569,41.184075086735746,0.2503131939772494
+N40_PWM20_D41,residual_sparse,near2+otherCount+limit2+turnLimit20+driveAlong+prior+priorOpening+freeCapCorrection+individualIn+prior*Near*Crowded,46.908916099994634,35526,60.717446973742916,45.19575204546209,0.21541086906125262
+N40_PWM20_D41,residual_compact,bias+prior+capCorrection,48.86716050451426,35526,62.18529814056302,46.209990350452856,0.17701726439449617
+N40_PWM20_D41,residual_boosted,23 leaves,45.81887791960397,35526,59.98879682246749,44.928182899265735,0.23412906883140683
+N30_PWM10_D41,residual_shared,near2+limit2+turnLimit20+spinMagnitude+gapSpeed*Crowded+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,48.98807844662533,19172,49.83610480131654,37.55751442657046,0.4276144544607592
+N40_PWM10_D40,residual_shared,near2+limit2+turnLimit20+spinMagnitude+gapSpeed*Crowded+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,50.89173664299545,40716,41.26787452529243,30.50877712537103,0.2466399821164289
+N40_PWM10_D41,residual_shared,near2+limit2+turnLimit20+spinMagnitude+gapSpeed*Crowded+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,50.22023144192006,37073,43.45542022349635,32.00652979363818,0.3323571899885974
+N40_PWM20_D40,residual_shared,near2+limit2+turnLimit20+spinMagnitude+gapSpeed*Crowded+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,48.55086698444204,41633,54.653719591931306,41.98591387091576,0.23162748805153066
+N40_PWM20_D41,residual_shared,near2+limit2+turnLimit20+spinMagnitude+gapSpeed*Crowded+priorClosing+freeCapCorrection+individualIn+prior*Near+prior*Crowded,46.92913042012378,35526,60.557737755970734,45.44298357720334,0.2195329566003319

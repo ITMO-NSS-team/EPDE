@@ -1,0 +1,11 @@
+held,score_type,candidate_terms,numerical_rank,r2
+N30_PWM10_D41,same_rows_fit_and_score,8,8,0.6498535000444872
+N30_PWM10_D41,same_rows_fit_and_score,299,274,0.6782889033927127
+N40_PWM10_D40,same_rows_fit_and_score,8,8,0.37389456179779135
+N40_PWM10_D40,same_rows_fit_and_score,299,274,0.48322877171890544
+N40_PWM10_D41,same_rows_fit_and_score,8,8,0.45674845993296764
+N40_PWM10_D41,same_rows_fit_and_score,299,275,0.5427830755963228
+N40_PWM20_D40,same_rows_fit_and_score,8,8,0.32729904174253643
+N40_PWM20_D40,same_rows_fit_and_score,299,274,0.38322694923571665
+N40_PWM20_D41,same_rows_fit_and_score,8,8,0.3184322628678279
+N40_PWM20_D41,same_rows_fit_and_score,299,277,0.3655990917066826

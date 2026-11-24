@@ -1,0 +1,36 @@
+{
+  "files": [
+    "N30_PWM10_D41.npz",
+    "N40_PWM10_D40.npz",
+    "N40_PWM10_D41.npz",
+    "N40_PWM20_D40.npz",
+    "N40_PWM20_D41.npz"
+  ],
+  "fps": 25.0,
+  "cap_diameter_px": 219.54929004593717,
+  "cap_diameter_mm": 48.7,
+  "fields": {
+    "pos": "Projected centers [frame, robot, x/y] in camera pixels",
+    "raw_pos": "Observed centers in the same order and units",
+    "phi": "Observed unwrapped headings in radians",
+    "ids": "Physical robot IDs in column order",
+    "frame": "Original zero-based frame index",
+    "quality_flags": "Per-pose bit mask",
+    "outside_reference_envelope": "Review only, beyond the training-prefix center envelope by 0.1 diameters",
+    "raw_sha256": "SHA-256 of the corresponding source pickle"
+  },
+  "quality_flag_bits": {
+    "1": "identical_pose_run",
+    "2": "whole_frame_repeat",
+    "4": "position_jump_endpoints",
+    "8": "heading_jump_endpoints"
+  },
+  "review_thresholds": {
+    "identical_pose_run": "At least three identical consecutive position-heading samples",
+    "position_jump": "One frame exceeds 0.2 cap diameters",
+    "heading_jump": "One frame exceeds 60 degrees after angle unwrapping"
+  },
+  "geometry": "Equal and opposite center shifts for violating pairs, repeated until all separations meet the diameter. Each frame uses only its recorded centers.",
+  "history": "Use raw_pos for existing strict-radius crossing and apparent-overlap terms. Re-establish contact labels before fitting event-dependent terms to projected data.",
+  "evaluation": "heldout_raw_target.csv compares all pipelines against original velocity targets and raw pair normals. The qc test subset also requires reliable input windows for neighbors up to two steps away."
+}

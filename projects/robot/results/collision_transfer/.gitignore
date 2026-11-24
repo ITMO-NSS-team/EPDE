@@ -1,0 +1,4 @@
+*.lock
+*.log
+*.tmp
+*.tmp.npz

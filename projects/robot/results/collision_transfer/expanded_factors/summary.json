@@ -1,0 +1,24 @@
+{
+ "recordings": [
+  "N30_PWM10_D41",
+  "N40_PWM10_D40",
+  "N40_PWM10_D41",
+  "N40_PWM20_D40",
+  "N40_PWM20_D41"
+ ],
+ "terms": 299,
+ "evaluated_fold_supports": 24542,
+ "common_eligible": 1317,
+ "merged_front": 10,
+ "native_fold_supports": 7834,
+ "native_three_factor_fold_supports": 1444,
+ "best_single_addition": "C102",
+ "coefficients": {
+  "C002": 0.30664232576935513,
+  "C020": 0.061297048994148215,
+  "C081": 0.00030606175408500526,
+  "C101": 0.3092529784978952,
+  "C102": 0.5032686721313144
+ },
+ "input_digest": "71348b3b3500aad4fa7a15c4649334b774c2a1ee94147103ebf4044f8def33e3"
+}
