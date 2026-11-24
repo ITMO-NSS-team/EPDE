@@ -3,8 +3,7 @@
 :func:`discover` is the plain EPDE workflow on a :class:`Problem` (the same
 calls a notebook makes); :func:`run_one` wraps it with noise, seeding,
 timing, scoring and bookkeeping. Campaigns (:mod:`epde_bench.campaign`)
-call ``bench.py run`` in a fresh process per run: EPDE keeps its settings
-in process globals, so separate processes are what makes runs independent.
+call ``bench.py run`` in a fresh process per run: process isolation lets campaigns enforce per-run time and memory limits.
 """
 
 import time
@@ -17,63 +16,77 @@ from .config import load_config, resolve_for_problem, split_bench_tokens
 from .datasets import load
 from .paths import REPO_ROOT
 from .problem import Problem
-from .preprocessing import make_preprocessor, validate_data, validate_derivatives
-from .library import _interior
+from .preprocessing import derivative_orders
 from .tokens import stored_groups
 
 
-def build_search(problem: Problem, search_cfg: dict, data: Optional[dict] = None,
-                 device: str = 'auto'):
-    """``EpdeSearch`` + domain + trajectory for ``problem``, ready to ``fit``.
-
-    Returns ``(search, trajectory, extra_token_families)``. ``data``
-    replaces ``problem.data`` (e.g. a noisy copy).
-    """
+def _inputs(problem: Problem, search_cfg: dict, data: Optional[dict] = None,
+            device: str = 'auto', *, live_trajectory=False):
     from epde import EpdeSearch
-    data = problem.data if data is None else data
-    validate_data(problem, data)
-    validate_derivatives(problem, data, search_cfg)
-    _interior(problem, search_cfg)
+    sample = problem.trajectory_data(data, derivative_orders(search_cfg, len(problem.grids)))
     search_cfg, bench_families = split_bench_tokens(search_cfg)
     solver = dict(search_cfg.get('solver', {}))
     solver['device'] = env.resolve_device(solver.get('device', device))
     search_cfg['solver'] = solver
 
+    # Older callable families can read or capture the active domain during construction.
+    live_trajectory = live_trajectory or problem.extra_tokens is not None
+    if live_trajectory:
+        from .library import _interior
+        _interior(problem, search_cfg)
     search = EpdeSearch(config=search_cfg)
-    _, domain = search.createDomain(list(problem.grids), ID=0)
-    families = bench_families + stored_groups(problem)
+    if live_trajectory:
+        _, domain = search.createDomain(sample.grids, ID=sample.trajectory_id)
+    families = bench_families + stored_groups(problem, include_tensors=live_trajectory)
     if problem.extra_tokens is not None:
         families += problem.extra_tokens(problem)
-    _, trajectory = search.createTrajectory(data, domain, cache_id=0, derivs=problem.derivs,
-                                            preprocessor=make_preprocessor(search_cfg))
-    return search, trajectory, families
+    if live_trajectory:
+        _, trajectory = search.createTrajectory(sample.fields, domain, cache_id=sample.trajectory_id,
+                                                derivs=sample.derivatives or None)
+        trajectory.axis_names = tuple(sample.coordinates)
+        return search, trajectory, families
+    return search, sample, families
+
+
+def build_search(problem, search_cfg, data=None, device='auto'):
+    """Compatibility API for callers that build a pool or inspect the live trajectory."""
+    return _inputs(problem, search_cfg, data, device, live_trajectory=True)
+
+
+def front_values(result):
+    """Ordered equation texts and objectives used by existing reports."""
+    return ([[eq['text'] for eq in system['equations']] for system in result.front],
+            [system['objectives'] for system in result.front])
 
 
 def pareto_front(search):
-    """Pareto-0 as ``(texts, objectives)``: each text is the list of the
-    system's equations (one per variable)."""
-    population = search.equations(only_print=False, num=1)
-    if not population:
-        return [], []
-    level = population[0] if search.multiobjective_mode else population
-    texts, objectives = [], []
-    for solution in level:
-        # text_form ends with a line of metaparameters ("{'max_terms_number': ...}")
-        texts.append([line.strip() for line in solution.text_form.split('\n')
-                      if '=' in line and not line.strip().startswith('{')])
-        obj = getattr(solution, 'obj_fun', None)
-        objectives.append(None if obj is None else [float(v) for v in list(obj)])
-    return texts, objectives
+    return front_values(search.result)
+
+
+def _discover(problem, search_cfg, data):
+    search, sample, families = _inputs(problem, search_cfg, data)
+    t0 = time.perf_counter()
+    try:
+        result = search.discover(sample, additional_tokens=families)
+        return search, result, time.perf_counter() - t0
+    except BaseException:
+        search.close()
+        raise
 
 
 def discover(problem: Problem, search_cfg: dict, data: Optional[dict] = None):
-    """Run EPDE once. Returns ``(search, texts, objectives, fit_seconds)``."""
-    search, trajectory, families = build_search(problem, search_cfg, data)
-    t0 = time.perf_counter()
-    search.fit(data=[trajectory], additional_tokens=families)
-    fit_seconds = time.perf_counter() - t0
-    texts, objectives = pareto_front(search)
-    return search, texts, objectives, fit_seconds
+    """Return the live search, ordered equation texts, objectives and elapsed seconds."""
+    search, result, elapsed = _discover(problem, search_cfg, data)
+    texts, objectives = front_values(result)
+    return search, texts, objectives, elapsed
+
+
+def record_front(record):
+    """Read both versioned discovery results and historical text-only records."""
+    if 'discovery' in record:
+        from epde import DiscoveryResult
+        return front_values(DiscoveryResult.from_dict(record['discovery']))[0]
+    return record.get('front', [])
 
 
 def run_one(dataset: str, variant: str = 'default', noise: float = 0.0, seed: int = 0,
@@ -103,7 +116,10 @@ def run_one(dataset: str, variant: str = 'default', noise: float = 0.0, seed: in
         if cfg['method'] == 'epde':
             search_cfg = resolve_for_problem(cfg, problem)
             record['search_config'] = search_cfg
-            _, texts, objectives, fit_seconds = discover(problem, search_cfg, data)
+            search, result, fit_seconds = _discover(problem, search_cfg, data)
+            search.close()
+            texts, objectives = front_values(result)
+            record['discovery'] = result.as_dict()
         elif cfg['method'] == 'pysindy':
             from .baselines import run_pysindy
             texts, objectives, fit_seconds, info = run_pysindy(problem, data, cfg, seed)
@@ -111,7 +127,8 @@ def run_one(dataset: str, variant: str = 'default', noise: float = 0.0, seed: in
         else:
             raise ValueError(f"unknown method {cfg['method']!r}")
         record.update(status='ok', fit_seconds=fit_seconds, front=texts, objectives=objectives)
-        record['metrics'] = metrics.score_run(texts, objectives, problem.truth_systems)
+        score_front = [s['equations'] for s in result.front] if cfg['method'] == 'epde' else texts
+        record['metrics'] = metrics.score_run(score_front, objectives, problem.truth_systems)
         sel = record['metrics'].get('selected_index')
         record['selected'] = texts[sel] if texts and sel is not None else None
     except UnsupportedProblem as exc:

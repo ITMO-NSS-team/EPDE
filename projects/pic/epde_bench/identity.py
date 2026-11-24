@@ -49,8 +49,9 @@ def _source_hash():
     files = {}
     for folder in (REPO_ROOT / 'epde', PIC_DIR / 'epde_bench'):
         for path in sorted(folder.rglob('*.py')):
-            if '__pycache__' not in path.parts:
-                files[f'{folder.name}/{path.relative_to(folder).as_posix()}'] = _file_hash(path, True)
+            relative = path.relative_to(folder)
+            if '__pycache__' not in relative.parts:
+                files[f'{folder.name}/{relative.as_posix()}'] = _file_hash(path, True)
     for name in ('bench.py',):
         path = PIC_DIR / name
         if path.is_file():

@@ -56,6 +56,10 @@ def load_runs(campaign: Path):
                 prob = dict(registered, **prob)
             except KeyError:
                 pass
+        selected = rec.get('selected') or []
+        if 'discovery' in rec and m.get('selected_index') is not None:
+            from .runner import record_front
+            selected = record_front(rec)[m['selected_index']]
         rows.append({
             'dataset': rec.get('dataset'), 'variant': rec.get('variant'),
             'noise': rec.get('noise'), 'seed': rec.get('seed'), 'status': rec.get('status'),
@@ -64,7 +68,7 @@ def load_runs(campaign: Path):
             'front_size': m.get('front_size'), 'success_front': m.get('success_front'),
             'success_selected': m.get('success_selected'), 'hamming_min': m.get('hamming_min'),
             'hamming_selected': m.get('hamming_selected'), 'coef_error': m.get('coef_error'),
-            'selected': ' | '.join(rec.get('selected') or []),
+            'selected': ' | '.join(selected),
             'error': rec.get('error') or rec.get('reason') or '',
         })
     return pd.DataFrame(rows)

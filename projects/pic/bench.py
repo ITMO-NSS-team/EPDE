@@ -86,7 +86,8 @@ def _print_record(record):
         return
     m = record['metrics']
     print(f"fit {record['fit_seconds']:.1f} s, Pareto front: {m['front_size']} solutions")
-    for i, system in enumerate(record['front']):
+    from epde_bench.runner import record_front
+    for i, system in enumerate(record_front(record)):
         mark = ' <- compromise pick' if i == m.get('selected_index') else ''
         print(f'  [{i}]{mark}')
         for eq in system:

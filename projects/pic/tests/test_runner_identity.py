@@ -2,7 +2,7 @@
 import sys
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 PIC = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(PIC), str(PIC.parent.parent)]
 from epde_bench import runner
@@ -22,8 +22,10 @@ def fixture(name, supplied=False):
 
 class RunRecordTests(unittest.TestCase):
     def test_run_records_content_identity(self):
+        from epde import DiscoveryResult
+        result = DiscoveryResult('multiobjective', [[]], [], {}, [])
         with patch.object(runner, 'load', return_value=fixture('ode')), \
-             patch.object(runner, 'discover', return_value=(None, [], [], .01)):
+             patch.object(runner, '_discover', return_value=(Mock(), result, .01)):
             record = runner.run_one('ode', noise=0, seed=2)
         self.assertEqual(record['status'], 'ok')
         self.assertIn('identity', record)

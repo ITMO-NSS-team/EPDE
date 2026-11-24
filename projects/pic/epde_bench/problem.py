@@ -91,6 +91,31 @@ class Problem:
             return []
         return [list(self.truth)] + [list(alt) for alt in self.truth_alternatives]
 
+    def trajectory_data(self, fields=None, order=None):
+        """Bind loader columns to the core discovery input and validate derivative provenance."""
+        from epde import TrajectoryData
+        fields = self.data if fields is None else fields
+        if list(fields) != self.variables:
+            raise ValueError(f'data variables must be {self.variables}')
+        if (self.derivs is not None and
+                any(not np.array_equal(fields[name], self.data[name]) for name in self.variables)):
+            raise ValueError('replaced fields cannot reuse pre-computed derivatives')
+        if self.derivs is not None and len(self.derivs) != len(fields):
+            raise ValueError('one pre-computed derivative stack is required per variable')
+        if order is not None and self.derivs is not None:
+            from epde.interface.data import check_supplied_orders
+            check_supplied_orders(self.deriv_orders, order, len(self.grids))
+        if len(self.axis_names) != len(self.grids) or len(set(self.axis_names)) != len(self.grids):
+            raise ValueError('Every coordinate grid needs its own axis name')
+        inputs = {}
+        for _, tensors, _ in self.token_groups:
+            if inputs.keys() & tensors.keys():
+                raise ValueError('Stored token labels must be unique across groups')
+            inputs.update(tensors)
+        return TrajectoryData(dict(zip(self.axis_names, self.grids)), fields,
+                              dict(zip(fields, self.derivs)) if self.derivs is not None else {},
+                              self.deriv_orders, external_inputs=inputs, trajectory_id=0)
+
     def noisy(self, level: float, seed: int) -> Dict[str, np.ndarray]:
         """Additive Gaussian noise of ``level`` % of each variable's std --
         the convention of the group's runners -- from a dedicated generator,

@@ -4,95 +4,40 @@ Supplied derivative stacks follow EPDE's axis-major column order and are
 used verbatim. Numeric preprocessing also returns the processed field:
 when smoothing is enabled, powers of the field must use that same field.
 """
-import numpy as np
 
 
 def derivative_orders(search, ndim):
     from epde.interface.search_config import load_search_config
-    orders = load_search_config(search).preprocessing.max_deriv_order
-    if np.isscalar(orders):
-        orders = [orders] * ndim
-    else:
-        orders = list(orders)
-    if len(orders) != ndim or any(int(k) != k or k < 0 for k in orders):
-        raise ValueError(f'max_deriv_order must contain {ndim} nonnegative integers: {orders}')
-    return [int(k) for k in orders]
+    from epde.interface.data import derivative_orders as expand_orders
+    return list(expand_orders(load_search_config(search).preprocessing.max_deriv_order, ndim))
 
 
 def make_preprocessor(search):
-    """Build the same native EPDE pipeline as EpdeSearch.set_preprocessor."""
     from epde.interface.search_config import load_search_config
-    from epde.preprocessing.preprocessor import ConcretePrepBuilder
-    from epde.preprocessing.preprocessor_setups import PreprocessorSetup
+    from epde.preprocessing.factory import make_preprocessor as build
     cfg = load_search_config(search)
-    prep = cfg.preprocessing
-    setup = PreprocessorSetup()
-    setup.builder = ConcretePrepBuilder()
-    builders = {'FD': setup.build_FD_preprocessing,
-                'poly': setup.build_poly_diff_preprocessing,
-                'spectral': setup.build_spectral_preprocessing,
-                'ANN': setup.build_ANN_preprocessing}
-    if prep.default_preprocessor_type not in builders:
-        raise ValueError(f'Unsupported EPDE preprocessor: {prep.default_preprocessor_type}')
-    kwargs = dict(prep.preprocessor_kwargs or {})
-    if prep.default_preprocessor_type == 'FD':
-        # EpdeSearch hands FD the domain's time axis (the one-sided schemes run along it).
-        kwargs = {'time_axis': cfg.domain.time_axis, **kwargs}
-    builders[prep.default_preprocessor_type](**kwargs)
-    return setup.builder.prep_pipeline
+    return build(cfg.preprocessing.default_preprocessor_type, cfg.preprocessing.preprocessor_kwargs,
+                 cfg.domain.time_axis)
 
 
 def validate_data(problem, data):
     """Fail before building a search when a loader or override is unusable."""
-    if list(data) != problem.variables:
-        raise ValueError(f'data variables must be {problem.variables}, got {list(data)}')
-    if any(np.shape(grid) != problem.shape for grid in problem.grids):
-        raise ValueError('grid shapes must match the data shape')
-    for var, values in data.items():
-        if np.shape(values) != problem.shape:
-            raise ValueError(f'{var}: shape must be {problem.shape}, got {np.shape(values)}')
-        if problem.derivs is not None and not np.array_equal(values, problem.data[var]):
-            raise ValueError(f'{var}: replaced fields cannot reuse pre-computed derivatives; '
-                             'provide a new consistent Problem')
-        if not np.isfinite(values).all():
-            raise ValueError(f'{var}: data contains NaN or infinity; crop a finite region before discovery')
+    problem.trajectory_data(data)
 
 
 def validate_derivatives(problem, data, search):
-    """Validate the axis-major schema before either checking or searching."""
-    orders = derivative_orders(search, len(problem.grids))
-    if problem.derivs is None:
-        return
-    if problem.deriv_orders is None or list(problem.deriv_orders) != orders:
-        raise ValueError(f'pre-computed derivative orders {problem.deriv_orders} '
-                         f'do not match configured orders {orders}')
-    if len(problem.derivs) != len(data):
-        raise ValueError('one pre-computed derivative stack is required per variable')
-    for (var, values), stack in zip(data.items(), problem.derivs):
-        stack = np.asarray(stack)
-        expected = (values.size, sum(orders))
-        if stack.shape != expected or not np.isfinite(stack).all():
-            raise ValueError(f'{var}: derivatives must be finite with shape {expected}, got {stack.shape}')
+    problem.trajectory_data(data, derivative_orders(search, len(problem.grids)))
 
 
 def prepare_data(problem, data, search):
     """Return (processed fields, derivative stacks) without an EPDE search."""
-    validate_data(problem, data)
-    validate_derivatives(problem, data, search)
+    from epde.preprocessing.preprocessor import prepare_field
     orders = derivative_orders(search, len(problem.grids))
-    supplied = problem.derivs
-    if supplied is not None and len(supplied) != len(data):
-        raise ValueError('one pre-computed derivative stack is required per variable')
-    pipeline = make_preprocessor(search) if supplied is None else None
+    sample = problem.trajectory_data(data, orders)
+    pipeline = None if sample.derivatives else make_preprocessor(search)
     fields, stacks = {}, {}
-    for i, (var, values) in enumerate(data.items()):
-        if supplied is None:
-            field, stack = pipeline.run(values.copy(), grid=list(problem.grids), max_order=orders)
-        else:
-            field, stack = values, np.asarray(supplied[i])
-        stack = np.asarray(stack)
-        expected = (values.size, sum(orders))
-        if stack.shape != expected or not np.isfinite(stack).all():
-            raise ValueError(f'{var}: derivatives must be finite with shape {expected}, got {stack.shape}')
-        fields[var], stacks[var] = field, stack
+    grids = sample.grids
+    for var, observed in sample.fields.items():
+        fields[var], stacks[var] = prepare_field(var, observed, grids, orders, pipeline,
+                                                 supplied=sample.derivatives.get(var))
     return fields, stacks

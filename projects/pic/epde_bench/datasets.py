@@ -146,9 +146,11 @@ def load_lv(n_points: int = None):
 
 @dataset('lorenz', 'Lorenz-63 system', 'ode_system', 'synthetic', 'core',
          'lorenz/t.npy, lorenz/lorenz.npy')
-def load_lorenz(i0: int = 20000, n: int = 1041, step: int = 5):
+def load_lorenz(i0: int = 20000, n: int | None = 1041, step: int = 5):
     t = np.load(data_path('lorenz', 't.npy'))
     x = np.load(data_path('lorenz', 'lorenz.npy'))
+    if n is None:
+        n = len(range(i0, len(t), step))
     idx = i0 + step * np.arange(n)
     return _problem(
         'lorenz', mesh(t[idx] - t[idx[0]]),
@@ -159,8 +161,9 @@ def load_lorenz(i0: int = 20000, n: int = 1041, step: int = 5):
                '1.0 * u{power: 1.0} * v{power: 1.0} + -2.6666666666666665 * w{power: 1.0}'
                ' = dw/dx0{power: 1.0}'],
         meta={'i0': i0, 'n': n, 'step': step},
-        notes='sigma = 10, rho = 28, beta = 8/3. Window t in [20.0, 25.2] of the stored run, every '
-              '5th sample: on the attractor, not the initial transient.')
+        notes=('sigma = 10, rho = 28, beta = 8/3. Window t in [20.0, 25.2] of the stored run, every '
+               '5th sample: on the attractor, not the initial transient.' if (i0,n,step)==(20000,1041,5)
+               else f'sigma = 10, rho = 28, beta = 8/3. Selected {n} samples from index {i0}, stride {step}.'))
 
 
 # =========================================================================
@@ -201,9 +204,11 @@ def load_burgers_inviscid():
         truth_alternatives=[
             ['1.0 * u{power: 1.0} = x{power: 1.0, dim: 1.0} * du/dx1{power: 1.0}'],
             ['0.5 * x{power: 1.0, dim: 0.0} * u{power: 1.0} + -0.5 * x{power: 1.0, dim: 1.0}'
-             ' = du/dx1{power: 1.0} * x{power: 1.0, dim: 1.0}']],
-        notes='The record is the similarity solution u = x / (t + c), so two identities hold as '
-              'well as the PDE and count as correct.')
+             ' = du/dx1{power: 1.0} * x{power: 1.0, dim: 1.0}'],
+            ['0.5 * u{power: 1.0} + 0.5 * x{power: 1.0, dim: 0.0} * d^2u/dx0^2{power: 1.0}'
+             ' + -0.25 * x{power: 2.0, dim: 0.0} * d^2u/dx0^2{power: 1.0} = du/dx0{power: 1.0}']],
+        notes='The record is the similarity solution u = x / (t - 2). Its verified trajectory '
+              'identities also count as correct.')
 
 
 @dataset('wave', 'Wave equation', 'pde_1d', 'synthetic', 'core', 'wave/wave_sln_80.csv')
@@ -344,8 +349,10 @@ def load_ns(subset: str = 'gate'):
         ts, ys, xs = slice(0, 50), slice(5, 45, 2), slice(0, 72, 2)
     elif subset == 'full50':
         ts, ys, xs = slice(0, 50), slice(None), slice(None)
+    elif subset == 'full':
+        ts, ys, xs = slice(None), slice(None), slice(None)
     else:
-        raise ValueError("subset must be 'gate' or 'full50'")
+        raise ValueError("subset must be 'gate', 'full50' or 'full'")
     data = {k: np.ascontiguousarray(f[ts][:, ys][:, :, xs]) for k, f in full.items()}
     return _problem(
         'ns', mesh(t[ts], y[ys], x[xs]), data, ('t', 'y', 'x'),
@@ -359,7 +366,7 @@ def load_ns(subset: str = 'gate'):
         meta={'subset': subset},
         notes='Axes (t, y, x): dx1 = d/dy, dx2 = d/dx. Two momentum equations (nu = 0.01) and '
               'continuity. By default a subset of about 36 thousand points; the full window has 250'
-              ' thousand points per variable.')
+              ' thousand points per variable for the first 50 time levels and one million across all 200.')
 
 
 @dataset('heat_solar_1d', 'Heat in soil under solar forcing, 1-D', 'pde_1d', 'synthetic', 'other',

@@ -21,7 +21,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .library import _interior
-from .metrics import _parse_factor, _split_sum, _strip_system_prefix
+from .metrics import _parse_factor, _split_sum, _strip_system_prefix, result_factor
 from .preprocessing import derivative_orders, prepare_data
 from .truthcheck import _factor_arrays, _term_array
 
@@ -32,6 +32,11 @@ def parse_equation(eq_text):
     """``'c1 * f{..} * g{..} + ... + c0 = target{..}'`` ->
     ``(terms, constant, target, target_coef)``; every term is
     ``(coef, [factor, ...])`` with factors as parsed by the structural metrics."""
+    if isinstance(eq_text, dict):
+        if eq_text['target'] is None:
+            raise ValueError('Reconstruction requires a fitted equation')
+        return ([(t['coefficient'], list(map(result_factor, t['factors']))) for t in eq_text['terms']],
+                eq_text['intercept'], list(map(result_factor, eq_text['target'])), 1.0)
     # systems are printed with a brace drawn by '/', '|' and '\\' before each equation
     lhs_text, rhs_text = _strip_system_prefix(eq_text).split('=', 1)
 
@@ -330,7 +335,8 @@ def plot_reconstruction(problem, system, search, data=None, title=None, horizon=
     Returns ``(figure, summary)`` where ``summary`` holds R^2 values."""
     import matplotlib.pyplot as plt
     summary = {}
-    fields = [(eq, *equation_fields(problem, eq, search, data)) for eq in system]
+    fields = [(eq['text'] if isinstance(eq, dict) else eq, *equation_fields(problem, eq, search, data))
+              for eq in system]
     for eq, obs, pred in fields:
         summary[eq.split('=', 1)[1].strip()] = r2_score(obs, pred)
     simulation = simulate_ode(problem, system, search, data, horizon) if problem.dim == 0 else None

@@ -46,6 +46,7 @@ def _round_param(value: str):
         return value
 
 
+_ZERO_COEFFICIENT = 1e-12
 _GRID_COORD_NAME_RE = re.compile(r'^x_\d+$')
 
 
@@ -100,10 +101,33 @@ def _parse_term(term_text: str):
     if not factors:
         # Pure-constant or unparseable term -> drop.
         return None
-    if coef_seen and abs(coef) < 1e-12:
+    if coef_seen and abs(coef) < _ZERO_COEFFICIENT:
         # Zero coefficient -> term doesn't actually appear in the equation.
         return None
     return frozenset(factors)
+
+
+def result_factor(factor):
+    label = factor['label']
+    return ('x' if _GRID_COORD_NAME_RE.match(label) else label,
+            frozenset((k, _round_param(str(v))) for k, v in factor['parameters'].items()))
+
+
+def _result_term(factors):
+    return frozenset(map(result_factor, factors))
+
+
+def _result_coefficients(eq):
+    if eq['target'] is None:
+        return None
+    target = _result_term(eq['target'])
+    coefficients = {}
+    for term in eq['terms']:
+        c = term['coefficient']
+        if c is not None and abs(c) >= _ZERO_COEFFICIENT:
+            key = _result_term(term['factors'])
+            coefficients[key] = coefficients.get(key, 0.) + c
+    return coefficients, target
 
 
 def _canonical_equation(eq_text: str):
@@ -111,6 +135,9 @@ def _canonical_equation(eq_text: str):
 
     Returns ``(target_term, frozenset_of_rhs_terms)`` or None if no ``=``.
     """
+    if isinstance(eq_text, dict):
+        parsed = _result_coefficients(eq_text)
+        return (parsed[1], frozenset(parsed[0])) if parsed else None
     if '=' not in eq_text:
         return None
     left, right = _strip_system_prefix(eq_text).split('=', 1)
@@ -154,7 +181,7 @@ def canonical_tokens(eq_texts: Sequence[str]) -> tuple:
     """
     out = []
     for eq in eq_texts:
-        if not eq.strip():
+        if isinstance(eq, str) and not eq.strip():
             continue
         canon = _canonical_equation(eq)
         if canon is None:
@@ -321,7 +348,7 @@ def _parse_term_with_coef(term_text: str):
             factors.append(factor)
     if not factors:
         return None
-    if coef_seen and abs(coef) < 1e-12:
+    if coef_seen and abs(coef) < _ZERO_COEFFICIENT:
         return None
     if not coef_seen:
         coef = 1.0
@@ -336,6 +363,13 @@ def _equation_term_coefs(eq_text: str):
     (target term gets ``-target_coef`` so the dict is in ``Σ c_i t_i = 0``
     form). Same factor / param canonicalisation as :func:`_parse_term`.
     """
+    if isinstance(eq_text, dict):
+        parsed = _result_coefficients(eq_text)
+        if parsed is None:
+            return None
+        coefs, target = parsed
+        coefs[target] = coefs.get(target, 0.) - 1.
+        return coefs, target
     if '=' not in eq_text:
         return None
     lhs, rhs = _strip_system_prefix(eq_text).split('=', 1)
@@ -409,7 +443,7 @@ def _system_coef_error(discovered_eq_texts: Sequence[str],
     per-equation :func:`_equation_relative_coef_error`. Returns
     ``float('nan')`` if every permutation contains an unparseable pair.
     """
-    disc = [s for s in discovered_eq_texts if isinstance(s, str) and s.strip()]
+    disc = [s for s in discovered_eq_texts if isinstance(s, dict) or (isinstance(s, str) and s.strip())]
     truth = [s for s in truth_eq_texts if isinstance(s, str) and s.strip()]
     if not disc or not truth:
         return float('nan')
@@ -500,7 +534,7 @@ def select_compromise(objectives) -> int | None:
 def score_run(front: Sequence[Sequence[str]], objectives: Sequence, truth_systems) -> dict:
     """All structural metrics of one run.
 
-    ``front``: the Pareto-0 solutions, each a list of equation strings (one
+    ``front``: the Pareto-0 solutions, each a list of equation records or strings (one
     per variable). ``objectives``: their objective vectors (same order).
     ``truth_systems``: the accepted systems (primary truth first), each a
     list of equation strings; empty when the truth is unknown.

@@ -118,12 +118,8 @@ def split_bench_tokens(search: dict):
     """Build every declared token family here and hand EPDE a config with an
     empty ``search_space.tokens``. Returns ``(search, families)``.
 
-    Two reasons. (1) Families only this package knows (``tokens.BENCH_FAMILIES``)
-    cannot go through EPDE's registry. (2) Families declared
-    in ``search_space.tokens`` end up in the pool TWICE when ``fit()`` is used:
-    ``fit`` merges them into ``additional_tokens`` and ``create_pool`` merges
-    them again (both call ``_resolve_token_families``), which duplicates e.g.
-    the grid family. Passing everything as ``additional_tokens`` avoids that.
+    Some families have benchmark-specific constructors. Resolve the ordered
+    list once so seeded draws use the YAML order across both registries.
     """
     from epde.interface.search_config import build_tokens
     from .tokens import BENCH_FAMILIES

@@ -82,7 +82,8 @@ def print_run(record: dict) -> None:
     origin = '(from cache)' if record.get('from_cache') else ''
     print(record['status'], f"fit {record.get('fit_seconds', 0):.0f} s", origin)
     selected = record.get('metrics', {}).get('selected_index')
-    for i, system in enumerate(record.get('front', [])):
+    from .runner import record_front
+    for i, system in enumerate(record_front(record)):
         print(f'[{i}]' + (' <- compromise pick' if i == selected else ''))
         for eq in system:
             print('    ', eq)

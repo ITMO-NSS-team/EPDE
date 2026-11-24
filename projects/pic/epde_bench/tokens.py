@@ -3,9 +3,9 @@
 Declarative families (trigonometric, grid, ...) live in ``configs/*.yaml``
 under ``search.search_space.tokens``. The ones here need an array or a
 callable: arrays come from ``Problem.token_groups`` (:func:`stored_groups`),
-callables from a loader's ``extra_tokens`` (:func:`cos_t_sin_x`). Both are
-built after ``createDomain`` (CacheStoredTokens requires an initialised
-search).
+callables from a loader's ``extra_tokens`` (:func:`cos_t_sin_x`). Stored token
+families require an initialised search. Callable factories can also use the
+active domain.
 """
 
 from typing import Dict
@@ -29,11 +29,11 @@ def cos_t_sin_x(problem) -> list:
                          unique_token_type=False, dimensionality=problem.dim)]
 
 
-def stored_groups(problem) -> list:
+def stored_groups(problem, *, include_tensors=True) -> list:
     """One ``CacheStoredTokens`` family per ``problem.token_groups`` entry."""
     from epde import CacheStoredTokens
     return [CacheStoredTokens(token_type=token_type, token_labels=list(tensors),
-                              token_tensors=dict(tensors), params_ranges={'power': (1, 1)},
+                              token_tensors=dict(tensors) if include_tensors else None, params_ranges={'power': (1, 1)},
                               params_equality_ranges=None, dimensionality=problem.dim,
                               meaningful=meaningful)
             for token_type, tensors, meaningful in problem.token_groups]
