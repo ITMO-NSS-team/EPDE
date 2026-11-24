@@ -3,7 +3,7 @@
 
 import numpy as np
 import inspect
-from typing import Callable, Union, Dict, Tuple, Any
+from typing import Callable, Union, Dict, Tuple, Any, Hashable
 
 from functools import wraps
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
@@ -18,16 +18,14 @@ OPERATOR_LEVELS = ('custom level', 'term level', 'gene level', 'chromosome level
 OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level': None, 'term level': Term, 'gene level': Gene,
                                    'chromosome level': Chromosome, 'population level': ParetoLevels}
 
-def checkDicts(*args, suppressed = False) -> None:
+def checkDicts(*args, suppressed=False) -> None:
     if suppressed:
-        return None
-    
+        return
     for arg in args:
-        assert all([(isinstance(key, int) and isinstance(value, (np.ndarray, float, int, list))) for key, value in arg.items()]), \
-              f'If input is a dict, it must be in form of int: np.ndarray, instead got {[(type(key), type(value)) for key, value in arg.items()]}'
-        
-    for arg_idx in range(len(args) - 1):
-        assert set(args[0].keys()) == set(args[arg_idx + 1].keys()), 'Mismatching keys of dicts inputs into dictDot'        
+        assert all(isinstance(value, (np.ndarray, np.number, float, int, list)) for value in arg.values()), (
+            'Per-trajectory values must be numeric arrays, lists, or scalars')
+    assert all(arg.keys() == args[0].keys() for arg in args[1:]), 'Mismatching trajectory IDs'
+
 
 def add_base_param_to_operator(operator, target_dict):
     params_container = EvolutionaryParams()
@@ -35,8 +33,8 @@ def add_base_param_to_operator(operator, target_dict):
         operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys(
         ) else param_value
 
-def dictZerosLike(ref: Union[Dict[int, np.ndarray], np.ndarray], dim: int = 0) \
-        -> Union[Dict[int, np.ndarray], np.ndarray]:
+def dictZerosLike(ref: Union[Dict[Hashable, np.ndarray], np.ndarray], dim: int = 0) \
+        -> Union[Dict[Hashable, np.ndarray], np.ndarray]:
     if isinstance(ref, np.ndarray):
         return np.zeros(ref.shape[dim])
     else:
@@ -46,8 +44,8 @@ def dictZerosLike(ref: Union[Dict[int, np.ndarray], np.ndarray], dim: int = 0) \
         # all-features-zeroed fallback, adds/subtracts the result).
         return {key: np.zeros(value.shape[dim]) for key, value in ref.items()}
 
-def dictApplyUFunc(func: Union[np.ufunc, Callable], *args: Tuple[Union[np.ndarray, Dict[int, np.ndarray], Any]],
-                   suppressed: bool = False) -> Dict[int, np.ndarray]:
+def dictApplyUFunc(func: Union[np.ufunc, Callable], *args: Tuple[Union[np.ndarray, Dict[Hashable, np.ndarray], Any]],
+                   suppressed: bool = False) -> Dict[Hashable, np.ndarray]:
     if all([isinstance(x, dict) for x in args]): # and isinstance(y, dict)
         checkDicts(*args, suppressed=suppressed)
 
@@ -68,8 +66,8 @@ def dictApplyUFunc(func: Union[np.ufunc, Callable], *args: Tuple[Union[np.ndarra
         
         return results
 
-def dictDot(x: Union[Dict[int, np.ndarray], np.ndarray], y: Union[Dict[int, np.ndarray], np.ndarray],
-            suppressed: bool = False) -> Dict[int, np.ndarray]:
+def dictDot(x: Union[Dict[Hashable, np.ndarray], np.ndarray], y: Union[Dict[Hashable, np.ndarray], np.ndarray],
+            suppressed: bool = False) -> Dict[Hashable, np.ndarray]:
     if not (isinstance(x, (dict, np.ndarray)) or isinstance(y, (dict, np.ndarray))):
         raise TypeError(f'dictDot requires individual or dicts of numpy ndarrays as arguments, instead got {type(x)} and {type(y)}.')
     
@@ -80,26 +78,26 @@ def dictDot(x: Union[Dict[int, np.ndarray], np.ndarray], y: Union[Dict[int, np.n
         if isinstance(y, np.ndarray):
             return {-1: np.dot(x, y)}
         else:
-            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[int, np.ndarray], or np.ndarray'
+            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[Hashable, np.ndarray], or np.ndarray'
             x = {key: x for key in y.keys()}
     
     if isinstance(y, np.ndarray):
         y = {key: y for key in x.keys()}
 
-    results: Dict[int, np.ndarray] = dict()
+    results: Dict[Hashable, np.ndarray] = dict()
     for key in x.keys():
         results[key] = np.dot(x[key], y[key])
 
     return results
 
-def dictFullLike(ref: Union[Dict[int, np.ndarray], np.ndarray], val) -> Union[Dict[int, np.ndarray], np.ndarray]:
+def dictFullLike(ref: Union[Dict[Hashable, np.ndarray], np.ndarray], val) -> Union[Dict[Hashable, np.ndarray], np.ndarray]:
     if isinstance(ref, np.ndarray):
         return np.full_like(ref, val)
     else:
         return {key: np.full_like(value, val) for key, value in ref.items()}
     
-def dictAdd(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[int, np.ndarray], np.ndarray, Any], 
-            suppressed: bool = False) -> Dict[int, np.ndarray]:
+def dictAdd(x: Union[Dict[Hashable, np.ndarray], np.ndarray, Any], y: Union[Dict[Hashable, np.ndarray], np.ndarray, Any],
+            suppressed: bool = False) -> Dict[Hashable, np.ndarray]:
     # if suppressed:
     #     if 
     if isinstance(x, dict) and isinstance(y, dict):
@@ -109,21 +107,21 @@ def dictAdd(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[int,
         if isinstance(y, (np.ndarray, float, int)):
             return {-1: x + y}
         else:
-            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[int, np.ndarray], or np.ndarray'
+            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[Hashable, np.ndarray], or np.ndarray'
             x = {key: x for key in y.keys()}
 
     if isinstance(y, (np.ndarray, float, int)):
         y = {key: y for key in x.keys()}
 
     
-    results: Dict[int, np.ndarray] = dict()
-    for key in x.keys() | y.keys():
+    results: Dict[Hashable, np.ndarray] = dict()
+    for key in x:
         results[key] = x[key] + y[key]
 
     return results
 
-def dictSubtr(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[int, np.ndarray], np.ndarray, Any],
-              suppressed: bool = False) -> Dict[int, np.ndarray]:
+def dictSubtr(x: Union[Dict[Hashable, np.ndarray], np.ndarray, Any], y: Union[Dict[Hashable, np.ndarray], np.ndarray, Any],
+              suppressed: bool = False) -> Dict[Hashable, np.ndarray]:
     if isinstance(x, dict) and isinstance(y, dict):
         checkDicts(x, y, suppressed=suppressed)
 
@@ -131,13 +129,13 @@ def dictSubtr(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[in
         if isinstance(y, (np.ndarray, float, int)):
             return {-1: x - y}
         else:
-            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[int, np.ndarray], or np.ndarray'
+            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[Hashable, np.ndarray], or np.ndarray'
             x = {key: x for key in y.keys()}
 
     if isinstance(y, (np.ndarray, float, int)):
         y = {key: y for key in x.keys()}
 
-    results: Dict[int, np.ndarray] = dict()
+    results: Dict[Hashable, np.ndarray] = dict()
     for key in x.keys():
         results[key] = x[key] - y[key]
 

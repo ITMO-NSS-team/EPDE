@@ -23,6 +23,7 @@ forgotten. Arguments that the current pipeline genuinely no longer has
 ignored with a warning naming them, which is what they already did -- silently.
 """
 
+import sys
 import warnings
 
 from epde.globals import EPDEDeprecationWarning
@@ -118,22 +119,18 @@ def split_legacy(kwargs: dict, keys) -> tuple:
     return legacy, rest
 
 
-def warn_legacy(where: str, legacy: dict, replacement: str,
-                stacklevel: int = 3) -> None:
-    """Emit one ``DeprecationWarning`` naming the arguments and the new form.
+def caller_stacklevel():
+    """Locate the public caller across helpers and runtime decorators."""
+    frame = sys._getframe(1)
+    depth = 1
+    while frame is not None and frame.f_globals.get('__name__', '').startswith('epde.'):
+        frame = frame.f_back
+        depth += 1
+    return depth
 
-    ``stacklevel`` must land on the USER's line, not on an EPDE frame:
-    DeprecationWarning is hidden by default everywhere except ``__main__``, so
-    a warning attributed to ``interface.py`` is invisible to exactly the people
-    who need to see it. 3 is right for a warning raised directly by the public
-    method; pass 4 when there is a helper in between.
 
-    The category is ``EPDEDeprecationWarning`` (a DeprecationWarning subclass,
-    so ``pytest.warns(DeprecationWarning)`` and the usual filters still catch
-    it) because ``globals.init_verbose`` installs a process-wide
-    ``filterwarnings('ignore')`` unless ``show_warnings=True`` -- constructing
-    a search would otherwise silence this whole channel.
-    """
+def warn_legacy(where: str, legacy: dict, replacement: str) -> None:
+    """Emit one caller-visible deprecation warning naming the arguments and replacement."""
     if not legacy:
         return
     used = sorted(legacy)
@@ -144,4 +141,4 @@ def warn_legacy(where: str, legacy: dict, replacement: str,
     if inert:
         message += (' Note that {0} no longer affect the search at all and '
                     'are ignored.'.format(', '.join(inert)))
-    warnings.warn(message, EPDEDeprecationWarning, stacklevel=stacklevel)
+    warnings.warn(message, EPDEDeprecationWarning, stacklevel=caller_stacklevel())

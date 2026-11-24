@@ -18,7 +18,9 @@ def _forget_registered_samples():
     """Leave no trajectory in the global samples manager: tests that resolve from it (the vcoef
     microscale) would read this module's fields."""
     yield
-    global_var.samples_manager.reset()
+    manager = getattr(global_var, 'samples_manager', None)
+    if manager is not None:
+        manager.reset()
 
 
 def _dims(family, n=60, label=None):

@@ -168,6 +168,13 @@ class EPDEUsageWarning(UserWarning):
     """An argument EPDE accepted and will not act on."""
 
 
+def configure_warning_filters(show_warnings):
+    if not show_warnings:
+        warnings.filterwarnings('ignore')
+        for category in (EPDEDeprecationWarning, EPDEUsageWarning):
+            warnings.simplefilter('default', category)
+
+
 def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
                  show_iter_fitness : bool = False, show_iter_stats : bool = False,
                  show_ann_loss : bool = False, show_warnings : bool = False,
@@ -188,17 +195,7 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
             display warnings arising during the operation of the algorithm, default - False
     """
     global verbose
-    if not show_warnings:
-        warnings.filterwarnings("ignore")
-        # ...but never EPDE's own API diagnostics. The line above is
-        # process-global, permanent and category-blind, so simply CONSTRUCTING
-        # an EpdeSearch used to silence every later warning in the process --
-        # including the deprecation notices that tell a script author their
-        # call form is going away, which is the one audience that cannot act
-        # on a warning it never sees. Registered after the ignore, hence ahead
-        # of it in the filter list.
-        for category in (EPDEDeprecationWarning, EPDEUsageWarning):
-            warnings.filterwarnings("default", category=category)
+    configure_warning_filters(show_warnings)
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness,
                              show_iter_stats, show_ann_loss, show_warnings,
                              candidate_objectives)

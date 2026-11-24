@@ -33,7 +33,7 @@ class EvolutionaryStrategy(Strategy):
         self._stop_criterion = stop_criterion(**sc_init_kwargs)
         self.run_performed = False
     
-    def run(self, initial_population: Iterable, EA_kwargs: dict, stop_criterion_params: dict = {}):
+    def run(self, initial_population: Iterable, EA_kwargs: dict, stop_criterion_params: dict = {}, *, start_epoch=0, epoch_observer=None):
         """
         Running evolutionary strategy for input population
 
@@ -45,7 +45,10 @@ class EvolutionaryStrategy(Strategy):
         Returns:
             None
         """
-        self._stop_criterion.reset(**stop_criterion_params)
+        if start_epoch:
+            self._stop_criterion.limit = stop_criterion_params['limit']
+        else:
+            self._stop_criterion.reset(**stop_criterion_params)
         population = initial_population
         observe = getattr(self._stop_criterion, 'observe', None)
         while not self._stop_criterion.check():
@@ -53,6 +56,10 @@ class EvolutionaryStrategy(Strategy):
             population = self.linked_blocks.output
             if observe is not None:
                 observe(population)
+            if epoch_observer:
+                criterion = self._stop_criterion
+                stopped = criterion.patience is not None and criterion._still >= criterion.patience
+                epoch_observer(criterion.checks, stopped)
         self.run_performed = True
 
 class Population(object):
@@ -186,12 +193,14 @@ class SimpleOptimizer(object):
         builder.assemble(True)
         self.strategy = builder.processer
         
-    def optimize(self, EA_kwargs: dict = {},  epochs: int = None, patience: int = None):
+    def optimize(self, EA_kwargs: dict = {},  epochs: int = None, patience: int = None, *, start_epoch=0, epoch_observer=None):
         """``patience`` (``early_stopping_patience``): also stop once the best individual's
         structure is unchanged for that many iterations."""
         scp = {'limit' : epochs} if epochs is not None else {'limit' : 50}
         scp['patience'] = patience
-        global_var.reset_hist()
+        if not start_epoch:
+            global_var.reset_hist()
         
-        self.strategy.run(initial_population = self.population, EA_kwargs = EA_kwargs, 
-                          stop_criterion_params = scp)
+        continuation = dict(start_epoch=start_epoch, epoch_observer=epoch_observer) if epoch_observer else {}
+        self.strategy.run(initial_population=self.population, EA_kwargs=EA_kwargs,
+                          stop_criterion_params=scp, **continuation)

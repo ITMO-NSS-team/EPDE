@@ -254,7 +254,7 @@ class NSGAOptimizer(MOEADDOptimizer):
         return snapshot
 
     # ----------------------------------------------------------------- optimize
-    def optimize(self, epochs, early_stopping_callback=None):
+    def optimize(self, epochs, early_stopping_callback=None, *, start_epoch=0, epoch_observer=None):
         """Run ``epochs`` NSGA-II epochs (see the module docstring). The
         callback gets ``(snapshot, epoch_idx)`` after every epoch, the snapshot
         listing the archive, and a truthy return stops the run."""
@@ -269,17 +269,21 @@ class NSGAOptimizer(MOEADDOptimizer):
             self._sync_weights()
         if getattr(levels_obj, '_init_collapsed', False):
             self._archive = list(levels_obj.levels[0])
-            self._pareto_history.append(self._snapshot())
+            if not self._pareto_history:
+                self._pareto_history.append(self._snapshot())
+            if epoch_observer:
+                epoch_observer(0, True)
             return
         if self._mu is None:
             self._mu = len(levels_obj.population)
-        for member in levels_obj.population:
-            self._archive_insert(member)
+        if not start_epoch:
+            for member in levels_obj.population:
+                self._archive_insert(member)
         from epde.interface.search_config import active_config
         fraction = active_config().evolution.operators.get('MOEADDSelection', {}).get('parents_fraction', 0.2)
         generations = moeadd_parents_per_sector(self._mu, fraction)
 
-        for epoch_idx in np.arange(epochs):
+        for epoch_idx in range(start_epoch, epochs):
             with _loop_stats.timer('NSGA.epoch'):
                 if global_var.verbose.show_iter_idx:
                     print(f'\n----- NSGA-II : {epoch_idx + 1}-th epoch ({generations} generations) -----')
@@ -299,6 +303,7 @@ class NSGAOptimizer(MOEADDOptimizer):
             self._hist.append(levels_obj.get_stats())
             snapshot = self._snapshot()
             self._pareto_history.append(snapshot)
+            should_stop = False
             if early_stopping_callback is not None:
                 try:
                     should_stop = bool(early_stopping_callback(snapshot, int(epoch_idx)))
@@ -306,9 +311,12 @@ class NSGAOptimizer(MOEADDOptimizer):
                     warnings.warn(f'early_stopping_callback raised {exc!r}; the run goes on.',
                                   global_var.EPDEUsageWarning)
                     should_stop = False
-                if should_stop:
-                    if global_var.verbose.show_iter_idx:
-                        print(f'Early stopping at epoch {int(epoch_idx) + 1}/{int(epochs)} '
-                              '(callback returned True).')
-                    break
+
+            if epoch_observer is not None:
+                epoch_observer(epoch_idx + 1, should_stop)
+            if should_stop:
+                if global_var.verbose.show_iter_idx:
+                    print(f'Early stopping at epoch {int(epoch_idx) + 1}/{int(epochs)} '
+                          '(callback returned True).')
+                break
         self._report()

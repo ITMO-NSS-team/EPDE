@@ -18,18 +18,22 @@ import numpy as np
 import torch
 
 from copy import copy, deepcopy
+from weakref import WeakKeyDictionary, ref
 from typing import Union, Callable, List, Tuple, Dict
 from collections import OrderedDict
 from functools import reduce, singledispatchmethod
 
 import epde.globals as global_var
+from epde.interface.data import TrajectoryData, attach_inputs
+from epde.interface.results import DiscoveryResult
+from epde.interface.runtime import search_constructor, search_operation
 from epde.operators.common.objectives import ideal_point
 from epde.interface.search_config import (UNSET, active_config, build_tokens, check_auto_settings,
                                           check_rps_params, check_target_axes_variables, collect_overrides,
                                           load_search_config, resolve_patience, resolve_plain_params,
                                           set_active_config, target_axes_of)
 from epde.interface.legacy_api import (LEGACY_DATA_KEYS, LEGACY_INIT_KEYS,
-                                       reject_removed, split_legacy, warn_legacy)
+                                       caller_stacklevel, reject_removed, split_legacy, warn_legacy)
 
 from epde import _loop_stats
 
@@ -67,6 +71,11 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import (PreparedTokens, CustomTokens, CacheStoredTokens, GridTokens, DataPolynomials,
                                             ControlVarTokens, TrigonometricTokens)
 from epde.integrate import BoundaryConditions, SolverAdapter, SystemSolverInterface
+
+
+# A passed pool can recover its live records across searches. Keep training
+# data out of serialized pools and allow the owning search to release it.
+_pool_records = WeakKeyDictionary()
 
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
@@ -112,6 +121,7 @@ class EpdeSearch(object):
         optimizer_exec_params (`dict`): parameters for execution algorithm of optimization
         optimizer (`OptimizationPatternDirector`): the strategy of the evolutionary algorithm
     """
+    @search_constructor
     def __init__(self, config=None, *, director=None,
                  multiobjective_mode=UNSET, second_objective=UNSET,
                  complexity_metric=UNSET, instability_metric=UNSET,
@@ -165,10 +175,8 @@ class EpdeSearch(object):
                 parameters by group.
 
         Note:
-            The objective settings are process globals, so the last search
-            constructed -- or fitted, since ``fit`` publishes its own
-            configuration again -- wins for the process: a long-standing
-            trade-off.
+            Public search operations activate the owning search's runtime.
+            Multiple searches can be used sequentially in one process.
         """
         reject_removed(solver_kwargs)
         legacy, solver_kwargs = split_legacy(solver_kwargs, LEGACY_INIT_KEYS)
@@ -293,6 +301,7 @@ class EpdeSearch(object):
         """The resolved :class:`SearchConfig` backing this search."""
         return self._config
 
+    @search_operation
     def set_memory_properties(self, example_tensor, mem_for_cache_frac=None, mem_for_cache_abs=None):
         """
         Setting properties for using memory to cache
@@ -324,6 +333,7 @@ class EpdeSearch(object):
         global_var.tensor_cache.memoryUsageProperties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)
         self._cache_mem_set = True
 
+    @search_operation
     def set_moeadd_params(self, population_size=UNSET, solution_params=UNSET,
                           neighbors_number=UNSET,
                           nds_method: Callable = fast_non_dominated_sorting,
@@ -347,7 +357,7 @@ class EpdeSearch(object):
             H (`float`): optional
                 parameter of uniform spacing between the weight vectors; *H = 1 / delta*
                 should be integer - a number of divisions along an objective coordinate axis.
-                NOTE: currently ignored — the optimizer always uses *H = population_size - 1*,
+                NOTE: currently ignored вЂ” the optimizer always uses *H = population_size - 1*,
                 which (for the two-objective weight space used by EPDE) keeps the number of
                 Das-Dennis weight vectors equal to the population size, as the MOEA/DD paper
                 requires (N solutions <-> N weight vectors).
@@ -356,14 +366,14 @@ class EpdeSearch(object):
                 of evolutionary operators as the "neighbors" of the processed sectors.
             nds_method (`callable`): optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
                 Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article
-                *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist
-                multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
-                vol. 6, no. 2, pp. 182–197, Apr. 2002.*
+                *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, вЂњA fast and elitist
+                multiobjective genetic algorithm: NSGA-II,вЂќ IEEE Trans. Evol. Comput.,
+                vol. 6, no. 2, pp. 182вЂ“197, Apr. 2002.*
             ndl_update (`callable`): optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
                 Method of adding a new solution point into the objective functions space, introduced
                 to minimize the recalculation of the non-dominated levels for the entire population.
-                The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
-                update approach for steady-state evolutionary multiobjective optimization,”
+                The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, вЂњEfficient non-domination level
+                update approach for steady-state evolutionary multiobjective optimization,вЂќ
                 Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
                 MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
             subregion_mating_limitation (`float`): optional
@@ -439,6 +449,7 @@ class EpdeSearch(object):
                 pareto_updater = blocks['pareto_updater_compl']._operator
                 pareto_updater.suboperators['pareto_level_updater'].params['PBI_penalty'] = PBI_penalty
 
+    @search_operation
     def set_singleobjective_params(self, population_size=UNSET, solution_params=UNSET,
                                    sorting_method: Callable = simple_sorting,
                                    training_epochs=UNSET, early_stopping_patience=UNSET):
@@ -505,6 +516,7 @@ class EpdeSearch(object):
         # upload_grids(coordinate_tensors, global_var.initial_data_cache)
         # upload_grids(coordinate_tensors, global_var.grid_cache)
 
+    @search_operation
     def createDomain(self, grids: Union[np.ndarray, Tuple[np.ndarray], List[np.ndarray]],
                      time_axis=UNSET, ID: int = 0, gfunction: Callable = None,
                      boundary_width=UNSET) -> Tuple[int, Domain]:
@@ -610,6 +622,7 @@ class EpdeSearch(object):
                     'createDomain(gfunction=...) if that is not what you want.',
                     global_var.EPDEUsageWarning, stacklevel=3)
     
+    @search_operation
     def createTrajectory(self, entries: Union[List[VariableEntry], Dict[str, np.ndarray]],
                          domain: Domain, cache_id = None,
                          derivs: Union[List[np.ndarray], np.ndarray] = None,
@@ -651,15 +664,18 @@ class EpdeSearch(object):
         return trajectory.ID, trajectory
 
     @property
+    @search_operation
     def grid_cache(self) -> Cache:
         return global_var.grid_cache
     
     @property
+    @search_operation
     def tensor_cache(self) -> Cache:
         for trajectory in global_var.samples_manager._traj.values():
             trajectory.prepare_pointwise()
         return global_var.tensor_cache
 
+    @search_operation
     def set_boundaries(self, boundary_width: Union[int, list]):
         """
         Setting the number of unaccountable elements at the edges into cache with saved grid.
@@ -710,6 +726,7 @@ class EpdeSearch(object):
             except NameError:
                 raise NameError('Cache for grids has not been initilized yet!')
 
+    @search_operation
     def set_domain_properties(self, coordinate_tensors, memory_for_cache, boundary_width: Union[int, list],
                               function_form: Callable = None, prune_domain: bool = False,
                               pivotal_tensor_label=None, pruner=None, threshold: float = 1e-5,
@@ -758,6 +775,7 @@ class EpdeSearch(object):
         self.set_boundaries(boundary_width)
         self._upload_g_func(function_form)
 
+    @search_operation
     def set_preprocessor(self, preprocessor_pipeline: PreprocessingPipe = None,
                          default_preprocessor_type=UNSET, preprocessor_kwargs=UNSET):
         '''
@@ -813,7 +831,8 @@ class EpdeSearch(object):
         self.preprocessor_set = True
         self.preprocessor_pipeline = preprocessor_pipeline
 
-    def create_pool(self, data: Union[Trajectory, List[Trajectory]],
+    @search_operation
+    def create_pool(self, data: Union[TrajectoryData, Trajectory, List[TrajectoryData], List[Trajectory]],
                     additional_tokens=None, max_deriv_order=UNSET,
                     data_fun_pow=UNSET, deriv_fun_pow=UNSET, **legacy_kwargs):
         '''
@@ -843,6 +862,7 @@ class EpdeSearch(object):
             max_deriv_order, data_fun_pow, deriv_fun_pow)
 
         additional_tokens = self._resolve_token_families(additional_tokens)
+        data = attach_inputs(self, data, additional_tokens, max_deriv_order)
         data = self._as_trajectories(data, legacy_kwargs, 'create_pool')
         if isinstance(data, Trajectory):
             data = [data,]
@@ -931,9 +951,14 @@ class EpdeSearch(object):
             self._warn_lattice_nyquist(strided, additional_tokens)
         # The key last: if anything above raised, the next fit must not take the
         # half-built pool for the one this key describes.
-        self._pool_data = list(data)
+        self._remember_pool_data(data, additional_tokens)
         self.pool_params = self._pool_params(
             data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
+
+    def _remember_pool_data(self, data, additional_tokens):
+        self._pool_data = list(data)
+        uploads = tuple(family for family in additional_tokens if getattr(family, 'token_tensors', None))
+        _pool_records[self.pool] = tuple(ref(sample) for sample in data), uploads
 
     @staticmethod
     def _validate_trajectories(data) -> None:
@@ -993,6 +1018,9 @@ class EpdeSearch(object):
         for trajectory in data:
             assert isinstance(trajectory, Trajectory), \
                 f'Individual trajectories have to be passed as Trajectory objects, instead got {type(trajectory)}.'
+            checkpoint = getattr(self, '_checkpoint', None)
+            if checkpoint is not None:
+                checkpoint.validate_preprocessor(trajectory)
             defer = (not self._custom_director and not getattr(self, '_custom_fit', False)
                      and active_config().domain.evaluation_form == 'forward'
                      and getattr(trajectory._preprocessor_pipeline, 'defer_for_forward', False)
@@ -1219,14 +1247,12 @@ class EpdeSearch(object):
             warn_legacy('{0}(...)'.format(where), legacy,
                         'These are createTrajectory arguments now and are '
                         'ignored here, because the data was passed as '
-                        'Trajectory objects that already carry them.',
-                        stacklevel=4)
+                        'Trajectory objects that already carry them.')
             return data
 
         warn_legacy('{0}(...)'.format(where), legacy,
                     "Build the data with createTrajectory({'u': array}, domain) "
-                    'and pass the resulting Trajectory instead of raw arrays.',
-                    stacklevel=4)
+                    'and pass the resulting Trajectory instead of raw arrays.')
 
         domain = self._legacy_domain
         if domain is None:
@@ -1375,7 +1401,7 @@ class EpdeSearch(object):
             print('Trying to get derivatives before their calculation. Call EPDESearch.create_pool() to calculate derivatives')
             return None
 
-    def _seeding_interval(self, eq_sparsity_interval, stacklevel: int) -> tuple:
+    def _seeding_interval(self, eq_sparsity_interval) -> tuple:
         """The interval a new population seeds the ``('sparsity', var)``
         metaparameter -- the legacy LASSO alpha -- from. It is the sparsity
         operator's parameter, not the search space's (only ``LASSOSparsity``
@@ -1402,17 +1428,18 @@ class EpdeSearch(object):
                 '{0} never reads it -- the value is ignored. Pass '
                 "sparsity_cls='lasso' to run the pipeline it configures, and its interval "
                 "as sparsity_kwargs={{'initial_sparsity_interval': ...}}.".format(name),
-                global_var.EPDEUsageWarning, stacklevel=stacklevel)
+                global_var.EPDEUsageWarning, stacklevel=caller_stacklevel())
         else:
             warnings.warn(
                 'fit(eq_sparsity_interval=...) is deprecated: the interval is a parameter of '
                 "{0} only. Pass EpdeSearch(sparsity_kwargs={{'initial_sparsity_interval': "
                 '{1}}}) instead.'.format(name, tuple(eq_sparsity_interval)),
-                global_var.EPDEDeprecationWarning, stacklevel=stacklevel)
+                global_var.EPDEDeprecationWarning, stacklevel=caller_stacklevel())
         return tuple(eq_sparsity_interval)
 
     @_loop_stats.timed('EpdeSearch.fit')
-    def fit(self, data: Union[Trajectory, List[Trajectory]] = None,
+    @search_operation
+    def fit(self, data: Union[TrajectoryData, Trajectory, List[TrajectoryData], List[Trajectory]] = None,
             equation_terms_max_number=UNSET, equation_factors_max_number=UNSET,
             eq_sparsity_interval=UNSET, additional_tokens=None,
             max_deriv_order=UNSET, data_fun_pow=UNSET, deriv_fun_pow=UNSET,
@@ -1506,8 +1533,7 @@ class EpdeSearch(object):
         # the mode's caps decides what the assignment-mode subset search may cost.
         check_rps_params(search_space.system_rps_mode, equation_terms_max_number,
                          search_space.system_rps_params)
-        eq_sparsity_interval = self._seeding_interval(eq_sparsity_interval,
-                                                      stacklevel=4)   # 4: @timed wrapper
+        eq_sparsity_interval = self._seeding_interval(eq_sparsity_interval)
 
         max_deriv_order, data_fun_pow, deriv_fun_pow = self._pool_structure(
             max_deriv_order, data_fun_pow, deriv_fun_pow)
@@ -1522,13 +1548,30 @@ class EpdeSearch(object):
         # not only the one read today. The instance config is left alone: a fit
         # argument is for that fit. (``eq_sparsity_interval`` has no config key;
         # it travels to the population constructor only.)
+        # Once preparation changes the live data, earlier equations and new
+        # measurement geometry cannot describe the same fitted search.
+        self.search_conducted = False
         set_active_config(self._config.with_overrides(
             equation_terms_max_number=equation_terms_max_number,
             equation_factors_max_number=equation_factors_max_number,
             max_deriv_order=max_deriv_order,
             data_fun_pow=data_fun_pow, deriv_fun_pow=deriv_fun_pow))
 
+        if pool is not None and pool is not self.pool:
+            source = _pool_records.get(pool)
+            if source is not None:
+                if data is None:
+                    records, uploads = source
+                    data = [sample() for sample in records]
+                    if any(sample is None for sample in data):
+                        raise ValueError('Pass data when the original pool records have been released.')
+                    if additional_tokens is None:
+                        additional_tokens = list(uploads)
+                # Binding dimensions and frequency ranges must only change this search.
+                pool = copy(pool)
+                pool.families = list(pool.families)
         additional_tokens = self._resolve_token_families(additional_tokens)
+        data = attach_inputs(self, data, additional_tokens, max_deriv_order)
         data = self._as_trajectories(data, legacy_kwargs, 'fit')
 
         if isinstance(data, Trajectory):
@@ -1570,7 +1613,7 @@ class EpdeSearch(object):
                 self._prepare_trajectories(data, additional_tokens, max_deriv_order,
                                            data_fun_pow, deriv_fun_pow, force=True)
                 self._register_trajectories(data)
-                self._pool_data = list(data)
+                self._remember_pool_data(data, additional_tokens)
 
         if self._custom_fit:
             # A pool built earlier for native forward fitting can still be reused
@@ -1595,6 +1638,57 @@ class EpdeSearch(object):
                 solution.reset_state()
         self._run_optimization(equation_terms_max_number, equation_factors_max_number,
                                eq_sparsity_interval, optimizer, population)
+
+    @search_operation
+    def discover(self, data, *, checkpoint=None, **fit_options):
+        """Return detached results. An optional path saves each completed epoch."""
+        if isinstance(data, (tuple, list)) and not data:
+            raise ValueError('Discovery needs at least one trajectory')
+        if checkpoint is None:
+            self.fit(data=data, **fit_options)
+            return self.result
+        from epde.interface.checkpoint import EpochCheckpoint
+        return self._checkpointed(data, EpochCheckpoint(checkpoint), fit_options)
+
+    @search_operation
+    def resume(self, checkpoint, data, *, total_epochs=None, **fit_options):
+        """Continue a trusted local CPU checkpoint, verifying data and configuration."""
+        from epde.interface.checkpoint import EpochCheckpoint
+        return self._checkpointed(data, EpochCheckpoint(checkpoint, resume=True, total_epochs=total_epochs),
+                                  fit_options)
+
+    def _checkpointed(self, data, checkpoint, options):
+        from epde.interface import prepared_tokens
+        from epde.interface.search_config import TOKEN_REGISTRY
+        supported_tokens = tuple(getattr(prepared_tokens, name) for name in TOKEN_REGISTRY.values()) + (CacheStoredTokens,)
+        families = options.get('additional_tokens') or []
+        if isinstance(families, (PreparedTokens, TokenFamily)):
+            families = [families]
+        if (self._custom_director or self.optimizer_exec_params.get('early_stopping_callback') is not None
+                or any(options.get(key) is not None for key in ('optimizer', 'pool', 'population'))
+                or any(type(f) not in supported_tokens
+                       for f in families)):
+            raise ValueError('Epoch checkpoints require built-in token families, optimizer and director')
+        if self._config.solver.use_solver and str(self._config.solver.device) != 'cpu':
+            raise ValueError('Epoch checkpoints require a CPU solver')
+        checkpoint.begin()
+        # A checkpoint must reference only base tensors reproducible from its
+        # inputs, even if the caller fitted these same legacy trajectories earlier.
+        global_var.release_tensor_cache()
+        self.pool_params = None
+        self._pool_data = None
+        self._checkpoint = checkpoint
+        try:
+            self.fit(data=data, **options)
+            return self.result
+        finally:
+            self._checkpoint = None
+
+    @property
+    @search_operation
+    def result(self):
+        """Snapshot the reported equations while the search's runtime is active."""
+        return DiscoveryResult.from_search(self)
 
     def _bind_token_families(self, families, trajectories):
         """Resolve search-dependent token settings before comparing or building pools."""
@@ -1696,6 +1790,7 @@ class EpdeSearch(object):
             "sparsity_interval": eq_sparsity_interval,
             "second_objective": self._second_objective}
 
+        self._stagnation = dict(key=None, still=0)
         init_params, exec_params = self._resolved_budget()
         if active_config().search_space.system_rps_mode == 'plain':
             # Plain mode's per-fit state: its caches (library, Gram stores, group memo,
@@ -1704,12 +1799,21 @@ class EpdeSearch(object):
             # (system_rps_params['variable_order_seed']).
             from epde.operators.common.plain_fit import start_fit
             start_fit(resolve_plain_params(active_config())['variable_order_seed'])
-        if optimizer is None:
+        checkpoint = getattr(self, '_checkpoint', None)
+        if checkpoint is not None:
+            checkpoint.prepare(self, init_params)
+            total = checkpoint.total_epochs or exec_params['epochs']
+            if total < checkpoint.completed:
+                raise ValueError('total_epochs precedes the saved epoch')
+            exec_params.update(epochs=checkpoint.completed if checkpoint.stopped else total,
+                               start_epoch=checkpoint.completed,
+                               epoch_observer=lambda epoch, stopped: checkpoint.save(self, epoch, stopped))
+        if optimizer is not None:
+            self.optimizer = optimizer
+        elif checkpoint is None or not checkpoint.resume:
             self.optimizer = self._create_optimizer(
                 self.multiobjective_mode, init_params,
                 self.director, population, self._second_objective)
-        else:
-            self.optimizer = optimizer
 
         # Pass only the exec params this optimizer's ``optimize`` accepts:
         # SimpleOptimizer.optimize has no ``early_stopping_callback`` (a
@@ -1774,9 +1878,10 @@ class EpdeSearch(object):
         on the first Pareto level (``SoEq.equations_labels``, never the
         coefficient-bearing text form) has not changed for ``patience`` epochs
         in a row. ``user_callback``, if any, is still asked every other epoch."""
-        state = {'key': None, 'still': 0}
+        self._stagnation = {'key': None, 'still': 0}
 
         def callback(snapshot, epoch_idx):
+            state = self._stagnation
             # NSGA-II reports its archive; MOEA/DD its first level. Keyed on
             # structures (``SoEq.structure_labels``, the same labels as
             # ``equations_labels`` outside plain mode), so a system re-solved
@@ -1812,7 +1917,7 @@ class EpdeSearch(object):
             # does not change -- and the ideal can no longer disagree with the
             # axis actually assembled.
             axes = ('discrepancy',
-                    second_objective or self._config.objectives.second_objective)
+                    second_objective or active_config().objectives.second_objective)
             best_sol_vals = ideal_point(axes)
             optimizer_init_params['best_sol_vals'] = best_sol_vals
             optimizer_init_params['passed_population'] = population
@@ -1836,6 +1941,7 @@ class EpdeSearch(object):
         return optimizer
 
     @property
+    @search_operation
     def _resulting_population(self):
         if not self.search_conducted:
             raise AttributeError('Pareto set of the best equations has not been discovered. Use ``self.fit`` method.')
@@ -1844,6 +1950,7 @@ class EpdeSearch(object):
         else:
             return self.optimizer.population.population
     
+    @search_operation
     def equations(self, only_print : bool = True, only_str = False, num = 1):
         """
         Method for print or getting results of searching differential equation
@@ -1885,6 +1992,7 @@ class EpdeSearch(object):
                 else:
                     return self._resulting_population[:num]
 
+    @search_operation
     def equations_by_variable(self, only_print: bool = True, only_str: bool = False):
         """
         Method for print or getting the own front of every variable
@@ -1930,6 +2038,7 @@ class EpdeSearch(object):
             return {variable: [equation.text_form for equation, _ in front] for variable, front in fronts.items()}
         return {variable: [equation for equation, _ in front] for variable, front in fronts.items()}
 
+    @search_operation
     def solver_forms(self, grids: list = None, num: int = 1, sample_key: int = None):
         '''
         Method returns solver forms of the equations in a form of Python list.
@@ -1976,18 +2085,16 @@ class EpdeSearch(object):
         return forms
 
     @property
+    @search_operation
     def cache(self):
-        if global_var.grid_cache is not None:
-            return global_var.grid_cache, global_var.tensor_cache
-        else:
-            return None, global_var.tensor_cache
+        return global_var.grid_cache, self.tensor_cache
 
+    @search_operation
     def close(self):
         """Release every cached tensor held for this search.
 
-        The caches are process-level, so this ends the *process's* search
-        state, not just this object's: after it, ``predict``, ``solver_forms``
-        and ``visualize_solutions`` have no data to work from. Call it when the
+        After release this search's prediction and visualization methods no
+        longer have their training arrays. Other searches own their caches. Call it when the
         results have been read out, or use the context-manager form::
 
             with EpdeSearch(...) as search:
@@ -2001,7 +2108,9 @@ class EpdeSearch(object):
         global_var.delete_cache()
         from epde.operators.common import plain_fit
         plain_fit.release()
+        self._pool_data = None
 
+    @search_operation
     def __enter__(self):
         return self
 
@@ -2022,6 +2131,7 @@ class EpdeSearch(object):
         """
         return getattr(self.optimizer, '_pareto_history', [])
 
+    @search_operation
     def get_equations_by_complexity(self, complexity : Union[float, list]):
         '''
         Get equations with desired complexity. Works best with ``EpdeSearch.visualize_solutions(...)``
@@ -2037,6 +2147,7 @@ class EpdeSearch(object):
         '''
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
+    @search_operation
     def predict(self, system : SoEq = None, boundary_conditions: BoundaryConditions = None,
                 grid : list = None, data = None, system_file: str = None, net = None,
                 mode=UNSET, compiling_params=UNSET, optimizer_params=UNSET,
@@ -2146,6 +2257,7 @@ class EpdeSearch(object):
                                                    use_adaptive_lambdas = use_adaptive_lambdas)
         return solution_model
 
+    @search_operation
     def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs) -> None:
         '''
         Plot discovered equation, using matplotlib tools. By default the method plots only the Pareto-optimal 
@@ -2253,6 +2365,13 @@ class EpdeMultisample(EpdeSearch):
         return dict(zip(names, arrays)), names
 
     def _make_samples(self, records, derivatives=None, names=None):
+        if isinstance(records, (Trajectory, TrajectoryData)):
+            records = [records]
+        if isinstance(records, (list, tuple)) and records and all(
+                isinstance(record, (Trajectory, TrajectoryData)) for record in records):
+            if derivatives is not None or names is not None:
+                raise ValueError('Supply variable names and derivatives on the trajectories themselves.')
+            return list(records)
         if not isinstance(records, (list, tuple)) or not records:
             raise ValueError('Pass at least one (grids, fields) sample.')
         if names is not None:
@@ -2283,6 +2402,7 @@ class EpdeMultisample(EpdeSearch):
         self._validate_trajectories(trajectories)
         return trajectories
 
+    @search_operation
     def set_samples(self, data_samples, sample_derivs=None, var_names=None,
                     max_deriv_orders=UNSET, additional_tokens=None,
                     data_fun_pow=UNSET, deriv_fun_pow=UNSET):
@@ -2298,6 +2418,7 @@ class EpdeMultisample(EpdeSearch):
         self._sample_trajectories = trajectories
         self._sample_pool_options = options
 
+    @search_operation
     def fit(self, samples=None, equation_terms_max_number=UNSET,
             equation_factors_max_number=UNSET, variable_names=None,
             eq_sparsity_interval=UNSET, derivs=None, max_deriv_order=UNSET,

@@ -740,7 +740,7 @@ class MOEADDOptimizer(object):
         builder.assemble(True)
         self.set_sector_processer(builder.processer)
     
-    def optimize(self, epochs, early_stopping_callback=None):
+    def optimize(self, epochs, early_stopping_callback=None, *, start_epoch=0, epoch_observer=None):
         """
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to
         the population, if the previous results are insufficient. The output of the
@@ -786,6 +786,8 @@ class MOEADDOptimizer(object):
                 init_block.apply(self.form_processer_args(0))
                 self._sync_weights()
             if getattr(self.pareto_levels, '_init_collapsed', False):
+                if self._pareto_history:
+                    return
                 # Init flagged a search-space collapse (see
                 # ``InitialParetoLevelSorting.apply``). Skip the epoch loop --
                 # mutation/crossover on a degenerate truncated population would
@@ -801,11 +803,13 @@ class MOEADDOptimizer(object):
                         obj = None
                     snapshot.append({'text_form': sol.text_form, 'obj_fun': obj})
                 self._pareto_history.append(snapshot)
+                if epoch_observer:
+                    epoch_observer(0, True)
                 if global_var.verbose.show_iter_idx:
                     print(f'\n*** MOEADD.optimize: early stop after init collapse '
                           f'with {len(self.pareto_levels.levels[0])} candidates. ***')
                 return
-            for epoch_idx in np.arange(epochs):
+            for epoch_idx in range(start_epoch, epochs):
                 # Refresh the PBI objective normalizer so its scale tracks
                 # the evolving population (set initially after placement in
                 # InitialParetoLevelSorting).
@@ -854,6 +858,7 @@ class MOEADDOptimizer(object):
                         print(f'       {solution.text_form}')
                     print('---')
 
+                should_stop = False
                 if early_stopping_callback is not None:
                     try:
                         should_stop = bool(early_stopping_callback(snapshot, int(epoch_idx)))
@@ -863,11 +868,14 @@ class MOEADDOptimizer(object):
                         warnings.warn(f'early_stopping_callback raised {exc!r}; the run goes on.',
                                       global_var.EPDEUsageWarning)
                         should_stop = False
-                    if should_stop:
-                        if global_var.verbose.show_iter_idx:
-                            print(f'Early stopping at epoch {int(epoch_idx) + 1}/'
-                                  f'{int(epochs)} (callback returned True).')
-                        break
+
+                if epoch_observer is not None:
+                    epoch_observer(epoch_idx + 1, should_stop)
+                if should_stop:
+                    if global_var.verbose.show_iter_idx:
+                        print(f'Early stopping at epoch {int(epoch_idx) + 1}/'
+                              f'{int(epochs)} (callback returned True).')
+                    break
 
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         """

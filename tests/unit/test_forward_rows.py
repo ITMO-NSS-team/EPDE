@@ -132,6 +132,29 @@ def test_irregular_fitted_tone_and_time_only_reduction(monkeypatch, space):
     assert fit.structure[1].structure[0].param('freq') == pytest.approx(omega, rel=1e-5)
 
 
+def test_joint_forward_frequency_fit_uses_both_named_records(monkeypatch):
+    omega = 2.1
+    records = []
+    for name, size, level in [('first', 90, 1.), ('second', 135, 3.)]:
+        t = np.arange(size) * .08
+        rate = 2. * level + .4 + np.cos(omega * t[:-1])
+        u = np.r_[0., np.cumsum(np.diff(t) * rate)]
+        records.append(epde.TrajectoryData({'t': t}, {'u': u, 'v': np.full_like(t, level)},
+                                           trajectory_id=name))
+    s = epde.EpdeMultisample(evaluation_form='forward', system_rps_mode='plain', engine='nsga2',
+                             multisample_mode='joint', default_preprocessor_type='FD')
+    rows = row_fit(s, records, monkeypatch, additional_tokens=[TrigonometricTokens()])
+    assert set(rows.keys) == {'first', 'second'}
+    tone = s.pool.create(label='cos', power=1, freq=0., dim=0)[1]
+    terms = [term(s, 'du/dx0'), term(s, 'v'), Term(s.pool, passed_term=[tone])]
+    equation = Equation(s.pool, terms, 'u', {'max_terms_number': {'value': 3},
+                                             'max_factors_in_term': {'value': 1}})
+    equation.target_idx = 0
+    # v is constant within each record. Only the pooled design distinguishes it from the intercept.
+    fitted = fit_support(equation, [1, 2], True, rows)
+    assert fitted.structure[2].structure[0].param('freq') == pytest.approx(omega, rel=1e-5)
+
+
 def test_stored_predictors_require_origin_declaration(monkeypatch):
     s = search()
     t = np.linspace(0, 3, 60)

@@ -253,6 +253,21 @@ class TestFamiliesChange:
         search.fit(data=[trajectory], max_deriv_order=(1,))
         assert len(builds) == 2                                            # rebuilt after the passed pool
 
+    def test_pool_from_another_search_rebinds_its_own_records_and_stored_tokens(self, monkeypatch):
+        donor = _search()
+        data = [_trajectory(donor, key) for key in (7, 19)]
+        forcing = np.linspace(.1, .9, len(data[0].raw_field('u')))
+        donor.create_pool(data, additional_tokens=[self._stored(forcing)])
+        families = list(donor.pool.families)
+        recipient = _search()
+        _no_search(recipient, monkeypatch)
+        recipient.fit(pool=donor.pool)
+        assert [record.ID for record in _registered()] == [7, 19]
+        for original, rebound in zip(data, _registered()):
+            assert original is not rebound
+            np.testing.assert_array_equal(rebound.raw_token('f'), forcing)
+        assert donor.pool.families == families
+
 
 # ---------------------------------------------------------------------------
 # the key: a fingerprint per family
