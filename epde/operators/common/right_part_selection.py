@@ -22,10 +22,10 @@ import epde.globals as global_var
 from epde.interface.search_config import (ASSIGNMENT_MAX_SUBSETS, active_config,
                                           assignment_subset_count, rps_param)
 
-from epde.operators.utils.template import CompoundOperator, dictApplyUFunc, dictAdd
+from epde.operators.utils.template import CompoundOperator, dictApplyUFunc
 from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
-from epde.structure.weak_rows import slot_of, term_columns
+from epde.structure.evaluation_rows import slot_of, term_columns
 from epde.structure.factor import Factor
 
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup)
@@ -484,7 +484,11 @@ class EqRightPartSelector(CompoundOperator):
                             stats_name='simplify_equation.degree_reduction')
                     objective.reset_for_structure_change()
                     return True
-        common_factors = list(frozenset.intersection(*equation_terms))
+        # String hashes vary between interpreters. Use the written factor order
+        # when more than one cancellation is possible at a restart boundary.
+        common = frozenset.intersection(*equation_terms)
+        common_factors = [f.structural_label_without_power for f in nonzero_terms[0].structure
+                          if f.structural_label_without_power in common]
         if not common_factors:
             # No symbolic reduction applies -- run the numeric completion of
             # the duplicate-term invariant: exactly linearly dependent
@@ -820,30 +824,16 @@ def amplification_ratio(objective: Equation) -> float:
         return np.inf
     nonrs = [term for i, term in enumerate(objective.structure) if i != tgt]
 
-    num = defaultdict(float) # 0.0
+    # The intercept column is a ones-vector on each record's own rows.
+    num = {key: abs(w[-1]) * np.sqrt(values.size) for key, values in t.items()}
     for wj, term in zip(w[:-1], nonrs):
         if wj == 0.0:
             continue
-        col = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1), term_columns(term, slot)) # grids=()
-        num = dictAdd(num, dictApplyUFunc(lambda x: abs(wj) * norm(x), col), suppressed=True)
+        columns = term_columns(term, slot)
+        for key in num:
+            num[key] += abs(wj) * norm(np.asarray(columns[key], dtype=float).reshape(-1))
 
-    if w[-1] != 0.0:
-        # Intercept column of ones: its norm is sqrt(n) PER SAMPLE, and ``t`` is
-        # the dict of per-sample target columns -- not a single array.
-        num = dictAdd(num, dictApplyUFunc(lambda x: abs(w[-1]) * np.sqrt(x.size), t),
-                      suppressed=True)
-
-    if not num:
-        # Every term weight and the intercept are 0: nothing reaches the
-        # target, so nothing is amplified -- the empty sum is 0, the natural
-        # ratio (A >= 0, and A < 1 is "less than the target's magnitude").
-        # The per-sample divide below would get an empty numerator dict
-        # against the target's keys and raise.
-        return 0.0
-
-    num = dictApplyUFunc(np.divide, num, den)
-
-    return np.mean(list(num.values()))
+    return np.mean([num[key] / den[key] for key in num]) if num else 0.0
 
 
 def _term_divides(term, target_term) -> bool:

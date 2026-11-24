@@ -164,6 +164,12 @@ def _spectrum_peaks(lines: np.ndarray, spacing: float):
     return peaks
 
 
+def field_spectral_peaks(field, axis, spacing):
+    """Hann spectral peaks of one observed field along its sampled axis."""
+    from epde.integrate.data_profile import _lines
+    return _spectrum_peaks(_lines(field, axis), spacing)
+
+
 def _merge_peaks(peaks):
     """``[(energy, cyclic frequency)]`` clusters of ``peaks`` (``(energy,
     frequency, bin width)`` triples), in the order their leaders are taken.
@@ -234,7 +240,7 @@ def dominant_frequencies(trajectories, axes, n: int, unit: str, band=None, per_a
     few periods in the record: one below 2 cycles per record cannot be told from
     the removed mean, and a record without any resolvable peak raises.
     """
-    from epde.integrate.data_profile import axis_coordinates, _lines   # lazy: interface -> integrate cycle
+    from epde.integrate.data_profile import axis_coordinates   # lazy: interface -> integrate cycle
 
     if unit not in ('angular', 'cyclic'):
         raise ValueError(f"unit must be 'angular' or 'cyclic', got {unit!r}.")
@@ -258,7 +264,7 @@ def dominant_frequencies(trajectories, axes, n: int, unit: str, band=None, per_a
                 if not (spacing > 0 and np.allclose(steps, spacing, rtol=1e-6, atol=0)):
                     raise ValueError(f'freq_from_data needs uniform spacing along axis {axis}; '
                                      'the spectrum is taken with an FFT.')
-                found = _spectrum_peaks(_lines(field, axis), spacing)
+                found = field_spectral_peaks(field, axis, spacing)
                 if found is not None:
                     live = True
                     peaks.extend(found)
@@ -282,26 +288,26 @@ def dominant_frequencies(trajectories, axes, n: int, unit: str, band=None, per_a
     return {axis: values for axis, values in found.items() if values}
 
 
-def _strongest(peaks, n: int, unit: str, band, axis=None) -> tuple:
-    """The ``n`` strongest clusters of ``peaks`` (``_merge_peaks``) in ``unit``
-    inside ``band``, ascending; () when there is none, with a warning when
-    there are fewer than ``n``."""
-    clusters = _merge_peaks(peaks)
+def ranked_frequencies(peaks, unit, band=None):
+    """Merged peak frequencies in descending energy order, with ties by frequency."""
     scale = 2.0 * np.pi if unit == 'angular' else 1.0
-    clusters = [(energy, freq * scale) for energy, freq in clusters]
+    clusters = [(energy, freq * scale) for energy, freq in _merge_peaks(peaks)]
     if band is not None:
         clusters = [c for c in clusters if band[0] <= c[1] <= band[1]]
-    if not clusters:
-        return ()
     clusters.sort(key=lambda c: (-c[0], c[1]))
-    chosen = clusters[:n]
-    if len(chosen) < n:
+    return tuple(float(freq) for _, freq in clusters)
+
+
+def _strongest(peaks, n: int, unit: str, band, axis=None) -> tuple:
+    """Select up to n peaks by energy and return them in frequency order."""
+    chosen = ranked_frequencies(peaks, unit, band)[:n]
+    if 0 < len(chosen) < n:
         import epde.globals as global_var
         where = '' if axis is None else f' along axis {axis}'
         warnings.warn(f'freq_from_data asked for {n} frequencies{where}; the data has only {len(chosen)} '
                       f'spectral peak(s){" in the band " + str(band) if band is not None else ""}.',
                       global_var.EPDEUsageWarning, stacklevel=3)
-    return tuple(sorted(float(freq) for _, freq in chosen))
+    return tuple(sorted(chosen))
 
 
 def _no_peak(band):

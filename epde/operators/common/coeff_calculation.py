@@ -13,7 +13,7 @@ from sklearn.linear_model import LinearRegression
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
-from epde.structure.weak_rows import slot_of, term_columns
+from epde.structure.evaluation_rows import slot_of, term_columns
 
 
 class LinRegBasedCoeffsEquation(CompoundOperator):

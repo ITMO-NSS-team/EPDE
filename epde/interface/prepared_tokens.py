@@ -8,7 +8,8 @@ Created on Wed Jul 14 13:26:56 2021
 import inspect
 from abc import ABC
 from collections import OrderedDict
-from typing import Union, Callable, List, Tuple, Dict
+from copy import copy
+from typing import Union, Callable, List, Tuple, Dict, Optional
 
 import numpy as np
 import torch
@@ -233,7 +234,7 @@ _DEFAULT_FREQ = (np.pi/2., 2*np.pi)
 
 _FREQUENCY_KINDS_DOC = """\
 The frequency is defined by ONE of these keyword sets (the others left None):
-    freq=(lo, hi) alone              continuous: any value in the interval (the default)
+    freq=(lo, hi) alone              continuous: any value in the interval
     freq_num=n                       np.linspace(lo, hi, n) of freq=(lo, hi)
     freq_num=n, freq_spacing='log'   np.geomspace(lo, hi, n)
     freq_step=s                      lo, lo + s, ..., up to hi
@@ -318,24 +319,36 @@ class TrigonometricTokens(_DimensionFromData, _FrequencyFromData, PreparedTokens
     """
     Class for prepared tokens, that belongs to the trigonometric family
     """
-    def __init__(self, freq: tuple = _DEFAULT_FREQ, dimensionality='auto', meaningful: bool = False,
+    def __init__(self, freq: tuple = _DEFAULT_FREQ, dimensionality='auto', meaningful: Optional[bool] = None,
                  freq_num: int = None, freq_spacing: str = None, freq_step: float = None,
-                 freq_values: list = None, freq_base: float = None, freq_from_data: int = None):
+                 freq_values: list = None, freq_base: float = None, freq_from_data: int = None,
+                 fit_frequencies: Optional[bool] = None, allow_products: Optional[bool] = None):
         """
         Initialization of class
 
         Args:
-            freq (`tuple`): optional, default - (pi/2., 2*pi)
-                interval for parameter frequency in trigonometric token: sin(freq * x), so an ANGULAR
-                frequency.
+            freq (`tuple`): optional interval for the angular frequency in sin(freq * x).
+                Supplying an interval selects ordinary parameter sampling.
             dimensionality (`int` or 'auto'): optional, default - 'auto'
                 the largest axis index the tokens take their argument from (the data dimension - 1);
                 'auto' takes it from the data when the pool is built.
-            meaningful (`bool`): optional, defaule - False
-                flag, if the token can be used as a separate term or term-forming factor in the equation.
+            meaningful: Allow the token to start a term. Defaults to fit_frequencies.
+            fit_frequencies: By default a causal forward search or a plain weak search with plain derivative targets fits each
+                angular frequency together with the equation coefficients, up to its axis's Nyquist
+                bound. The two strongest resolvable peaks per axis in the training observations
+                supplement the residual-based starts. The fit with the lowest weighted training
+                residual supplies the frequency. An explicit band or grid selects ordinary sampling.
+                Other searches sample from (pi/2, 2*pi) by default. False opts out and True
+                requires equation fitting.
+            allow_products: Allow sine and cosine factors in the same term. Defaults to fit_frequencies.
             freq_num, freq_spacing, freq_step, freq_values, freq_base, freq_from_data: optional, default - None
                 how the frequency is defined; see the table below.
         """
+        explicit_frequency = ((freq is not _DEFAULT_FREQ and freq is not None) or
+                              any(v is not None for v in (freq_num, freq_spacing, freq_step,
+                                                          freq_values, freq_base, freq_from_data)))
+        if fit_frequencies and explicit_frequency:
+            raise ValueError('fit_frequencies uses the sampling Nyquist bound and takes no frequency grid or band.')
         if freq is None:                        # JSON null: the same as not passing it
             freq = _DEFAULT_FREQ
         auto_dim = _checked_dimensionality(dimensionality)
@@ -357,8 +370,12 @@ class TrigonometricTokens(_DimensionFromData, _FrequencyFromData, PreparedTokens
             freq = bounds if bounds is not None else (0.0, np.inf)
 
         self._token_family = TokenFamily(token_type='trigonometric')
-        self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
-                                      meaningful=meaningful)
+        products = bool(fit_frequencies) if allow_products is None else allow_products
+        self._token_family.set_status(unique_specific_token=True, unique_token_type=not products,
+                                      meaningful=bool(fit_frequencies) if meaningful is None else meaningful,
+                                      available_at_origin=True)
+        if fit_frequencies:
+            self._token_family.status['fit_frequencies'] = True
             
         def latex_form(label, **params):
             '''
@@ -397,16 +414,42 @@ class TrigonometricTokens(_DimensionFromData, _FrequencyFromData, PreparedTokens
         # scored. It also made the trig tokens mutually "equal" under
         # ``Factor.__eq__``, which collapses dedup across the whole family.
         trig_equal_params = {'power': 0,
-                             'freq': 0. if kind == 'data' else (freq[1] - freq[0]) * freq_equality_fraction,
+                             'freq': 0. if kind == 'data' or fit_frequencies else (freq[1] - freq[0]) * freq_equality_fraction,
                              'dim': 0}
         # With a grid the family replaces the freq equality range by half the grid's gap.
         self._token_family.set_params(['sin', 'cos'], trig_token_params, trig_equal_params,
                                       param_grids=None if grid is None else {'freq': grid})
+        if fit_frequencies is None and not explicit_frequency:
+            self._token_family._auto_frequency_defaults = (
+                meaningful, allow_products, freq, trig_equal_params['freq'])
         self._token_family.set_evaluator(trigonometric_evaluator)
         if kind == 'data':
             self._defer_frequencies(freq_from_data, bounds, axes=range(dimensionality + 1), unit='angular')
         if auto_dim:
             self._defer_dimensionality()
+
+    @staticmethod
+    def bind_frequency_mode(family, supported):
+        """Bind an automatic family to one pool, preserving earlier pools and their factors."""
+        meaningful, products, band, tolerance = family._auto_frequency_defaults
+        bound = copy(family)
+        bound.tokens = family.tokens.copy()
+        bound.status = family.status.copy()
+        has_grid = 'freq' in (family.param_grids or {})
+        enabled = supported and not has_grid
+        if meaningful is None:
+            bound.status['meaningful'] = enabled
+        if products is None:
+            bound.status['unique_token_type'] = not enabled
+        if enabled:
+            bound.status['fit_frequencies'] = True
+            bound.equality_ranges = dict(family.equality_ranges, freq=0.)
+        elif bound.status.pop('fit_frequencies', False):
+            bound.status.pop('frequency_nyquist', None)
+            if not has_grid:
+                bound.install_param_range('freq', band)
+                bound.equality_ranges = dict(family.equality_ranges, freq=tolerance)
+        return bound
 
     def _dimensionality_installed(self, dimensionality: int) -> None:
         if self._freq_from_data is not None:
@@ -444,7 +487,7 @@ class PhasedSine1DTokens(_FrequencyFromData, PreparedTokens):
             freq = bounds if bounds is not None else (0.0, np.inf)
         self._token_family = TokenFamily(token_type='phased_sine_1d')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
-                                      meaningful=False)
+                                      meaningful=False, available_at_origin=True)
         
         sine_token_params = OrderedDict([('power', (1, 1)),#tuple([(1, 1) for idx in range(dimensionality)])),
                                          ('freq', freq),
@@ -576,12 +619,15 @@ class LogfunTokens(PreparedTokens):
 
 class CustomTokens(PreparedTokens):
     """
-    Class for customer tokens
+    User-defined tokens. For forward fitting, ``available_at_origin=True``
+    declares that each value can be computed from information available at
+    its timestamp. This declaration also covers tensors in CacheStoredTokens.
     """
     def __init__(self, token_type: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
                  params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
-                 unique_specific_token=True, unique_token_type=True, meaningful=False, non_default_power = False):
+                 unique_specific_token=True, unique_token_type=True, meaningful=False, non_default_power = False,
+                 available_at_origin=False):
         
         """
         Initialization of class
@@ -602,6 +648,7 @@ class CustomTokens(PreparedTokens):
         """
         self._token_family = TokenFamily(token_type=token_type)
         self._token_family.set_status(unique_specific_token=unique_specific_token,
+                                      available_at_origin=available_at_origin,
                                       unique_token_type=unique_token_type, 
                                       meaningful=meaningful,
                                       non_default_power = non_default_power)
@@ -641,7 +688,8 @@ class CacheStoredTokens(CustomTokens):
                  token_tensors: Dict[str, np.ndarray] = None,
                  params_ranges: dict = None, params_equality_ranges: Union[None, dict] = None,
                  dimensionality: int = 1,
-                 unique_specific_token=True, unique_token_type=True, meaningful=False,non_default_power = True):
+                 unique_specific_token=True, unique_token_type=True, meaningful=False,non_default_power = True,
+                 available_at_origin=False):
         try:
             assert global_var.samples_manager is not None, 'Unintended logic: sample manager was initialized as None.'
         except AttributeError:
@@ -656,6 +704,7 @@ class CacheStoredTokens(CustomTokens):
         self.token_tensors = token_tensors
 
         super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simple_function_evaluator,
+                         available_at_origin=available_at_origin,
                          params_ranges=params_ranges, params_equality_ranges=params_equality_ranges,
                          dimensionality=dimensionality, unique_specific_token=unique_specific_token,
                          unique_token_type=unique_token_type, meaningful=meaningful, non_default_power = non_default_power)
@@ -727,7 +776,7 @@ class ConstantToken(PreparedTokens):
         assert len(values_range) == 2 and values_range[0] < values_range[1], 'Range of the values has not been stated correctly.'
         self._token_family = TokenFamily(token_type='constants')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
-                                      meaningful=False)
+                                      meaningful=False, available_at_origin=True)
         const_token_params = OrderedDict([('power', (1, 1)),
                                           ('value', values_range)])
         if - values_range[0] == np.inf or values_range[0] == np.inf:

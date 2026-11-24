@@ -3,13 +3,14 @@ predicted a repeat (the plan's redraws exhausted) does before its first fit.
 
 Pinned here:
 
-* the configuration -- the default, the menu, the refusal of ``'mutate'`` outside per-variable niching, the
-  ``EpdeSearch`` keyword;
+* the configuration -- the default (``'auto'``), the menu, how ``'auto'`` resolves with the niching, the
+  refusal of ``'mutate'`` (and the acceptance of ``'auto'``) outside per-variable niching, the ``EpdeSearch``
+  keyword;
 * ``per_variable.select`` -- the per-pair flags, and the global random draws it makes;
 * ``per_variable.assemble`` -- the first mutation skipped or not, and the plan status the child carries;
 * the loop counters of a short fit -- planned pairs and first fits of the assembled children;
-* a seeded fit with ``planned_duplicates='fit'`` equals the same fit without the key, and one with
-  ``'mutate'`` finishes.
+* a seeded fit without the key equals the same fit with ``planned_duplicates='auto'`` and with ``'mutate'``,
+  and one with ``'fit'`` finishes.
 """
 import warnings
 from contextlib import contextmanager
@@ -23,7 +24,8 @@ import epde
 import epde.globals as global_var
 from epde import _loop_stats
 from epde.interface.search_config import (PLANNED_DUPLICATES, active_config, collect_overrides,
-                                          load_search_config, set_active_config)
+                                          load_search_config, resolve_planned_duplicates,
+                                          set_active_config)
 from epde.operators.common import plain_fit as PF
 from epde.optimizers.nsga import per_variable as PV
 
@@ -118,9 +120,34 @@ def _two_apart(systems):
 
 class TestConfig:
 
-    def test_the_default_is_fit(self):
-        assert load_search_config().evolution.planned_duplicates == 'fit'
+    def test_the_default_is_auto(self):
+        assert load_search_config().evolution.planned_duplicates == 'auto'
         assert PLANNED_DUPLICATES == ('fit', 'mutate')
+
+    @pytest.mark.parametrize('extra, expected', [
+        (UNIVERSAL, 'mutate'),
+        ({**UNIVERSAL, 'niching': 'per_variable'}, 'mutate'),
+        ({}, 'fit'),
+        ({'system_rps_mode': 'plain', 'engine': 'moeadd'}, 'fit'),
+        ({**UNIVERSAL, 'niching': 'system'}, 'fit'),
+        ({**UNIVERSAL, 'niching': 'per_equation'}, 'fit')])
+    def test_auto_resolves_with_the_niching(self, extra, expected):
+        evolution = _config(**extra)
+        assert evolution.evolution.planned_duplicates == 'auto'
+        assert resolve_planned_duplicates('auto', evolution.evolution.niching,
+                                          evolution.search_space.system_rps_mode,
+                                          evolution.evolution.engine) == expected
+
+    def test_an_explicit_value_resolves_to_itself(self):
+        for value in PLANNED_DUPLICATES:
+            assert resolve_planned_duplicates(value, 'system', 'plain', 'moeadd') == value
+            assert resolve_planned_duplicates(value, 'auto', 'plain', 'nsga2') == value
+
+    @pytest.mark.parametrize('extra', [{}, {'system_rps_mode': 'plain'},
+                                       {'system_rps_mode': 'plain', 'engine': 'nsga2', 'niching': 'system'},
+                                       {'system_rps_mode': 'plain', 'engine': 'nsga2', 'niching': 'per_equation'}])
+    def test_auto_is_accepted_where_mutate_is_refused(self, extra):
+        assert _config(planned_duplicates='auto', **extra).evolution.planned_duplicates == 'auto'
 
     def test_a_value_outside_the_menu_is_refused(self):
         with pytest.raises(ValueError, match='planned_duplicates must be one of'):
@@ -141,7 +168,7 @@ class TestConfig:
 
     def test_the_search_keyword_reaches_the_config(self):
         assert _search(planned_duplicates='mutate')._config.evolution.planned_duplicates == 'mutate'
-        assert _search()._config.evolution.planned_duplicates == 'fit'
+        assert _search()._config.evolution.planned_duplicates == 'auto'
         with pytest.raises(ValueError, match='planned_duplicates'):
             epde.EpdeSearch(planned_duplicates='mutate')
 
@@ -198,11 +225,22 @@ class TestSelect:
 class TestAssemble:
 
     @staticmethod
-    def _assemble(fitted, planned_duplicate, setting):
+    def _assemble(fitted, planned_duplicate, setting, **extra):
         A, B = fitted[:2]
         keys = list(A.vals.equation_keys)
-        with _active(_config(planned_duplicates=setting, **UNIVERSAL)):
+        with _active(_config(planned_duplicates=setting, **{**UNIVERSAL, **extra})):
             return PV.assemble(A, keys[0], B, keys[1], keys, frozenset(), planned_duplicate)
+
+    def test_under_auto_a_planned_duplicate_is_mutated_first(self, fitted):
+        child = self._assemble(fitted, True, 'auto')
+        assert PV.skip_first_mutation(child) is False
+        child = self._assemble(fitted, False, 'auto')
+        assert PV.skip_first_mutation(child) is True
+
+    def test_under_auto_outside_per_variable_niching_every_child_skips(self, fitted):
+        for flagged in (True, False):
+            child = self._assemble(fitted, flagged, 'auto', niching='system')
+            assert PV.skip_first_mutation(child) is True
 
     def test_under_fit_every_assembled_child_skips_its_first_mutation(self, fitted):
         for flagged in (True, False):
@@ -275,11 +313,13 @@ class TestFits:
         outcomes = {'placed', 'swapped', 'sibling', 'nothing'}
         assert all(site.split('.')[2] in statuses and site.split('.')[3] in outcomes for site in firsts)
 
-    def test_fit_given_explicitly_equals_the_key_absent(self):
-        absent, given = _run(), _run(planned_duplicates='fit')
-        assert absent.front and absent.front == given.front
-        assert absent.history == given.history
-        assert absent.population == given.population
+    def test_auto_and_mutate_given_explicitly_equal_the_key_absent(self):
+        absent = _run()
+        for setting in ('auto', 'mutate'):
+            given = _run(planned_duplicates=setting)
+            assert absent.front and absent.front == given.front
+            assert absent.history == given.history
+            assert absent.population == given.population
 
-    def test_a_fit_under_mutate_finishes_with_a_front(self):
-        assert _run(planned_duplicates='mutate').front
+    def test_a_fit_under_fit_finishes_with_a_front(self):
+        assert _run(planned_duplicates='fit').front

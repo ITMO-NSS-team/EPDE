@@ -26,7 +26,8 @@ representatives, identical points sharing one distance.
   A-side child of the usual chromosome crossover. The assembled child of a
   planned duplicate skips its first mutation too under
   ``evolution.planned_duplicates='fit'`` and is mutated before its first fit
-  under ``'mutate'``; every assembled child carries its plan status
+  under ``'mutate'``; ``'auto'`` (the default) resolves to ``'mutate'`` under
+  this niching. Every assembled child carries its plan status
   (:func:`take_plan_status`).
 * Initial population (:class:`PerPlaneFirstLevelCount`): at most half the
   systems on level 0 of EVERY plane.
@@ -306,8 +307,12 @@ def _replace(vals, key, value) -> None:
 def assemble(A, kA, B, kB, keys, from_b, planned_duplicate=False):
     """deepcopy(A) with B's equation at kB and at every key of ``from_b``; no fit, no target. It carries its
     plan status (:data:`PLAN_STATUS`) and skips its first mutation, unless ``planned_duplicate`` and
-    ``evolution.planned_duplicates='mutate'``."""
-    from epde.interface.search_config import active_config
+    ``evolution.planned_duplicates`` resolves to ``'mutate'`` (:func:`resolve_planned_duplicates`)."""
+    from epde.interface.search_config import active_config, resolve_planned_duplicates
+    config = active_config()
+    planned = resolve_planned_duplicates(
+        config.evolution.planned_duplicates, config.evolution.niching,
+        config.search_space.system_rps_mode, config.evolution.engine)
     child = deepcopy(A)
     _replace(child.vals, kB, deepcopy(B.vals[kB]))
     for k in keys:
@@ -316,7 +321,7 @@ def assemble(A, kA, B, kB, keys, from_b, planned_duplicate=False):
     if hasattr(child, 'reset_state'):
         child.reset_state(True)
     child.__dict__[PLAN_STATUS] = PLAN_DUPLICATE if planned_duplicate else PLAN_NEW
-    if not (planned_duplicate and active_config().evolution.planned_duplicates == 'mutate'):
+    if not (planned_duplicate and planned == 'mutate'):
         child.__dict__[SKIP_FIRST_MUTATION] = True
     return child
 

@@ -41,7 +41,7 @@ from epde.integrate import SolverAdapter
 # triggering deepxde's import-time backend banner when no DeepXDE solver
 # is used (the solver-free path never imports it).
 from epde.structure.main_structures import SoEq, Equation
-from epde.structure.weak_rows import slot_of
+from epde.structure.evaluation_rows import slot_of
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
 from epde.interface.search_config import active_config

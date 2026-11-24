@@ -234,6 +234,7 @@ class Fields:
         self.values = {k: np.asarray(v, dtype=float) for k, v in values.items()}
         self.axes = [np.asarray(a, dtype=float).reshape(-1) for a in axes]
         self.D = len(self.axes)
+        self.window_axes = tuple(range(self.D))
         self.shape = tuple(a.size for a in self.axes)
         for k, v in self.values.items():
             if v.shape != self.shape:
@@ -252,8 +253,17 @@ class Fields:
                 a = max(i for i, o in enumerate(orders) if o > 0)
                 lo = list(orders)
                 lo[a] -= 1
-                self._cache[key] = _central4(self.get(var, tuple(lo)), self.axes[a], a)
+                self._cache[key] = self.spatial_derivative(self.get(var, tuple(lo)), self.axes[a], a)
         return self._cache[key]
+
+    spatial_derivative = staticmethod(_central4)
+
+    def noise_draw(self, rng, names):
+        drawn = dict(self.values)
+        for name in names:
+            sig, rhos, _ = noise_model(self.values[name])
+            drawn[name] = self.values[name] + ar_noise(rng, self.shape, sig, rhos)
+        return self.with_values(drawn)
 
     def point(self, data, coords, opaque=()) -> np.ndarray:
         """Pointwise product of data factors, coordinate powers and opaque factors on the full grid."""
@@ -308,6 +318,11 @@ def window_kernels(ms: Sequence[int], steps: Sequence[float], q: Sequence[int], 
     K = []
     for d in range(len(ms)):
         m, h = int(ms[d]), float(steps[d])
+        if m == 0:
+            if g_max[d]:
+                raise ValueError('A pointwise axis cannot differentiate a test function.')
+            K.append([np.ones(1)])
+            continue
         mass = float(exact_kernel(m, q[d], 0).sum()) * m * h       # int psi dx (the P_0 moment is exact)
         K.append([exact_kernel(m, q[d], g) * (m * h) ** (1 - g) / mass for g in range(int(g_max[d]) + 1)])
     return K
@@ -317,6 +332,8 @@ def wint_s(f: np.ndarray, gam: Sequence[int], ms: Sequence[int], ss: Sequence[in
     """Separable window integrals of ``f`` against ``D^gam psi`` with half-widths ``ms`` and row strides ``ss``:
     an array of the lattice shape."""
     for a in range(f.ndim):
+        if ms[a] == 0:
+            continue
         w = K[a][gam[a]]
         v = sliding_window_view(f, w.size, axis=a)
         sl = [slice(None)] * v.ndim
@@ -326,7 +343,7 @@ def wint_s(f: np.ndarray, gam: Sequence[int], ms: Sequence[int], ss: Sequence[in
 
 
 def lattice_shape(n_eff: Sequence[int], ms: Sequence[int], ss: Sequence[int]) -> Tuple[int, ...]:
-    return tuple((int(n) - 2 * int(m) - 1) // int(s) + 1 for n, m, s in zip(n_eff, ms, ss))
+    return tuple((int(n) - 2 * int(m) - 1) // max(1, int(s)) + 1 for n, m, s in zip(n_eff, ms, ss))
 
 
 # ------------------------------------------------------------------------------------------ noise model
@@ -580,7 +597,7 @@ def kept_shares(fields: Fields, draw: Fields, cut: Sequence[int], ms: Sequence[i
     own, drawn = (None, None) if caches is None else caches
     M, shape = weak_matrix(monos, opq, fields, cut, ms, ms, q, own)
     Md, _ = weak_matrix(monos, opq, draw, cut, ms, ms, q, drawn)
-    centres = np.ix_(*[int(m) + int(m) * np.arange(n) for m, n in zip(ms, shape)])
+    centres = np.ix_(*[int(m) + max(1, int(m)) * np.arange(n) for m, n in zip(ms, shape)])
     out = []
     for k, v in enumerate(names):
         a = _crop(fields.values[v], cut)
@@ -613,7 +630,7 @@ class WindowPlan:
 
     def __init__(self, j, r, ms, ss, cut, shape, score, table=(), *, kept=None, admissible=None, shares=None):
         self.j, self.r = int(j), tuple(int(x) for x in r)
-        self.q = tuple(x + self.j for x in self.r)
+        self.q = tuple(x + self.j if m else 0 for x, m in zip(self.r, ms))
         self.ms, self.ss = tuple(int(x) for x in ms), tuple(int(x) for x in ss)
         self.cut, self.shape = tuple(int(x) for x in cut), tuple(int(x) for x in shape)
         self.score, self.table = float(score), list(table)
@@ -635,7 +652,7 @@ def _stride(n_eff, ms, p, rows_ok):
     """The row stride: start at the half-width (50% overlap) and halve until the rows determine a fit of the
     whole library (rows > p + 1) and pass ``rows_ok`` (the instability metric's floor); ``None`` if even
     stride 1 does not."""
-    ss = list(ms)
+    ss = [max(1, m) for m in ms]
     while True:
         shape = lattice_shape(n_eff, ms, ss)
         if min(shape) >= 1 and int(np.prod(shape)) > p + 1 and rows_ok(shape):
@@ -673,7 +690,11 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
     D = fields.D
     if not targets:
         raise ValueError('the slot has no candidate target in its selection library.')
-    monos = [t.monomials() for t in library]
+    active = fields.window_axes
+    # A forward time derivative is a measured target. Only the integration
+    # axes can transfer derivatives to a test function.
+    cap = None if len(active) == D else tuple(np.inf if d in active else 0 for d in range(D))
+    monos = [t.monomials(psi_cap=cap) for t in library]
     opq = [t.opaque for t in library]
     r = [0] * D
     left = [0] * D
@@ -681,24 +702,23 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
         r = [max(a, b) for a, b in zip(r, psi_orders(mo, D))]
         left = [max(a, b) for a, b in zip(left, leftover_orders(mo, D))]
     if cut is None:
-        cut = [2 * FD_REACH * x for x in left]
+        cut = [2 * FD_REACH * x if d in active else 0 for d, x in enumerate(left)]
     cut = [int(c) for c in cut]
     if any(c % 2 for c in cut):
         raise ValueError(f'the edge cut {cut} must be even (the every-other-sample grid keeps half of it).')
     for mo in monos:
-        check_cut(mo, D, [c // 2 for c in cut])               # the coarse grid's reach, in its own samples
+        check_cut(mo, D, [c // 2 if d in active else np.inf for d, c in enumerate(cut)])
     cut_s = [c // 2 for c in cut]
     coarse = fields.every_other()
     names = list(fields.values) if noise_vars is None else list(noise_vars)
-    drawn = dict(fields.values)
-    for k in names:
-        sig, rhos, _ = noise_model(fields.values[k])
-        drawn[k] = fields.values[k] + ar_noise(rng, fields.values[k].shape, sig, rhos)
-    draw = fields.with_values(drawn)
+    draw = fields.noise_draw(rng, names)
     n_eff = [fields.shape[d] - 2 * cut[d] for d in range(D)]
     n_eff_s = [coarse.shape[d] - 2 * cut_s[d] for d in range(D)]
     per_axis = []
     for d in range(D):
+        if d not in active:
+            per_axis.append([0])
+            continue
         ms_d, m = [], 2
         while n_eff[d] >= 2 * m + 1:
             ms_d.append(m)
@@ -717,13 +737,13 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
             if j in done:
                 continue
             done.add(j)
-            q = [x + j for x in r]
+            q = [x + j if d in active else 0 for d, x in enumerate(r)]
             for ms in product(*per_axis):
                 st = _stride(n_eff, ms, p, rows_ok)
                 if st is None:
                     continue
                 ss, shape = st
-                msc = [max(1, m // 2) for m in ms]
+                msc = [max(1, m // 2) if m else 0 for m in ms]
                 if any(n_eff_s[d] < 2 * msc[d] + 1 for d in range(D)):
                     continue
                 # the score reads the window's own (non-overlapping-centre) rows, stride m, and the coarse grid at

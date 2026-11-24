@@ -62,17 +62,20 @@ def _deepxde_adapter():
     return DeepXDEAdapter
 
 
-@pytest.fixture(scope='module')
-def fitted():
+def _finished_search(preprocessor_kwargs=None):
     """A finished two-trajectory 1-D search, so the trajectory accessors have
     something to answer with. The tensor cache is kept after fit: the DeepXDE
     tests translate and fit an equation afterwards, and the post-fit release
-    empties the term cache (``Cache.get`` then raises KeyError)."""
+    empties the term cache (``Cache.get`` then raises KeyError).
+
+    ``preprocessor_kwargs`` go to the finite-difference preprocessor; None
+    takes its defaults. ``test_lr_free_solve`` passes the difference order its
+    bitwise pins were captured under."""
     search = epde.EpdeSearch(multiobjective_mode=False,
                              free_tensor_cache_after_fit=False,
                              verbose_params={'show_iter_idx': False})
     search.set_preprocessor(default_preprocessor_type='FD',
-                            preprocessor_kwargs={})
+                            preprocessor_kwargs=dict(preprocessor_kwargs or {}))
     search.set_singleobjective_params(population_size=4, training_epochs=1)
     grid = np.linspace(0, 4 * np.pi, 100)
     trajectories = []
@@ -84,6 +87,12 @@ def fitted():
     search.fit(data=trajectories, max_deriv_order=(2,), data_fun_pow=1,
                equation_terms_max_number=3, equation_factors_max_number=1)
     return search
+
+
+@pytest.fixture(scope='module')
+def fitted():
+    """The finished search on the preprocessor's default settings."""
+    return _finished_search()
 
 
 def _scan(needles):

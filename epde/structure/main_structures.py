@@ -35,7 +35,7 @@ from epde.preprocessing.domain_pruning import DomainPruner
 from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness, _deepcopy_slots
-from epde.structure.weak_rows import slot_of, term_columns
+from epde.structure.evaluation_rows import current_rows, slot_of, term_columns
 from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form, minmax_normalize, retry_until_unique
 
 
@@ -256,14 +256,14 @@ class Term(ComplexStructure):
         if grids is not None:
             # FIX! grids are not used in the process...
             raise NotImplementedError("Trying to call Term.evaluate(grids != None), which is not yet implemented.")
-        weak = getattr(global_var.samples_manager, 'weak', None)
-        if weak is not None:
+        rows = current_rows()
+        if rows is not None:
             if slot is None:
                 raise RuntimeError(
                     f"Term.evaluate() of {self.name} without an equation slot under "
-                    "domain.evaluation_form='weak': weak rows are set per slot. Pass "
+                    f"domain.evaluation_form='{rows.form}': measurement rows are set per slot. Pass "
                     'slot=<equation>.main_var_to_explain.')
-            return weak.columns(self, slot)
+            return rows.columns(self, slot)
 
         if self.saved[False] or (self.factors_labels, False) in global_var.samples_manager:
             values = global_var.samples_manager.get(self.factors_labels, normalized=False,
@@ -627,14 +627,21 @@ class Equation(ComplexStructure):
         low = min(max(2, self.n_immutable), max_terms)
         high = max_terms
         birth_n = np.random.randint(low, high + 1) if low <= high else max_terms
-        for i in range(len(basic_structure), birth_n):
+        rows = current_rows()
+        forward = getattr(rows, 'form', None) == 'forward' and rows.pool is self.pool
+        first_slot = len(basic_structure)
+        if forward and not first_slot:
+            rows.ensure_target(self)
+            first_slot = len(self.structure)
+        for i in range(first_slot, birth_n):
             new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                             mandatory_family=None, passed_term=None)
             def _term_mutate():
                 new_term.randomize()
                 new_term.resetSavedState()
             success, _ = retry_until_unique(
-                predicate=lambda: new_term.factors_labels not in self.terms_labels,
+                predicate=lambda: (new_term.factors_labels not in self.terms_labels
+                                   and (not forward or rows.is_predictor(new_term))),
                 mutate=_term_mutate,
                 max_iter=max_iter,
                 stats_name='Equation.__init__.unique_term',
@@ -1269,7 +1276,7 @@ class Equation(ComplexStructure):
     def add_history(self, add):
         self._history += add
 
-    def add_random_term(self, forbidden_sigs=frozenset()) -> bool:
+    def add_random_term(self, forbidden_sigs=frozenset(), allowed=None) -> bool:
         """Try to append one fresh, non-duplicate term to ``self.structure``.
 
         Returns ``True`` if a term was appended, ``False`` if either the
@@ -1301,7 +1308,8 @@ class Equation(ComplexStructure):
                         mandatory_family=None, passed_term=None)
         success, _ = retry_until_unique(
             predicate=lambda: (new_term.factors_labels not in self.terms_labels
-                               and new_term.factors_labels not in forbidden_sigs),
+                               and new_term.factors_labels not in forbidden_sigs
+                               and (allowed is None or allowed(new_term))),
             mutate=lambda: new_term.randomize(),
             max_iter=max_iter,
             stats_name='add_random_term',

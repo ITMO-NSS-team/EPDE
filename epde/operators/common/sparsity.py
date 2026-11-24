@@ -18,7 +18,7 @@ import epde.globals as global_var
 from epde.interface.search_config import active_config
 from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
-from epde.structure.weak_rows import slot_of, term_columns
+from epde.structure.evaluation_rows import slot_of, term_columns
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup,
                                              cv_scores)  #(calculate_weights, GramSetup,
                                                                          # VaryingCoefSetup)

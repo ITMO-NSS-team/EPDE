@@ -98,7 +98,8 @@ class TokenFamily(object):
 
     def set_status(self, demands_equation=False, meaningful=False,
                    s_and_d_merged=True, unique_specific_token=False,
-                   unique_token_type=False, requires_grid=False, non_default_power=False) -> None:
+                   unique_token_type=False, requires_grid=False, non_default_power=False,
+                   available_at_origin=False) -> None:
         """
         Set the status of the elements of the token family; 
 
@@ -123,6 +124,10 @@ class TokenFamily(object):
         self.status['unique_token_type'] = unique_token_type
         self.status['requires_grid'] = requires_grid
         self.status['non_default_power'] = non_default_power
+        if not isinstance(available_at_origin, (bool, np.bool_)):
+            raise ValueError('available_at_origin must be a boolean.')
+        if available_at_origin:
+            self.status['available_at_origin'] = True
 
     def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None,
                    param_grids: dict = None) -> None:
@@ -155,6 +160,7 @@ class TokenFamily(object):
         assert bool(derivs_solver_orders is not None) == bool(
             self.family_of_derivs), 'Solver form must be set for derivatives, and only for them.'
 
+        self._pruned_from = None
         self.tokens = tokens
         self.token_params = token_params
         if self.family_of_derivs:
@@ -380,6 +386,20 @@ class TokenFamily(object):
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
+    @property
+    def declared_tokens(self):
+        """The input labels before a dataset's constancy check."""
+        return getattr(self, '_pruned_from', None) or self.tokens
+
+    def for_search(self):
+        from copy import copy
+        bound = copy(self)
+        bound.tokens = list(self.declared_tokens)
+        bound.status = self.status.copy()
+        bound.deferred_params = set(self.deferred_params)
+        bound._pruned_from = None
+        return bound
+
     def chech_constancy(self, **tfkwargs) -> None:
         """Filter tokens constant across the active records.
 
@@ -406,6 +426,8 @@ class TokenFamily(object):
             if math.isclose(minimum, maximum):
                 constant_tokens_labels.append(label)
 
+        if constant_tokens_labels and not getattr(self, '_pruned_from', None):
+            self._pruned_from = tuple(self.tokens)
         for label in constant_tokens_labels:
             print(f'Function {label} is assumed to be constant in the studied domain. \
                     Removed from the equaton search.')
@@ -473,6 +495,15 @@ class TokenFamily(object):
             occupied_by_factor = {label: 1}
         # A family pickled before param_grids existed has no attribute.
         param_grids = getattr(self, 'param_grids', None)
+        if self.status.get('fit_frequencies') and 'frequency_nyquist' not in self.status:
+            raise ValueError('Build the pool on coordinate grids before drawing a fitted frequency.')
+        if self.status.get('fit_frequencies') and factor_params:
+            if factor_params.keys() != self.token_params.keys():
+                raise ValueError('An explicit fitted trigonometric factor needs power, freq and dim.')
+            factor_params = {k: factor_params[k] for k in self.token_params}
+            dim = factor_params['dim']
+            if not np.isfinite(dim) or dim != int(dim) or not 0 <= dim < len(self.status['frequency_nyquist']):
+                raise ValueError(f'Invalid coordinate axis {dim} for a fitted frequency.')
         if len(factor_params) == 0:
             new_factor.set_parameters(params_description=self.token_params,
                                       equality_ranges=self.equality_ranges,
@@ -485,6 +516,16 @@ class TokenFamily(object):
                                       equality_ranges=self.equality_ranges,
                                       random=False, param_grids=param_grids,
                                       **factor_params)
+        if self.status.get('fit_frequencies'):
+            indices = {v['name']: i for i, v in new_factor.params_description.items()}
+            axis = int(new_factor.params[indices['dim']])
+            upper = self.status['frequency_nyquist'][axis]
+            idx = indices['freq']
+            if not factor_params:
+                new_factor.set_param(new_factor.params[idx] * upper / self.token_params['freq'][1], idx=idx)
+            elif not 0 <= new_factor.params[idx] <= upper:
+                raise ValueError(f'Frequency is outside the Nyquist interval [0, {upper}] for axis {axis}.')
+            new_factor.params_description[idx]['bounds'] = (0., upper)
         new_factor.evaluator = self._evaluator
 
         return occupied_by_factor, new_factor

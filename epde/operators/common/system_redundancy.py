@@ -194,7 +194,10 @@ def redundant_equations(equations: list, ranges: list = None, order: list = None
             for term in eq.structure:
                 for factor in term.structure:
                     evaluated = _factor(factor, jet, ndim)
-                    multipliers.append(evaluated[0])
+                    # A zero-weight term is left out of the residual, so it may hold a token this test
+                    # does not differentiate; such a factor is no multiplier.
+                    if evaluated is not None:
+                        multipliers.append(evaluated[0])
             columns = []
             for j, (other, grads) in enumerate(residuals):
                 if j == i or j in redundant:

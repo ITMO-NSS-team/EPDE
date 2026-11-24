@@ -695,7 +695,7 @@ class TestVcoefMicroscale:
         assert _vc_cache_key((60,), 'u', None) == ((60,), 'u', 0, 'vc')
         assert _vc_cache_key((60,), 'u', 0, ((2,), (120,))) != _vc_cache_key((60,), 'u', 0)
 
-    def test_a_lattice_and_a_box_of_the_same_shape_do_not_share_modes(self, vc_cache):
+    def test_a_lattice_and_a_box_of_the_same_shape_do_not_share_modes(self):
         """Every long record thins to about the same row count, so the lattice
         shape alone does not name the field: a box of 2 R points thinned to R
         and an unthinned box of R points must each get their own modes (R the
@@ -710,13 +710,13 @@ class TestVcoefMicroscale:
 
         # a configured stride applies to every domain of its search, so the
         # unthinned box comes from a search without a budget. Constructing it
-        # clears vc_modes_cache, so the lattice's entry is put back: without
+        # gives it a separate cache, so the lattice's entry is put back: without
         # that the box's modes would be computed on an empty cache and a key
         # that named only the shape would go unnoticed.
-        lattice_entries = dict(vc_cache)
+        lattice_entries = dict(global_var.vc_modes_cache)
         assert lattice_entries
         search = _search()
-        vc_cache.update(lattice_entries)
+        global_var.vc_modes_cache.update(lattice_entries)
         grids = _grids(slow_shape)
         slow = search.createTrajectory({'u': np.sin(2 * grids)},
                                        _domain(search, slow_shape, BW_1D, domain_id=1), cache_id=0)[1]

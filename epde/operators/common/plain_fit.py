@@ -55,7 +55,7 @@ import epde.globals as global_var
 from epde import _loop_stats
 from epde.interface.search_config import active_config, plain_kept_terms_cap, target_axes_of
 from epde.operators.common.system_redundancy import redundant_equations
-from epde.structure.weak_rows import slot_of
+from epde.structure.evaluation_rows import current_rows, slot_of
 
 
 # Sibling systems by the id of the system whose fit produced them. Keyed by id
@@ -127,6 +127,9 @@ def is_target_term(term, var, plain: bool, axes=None) -> bool:
     ``system_rps_params['target_axes']``)."""
     if not plain:
         return term.contains_deriv(var)
+    rows = current_rows()
+    if getattr(rows, 'form', None) == 'forward':
+        return rows.is_target(term, var)
     return is_plain_term(term, var) and (axes is None or frozenset(term.structure[0].deriv_code) <= axes)
 
 
@@ -194,6 +197,10 @@ def _ensure_target(equation, plain: bool) -> bool:
     rolled back after every draw that brought none. False when none
     appeared."""
     from epde.operators.common.right_part_selection import _ensure_own_derivative
+    rows = current_rows()
+    if getattr(rows, 'form', None) == 'forward':
+        rows.ensure_target(equation)
+        return True
     if not plain:
         return _ensure_own_derivative(equation)
     var = equation.main_var_to_explain
@@ -229,15 +236,37 @@ def start_variable_order(seed=None) -> None:
 
 def release() -> None:
     """Drop what plain mode keeps between calls: the sibling hand-over, the plain-token verdicts, the variable
-    order's generator, the fill-and-prune library and Gram stores, the product rule's group memo, and the
-    system-redundancy test's reported reasons."""
-    from epde.operators.common import fill_prune, product_rule, system_redundancy
+    order's generator, the fill-and-prune library and Gram stores, the product rule's group memo, the
+    system-redundancy test's reported reasons and the invariant rule of every pool."""
+    from epde.operators.common import fill_prune, invariant_terms, product_rule, system_redundancy
     _SIBLINGS.clear()
     _PLAIN_TOKENS.clear()
     _ORDER['rng'] = None
     fill_prune.reset()
+    invariant_terms.reset()
     product_rule.reset()
     system_redundancy.reset()
+
+
+def checkpoint_state():
+    # Rechecking a token verdict can enumerate the term library. Creating
+    # those factors consumes search RNG even if the verdict itself is identical.
+    tokens = [(pool, var, axes, found)
+              for (_, var, axes), (ref, found) in _PLAIN_TOKENS.items()
+              if (pool := ref()) is not None]
+    siblings = [(system, others) for ref, others in _SIBLINGS.values()
+                if (system := ref()) is not None]
+    return dict(order=_ORDER['rng'], tokens=tokens, siblings=siblings)
+
+
+def restore_checkpoint_state(state):
+    _ORDER['rng'] = state['order']
+    _PLAIN_TOKENS.clear()
+    for pool, var, axes, found in state['tokens']:
+        _PLAIN_TOKENS[id(pool), var, axes] = weakref.ref(pool), found
+    _SIBLINGS.clear()
+    for system, others in state['siblings']:
+        _hand_over(system, others)
 
 
 def start_fit(seed=None) -> None:
@@ -325,7 +354,8 @@ def _keeps_target(equation, params) -> bool:
     accepts the target."""
     var = equation.main_var_to_explain
     axes = target_axes_of(params, var)
-    return axes is None or is_target_term(equation.target, var, params['plain_target'], axes)
+    return ((axes is None and active_config().domain.evaluation_form != 'forward')
+            or is_target_term(equation.target, var, params['plain_target'], axes))
 
 
 def _install_target(equation, term) -> None:
@@ -358,16 +388,41 @@ def _read_only(result):
 
 
 def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
+    rows = current_rows()
+    if getattr(rows, 'fit_frequencies', False):
+        from epde.operators.common.frequency_fit import fitted_factors, fit_support
+        from epde.operators.common.invariant_terms import refused
+        target_idx = equation.target_idx
+        predictors = [j for j in range(len(equation.structure)) if j != target_idx]
+        if any(fitted_factors(equation.structure[j]) for j in predictors):
+            excluded = refused(equation, [equation.structure[j] for j in predictors])
+            kept = [j for j, skip in zip(predictors, excluded) if not skip]
+            if any(fitted_factors(equation.structure[j]) for j in kept):
+                versions = []
+                for constant in ([False, True] if len(kept) < cap else [False]):
+                    variant = fit_support(equation, kept, constant, rows)
+                    if variant is not None:
+                        versions.extend(_linear_versions(variant, cap, coeff_calc, coeff_args,
+                                                         host, host_args, constant))
+                return _pareto_versions(versions, host)
+    return _linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args)
+
+
+def _linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, intercept=None) -> list:
     """The fitted versions of ``equation`` -- S, and S+{1} when the cap leaves
     room for the constant -- that the fitness host accepts, minus one the other
     dominates. Each is a fitted, pruned and scored copy, built exactly as
-    ``right_part_selection._equation_variants`` builds a support."""
+    ``right_part_selection._equation_variants`` builds a support. S is every
+    term but the target, less the terms ``invariant_terms='refuse'`` refuses
+    (:mod:`epde.operators.common.invariant_terms`): left out of S, they drop
+    with the version's zero terms."""
     from epde.operators.common.right_part_selection import (
         _pruned_to_reducible, _subset_rank_deficient, _subset_reducible)
     from epde.operators.common.subset_selection import (
         store_fit, subset_table, support_scores, trajectory_gram)
     from epde.operators.common.objectives import LOSS_NAN_VAL
     from epde.operators.common.product_rule import declines
+    from epde.operators.common import invariant_terms
     from epde.operators.common.multisample import joint_enabled, joint_subset_table
 
     cfg = active_config()
@@ -398,8 +453,17 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
     if not finite:
         return []
     p = finite[0][1].shape[1]
-    every_feature = (1 << p) - 1
-    masks = [every_feature] + ([every_feature | (1 << p)] if p + 1 <= cap else [])
+    feature_terms = [term for i, term in enumerate(equation.structure) if i != equation.target_idx]
+    # system_rps_params['invariant_terms']='refuse': a term an exact invariant of the variables makes redundant
+    # stays out of the support, so the fitted version drops it (invariant_terms; every column under 'keep').
+    refused = invariant_terms.refused(equation, feature_terms)
+    cols = [j for j in range(p) if not refused[j]]
+    if not cols:
+        return []
+    every_feature = sum(1 << j for j in cols)
+    masks = [every_feature] + ([every_feature | (1 << p)] if len(cols) + 1 <= cap else [])
+    if intercept is not None:
+        masks = [mask for mask in masks if bool(mask >> p) == intercept]
 
     shared_coefficients = full_rank = None
     if joint:
@@ -422,12 +486,10 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         amp = np.mean([s[6] for s in samples], axis=0)
 
     work_target = equation.target
-    feature_terms = [term for i, term in enumerate(equation.structure) if i != equation.target_idx]
     X0 = finite[0][1]
     norms = np.linalg.norm(X0, axis=0)
     unit_cols = X0 / np.where(norms > 0, norms, 1.0)
     unit_constant = np.full(X0.shape[0], 1.0 / np.sqrt(X0.shape[0]))
-    cols = list(range(p))
 
     inst_attr = host.objectives[1].value_attr if len(host.objectives) > 1 else None
     versions = []
@@ -472,6 +534,10 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         variant.right_part_selected = True
         versions.append(variant)
 
+    return _pareto_versions(versions, host)
+
+
+def _pareto_versions(versions, host):
     if len(versions) == 2:
         attrs = [filler.value_attr for filler in host.objectives]
         if _dominates(versions[1], versions[0], attrs):
@@ -515,6 +581,8 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
 
     keys = list(objective.vals.equation_keys)
     equations = list(objective)
+    rows = current_rows()
+    forward = getattr(rows, 'form', None) == 'forward'
     fitted = [_fitted(eq) for eq in equations]
     degenerate = [False] * len(equations)
     targets = [None] * len(equations)
@@ -562,7 +630,8 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
         others = {sig for j, sig in enumerate(signatures) if j != i and sig is not None}
         kept = [term for term in eq.structure
                 if term is targets[i]
-                or (term.factors_labels not in others and not _related_to_target(term, targets[i]))]
+                or (term.factors_labels not in others and not _related_to_target(term, targets[i])
+                    and (not forward or rows.is_predictor(term)))]
         if len(kept) != len(eq.structure):
             eq.structure = kept
             eq._invalidate_label_cache()

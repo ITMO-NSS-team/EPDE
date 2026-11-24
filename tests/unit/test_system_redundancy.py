@@ -9,6 +9,7 @@ Pinned here, on Lotka-Volterra-shaped systems (a = b = c = d = 20, so u' + v' = 
   800 u v): the two still pin down both laws, so nothing follows;
 * the true pair, and an equation that is another multiplied by a field;
 * inexact (fitted) coefficients on both sides of the tolerance;
+* a zero-weight term holding a token the test does not differentiate gives no multiplier and no error;
 * the test draws from its own generator; plain mode re-rolls a following equation and drops a following
   sibling, testing it before copying it, on the equations the sibling holds; assignment mode declines a
   following pick;
@@ -86,6 +87,23 @@ class TestTheTest:
         rough = [-0.998, 396.7, 394.5, -792.2, 0.0]
         assert redundant_equations(_equations(lv_pool, SUM_AND_DIFFERENCE[0], rough, *SUM), RANGES) == []
         assert REDUNDANCY_RTOL == 0.1
+
+    def test_a_zero_weight_term_of_a_kind_not_differentiated_is_no_multiplier(self, lv_pool, monkeypatch):
+        # The residual leaves a zero-weight term out, so the term may hold a token the test does not
+        # differentiate (a stored data token); its factors are then no multipliers, and the test still runs.
+        extra = (f'-1.0 * {DU} + 20.0 * {U} + -20.0 * {V} + 0.0 * {DDV} + 0.0 = {DV}', [-1.0, 20.0, -20.0, 0.0, 0.0])
+        equations = _equations(lv_pool, *SUM_DERIVATIVE, *extra)
+        eq = equations[1]
+        weights = np.asarray(eq.weights_final, dtype=float)
+        blocked = {id(factor) for idx, term in enumerate(eq.structure)
+                   if idx != eq.target_idx and weights[eq.weight_index(idx, eq.target_idx)] == 0
+                   for factor in term.structure}
+        assert blocked
+        real = redundancy._factor
+        monkeypatch.setattr(redundancy, '_factor',
+                            lambda factor, jet, ndim: None if id(factor) in blocked else real(factor, jet, ndim))
+        assert redundant_equations(equations, RANGES) == [0]
+        assert redundant_equations(equations[::-1], RANGES) == [1]
 
     def test_one_equation_and_the_random_stream(self, lv_pool):
         equations = _equations(lv_pool, *SUM_DERIVATIVE, *SUM)

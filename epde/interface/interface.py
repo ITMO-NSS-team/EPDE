@@ -55,8 +55,8 @@ from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import define_derivatives
 from epde.cache.cache_refactored import Cache # upload_simple_tokens, upload_grids, prepareVarTensor, 
 
-from epde.preprocessing.preprocessor_setups import PreprocessorSetup
-from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
+from epde.preprocessing.factory import make_preprocessor
+from epde.preprocessing.preprocessor import PreprocessingPipe
 
 from epde.structure.domain import (VariableEntry, Trajectory, TrajectoriesManager, Domain,
                                    resolve_evaluation_stride)
@@ -64,8 +64,8 @@ from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TFPool, TokenFamily
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import (PreparedTokens, CustomTokens, DataPolynomials,
-                                            ControlVarTokens)
+from epde.interface.prepared_tokens import (PreparedTokens, CustomTokens, CacheStoredTokens, GridTokens, DataPolynomials,
+                                            ControlVarTokens, TrigonometricTokens)
 from epde.integrate import BoundaryConditions, SolverAdapter, SystemSolverInterface
 
 
@@ -122,6 +122,7 @@ class EpdeSearch(object):
                  use_solver=UNSET, solver_backend=UNSET, device=UNSET,
                  boundary_width=UNSET, time_axis=UNSET,
                  evaluation_stride=UNSET, evaluation_form=UNSET,
+                 forward_lag=UNSET, forward_space=UNSET,
                  weak_window_products=UNSET, weak_window_gate=UNSET,
                  default_preprocessor_type=UNSET, preprocessor_kwargs=UNSET,
                  max_deriv_order=UNSET,
@@ -188,6 +189,7 @@ class EpdeSearch(object):
             use_solver=use_solver, solver_backend=solver_backend, device=device,
             boundary_width=boundary_width, time_axis=time_axis,
             evaluation_stride=evaluation_stride, evaluation_form=evaluation_form,
+            forward_lag=forward_lag, forward_space=forward_space,
             weak_window_products=weak_window_products, weak_window_gate=weak_window_gate,
             default_preprocessor_type=default_preprocessor_type,
             preprocessor_kwargs=preprocessor_kwargs,
@@ -208,6 +210,8 @@ class EpdeSearch(object):
             memory_for_cache=memory_for_cache, verbose_params=verbose_params)
         overrides.update(solver_kwargs)
         self._config = cfg = load_search_config(config, overrides)
+        self._custom_director = director is not None
+        self.measurement_summary = {}
         self.multiobjective_mode = cfg.objectives.multiobjective_mode
 
         # Must be published BEFORE the director is built: ``use_baseline``
@@ -641,7 +645,7 @@ class EpdeSearch(object):
                 self.set_preprocessor()
             preprocessor = self.preprocessor_pipeline
 
-        trajectory = Trajectory(entries, domain, self.tensor_cache, cache_id,
+        trajectory = Trajectory(entries, domain, global_var.tensor_cache, cache_id,
                                 preprocessor, cached_token_tensors, derivs)
         # trajectory.
         return trajectory.ID, trajectory
@@ -652,6 +656,8 @@ class EpdeSearch(object):
     
     @property
     def tensor_cache(self) -> Cache:
+        for trajectory in global_var.samples_manager._traj.values():
+            trajectory.prepare_pointwise()
         return global_var.tensor_cache
 
     def set_boundaries(self, boundary_width: Union[int, list]):
@@ -791,32 +797,15 @@ class EpdeSearch(object):
             default_preprocessor_type = self._config.preprocessing.default_preprocessor_type
         if preprocessor_kwargs is UNSET:
             preprocessor_kwargs = self._config.preprocessing.preprocessor_kwargs
+        if self._config.domain.evaluation_form == 'forward':
+            from epde.interface.search_config import check_forward_preprocessor
+            check_forward_preprocessor(default_preprocessor_type, preprocessor_kwargs)
+            if preprocessor_pipeline is not None:
+                check_forward_preprocessor(None, preprocessor_pipeline.deriv_calculator_kwargs)
 
         if preprocessor_pipeline is None:
-            setup = PreprocessorSetup()
-            builder = ConcretePrepBuilder()
-            setup.builder = builder
-
-            if default_preprocessor_type == 'ANN':
-                setup.build_ANN_preprocessing(**preprocessor_kwargs)
-            elif default_preprocessor_type == 'poly':
-                setup.build_poly_diff_preprocessing(**preprocessor_kwargs)
-            elif default_preprocessor_type == 'spectral':
-                setup.build_spectral_preprocessing(**preprocessor_kwargs)
-            elif default_preprocessor_type == 'FD':
-                setup.build_FD_preprocessing(
-                    **{'time_axis': self._config.domain.time_axis, **preprocessor_kwargs})
-            elif default_preprocessor_type == 'forward':
-                warnings.warn("default_preprocessor_type='forward' is 'FD' with scheme='forward': use "
-                              "default_preprocessor_type='FD', preprocessor_kwargs={'scheme': 'forward', ...}.",
-                              global_var.EPDEDeprecationWarning, stacklevel=2)
-                setup.build_FD_preprocessing(
-                    **{'time_axis': self._config.domain.time_axis, **preprocessor_kwargs, 'scheme': 'forward'})
-            else:
-                raise NotImplementedError(
-                    f'Incorrect default preprocessor type {default_preprocessor_type!r}. '
-                    "Allowed: 'poly', 'ANN', 'spectral', 'FD', 'forward'.")
-            preprocessor_pipeline = setup.builder.prep_pipeline
+            preprocessor_pipeline = make_preprocessor(default_preprocessor_type, preprocessor_kwargs,
+                                                      self._config.domain.time_axis)
 
         if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
             preprocessor_pipeline.deriv_calculator_kwargs['max_order'] = None
@@ -857,10 +846,11 @@ class EpdeSearch(object):
         data = self._as_trajectories(data, legacy_kwargs, 'create_pool')
         if isinstance(data, Trajectory):
             data = [data,]
+        self._custom_fit = False
         self._validate_trajectories(data)
-        self._install_dimensionality(additional_tokens, data)
         self._resolve_auto_boundaries(data, max_deriv_order)
         self._check_evaluation_lattice(data)
+        self._bind_token_families(additional_tokens, data)
         self._build_pool(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
 
     def _build_pool(self, data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow) -> None:
@@ -913,13 +903,7 @@ class EpdeSearch(object):
         self._register_trajectories(data)
         declared_families = data[0].tokens + [
             tf if isinstance(tf, TokenFamily) else tf.token_family for tf in additional_tokens]
-        # Filter copies so a later fit can reuse the declared tokens.
-        pool_families = []
-        for family in declared_families:
-            pooled = copy(family)
-            pooled.tokens = list(family.tokens)
-            pool_families.append(pooled)
-        self.pool = TFPool(pool_families)
+        self.pool = TFPool([family.for_search() for family in declared_families])
         #TODO: add check, if all trajectories have the same tokens 
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
@@ -930,8 +914,12 @@ class EpdeSearch(object):
             else:
                 print(f'Frequencies of {ftype} found in the data: {list(values)}')
         before = {id(family): list(family.tokens) for family in self.pool.families} if strided else None
-        for family in self.pool.families:
-            family.chech_constancy()
+        # The cached derivative can be constant (e.g. a centred difference
+        # on an alternating signal) while the measured forward change varies.
+        # Let the existing rank checks operate on the actual forward columns.
+        if self._config.domain.evaluation_form != 'forward':
+            for family in self.pool.families:
+                family.chech_constancy()
         if strided:
             # Constancy is judged on the kept rows -- right for every scorer,
             # which sees only those, but worth saying.
@@ -992,8 +980,7 @@ class EpdeSearch(object):
                             or np.iscomplexobj(derivatives) or not np.all(np.isfinite(derivatives)):
                         raise ValueError(f'{label}: derivatives must contain finite real numbers.')
 
-    @staticmethod
-    def _prepare_trajectories(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow,
+    def _prepare_trajectories(self, data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow,
                               force: bool = False) -> None:
         """Build every trajectory for the request (from scratch with ``force``)
         and put the families' own tensors into it."""
@@ -1006,7 +993,16 @@ class EpdeSearch(object):
         for trajectory in data:
             assert isinstance(trajectory, Trajectory), \
                 f'Individual trajectories have to be passed as Trajectory objects, instead got {type(trajectory)}.'
-            trajectory.build(max_deriv_order, data_fun_pow, deriv_fun_pow, force=force)
+            defer = (not self._custom_director and not getattr(self, '_custom_fit', False)
+                     and active_config().domain.evaluation_form == 'forward'
+                     and getattr(trajectory._preprocessor_pipeline, 'defer_for_forward', False)
+                     and trajectory._derivs is None
+                     and all(type(family) in (GridTokens, TrigonometricTokens, CacheStoredTokens)
+                             for family in additional_tokens))
+            if defer:
+                trajectory.build(max_deriv_order, data_fun_pow, deriv_fun_pow, force=force, pointwise=False)
+            else:
+                trajectory.build(max_deriv_order, data_fun_pow, deriv_fun_pow, force=force)
             # A family that ships its own tensors (CacheStoredTokens) declares
             # them once, with the family, because a family is pool structure.
             # Evaluation is per trajectory, so the tensors land in every
@@ -1540,28 +1536,32 @@ class EpdeSearch(object):
         if data is None and pool is None:
             raise ValueError('Data has to be specified beforehand or passed in '
                              'fit as an argument.')
+        self._custom_fit = (optimizer is not None or pool is not None or population is not None
+                            or self.optimizer_exec_params.get('early_stopping_callback') is not None)
         if data is not None:
             self._validate_trajectories(data)
             self._resolve_auto_boundaries(data, max_deriv_order)
             self._check_evaluation_lattice(data, active_config().search_space)
-        self._install_dimensionality(additional_tokens, data if data is not None else
-                                     list(global_var.samples_manager._traj.values()))
-
-        cur_params = self._pool_params(data, additional_tokens, max_deriv_order,
-                                       data_fun_pow, deriv_fun_pow)
-
         # Frequencies found in the data belong to that data: the reuse key does not
         # see the data, so such a pool is rebuilt on every fit.
         from_data = any(getattr(family, '_freq_from_data', None) is not None for family in additional_tokens)
         # The key describes the pool, not the data: the pool is reused only when
         # it was built on these very trajectories and their tensors survive.
         if pool is None:
+            self._bind_token_families(additional_tokens, data)
+            cur_params = self._pool_params(data, additional_tokens, max_deriv_order,
+                                           data_fun_pow, deriv_fun_pow)
             if (self.pool is None or self.pool_params != cur_params or from_data
                     or not self._pool_built_on(data)):
                 self._build_pool(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
         else:
             # No key for a pool built elsewhere: the next fit without one rebuilds.
             self.pool = pool; self.pool_params = None
+            trajectories = data if data is not None else list(global_var.samples_manager._traj.values())
+            if not trajectories:
+                raise ValueError('Pass data with a pool that has no registered trajectories.')
+            self._install_dimensionality(additional_tokens, trajectories)
+            self._bind_token_families(self.pool.families, trajectories)
             if data is not None:
                 # A passed pool still needs this fit's samples built and
                 # registered: evaluation reads them from the samples manager,
@@ -1572,6 +1572,12 @@ class EpdeSearch(object):
                 self._register_trajectories(data)
                 self._pool_data = list(data)
 
+        if self._custom_fit:
+            # A pool built earlier for native forward fitting can still be reused
+            # when a caller attaches an optimizer or hook that reads the tensor cache.
+            for trajectory in global_var.samples_manager._traj.values():
+                trajectory.prepare_pointwise()
+
         # Again on what will actually be evaluated: a passed pool may come with
         # samples registered by an earlier fit.
         self._check_evaluation_lattice(list(global_var.samples_manager._traj.values()),
@@ -1580,27 +1586,68 @@ class EpdeSearch(object):
             # A target_axes key must name one of the pool's variables.
             check_target_axes_variables(active_config().search_space.system_rps_params,
                                         [family.variable for family in self.pool.families_demand_equation])
-        self._prepare_weak_rows()
+        self._prepare_evaluation_rows()
+        if population is not None and active_config().domain.evaluation_form == 'forward':
+            rows = global_var.samples_manager.evaluation_rows
+            for solution in getattr(population, 'population', population):
+                for equation in solution:
+                    rows.validate_candidate(equation)
+                solution.reset_state()
         self._run_optimization(equation_terms_max_number, equation_factors_max_number,
                                eq_sparsity_interval, optimizer, population)
 
-    def _prepare_weak_rows(self) -> None:
-        """Install this fit's rows on the samples manager.
+    def _bind_token_families(self, families, trajectories):
+        """Resolve search-dependent token settings before comparing or building pools."""
+        from epde.structure.weak_rows import axes_of
+        for index, family in enumerate(families):
+            tf = (family if isinstance(family, TokenFamily) else family.token_family).for_search()
+            if hasattr(tf, '_auto_frequency_defaults'):
+                tf = TrigonometricTokens.bind_frequency_mode(tf, self._config.supports_frequency_fitting)
+            if isinstance(family, TokenFamily):
+                families[index] = tf
+            else:
+                family._token_family = tf
+            self._install_dimensionality([family], trajectories)
+            if not tf.status.get('fit_frequencies'):
+                continue
+            if not self._config.supports_frequency_fitting:
+                raise ValueError('fit_frequencies requires plain weak fitting with plain derivative targets '
+                                 'or causal forward fitting.')
+            if not trajectories:
+                raise ValueError('fit_frequencies needs trajectories to determine the sampling Nyquist bound.')
+            grids = []
+            for trajectory in trajectories:
+                grid = trajectory.grids('full')
+                pointwise = ()
+                if self._config.domain.evaluation_form == 'forward':
+                    pointwise = (trajectory._domain._time_axis,) if self._config.domain.forward_space == 'weak' else range(len(grid))
+                grids.append(axes_of(grid, pointwise_axes=pointwise))
+            bounds = []
+            for axis in range(int(tf.token_params['dim'][1]) + 1):
+                if any(axis >= len(grid) or len(grid[axis]) < 2 for grid in grids):
+                    raise ValueError(f'Frequency axis {axis} needs at least two grid coordinates.')
+                steps = np.concatenate([np.diff(grid[axis]) for grid in grids])
+                if not np.all(np.isfinite(steps) & (steps > 0)):
+                    raise ValueError(f'Frequency axis {axis} needs finite, increasing coordinates.')
+                bounds.append(float(np.pi / steps.max()))
+            tf.status = dict(tf.status, frequency_nyquist=tuple(bounds))
+            tf.install_param_range('freq', (0., max(bounds)))
 
-        Strong rows clear any weak rows a previous fit left. Weak rows
-        (``domain.evaluation_form='weak'``) get one window per trajectory and
-        equation slot, picked from the raw data of the registered trajectories
-        (:func:`epde.structure.weak_rows.build_weak_rows`). The pick respects
-        the instability metric's row floor at the configured equation width. In plain mode a slot whose
-        variable has allowed target axes (``system_rps_params['target_axes']``) scores its window on the
-        derivatives along those axes only. ``domain.weak_window_products='pairs'`` adds the noise shares of
-        the pairwise products of the data and derivative tokens to every window's score.
-        ``domain.weak_window_gate='half_power'`` admits only the windows that keep at least half of every
-        field's variance, falling back to the ungated pick when none does."""
+    def _prepare_weak_rows(self):
+        return self._prepare_evaluation_rows()
+
+    def _prepare_evaluation_rows(self) -> None:
+        """Install fit-local measurements and capture their geometry on the search instance."""
         manager = global_var.samples_manager
-        manager.weak = None
+        manager.evaluation_rows = None
+        self.measurement_summary = {}
         cfg = active_config()
-        if cfg.domain.evaluation_form != 'weak':
+        if cfg.domain.evaluation_form == 'strong':
+            for key, shape in manager.inner_shapes.items():
+                for family in self.pool.families_demand_equation:
+                    self.measurement_summary[key, family.variable] = dict(
+                        form='strong', time_axis=manager[key]._domain._time_axis,
+                        shape=tuple(shape), rows=int(np.prod(shape)))
             return
         from time import perf_counter
         from epde.operators.common.survival import configured_width, row_floor
@@ -1614,12 +1661,27 @@ class EpdeSearch(object):
                 target_axes = {family.variable: target_axes_of(plain, family.variable)
                                for family in self.pool.families_demand_equation}
         start = perf_counter()
-        weak = build_weak_rows(self.pool, manager, lambda shape: row_floor(metric, shape, width) is None,
-                               target_axes=target_axes, window_products=cfg.domain.weak_window_products,
-                               window_gate=cfg.domain.weak_window_gate)
-        manager.weak = weak
-        print(f'Weak-form windows ({perf_counter() - start:.1f} s):')
-        for (key, slot), plan in weak.plans.items():
+
+        def row_ok(shape):
+            return row_floor(metric, shape, width) is None
+
+        if cfg.domain.evaluation_form == 'forward':
+            from epde.structure.forward_rows import build_forward_rows
+            rows = build_forward_rows(self.pool, manager, cfg.domain, plain, row_ok)
+        else:
+            rows = build_weak_rows(self.pool, manager, row_ok, target_axes=target_axes,
+                                   window_products=cfg.domain.weak_window_products,
+                                   window_gate=cfg.domain.weak_window_gate)
+        manager.evaluation_rows = rows
+        print(f'{rows.form.capitalize()} measurement rows ({perf_counter() - start:.1f} s):')
+        for (key, slot), plan in rows.plans.items():
+            info = dict(form=rows.form, time_axis=manager[key]._domain._time_axis, shape=plan.shape,
+                        rows=plan.rows, half_widths=plan.ms, strides=plan.ss, smoothness=plan.q, cut=plan.cut)
+            if rows.form == 'forward':
+                elapsed = rows.fields[key].elapsed
+                info.update(forward_lag=cfg.domain.forward_lag, forward_space=cfg.domain.forward_space,
+                            elapsed_time_range=(float(elapsed.min()), float(elapsed.max())))
+            self.measurement_summary[key, slot] = info
             print(f'  trajectory {key}, slot {slot}: {plan}')
 
 

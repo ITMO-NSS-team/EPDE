@@ -19,7 +19,7 @@ from epde.interface.prepared_tokens import DataPolynomials, CustomTokens, Extern
 from epde.interface.type_checks import *
 from epde.interface.token_family import TFPool, TokenFamily
 
-from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
+from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe, prepare_field
 
 
 RELATIVE_BC_LOC_DIR = {0: (), 1: (0.,), 2: (0., 1.),
@@ -189,29 +189,9 @@ class InputEntry(object):
         self.names = deriv_names
         self.d_orders = deriv_orders
 
-        if deriv_tensors is None:
-            # Preprocess a fresh copy in case the smoother mutates its input.
-            data, derivatives = preprocesser.run(self.raw_tensor.copy(), grid=grid,
-                                                 max_order=max_order)
-        else:
-            data, derivatives = self.raw_tensor, deriv_tensors
-
-        if not isinstance(data, np.ndarray) or data.shape != self.raw_tensor.shape:
-            raise ValueError(f'Preprocessed field {self.var_name!r} has shape {np.shape(data)}, '
-                             f'expected its observation shape {self.raw_tensor.shape}.')
-        if (not np.issubdtype(data.dtype, np.number) or not np.isrealobj(data)
-                or not np.all(np.isfinite(data))):
-            raise ValueError(f'Preprocessed field {self.var_name!r} must contain finite real numbers.')
-        expected = (self.raw_tensor.size, len(deriv_names))
-        if not isinstance(derivatives, np.ndarray) or derivatives.shape != expected:
-            raise ValueError(f'The derivatives of {self.var_name!r} have shape {np.shape(derivatives)}, '
-                             f'expected {expected} (grid points, derivative columns).')
-        if (not np.issubdtype(derivatives.dtype, np.number) or not np.isrealobj(derivatives)
-                or not np.all(np.isfinite(derivatives))):
-            raise ValueError(f'The derivatives of {self.var_name!r} must contain finite real numbers.')
-
-        self.data_tensor, self.derivatives = data, derivatives
-        self.deriv_properties = {'max order': max_order, 'dimensionality': data.ndim}
+        self.data_tensor, self.derivatives = prepare_field(
+            self.var_name, self.raw_tensor, grid, max_order, preprocesser, supplied=deriv_tensors)
+        self.deriv_properties = {'max order': max_order, 'dimensionality': self.ndim}
 
 
 class VariableEntry(InputEntry):
@@ -735,7 +715,8 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         # need to know which variables a trajectory carries.
         self.variable_names = [entry.var_name for entry in self._entries]
 
-        self.families, self.base_derivs = [], []
+        self.families, self._base_derivs = [], []
+        self._pointwise_pending = False
         # Recorded by build(), not left at zero: EpdeSearch keys its
         # pool-invalidation check on this, and a constant made that check
         # meaningless -- a pool built for max_deriv_order=1 would be reused
@@ -744,7 +725,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         self._built = None
 
     def build(self, max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
-              data_fun_pow: int = 1, deriv_fun_pow: int = 1, force: bool = False) -> 'Trajectory':
+              data_fun_pow: int = 1, deriv_fun_pow: int = 1, force: bool = False, pointwise: bool = True) -> 'Trajectory':
         """Differentiate the data and derive the token families from it.
 
         Called by ``create_pool`` with the search-level orders and powers, so
@@ -758,7 +739,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         # Copy mutable derivative orders before saving the build key.
         if isinstance(max_deriv_order, list):
             max_deriv_order = tuple(max_deriv_order)
-        request = (max_deriv_order, data_fun_pow, deriv_fun_pow)
+        request = (max_deriv_order, data_fun_pow, deriv_fun_pow, pointwise)
         if not force and self._built == request and self.tensors_cached:
             return self
 
@@ -769,13 +750,21 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         self._raw_token_tensors = {}
         self.max_deriv_order = max_deriv_order
         self._check_forward_boundary(max_deriv_order)
-        self.families, self.base_derivs = [], []
+        self.families, self._base_derivs = [], []
+        self._pointwise_pending = False
         for idx, entry in enumerate(self._entries):
-            fam, bd = self.setEntry(entry, self._preprocessor_pipeline,
-                                    self._entry_derivs(entry, idx),
-                                    max_deriv_order,
-                                    data_fun_pow, deriv_fun_pow)
-            self.families.extend(fam); self.base_derivs.extend(bd)
+            if pointwise:
+                fam, bd = self.setEntry(entry, self._preprocessor_pipeline, self._entry_derivs(entry, idx),
+                                        max_deriv_order, data_fun_pow, deriv_fun_pow)
+                self._base_derivs.extend(bd)
+            else:
+                entry.names, entry.d_orders = define_derivatives(entry.var_name, dimensionality=entry.ndim,
+                                                                 max_order=max_deriv_order)
+                entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
+                entry.create_polynomial_family(max_power=data_fun_pow)
+                fam = entry.get_families()
+                self._pointwise_pending = True
+            self.families.extend(fam)
 
         if isinstance(self._additional_cached_tokens, dict):
             for token_type, tokens_val in self._additional_cached_tokens.items():
@@ -784,6 +773,24 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         self._built = request
         self._cache.claim_subcache(self.ID, self)
         return self
+
+    def prepare_pointwise(self):
+        """Materialize native strong measurements when an explicit consumer needs them."""
+        if not self._pointwise_pending:
+            return
+        base = []
+        for idx, entry in enumerate(self._entries):
+            entry.setDerivatives(self._preprocessor_pipeline, self._entry_derivs(entry, idx),
+                                 self.max_deriv_order, self.grids())
+            addEntryToCache(entry, self._domain, self._cache, self.ID)
+            base.extend(entry.matched_derivs(max_order=2))
+        self._base_derivs = base
+        self._pointwise_pending = False
+
+    @property
+    def base_derivs(self):
+        self.prepare_pointwise()
+        return self._base_derivs
 
     def edge_reach(self, max_deriv_order) -> Union[None, List[int]]:
         """Samples per end of every axis whose derivatives the preprocessing corrupts at the edges
@@ -907,7 +914,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         the subcache over; a non-empty subcache alone proves neither -- every
         build also copies its variables into subcache 0."""
         return (self._cache.subcache_owner(self.ID) is self
-                and bool(self._cache.memory_default.get(self.ID)))
+                and (self._pointwise_pending or bool(self._cache.memory_default.get(self.ID))))
 
     @property
     def tokens(self):
@@ -974,6 +981,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         """The preprocessed field of ``var_name`` on EVERY point of the
         interior box, grid-shaped -- what the cache holds without a row budget,
         whatever lattice of it the cache holds now."""
+        self.prepare_pointwise()
         for entry in self._entries:
             if entry.var_name == var_name:
                 return np.asarray(entry.data_tensor)[self._domain.box_slices()]
@@ -1004,6 +1012,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
                 raise NotImplementedError("Incorrect mode for calling g_func of the domain.")
 
     def get(self, label, normalized=False, saved_as=None, deriv_code = None) -> np.ndarray:
+        self.prepare_pointwise()
         return self._cache.get(label = label,
                                subcache_ID = self._cache_id,
                                normalized = normalized,
@@ -1046,33 +1055,42 @@ class TrajectoriesManager(object):
         self._traj: Dict[int, Trajectory] = dict()
         self._domains: Dict[int, Domain] = dict()
         self._axis_ranges_memo = None                 # (grid state, ranges): axis_ranges()
-        #: The weak rows of the current fit (``epde.structure.weak_rows.WeakRows``), or ``None`` for
-        #: strong (pointwise) rows. Set by ``EpdeSearch.fit`` (``_prepare_weak_rows``).
-        self.weak = None
+        #: Fit-local measurement provider. Strong evaluation reads the pointwise cache directly.
+        self.evaluation_rows = None
+
+    @property
+    def weak(self):
+        """Legacy accessor for the full weak-form provider."""
+        rows = self.evaluation_rows
+        return rows if getattr(rows, 'form', 'weak') == 'weak' else None
+
+    @weak.setter
+    def weak(self, rows):
+        self.evaluation_rows = rows
 
     @property
     def weak_mode(self) -> bool:
         return getattr(self, 'weak', None) is not None
 
-    def _refuse_in_weak_mode(self, what: str) -> None:
-        if self.weak_mode:
+    def _require_pointwise_rows(self, what: str) -> None:
+        if self.evaluation_rows is not None:
             raise RuntimeError(
-                f"{what} holds the strong (pointwise) rows, but this fit evaluates weak rows "
-                "(domain.evaluation_form='weak'), which are set per equation slot. Use "
+                f"{what} holds the strong (pointwise) rows, but this fit evaluates "
+                f"{self.evaluation_rows.form} rows per equation slot. Use "
                 'row_weights(slot, mode) / row_shapes(slot).')
 
     def row_weights(self, slot: str, mode: Literal['dm', 'dmf'] = 'dm') -> Dict[int, np.ndarray]:
         """The row weights of equation slot ``slot`` per trajectory. Strong rows: the boundary-masked
         test function (``gFunc(mode)``). Weak rows: ones, one per row of the slot's window lattice."""
-        if self.weak_mode:
-            return self.weak.weights(slot)
+        if self.evaluation_rows is not None:
+            return self.evaluation_rows.weights(slot)
         return self.gFunc(mode)
 
     def row_shapes(self, slot: str) -> Dict[int, tuple]:
         """The row lattice of equation slot ``slot`` per trajectory: the interior box (strong rows) or the
         slot's window lattice (weak rows)."""
-        if self.weak_mode:
-            return self.weak.shapes(slot)
+        if self.evaluation_rows is not None:
+            return self.evaluation_rows.shapes(slot)
         return self.inner_shapes
 
     def addTrajectory(self, trajectory: Trajectory, domain: Domain):
@@ -1089,12 +1107,15 @@ class TrajectoriesManager(object):
         self._axis_ranges_memo = None
         if domain._ID not in self._domains.keys():
             self._domains[domain._ID] = domain
-        else:
-            assert trajectory.checkShapes(self._domains[domain._ID])
+        elif self._domains[domain.ID] is not domain:
+            previous = self._domains[domain.ID]
+            if (previous._time_axis != domain._time_axis or not np.array_equal(previous.g_func, domain.g_func)
+                    or not all(np.array_equal(a, b) for a, b in zip(previous.getGrids(), domain.getGrids()))):
+                raise ValueError(f'Domain ID {domain.ID!r} names different geometries in one fit')
 
     @property
     def inner_shapes(self):
-        self._refuse_in_weak_mode('inner_shapes')
+        self._require_pointwise_rows('inner_shapes')
         return {key: trajectory.inner_shape for key, trajectory in self._traj.items()}
 
     @property
@@ -1200,7 +1221,7 @@ class TrajectoriesManager(object):
 
     def gFunc(self, mode_key: Literal['d', 'f', 'm', 'dmf', 'dm']) -> Dict[int, np.ndarray]:
         if mode_key in ('dm', 'dmf'):
-            self._refuse_in_weak_mode(f'gFunc({mode_key!r})')
+            self._require_pointwise_rows(f'gFunc({mode_key!r})')
         return {key: trajectory.gFuncs(mode_key) for key, trajectory in self._traj.items()}
 
     def get(self, label, normalized=False, saved_as=None, deriv_code = None, sample_key: int = None, ) -> Dict[int, np.ndarray]:

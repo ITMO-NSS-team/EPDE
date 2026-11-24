@@ -17,8 +17,22 @@ import numpy as np
 import pytest
 import torch
 
-from test_solver_path import (_fitted_oscillator, fitted,          # noqa: F401
+from test_solver_path import (_finished_search, _fitted_oscillator,  # noqa: F401
                               lbfgs_on_cpu)
+
+
+@pytest.fixture(scope='module')
+def fitted():
+    """``test_solver_path``'s finished search on second-order finite
+    differences, the order every digest in this file was captured under.
+
+    The candidate's coefficients are fitted on those derivatives, so they are
+    an input of the solve. When the preprocessor's default became fourth-order
+    (Oct 2026) the coefficients moved and five pins failed, although the
+    solver had not changed. Fixing the order here keeps the Sep 28 digests
+    valid, so they still compare today's adapter with the one from before any
+    lr-free option existed."""
+    return _finished_search({'accuracy': 2})
 
 
 @pytest.fixture(scope='module', autouse=True)

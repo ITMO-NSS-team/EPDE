@@ -43,26 +43,15 @@ import numpy as np
 
 from epde.evaluators import CustomEvaluator, simple_function_evaluator
 from epde.preprocessing import weak_form as WF
+from epde.structure.evaluation_rows import current_rows, slot_of, term_columns
 
 __all__ = ['WeakRows', 'weak_term', 'selection_library', 'product_library', 'build_weak_rows', 'axes_of',
            'active', 'slot_of', 'term_columns']
 
 
 def active() -> bool:
-    """Whether the current fit evaluates weak rows (a ``WeakRows`` store on the samples manager)."""
-    import epde.globals as global_var
-    return getattr(getattr(global_var, 'samples_manager', None), 'weak', None) is not None
-
-
-def slot_of(equation) -> Optional[str]:
-    """The equation slot whose rows ``equation`` is evaluated on: its ``main_var_to_explain`` under weak rows,
-    ``None`` under strong rows (one set of rows for every slot)."""
-    return equation.main_var_to_explain if active() else None
-
-
-def term_columns(term, slot: Optional[str]):
-    """``term.evaluate`` on the rows of ``slot``: the plain call under strong rows (``slot`` None)."""
-    return term.evaluate() if slot is None else term.evaluate(slot=slot)
+    """Whether the current fit integrates weakly over every axis."""
+    return getattr(current_rows(), 'form', None) == 'weak'
 
 
 def _param(factor, name: str):
@@ -202,24 +191,29 @@ def product_library(pool, D: int) -> List[WF.WeakTerm]:
             for j in range(i, len(tokens))]
 
 
-def axes_of(grids: Sequence[np.ndarray]) -> List[np.ndarray]:
+def _uniform_step(coordinates):
+    """Spacing for uniform quadrature and spectral initialization."""
+    steps = np.diff(coordinates)
+    if steps.size and np.allclose(steps, steps[0], rtol=1e-6, atol=0.):
+        return float(steps[0])
+    return None
+
+
+def axes_of(grids: Sequence[np.ndarray], *, pointwise_axes=()) -> List[np.ndarray]:
     """1-D coordinate axes of a full meshgrid (``indexing='ij'``). Weak kernels need uniform steps."""
     D = len(grids)
     axes = []
     for d, grid in enumerate(grids):
         grid = np.asarray(grid)
         axis = grid[tuple(slice(None) if b == d else 0 for b in range(D))].astype(float)
-        if axis.size > 2:
-            steps = np.diff(axis)
-            if not np.allclose(steps, steps[0], rtol=1e-6, atol=0.0):
-                raise ValueError(f"domain.evaluation_form='weak' needs a uniform grid; axis {d} is not uniform.")
+        if axis.size > 2 and d not in pointwise_axes and _uniform_step(axis) is None:
+            raise ValueError(f"Weak integration needs a uniform grid; axis {d} is not uniform.")
         axes.append(axis)
     return axes
 
 
-class WeakRows:
-    """The weak rows of one fit: raw fields per trajectory, a window plan per (trajectory, slot) and the term
-    columns built on them."""
+class WindowRows:
+    """Fit-local columns, weights and lattice geometry for separable measurement windows."""
 
     def __init__(self, fields: Dict[Hashable, WF.Fields], plans: Dict[Tuple[Hashable, str], WF.WindowPlan],
                  keys: Sequence[Hashable], tokens: Optional[Dict[Hashable, Dict[str, np.ndarray]]] = None):
@@ -229,6 +223,28 @@ class WeakRows:
         #: {trajectory key: {stored token label: full-grid tensor}}
         self.tokens = {key: dict((tokens or {}).get(key, {})) for key in self.keys}
         self._columns: Dict[tuple, Dict[Hashable, np.ndarray]] = {}
+        self.fit_frequencies = False
+        self.frequency_solves = 0
+        self.frequency_fits = {}
+        self._observed_frequencies = {}
+        self._last_frequency_column = {}
+
+    def uniform_step(self, key, axis):
+        return _uniform_step(self.fields[key].axes[axis])
+
+    def observed_frequencies(self, axis):
+        """Angular frequencies ranked by pooled spectral energy on this fit's raw fields."""
+        from epde.interface.token_frequencies import field_spectral_peaks, ranked_frequencies
+        if axis not in self._observed_frequencies:
+            peaks = []
+            for key in self.keys:
+                fields = self.fields[key]
+                if self.uniform_step(key, axis) is None:
+                    continue
+                for field in fields.values.values():
+                    peaks.extend(field_spectral_peaks(field, axis, fields.steps[axis]) or ())
+            self._observed_frequencies[axis] = ranked_frequencies(peaks, 'angular')
+        return self._observed_frequencies[axis]
 
     def _plan(self, key, slot) -> WF.WindowPlan:
         try:
@@ -245,10 +261,11 @@ class WeakRows:
         """Unit row weights: the test function already weights each row's window."""
         return {key: np.ones(self._plan(key, slot).rows) for key in self.keys}
 
-    def _opaque_values(self, factor, key) -> np.ndarray:
+    def _opaque_values(self, factor, key, shape=None) -> np.ndarray:
         """The full-grid values of an opaque factor on trajectory ``key``."""
         evaluator = _inner_evaluator(factor.evaluator)
-        shape = self.fields[key].shape
+        if shape is None:
+            shape = self.fields[key].shape
         if isinstance(evaluator, CustomEvaluator):
             return np.broadcast_to(np.asarray(evaluator.full_grid(factor)[key], dtype=float), shape)
         power = _param(factor, 'power')
@@ -257,6 +274,9 @@ class WeakRows:
             raise ValueError(f'the stored token {factor.label!r} has shape {values.shape}, but the grid is '
                              f'{tuple(shape)}: stored tensors must be on the full grid.')
         return values ** (1.0 if power is None else float(power))
+
+    def validate_symbolic(self, symbolic, slot):
+        """Check that a symbolic column is admissible for this measurement."""
 
     def columns(self, term, slot) -> Dict[Hashable, np.ndarray]:
         """The term's weak column on each trajectory's rows for ``slot``."""
@@ -268,6 +288,7 @@ class WeakRows:
         for key in self.keys:
             fields = self.fields[key]
             wterm, factors = weak_term(term, fields.D, frozenset(self.tokens.get(key, {})))
+            self.validate_symbolic(wterm, slot)
             plan = self._plan(key, slot)
             for label, factor in factors.items():
                 fields.opaque[label] = self._opaque_values(factor, key)
@@ -278,8 +299,35 @@ class WeakRows:
                 for label in factors:
                     fields.opaque.pop(label, None)
             out[key] = M[:, 0]
+        if self.fit_frequencies and any(f.status.get('fit_frequencies') for f in term.structure):
+            from epde.operators.common.frequency_fit import frequency_structure
+            structure = (slot, frequency_structure(term))
+            previous = self._last_frequency_column.get(structure)
+            if previous is not None:
+                self._columns.pop(previous, None)
+            self._last_frequency_column[structure] = cache_key
         self._columns[cache_key] = out
         return out
+
+
+class WeakRows(WindowRows):
+    """Full weak integration over every axis."""
+
+    form = 'weak'
+
+
+def choose_slot_window(fields, library, targets, key, slot, trajectory_index, row_ok, window_gate, **options):
+    """Apply the same scoring, noise draw, variance gate and fallback to every windowed fit."""
+    import warnings
+    import epde.globals as global_var
+    gate = WF.HALF_POWER if window_gate == 'half_power' else None
+    plan = WF.choose_window(fields, library, targets, np.random.default_rng([0, trajectory_index]),
+                            rows_ok=row_ok, gate=gate, **options)
+    if plan.admissible == 0:
+        warnings.warn(f'weak-form window of trajectory {key!r}, equation slot {slot!r}: no window keeps '
+                      f"{gate:g} of every field's variance; the slot takes the ungated pick {plan}, "
+                      f'which keeps {plan.kept:.2f}.', global_var.EPDEUsageWarning, stacklevel=2)
+    return plan
 
 
 def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None,
@@ -301,8 +349,6 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
     ``'half_power'`` a window is admissible only if it keeps at least ``weak_form.HALF_POWER`` of every field's
     variance; a slot with no admissible window takes the ungated pick, with one ``EPDEUsageWarning`` naming the
     trajectory, the slot and the kept share of that window. ``'off'`` picks among every window."""
-    import warnings
-    import epde.globals as global_var
     from epde.interface.search_config import WEAK_WINDOW_GATES, WEAK_WINDOW_PRODUCTS, active_config
     if window_products not in WEAK_WINDOW_PRODUCTS:
         raise ValueError(f'window_products must be one of {list(WEAK_WINDOW_PRODUCTS)}, instead got '
@@ -311,7 +357,6 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
         window_gate = active_config().domain.weak_window_gate
     if window_gate not in WEAK_WINDOW_GATES:
         raise ValueError(f'window_gate must be one of {list(WEAK_WINDOW_GATES)}, instead got {window_gate!r}.')
-    gate = WF.HALF_POWER if window_gate == 'half_power' else None
     keys = list(manager.trajecatoryIDs)
     tokens = {key: manager[key].raw_tokens() for key in keys}
     label_sets = [set(stored) for stored in tokens.values()]
@@ -339,11 +384,8 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
                     raise ValueError(f"system_rps_params['target_axes']: equation slot {slot!r} has no derivative "
                                      f'token along the allowed grid axes {sorted(allowed)} to score its weak-form '
                                      'window on.')
-            plan = WF.choose_window(fields[key], library, targets, np.random.default_rng([0, idx]),
-                                    rows_ok=row_ok, gate=gate, **extra)
-            if plan.admissible == 0:
-                warnings.warn(f'weak-form window of trajectory {key!r}, equation slot {slot!r}: no window keeps '
-                              f'{gate:g} of every field\'s variance; the slot takes the ungated pick {plan}, '
-                              f'which keeps {plan.kept:.2f}.', global_var.EPDEUsageWarning, stacklevel=2)
-            plans[(key, slot)] = plan
-    return WeakRows(fields, plans, keys, tokens)
+            plans[key, slot] = choose_slot_window(fields[key], library, targets, key, slot, idx,
+                                                  row_ok, window_gate, **extra)
+    rows = WeakRows(fields, plans, keys, tokens)
+    rows.fit_frequencies = any(getattr(f, 'status', {}).get('fit_frequencies') for f in pool.families)
+    return rows

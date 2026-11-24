@@ -38,6 +38,7 @@ import numpy as np
 from epde import _loop_stats
 from epde.interface.search_config import active_config, plain_kept_terms_cap
 from epde.operators.common.plain_fit import gene_term, own_derivative_terms, plain_params, target_gene
+from epde.structure.evaluation_rows import current_rows
 
 #: Re-draws of a swapped term that keeps duplicating another (TermMutation's).
 MAX_REGEN_RETRIES = 3
@@ -51,6 +52,8 @@ def _continuous_params(term) -> list:
     found = []
     for factor in term.structure:
         for param_idx, description in factor.params_description.items():
+            if description['name'] == 'freq' and factor.status.get('fit_frequencies'):
+                continue
             lo, hi = description['bounds'][0], description['bounds'][1]
             if description['name'] in _FIXED_PARAMS or 'grid' in description:
                 continue
@@ -64,12 +67,17 @@ def _duplicated(equation) -> bool:
     return len({term.factors_labels for term in equation.structure}) != len(equation.structure)
 
 
+def _allowed_feature(term):
+    rows = current_rows()
+    return getattr(rows, 'form', None) != 'forward' or rows.is_predictor(term)
+
+
 def _swap(equation, term) -> bool:
     original = term.structure
     for _ in range(MAX_REGEN_RETRIES):
         term.randomize()
         term.resetSavedState()
-        if not _duplicated(equation):
+        if not _duplicated(equation) and _allowed_feature(term):
             return True
     term.structure = original
     term.resetSavedState()
@@ -167,7 +175,7 @@ def _factor_move(equation) -> bool:
     saved = [(f, f.params.copy()) for f in original]
     changed = move(term, cap)
     term.resetSavedState()
-    if changed and _duplicated(equation):
+    if changed and (_duplicated(equation) or not _allowed_feature(term)):
         changed = False
     if not changed:
         term.structure = original
@@ -220,7 +228,8 @@ def plain_mutation(equation):
     elif move == 'swap':
         changed = _swap(equation, features[np.random.randint(len(features))])
     elif move == 'add':
-        changed = equation.add_random_term()
+        changed = (equation.add_random_term(allowed=_allowed_feature)
+                   if active_config().domain.evaluation_form == 'forward' else equation.add_random_term())
     elif move == 'drop':
         victim = features[np.random.randint(len(features))]
         equation.structure = [term for term in equation.structure if term is not victim]

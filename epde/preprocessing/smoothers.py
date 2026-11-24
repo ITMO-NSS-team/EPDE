@@ -250,10 +250,15 @@ class ANNSmoother(AbstractSmoother):
         """0: the network's fit error is global, not tied to the samples near the ends."""
         return [0] * len(shape)
 
+    @staticmethod
+    def resolve_device(device='auto'):
+        if device == 'auto':
+            return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        return torch.device(device)
+
     def __call__(self, data, grid, epochs_max=1000, loss_mean=1000, loss_threshold=1e-8,
-                 batch_frac=0.5, val_frac=0.1, learning_rate=1e-3, return_ann=False, device='cpu'):
-        if torch.cuda.is_available():
-            device = "cuda"
+                 batch_frac=0.5, val_frac=0.1, learning_rate=1e-3, return_ann=False, device='auto'):
+        device = self.resolve_device(device)
         # Convert to int if passed as float
         epochs_max = int(epochs_max)
 

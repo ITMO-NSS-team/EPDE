@@ -13,6 +13,24 @@ from functools import reduce
 from abc import ABC, abstractmethod, abstractproperty
 
 
+def prepare_field(name, observed, grids, order, pipeline, supplied=None):
+    """Produce a field and its aligned, axis-major derivative columns from the observations."""
+    if supplied is None:
+        field, stack = pipeline.run(observed.copy(), grid=grids, max_order=order)
+    else:
+        field, stack = observed, supplied
+    field, stack = np.asarray(field), np.asarray(stack)
+    ncols = int(order) * observed.ndim if np.isscalar(order) else sum(order)
+    expected = (observed.size, ncols)
+    if field.shape != observed.shape:
+        raise ValueError(f'{name}: processed field shape {field.shape} differs from {observed.shape}')
+    if field.dtype.kind not in 'fiu' or not np.isfinite(field).all():
+        raise ValueError(f'Preprocessed field {name!r} must contain finite real numbers')
+    if stack.shape != expected or stack.dtype.kind not in 'fiu' or not np.isfinite(stack).all():
+        raise ValueError(f'{name}: derivatives must be finite with shape {expected}, got {stack.shape}')
+    return field, stack
+
+
 class GeneralizedPrepBuilder(ABC):
     def __init__(self):
         pass

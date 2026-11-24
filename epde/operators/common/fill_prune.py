@@ -53,6 +53,7 @@ import numpy as np
 
 import epde.globals as global_var
 from epde import _loop_stats
+from epde.structure.evaluation_rows import current_rows, term_columns
 
 #: In-memory cache bounds (memory only: an evicted entry is recomputed identically).
 CAND_MAX = 4096
@@ -77,6 +78,22 @@ _FALLBACK_TEXTS = {
 _LIBRARY = {}          # (id(pool), repr(cfg)) -> (pool, [Term]); one entry
 _STORES = {}           # slot (None for strong rows) -> Gram store
 _WARNED = set()
+
+
+def checkpoint_state():
+    return dict(stores=_STORES, warnings=_WARNED, libraries=[
+        (pool, key[1], terms) for key, (pool, terms) in _LIBRARY.items()])
+
+
+def restore_checkpoint_state(state):
+    reset()
+    _WARNED.update(state['warnings'])
+    for pool, setting, terms in state['libraries']:
+        _LIBRARY[id(pool), setting] = (pool, terms)
+    for key, store in state['stores'].items():
+        _, keys, _, *settings = store['skey']
+        store['skey'] = (id(global_var.samples_manager), keys, tuple(map(id, store['families'])), *settings)
+        _STORES[key] = store
 
 
 def reset() -> None:
@@ -139,7 +156,7 @@ def atom_params(family):
     return out
 
 
-def _token_atoms(pool):
+def _token_atoms(pool, frequency_grids=None):
     """{id(family): {token: [params, ...]}} for every family whose parameters are discrete.
 
     Each row's factor is built once here and checked to carry the row's parameters. Building a factor draws
@@ -148,7 +165,12 @@ def _token_atoms(pool):
     all_vars = [family.variable for family in pool.families_demand_equation]
     atoms = {}
     for family in pool.families:
-        params = atom_params(family)
+        if frequency_grids is not None and family.status.get('fit_frequencies'):
+            params = [dict(power=1, dim=axis, freq=w)
+                      for axis, grid in frequency_grids.items()
+                      if axis <= family.token_params['dim'][1] for w in grid]
+        else:
+            params = atom_params(family)
         if params is None:
             continue
         fixed = getattr(family, 'token_fixed_params', None) or {}
@@ -173,12 +195,12 @@ def _token_atoms(pool):
     return atoms
 
 
-def _enumerate(pool, cfg) -> dict:
+def _enumerate(pool, cfg, frequency_grids=None) -> dict:
     """{factors_labels: Term} for every term the pool can draw under the factors setting ``cfg``."""
     from epde.structure.main_structures import Term
     counts, fmax = _counts_and_fmax(cfg)
     all_vars = [family.variable for family in pool.families_demand_equation]
-    atoms = _token_atoms(pool)
+    atoms = _token_atoms(pool, frequency_grids)
     status0 = {}
     for family in pool.families:
         for tok in family.tokens:
@@ -411,13 +433,10 @@ def _warn_once(what, message) -> None:
         warnings.warn(message, global_var.EPDEUsageWarning, stacklevel=3)
 
 
-def _weak() -> bool:
-    return bool(getattr(global_var.samples_manager, 'weak_mode', False))
-
-
 def _trajectory_keys():
     manager = global_var.samples_manager
-    keys = list(manager.weak.keys) if _weak() else list(manager.inner_shapes.keys())
+    rows = current_rows()
+    keys = list(rows.keys) if rows is not None else list(manager.inner_shapes.keys())
     from epde.operators.common.multisample import joint_enabled
     if joint_enabled(len(keys)):
         return tuple(keys)
@@ -431,7 +450,6 @@ def _trajectory_keys():
 def _column(term, keys, slot):
     """``term``'s column on the evaluation rows (weak rows: those of ``slot``)."""
     if slot is not None:
-        from epde.structure.weak_rows import term_columns
         values = term_columns(term, slot)
     else:
         from epde.structure.structure_template import ComplexStructure
@@ -444,20 +462,43 @@ def _column(term, keys, slot):
     return columns[0] if len(columns) == 1 else np.concatenate(columns)
 
 
-def gram_store(equation, keys, sw, slot) -> dict:
+def gram_store(equation, keys, sw, slot, target=None) -> dict:
     """The Gram store of ``slot`` (None: strong rows, one store), built at its first use in a fit and rebuilt
     only when the samples manager, the trajectory, the token families or the factors setting change."""
     from epde.interface.search_config import active_config
     families = list(equation.pool.families)
+    if not isinstance(keys, tuple):
+        keys = (keys,)
     cfg = active_config().objectives
     skey = (id(global_var.samples_manager), keys, tuple(id(f) for f in families),
             repr(factors_setting(equation)), slot, cfg.multisample_mode, cfg.multisample_weighting)
-    gs = _STORES.get(slot)
+    rows = current_rows()
+    fitted = target is not None and getattr(rows, 'fit_frequencies', False)
+    store_key = (slot, target.factors_labels) if fitted else slot
+    gs = _STORES.get(store_key)
     if gs is not None and gs['skey'] == skey and all(a is b for a, b in zip(gs['families'], families)):
         return gs
-    for other in [s for s, g in _STORES.items() if s == slot or g['skey'][0] != skey[0]]:
+    for other in [s for s, g in _STORES.items() if s == store_key or g['skey'][0] != skey[0]]:
         del _STORES[other]
-    lib = library_terms(equation.pool, factors_setting(equation))
+    if fitted:
+        from epde.operators.common.frequency_fit import row_residual_modes
+        residuals = rows.columns(target, slot)
+        grids = {}
+        for d in range(len(rows.fields[keys[0]].axes)):
+            bounds = [f.status['frequency_nyquist'][d] for f in families
+                      if f.status.get('fit_frequencies') and d <= f.token_params['dim'][1]]
+            if not bounds:
+                continue
+            upper = min(bounds)
+            span = max(np.ptp(rows.fields[key].axes[d]) for key in keys)
+            subcycle = min(np.pi / (2 * span), upper / 2) if span else upper / 2
+            peaks = [row_residual_modes(rows, key, slot, residuals[key], d, upper)[0] for key in keys]
+            grids[d] = np.unique([subcycle, *peaks])
+        lib = list(_enumerate(equation.pool, _factors_cfg(factors_setting(equation)), grids).values())
+    else:
+        lib = library_terms(equation.pool, factors_setting(equation))
+    if getattr(rows, 'form', None) == 'forward':
+        lib = [term for term in lib if rows.is_predictor(term) or rows.is_target(term, slot)]
     n, M = sw.size, len(lib)
     free = _free_ram_bytes()
     if free is not None and free < n * M * 8 + M * M * 16 + MIN_FREE_BYTES:
@@ -491,7 +532,7 @@ def gram_store(equation, keys, sw, slot) -> dict:
     labels = tuple(t.factors_labels for t in lib)
     gs = dict(skey=skey, families=families, lib=lib, labels=labels, index={lab: i for i, lab in enumerate(labels)},
               Gn=Gn, ok=ok, related={}, cand=OrderedDict(), beams=OrderedDict())
-    _STORES[slot] = gs
+    _STORES[store_key] = gs
     return gs
 
 
@@ -620,7 +661,7 @@ def _attempt(equation, target, features, system, params) -> None:
     if target.factors_labels in partner_labels:
         raise _Fallback('target_conflict')
     keys = _trajectory_keys()
-    if _weak():
+    if current_rows() is not None:
         slot = var
         row_weights = global_var.samples_manager.row_weights(slot, 'dm')
     else:
@@ -631,7 +672,10 @@ def _attempt(equation, target, features, system, params) -> None:
         sw = np.concatenate([fit_row_weights(row_weights[key]) for key in keys])
     else:
         sw = np.asarray(row_weights[keys[0]], dtype=float).reshape(-1)
-    gs = gram_store(equation, keys, sw, slot)
+    if getattr(current_rows(), 'fit_frequencies', False):
+        gs = gram_store(equation, keys, sw, slot, target)
+    else:
+        gs = gram_store(equation, keys, sw, slot)
     t = gs['index'].get(target.factors_labels)
     if t is None:
         raise _Fallback('target_not_in_library')

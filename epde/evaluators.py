@@ -11,7 +11,7 @@ import torch
 # device = torch.device('cpu')
 
 from abc import ABC, abstractmethod
-from typing import Callable, Union, List, Dict
+from typing import Callable, Union, List, Dict, Hashable
 
 import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
@@ -114,94 +114,29 @@ class CustomEvaluator(EvaluatorTemplate):
 
 
 
-def simple_function_evaluator(factor,
-                              # structural: bool = False,
-                              grids: Union[Dict[int, List[np.ndarray]], List[np.ndarray]] = None,
-                              **kwargs) -> Dict[int, np.ndarray]:
-    '''
-
-    Example of the evaluator of token values, that can be used for uploading values of stored functions from cache. Cases, when
-    this approach can be used, include evaluating derivatives, coordinates, etc.
-
-
-    Parameters
-    ----------
-
-    factor : epde.factor.Factor object,
-        Object, that represents a factor from the equation terms, for that we want to calculate the values.
-
-    structural : bool,
-        Mark, if the evaluated value will be used for discovering equation structure (True), 
-        or calculating coefficients (False)
-
-    Returns
-    ----------
-    values : Dict[int, numpy.ndarray]
-        Dict of vector of the evaluation of the token values, that can be used as target,
-        or feature during the LASSO regression.
-
-    '''
-
-    for param_idx, param_descr in factor.params_description.items():
-        if param_descr['name'] == 'power':
-            power_param_idx = param_idx
-
-    if isinstance(grids, dict):
-        if all([isinstance(grid, list) for grid in grids.values()]):  
-            if any([any([subgr is None for subgr in grid]) for grid in grids.values()]):
-                none_cond = True
-            else:
-                assert all([isinstance(key, int) and isinstance(grid, (np.ndarray, list)) for key, grid in grids.items()]), \
-                    f'Some domain keys and grids do not match desired types: \
-                      got {[(type(key), type(grid)) for key, grid in grids.items]}.'
-                none_cond = False
-        elif all([isinstance(grid, np.ndarray) for grid in grids.values()]):
-            if any([grid is None for grid in grids.values()]):
-                none_cond = True
-            else:
-                assert all([isinstance(key, int) and isinstance(grid, np.ndarray) for key, grid in grids.items()]), \
-                    f'Some domain keys and grids do not match desired types:  \
-                      got {[(type(key), type(grid)) for key, grid in grids.items]}.'
-                none_cond = False
+def simple_function_evaluator(factor, grids: Union[Dict[Hashable, List[np.ndarray]], List[np.ndarray]] = None,
+                              **kwargs) -> Dict[Hashable, np.ndarray]:
+    """Read a field from each trajectory's cache, or predict it on explicit grids."""
+    power_idx = next(i for i, desc in factor.params_description.items() if desc['name'] == 'power')
+    power = factor.params[power_idx]
+    if grids is not None:
+        if isinstance(grids, dict):
+            requested = {key: [axes] if isinstance(axes, np.ndarray) else axes for key, axes in grids.items()}
+        elif isinstance(grids, (list, tuple)):
+            requested = {-1: grids}
         else:
-            raise TypeError(f'Incorrect type of values in grids dict, \
-                            expected np.ndarrays or list, got {[type(grid) for grid in grids.values()]}')            
-    elif isinstance(grids, list):
-        if any([grid is None for grid in grids]):
-            none_cond = True
-        else:
-            assert all([isinstance(grid, np.ndarray) for grid in grids]), \
-                f'Some domain reeval grids do not match desired np.ndarray type: got {[type(grid) for grid in grids]}.'
-            none_cond = False
-    else:
-        assert grids is None, f'Non-default behavior, expected other grids, got {type(grids)}'
-        none_cond = True
+            raise TypeError('Expected a coordinate list or a mapping from trajectory IDs to coordinates')
+        if any(not isinstance(axes, (list, tuple)) for axes in requested.values()):
+            raise TypeError('Each trajectory requires a coordinate array or a list of coordinate arrays')
+        if all(axis is not None for axes in requested.values() for axis in axes):
+            if any(not isinstance(axis, np.ndarray) for axes in requested.values() for axis in axes):
+                raise TypeError('Each coordinate must be a NumPy array')
+            return {key: factor.predict_with_ann(axes) ** power for key, axes in requested.items()}
 
-    if not none_cond: # grids is not None or any([for grid in ]):
-        if isinstance(grids, list):
-            values = factor.predict_with_ann(grids)
-            values = {-1: values**(factor.params[power_param_idx])}
-        else:
-            values = {}
-            for key, domain_grids in grids.items():
-                if isinstance(domain_grids, np.ndarray):
-                    domain_grids = [domain_grids]
-                assert all([isinstance(domain_grid, np.ndarray) for domain_grid in domain_grids]), \
-                    'In multiple grids evalutation, the grids have to be passed as a dict with values - lists of np.ndarrays!' 
-                values[key] = factor.predict_with_ann(domain_grids)**(factor.params[power_param_idx])
-        return values
-
-    else:
-        if factor.params[power_param_idx] == 1:
-            # Same bucketed key Factor.evaluate uses so trig factors with
-            # within-tolerance freq share a single cached evaluation.
-            values = global_var.samples_manager.get(factor.structural_label) # , structural = structural
-            return values
-        else:
-            values = global_var.samples_manager.get(factor_params_to_str(factor, set_default_power = True,
-                                                                         power_idx = power_param_idx))
-            values = {ID : value**(factor.params[power_param_idx]) for ID, value in values.items()}
-            return values
+    if power == 1:
+        return global_var.samples_manager.get(factor.structural_label)
+    label = factor_params_to_str(factor, set_default_power=True, power_idx=power_idx)
+    return {key: value ** power for key, value in global_var.samples_manager.get(label).items()}
 
 
 sign_eval_fun_np = lambda *args, **kwargs: np.sign(args[0]) # If dim argument is needed here: int(kwargs['dim'])

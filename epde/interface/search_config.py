@@ -135,6 +135,18 @@ class DomainConfig:
 
     ``evaluation_form`` selects the rows the solver-free search fits and scores on.
     - ``'strong'`` (the default) uses pointwise values on the interior box.
+    - ``'forward'`` fits each variable's first forward time increment in plain search.
+      Predictors are measured at the interval origin. ``forward_lag`` is the
+      number of samples between endpoints; elapsed time uses the actual coordinates.
+      ``forward_space`` chooses pointwise spatial differences or weak spatial windows.
+      Measurement rows use raw observations. Custom and stored predictor families
+      declare ``available_at_origin=True`` when their value at a sample is known
+      at that time. On a time-only trajectory both spatial settings give the same rows.
+      Complete intervals inside an explicit boundary are weighted equally. Automatic
+      pointwise boundaries follow the spatial difference stencil. Weak spatial
+      integration requires a rectilinear grid uniformly spaced on each spatial axis.
+      After fitting, ``search.measurement_summary[trajectory_id, variable]`` records
+      the resolved lattice, row count, lag, elapsed-time range and window geometry.
     - ``'weak'`` uses window averages against compact test functions, after
       integration by parts. Each equation
       slot gets one window per trajectory, chosen once per fit from the data, and
@@ -150,8 +162,8 @@ class DomainConfig:
     products of the pool's data and derivative tokens
     (:func:`epde.preprocessing.weak_form.product_noise`), so a window is also
     judged on the product columns the search fits. ``'off'`` (the default)
-    scores the one-factor columns only. ``'pairs'`` requires
-    ``evaluation_form='weak'``.
+    scores the one-factor columns only. Forward spatial windows use the same
+    setting and score products of origin-available factors.
 
     ``weak_window_gate`` (one of :data:`WEAK_WINDOW_GATES`) restricts which
     weak windows may be picked. ``'half_power'`` (the default) admits a
@@ -166,6 +178,8 @@ class DomainConfig:
     time_axis: int = 0
     evaluation_stride: Union[None, int, list, tuple] = None
     evaluation_form: str = 'strong'
+    forward_lag: int = 1
+    forward_space: str = 'pointwise'
     weak_window_products: str = 'off'
     weak_window_gate: str = 'half_power'
 
@@ -267,6 +281,13 @@ class SearchSpaceConfig:
     * ``factor_move_probability`` -- the chance that a mutation edits one
       factor of a term instead (power +-1, add or drop a factor).
       ``'auto'``: 1/6 / 0.
+    * ``invariant_terms`` -- one of :data:`INVARIANT_TERMS`: ``'keep'`` (the
+      default) every term; ``'refuse'`` reads the exact polynomial
+      invariants of the variables off the data (``c**2 + s**2 = 1`` of a
+      heading vector) with their derivatives and leaves out of every fit a
+      term they make redundant, so no identity of the variables can be
+      written (``epde.operators.common.invariant_terms``). Data without such
+      an invariant keep every term.
 
     ``equation_terms_max_number`` bounds an equation's STRUCTURE in every
     mode: the terms it holds, the target included -- the library
@@ -327,7 +348,7 @@ SYSTEM_RPS_PARAMS = {
     'plain': {'fill_probability': 'auto', 'fill_beam_width': 1000, 'fill_top': 20,
               'fill_prune_alpha': 0.3, 'fill_levels': 'all', 'product_rule_decline': 'auto',
               'variable_order': 'auto', 'variable_order_seed': None, 'plain_target': 'auto',
-              'factor_move_probability': 'auto', 'target_axes': None},
+              'factor_move_probability': 'auto', 'target_axes': None, 'invariant_terms': 'keep'},
 }
 assert tuple(SYSTEM_RPS_PARAMS) == SYSTEM_RPS_MODES
 #: ``'plain'`` mode's ``'auto'`` settings: ``'universal'`` under
@@ -342,6 +363,8 @@ PLAIN_AUTO = {
 #: ``fill_levels`` values, ``variable_order`` values (resolved).
 FILL_LEVELS = ('all', 'max')
 VARIABLE_ORDERS = ('fixed', 'random')
+#: ``'plain'`` mode's ``invariant_terms`` values.
+INVARIANT_TERMS = ('keep', 'refuse')
 #: Which non-dominated variant a system takes in ``'assignment'`` mode
 #: (its ``variant_pick`` setting).
 VARIANT_PICKS = ('random', 'sector')
@@ -396,7 +419,7 @@ def check_evaluation_budget(stride, use_solver) -> None:
 
 
 #: ``domain.evaluation_form`` values.
-EVALUATION_FORMS = ('strong', 'weak')
+EVALUATION_FORMS = ('strong', 'weak', 'forward')
 #: ``domain.weak_window_products`` values.
 WEAK_WINDOW_PRODUCTS = ('off', 'pairs')
 #: ``domain.weak_window_gate`` values.
@@ -453,6 +476,34 @@ def check_evaluation_form(form, stride, use_solver, instability_metric) -> None:
                          'pointwise fields.')
 
 
+def check_forward_options(resolved):
+    domain = resolved['domain']
+    forward = domain['evaluation_form'] == 'forward'
+    lag, space = domain['forward_lag'], domain['forward_space']
+    if isinstance(lag, bool) or not isinstance(lag, Integral) or lag < 1:
+        raise ValueError('forward_lag must be a positive integer number of samples.')
+    if space not in ('pointwise', 'weak'):
+        raise ValueError("forward_space must be 'pointwise' or 'weak'.")
+    if not forward:
+        if lag != DomainConfig.forward_lag or space != DomainConfig.forward_space:
+            raise ValueError("forward_lag and forward_space require evaluation_form='forward'.")
+        return
+    search = resolved['search_space']
+    if search['system_rps_mode'] != 'plain' or resolved['solver']['use_solver']:
+        raise ValueError("evaluation_form='forward' requires solver-free system_rps_mode='plain'.")
+    if domain['evaluation_stride'] is not None or resolved['objectives']['instability_metric'] == 'vcoef':
+        raise ValueError("forward rows define their own lattice and do not support evaluation_stride or vcoef.")
+    if search['system_rps_params']['plain_target'] is False:
+        raise ValueError('Forward increments require plain_target=True.')
+    pre = resolved['preprocessing']
+    check_forward_preprocessor(pre['default_preprocessor_type'], pre['preprocessor_kwargs'])
+
+
+def check_forward_preprocessor(kind, kwargs):
+    if kind == 'forward' or 'lag' in kwargs or kwargs.get('scheme') in ('forward', 'backward'):
+        raise ValueError("Set the forward interval with forward_lag alone when evaluation_form='forward'.")
+
+
 def plain_kept_terms_cap(terms) -> int:
     """``'plain'`` mode's cap on what an equation keeps besides its target --
     its other terms plus the constant, each counting 1: the ``terms - 1``
@@ -502,6 +553,8 @@ def resolve_plain_params(config) -> dict:
     params = dict(SYSTEM_RPS_PARAMS['plain'])
     if space.system_rps_mode == 'plain':
         params.update(space.system_rps_params)
+    if config.domain.evaluation_form == 'forward':
+        params['plain_target'] = True
     return _resolve_plain_autos(params, _plain_nsga2(space.system_rps_mode, config.evolution.engine),
                                 config.domain.evaluation_form == 'weak')
 
@@ -526,9 +579,9 @@ def check_plain_params(params) -> None:
     scale positive, ``fill_levels`` one of :data:`FILL_LEVELS`,
     ``product_rule_decline`` one of ``DECLINE_MODES`` (or ``'auto'``),
     ``variable_order`` one of :data:`VARIABLE_ORDERS` (or ``'auto'``),
-    ``plain_target`` a bool (or ``'auto'``), ``variable_order_seed`` an int
-    or None and ``target_axes`` one of the shapes :func:`target_axes_of`
-    reads."""
+    ``invariant_terms`` one of :data:`INVARIANT_TERMS`, ``plain_target`` a
+    bool (or ``'auto'``), ``variable_order_seed`` an int or None and
+    ``target_axes`` one of the shapes :func:`target_axes_of` reads."""
     from epde.operators.common.product_rule import DECLINE_MODES
 
     def refuse(key, what):
@@ -549,7 +602,8 @@ def check_plain_params(params) -> None:
         refuse('fill_prune_alpha', 'a positive number')
     choices = (('fill_levels', FILL_LEVELS, False),
                ('product_rule_decline', DECLINE_MODES, True),
-               ('variable_order', VARIABLE_ORDERS, True))
+               ('variable_order', VARIABLE_ORDERS, True),
+               ('invariant_terms', INVARIANT_TERMS, False))
     for key, menu, auto in choices:
         value = params[key]
         if not (isinstance(value, str) and (value in menu or (auto and value == 'auto'))):
@@ -924,13 +978,15 @@ class EvolutionConfig:
     * ``'auto'`` (the default) -- ``'per_variable'`` for plain-mode NSGA-II,
       ``'system'`` otherwise (:func:`resolve_niching`).
 
-    ``planned_duplicates`` (one of :data:`PLANNED_DUPLICATES`) applies under
-    ``niching='per_variable'``: an assembled child whose mating plan predicted
-    a repeat of a parent or of the history (the plan's redraws exhausted)
-    either enters its first fit unmutated like every assembled child
-    (``'fit'``, the default) or is mutated before its first fit
-    (``'mutate'``). ``'mutate'`` is refused unless ``niching`` resolves to
-    ``'per_variable'``.
+    ``planned_duplicates`` (one of :data:`PLANNED_DUPLICATES` or ``'auto'``)
+    applies under ``niching='per_variable'``: an assembled child whose mating
+    plan predicted a repeat of a parent or of the history (the plan's redraws
+    exhausted) either enters its first fit unmutated like every assembled
+    child (``'fit'``) or is mutated before its first fit (``'mutate'``).
+    ``'auto'`` (the default) is ``'mutate'`` where ``niching`` resolves to
+    ``'per_variable'`` and ``'fit'`` otherwise
+    (:func:`resolve_planned_duplicates`). An explicit ``'mutate'`` is refused
+    unless ``niching`` resolves to ``'per_variable'``.
 
     ``complementary_mating_prob`` is the probability that the second parent is
     drawn from the systems holding some equation's front where the first
@@ -971,7 +1027,7 @@ class EvolutionConfig:
     niching: str = 'auto'
     complementary_mating_prob: float = 0.0
     engine: str = 'moeadd'
-    planned_duplicates: str = 'fit'
+    planned_duplicates: str = 'auto'
 
 
 #: How a multi-equation system survives and mates; see
@@ -996,6 +1052,17 @@ def resolve_niching(niching, rps_mode, engine) -> str:
     if niching != 'auto':
         return niching
     return 'per_variable' if _plain_nsga2(rps_mode, engine) else 'system'
+
+
+def resolve_planned_duplicates(planned, niching, rps_mode, engine) -> str:
+    """``evolution.planned_duplicates`` with ``'auto'`` resolved: ``'mutate'``
+    where ``niching`` resolves to ``'per_variable'`` (plain-mode NSGA-II),
+    ``'fit'`` otherwise. An explicit value is returned as is."""
+    if planned != 'auto':
+        return planned
+    if resolve_niching(niching, rps_mode, engine) == 'per_variable':
+        return 'mutate'
+    return 'fit'
 
 
 def resolve_patience(patience, rps_mode, engine):
@@ -1230,6 +1297,13 @@ class SearchConfig:
     solver: SolverConfig
     evolution: EvolutionConfig
     runtime: RuntimeConfig
+
+    @property
+    def supports_frequency_fitting(self) -> bool:
+        """Whether equation scoring fits continuous frequencies on weak derivative targets."""
+        return (self.domain.evaluation_form in ('weak', 'forward') and
+                self.search_space.system_rps_mode == 'plain' and
+                resolve_plain_params(self)['plain_target'])
 
     def as_dict(self) -> dict:
         """Nested plain-dict view, for logging and round-trip tests."""
@@ -1659,10 +1733,10 @@ def _check_types(resolved: dict) -> None:
             'evolution.niching must be one of {0}, instead got {1!r}.'.format(
                 list(NICHING_MODES) + ['auto'], niching))
     planned = resolved['evolution']['planned_duplicates']
-    if planned not in PLANNED_DUPLICATES:
+    if planned not in PLANNED_DUPLICATES + ('auto',):
         raise ValueError(
             'evolution.planned_duplicates must be one of {0}, instead got {1!r}.'.format(
-                list(PLANNED_DUPLICATES), planned))
+                list(PLANNED_DUPLICATES) + ['auto'], planned))
     mating = resolved['evolution']['complementary_mating_prob']
     if isinstance(mating, bool) or not isinstance(mating, (int, float)) \
             or not 0.0 <= mating <= 1.0:
@@ -1705,7 +1779,7 @@ def _check_types(resolved: dict) -> None:
                 "setting, not supported with evolution.engine='nsga2'.")
     # The 'auto' settings follow the mode and the engine (EvolutionConfig,
     # SearchSpaceConfig). The config keeps 'auto'; each reader resolves it
-    # (resolve_niching, resolve_patience, resolve_plain_params).
+    # (resolve_niching, resolve_planned_duplicates, resolve_patience, resolve_plain_params).
     niching = resolve_niching(niching, rps_mode, engine)
     if planned == 'mutate' and niching != 'per_variable':
         raise ValueError(
@@ -1729,7 +1803,7 @@ def _check_types(resolved: dict) -> None:
             raise ValueError(
                 "search_space.system_rps_params['product_rule_decline'] reads the weak rows' "
                 "integration by parts; it requires domain.evaluation_form='weak'.")
-        if plain['target_axes'] is not None and not plain['plain_target']:
+        if plain['target_axes'] is not None and not plain['plain_target'] and resolved['domain']['evaluation_form'] != 'forward':
             raise ValueError(
                 "search_space.system_rps_params['target_axes'] restricts plain targets; it requires "
                 "system_rps_params['plain_target'] to resolve to True (set it to True, or use "
@@ -1740,8 +1814,10 @@ def _check_types(resolved: dict) -> None:
                           resolved['domain']['evaluation_stride'],
                           resolved['solver']['use_solver'],
                           resolved['objectives']['instability_metric'])
-    check_weak_window_products(resolved['domain']['weak_window_products'],
-                               resolved['domain']['evaluation_form'])
+    check_forward_options(resolved)
+    domain = resolved['domain']
+    spatial_windows = domain['evaluation_form'] == 'forward' and domain['forward_space'] == 'weak'
+    check_weak_window_products(domain['weak_window_products'], 'weak' if spatial_windows else domain['evaluation_form'])
     check_weak_window_gate(resolved['domain']['weak_window_gate'])
     check_auto_settings(resolved['domain']['boundary_width'],
                         resolved['evolution']['population_size'],
