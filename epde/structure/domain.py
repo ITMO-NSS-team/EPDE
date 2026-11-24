@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import torch
 from collections import OrderedDict
+from copy import deepcopy
 
 from typing import Callable, Tuple, List, Union, Literal, Dict, Optional
 from functools import singledispatchmethod, singledispatch
@@ -163,11 +164,9 @@ class InputEntry(object):
         else:
             raise TypeError(f'data_tensor arg. in InputEntry.__init__(...) must be a np.ndarray.')
         
-        self.data_tensor = data_tensor
-        #: The field exactly as handed in. ``data_tensor`` is replaced by the
-        #: preprocessor's output (smoothed, when a smoother is set); a solver
-        #: that profiles the observations wants what was observed.
-        self.raw_tensor = data_tensor
+        #: Keep the original observations for weak rows and solver scoring.
+        self.raw_tensor = data_tensor.copy()
+        self.data_tensor = self.raw_tensor
 
     def setDerivatives(self, preprocesser: PreprocessingPipe, deriv_tensors: Union[list, np.ndarray] = None,
                         max_order: Union[list, tuple, int] = 1, grid: list = []):
@@ -190,37 +189,29 @@ class InputEntry(object):
         self.names = deriv_names
         self.d_orders = deriv_orders
 
-        if deriv_tensors is None and isinstance(self.data_tensor, np.ndarray):
-            self.data_tensor, self.derivatives = preprocesser.run(self.data_tensor, grid=grid,
-                                                                  max_order=max_order)
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}
-        elif deriv_tensors is None and isinstance(self.data_tensor, list):
-            raise NotImplementedError("Depricated method: used to be a way to create multi-sample setup")
-            if isinstance(grid[0], np.ndarray):
-                raise ValueError('A single set of grids passed for multiple samples mode.')
-            data_tensors, derivatives = [], []
-            for samp_idx, sample in enumerate(self.data_tensor):
-                processed_data, derivs = preprocesser.run(sample, grid=grid[samp_idx],
-                                                          max_order=max_order)
-                data_tensors.append(processed_data)
-                derivatives.append(derivs)
-            self.data_tensor = np.concatenate(data_tensors, axis = 0) # TODO: stack data_tensors with the time axis in the correct wa
-            self.derivatives = np.concatenate(derivatives, axis=0) # TODO: check the correct
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}
-
-        elif deriv_tensors is not None and isinstance(self.data_tensor, list):
-            self.data_tensor = np.concatenate(self.data_tensor, axis = 0)
-
-            print(f'Concatenating arrays of len {len(deriv_tensors)}')
-            self.derivatives = np.concatenate(deriv_tensors, axis = 0)
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}            
+        if deriv_tensors is None:
+            # Preprocess a fresh copy in case the smoother mutates its input.
+            data, derivatives = preprocesser.run(self.raw_tensor.copy(), grid=grid,
+                                                 max_order=max_order)
         else:
-            self.derivatives = deriv_tensors
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}
+            data, derivatives = self.raw_tensor, deriv_tensors
+
+        if not isinstance(data, np.ndarray) or data.shape != self.raw_tensor.shape:
+            raise ValueError(f'Preprocessed field {self.var_name!r} has shape {np.shape(data)}, '
+                             f'expected its observation shape {self.raw_tensor.shape}.')
+        if (not np.issubdtype(data.dtype, np.number) or not np.isrealobj(data)
+                or not np.all(np.isfinite(data))):
+            raise ValueError(f'Preprocessed field {self.var_name!r} must contain finite real numbers.')
+        expected = (self.raw_tensor.size, len(deriv_names))
+        if not isinstance(derivatives, np.ndarray) or derivatives.shape != expected:
+            raise ValueError(f'The derivatives of {self.var_name!r} have shape {np.shape(derivatives)}, '
+                             f'expected {expected} (grid points, derivative columns).')
+        if (not np.issubdtype(derivatives.dtype, np.number) or not np.isrealobj(derivatives)
+                or not np.all(np.isfinite(derivatives))):
+            raise ValueError(f'The derivatives of {self.var_name!r} must contain finite real numbers.')
+
+        self.data_tensor, self.derivatives = data, derivatives
+        self.deriv_properties = {'max order': max_order, 'dimensionality': data.ndim}
 
 
 class VariableEntry(InputEntry):
@@ -333,7 +324,7 @@ class Domain(object): # inheritance from cache objects?
         has no boundary (and no test function) until :meth:`resolve_boundary`
         sets the width the pool build asks for (``boundary_pending`` until
         then); the inner shape and the row-budget strides follow from it, and
-        stay fixed from then on."""
+        stay fixed from then on. Coordinates are copied on creation."""
         self._ID = ID
         self._time_axis = time_axis
         self._boundary_auto = isinstance(boundary, str) and boundary == 'auto'
@@ -360,7 +351,8 @@ class Domain(object): # inheritance from cache objects?
             self._dim = len(grids)
         
         self._grid_cache: Cache = grid_cache
-        uploadGrids(grids, grid_cache, domain_id = self._ID)
+        uploadGrids([np.array(grid, copy=True) for grid in grids], grid_cache,
+                    domain_id=self._ID)
         self.setBoundaries(0 if self._boundary_auto else boundary)
 
     @property
@@ -465,11 +457,9 @@ class Domain(object): # inheritance from cache objects?
         picked up exactly as before.
         """
         if self._g_func_val_cache is None:
-            try:
-                self._g_func_val_cache = self._g_func(self.getGrids(mode = 'full'))
-            except TypeError:
-                assert isinstance(self._g_func, (np.ndarray, list))
-                self._g_func_val_cache = self._g_func
+            value = self._g_func(self.getGrids(mode='full')) if callable(self._g_func) else self._g_func
+            # Keep the cached weights and mask consistent if the caller edits the array.
+            self._g_func_val_cache = np.array(value, copy=True)
         return self._g_func_val_cache
 
     @g_func.setter
@@ -625,35 +615,26 @@ class Domain(object): # inheritance from cache objects?
             print(f'Set domain {self} with inner shape of {self.inner_shape}')
 
     def validateTestFunction(self) -> None:
-        """Check the two things every downstream reshape silently assumes.
+        """Require finite weights that are positive exactly on the interior box.
 
-        ``inner_shape`` (recorded here) and ``g_func_mask`` (which actually
-        deletes the points, ``addEntryToCache``) are one concept declared
-        twice -- see ``EpdeSearch.createDomain``. Everything that recovers grid
-        structure from the flat rows reshapes to ``inner_shape``:
-        ``chi2_scores``, ``GramSetup``, ``VaryingCoefSetup``, ``_slab_edges``.
-        If the mask is not exactly the rectangular interior box, those
-        reshapes either raise deep inside an estimator or -- worse --
-        ``chi2_scores`` silently falls back to a single flat sample-axis path
-        (``survival.py``, the ``prod(gs) != n_samples`` branch) and the second
-        Pareto objective quietly stops seeing the grid.
-
-        A CONSTANT test function cannot trip this. A user-supplied
-        ``gfunction`` can, the moment it has an interior zero or reaches zero
-        before the boundary margin -- which is exactly what the shipped-but-
-        disabled ``baseline_exp_function`` bump does at the axis extremes.
-        Fail loudly here rather than degrade there.
-
-        Under a row budget the count alone would let a shifted box through
-        (the lattice of a shifted box can keep as many points), so the
-        test function's support must also be the box itself.
+        The mask must select the solver grid, including under a row budget.
+        A shifted box can have the correct row count and still select the
+        wrong coordinates. A hole can create false neighbours on reshape.
         """
-        if self._eval_stride is not None and not np.array_equal(self.g_func != 0, self._box_mask()):
+        weights = self.g_func
+        if weights.shape != tuple(self.initial_shape):
+            raise ValueError(f'The test function has shape {weights.shape}, expected the full '
+                             f'grid shape {tuple(self.initial_shape)}.')
+        numeric = np.issubdtype(weights.dtype, np.number) or np.issubdtype(weights.dtype, np.bool_)
+        if (not numeric or not np.isrealobj(weights)
+                or not np.all(np.isfinite(weights)) or np.any(weights < 0)):
+            raise ValueError('The test function must contain finite nonnegative real weights.')
+        if not np.array_equal(weights != 0, self._box_mask()):
             raise ValueError(
                 'The test function is not nonzero exactly on the interior box '
-                f'(boundary_width={self.boundary_width}). Under a row budget '
-                f'(evaluation_stride {self._eval_stride}) the kept rows are a lattice of '
-                'that box, so its support must be the box itself.')
+                f'(boundary_width={self.boundary_width}). Cached rows and solver '
+                'coordinates require the same rectangular support, with or without '
+                'an evaluation stride; shifted support and interior zeros are unsupported.')
         kept = int(np.count_nonzero(self.g_func_mask))
         expected = int(np.prod(self.inner_shape))
         if kept != expected:
@@ -684,12 +665,8 @@ def _(input_entry: InputEntry, domain: Domain, cache: Cache, trajectory_id: int 
 def _(input_entry: VariableEntry, domain: Domain, cache: Cache, trajectory_id: int = 0):
     deriv_codes = [(input_entry.var_idx, code) for code in input_entry.d_orders]
 
-    # Flat mask: derivatives are (n_points, n_derivs); the data tensor below
-    # keeps the grid shape and takes the grid-shaped mask.
-    derivatives = np.array([derivative[domain.g_func_mask_flat]
-                            for derivative in input_entry.derivatives.T]).T
-    # print(f'In addEntryToCache: {derivatives}')
-    derivs_stacked = prepareVarTensor(input_entry.data_tensor[domain.g_func_mask], derivatives, time_axis = domain._time_axis)
+    # Mask flattened rows in grid order to keep derivatives aligned with the field.
+    derivs_stacked = input_entry.derivatives[domain.g_func_mask_flat].T
     
     try:
         uploadSimpleTokens(labels = input_entry.names, cache = cache, tensors = derivs_stacked, 
@@ -703,15 +680,12 @@ def _(input_entry: VariableEntry, domain: Domain, cache: Cache, trajectory_id: i
 
 
 class Trajectory(object): # Pass around in evo. operators or init in globals. Use instead of caches!
-    """One data sample attached to a domain.
+    """One record with its domain and preprocessing pipeline.
 
-    A trajectory carries WHAT is differentiated and evaluated -- the tensors,
-    the domain they live on, the pipeline that differentiates them -- but not
-    HOW MANY derivatives or powers the search may use. Those describe the token
-    pool, which is one shared structure however many trajectories feed it
-    (``create_pool`` reads its families off ``data[0]``), so they belong to
-    ``create_pool``/``fit`` and arrive here through :meth:`build`. Trajectories
-    differ from one another in evaluation only.
+    Derivative orders and powers come from the shared token pool. Observations,
+    supplied derivatives and per-record token tensors are copied on creation.
+    Create a new trajectory to supply new data. Pool-level tensors are copied
+    when uploaded for a build.
     """
 
     def __init__(self, entries: Union[List[VariableEntry], Dict[str, np.ndarray]],
@@ -729,18 +703,23 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         # Resolved now and kept, so that a later set_preprocessor() does not
         # retroactively change how already-registered data is differentiated.
         self._preprocessor_pipeline = preprocessor_pipeline
-        self._derivs = derivs
-        self._additional_cached_tokens = additional_cached_tokens
+        self._derivs = deepcopy(derivs)
         self._raw_token_tensors: Dict[str, np.ndarray] = {}
 
         if additional_cached_tokens is not None and not isinstance(additional_cached_tokens, dict):
             raise TypeError(f'additional_cached_tokens were passed incorrectly, expected dict, got {type(additional_cached_tokens)}')
+        # Copy token values and keep the family keys shared.
+        self._additional_cached_tokens = (None if additional_cached_tokens is None else
+                                         {family: deepcopy(tensors)
+                                          for family, tensors in additional_cached_tokens.items()})
 
         if isinstance(entries, list):
             for entry in entries:
                 assert isinstance(entry, VariableEntry), \
                     'Entries have to be passed as list of VariableEntry objects or specific dicts.'
-            self._entries = list(entries)
+            # A reused entry needs separate preprocessing state in each trajectory.
+            self._entries = [VariableEntry(entry.var_name, entry.var_idx, entry.raw_tensor)
+                             for entry in entries]
 
         elif isinstance(entries, dict):
             self._entries = []
@@ -776,6 +755,9 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         term tensors no longer apply) recomputes, which is what makes a pool
         rebuild honest.
         """
+        # Copy mutable derivative orders before saving the build key.
+        if isinstance(max_deriv_order, list):
+            max_deriv_order = tuple(max_deriv_order)
         request = (max_deriv_order, data_fun_pow, deriv_fun_pow)
         if not force and self._built == request and self.tensors_cached:
             return self
@@ -784,6 +766,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         # a label, so tensors left by an earlier build -- or by another sample
         # that used this cache id -- would be read in place of the new ones.
         self._cache.drop_subcache(self.ID)
+        self._raw_token_tensors = {}
         self.max_deriv_order = max_deriv_order
         self._check_forward_boundary(max_deriv_order)
         self.families, self.base_derivs = [], []
@@ -824,7 +807,8 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         boundary the domain excludes from fitting, or the search fits on padded values."""
         pipe = self._preprocessor_pipeline
         required = getattr(getattr(pipe, 'deriv_calculator', None), 'required_boundary', None)
-        if self._derivs is not None or required is None:
+        if required is None or all(self._entry_derivs(entry, idx) is not None
+                                   for idx, entry in enumerate(self._entries)):
             return
         kwargs = pipe.deriv_calculator_kwargs
         t_ax = kwargs.get('time_axis', 0)
@@ -885,19 +869,11 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         return self._derivs
 
     def uploadTokenTensors(self, family, tensors: Dict[str, np.ndarray]) -> None:
-        """Put a token family's declared tensors into THIS trajectory's subcache.
+        """Mask full-grid token tensors and cache the selected rows.
 
-        The tensors arrive on the full grid, like the variable data, and are
-        masked the same way -- ``addEntryToCache`` does exactly this for the
-        variable itself. Without the mask they keep the untrimmed shape and no
-        longer line up with anything else in the cache.
-
-        External derivative tokens are refused under a row budget: they are
-        differentiated from the masked tensors, which on a lattice would be a
-        coarser scheme than the full-grid derivatives of the variables.
-
-        The full-grid tensors of every other family are kept by reference, before the mask, for the weak
-        rows (``raw_token``); external derivative tokens keep none, their tensors are bases.
+        Keep the first full-grid copy per label for weak rows until the next
+        build. External derivative tokens supply base tensors only and require
+        the full interior grid for differentiation.
         """
         if (self._domain.evaluation_stride is not None
                 and isinstance(family, ExternalDerivativesTokens)):
@@ -906,13 +882,18 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
                 f'under a row budget (evaluation_stride {self._domain.evaluation_stride}) its '
                 'derivatives would come from the sub-lattice. Build the domain without a row '
                 'budget to use them.')
+        staged = {}
         if not isinstance(family, ExternalDerivativesTokens):
-            for label, tensor in tensors.items():
-                self._raw_token_tensors[label] = np.asarray(tensor)
+            staged = {label: (self._raw_token_tensors[label]
+                              if label in self._raw_token_tensors else np.array(tensor, copy=True))
+                      for label, tensor in tensors.items()}
+            tensors = staged
         masked = {label: np.asarray(tensor)[self._domain.g_func_mask]
                   for label, tensor in tensors.items()}
         family.upload(trajectory = masked, cache = self._cache,
                       traj_id = self._cache_id)
+        # Cache the copy only after upload succeeds so the caller can retry.
+        self._raw_token_tensors.update(staged)
 
     @property
     def built(self) -> bool:
@@ -959,17 +940,18 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         return self._domain.inner_shape
 
     def checkShapes(self, domain: Domain) -> bool:
+        """Compare domain geometry and the number of cached, flattened rows."""
         sample_tensor = self._cache.get(subcache_ID = self._cache_id)
-        print('In check shapes: ', domain.inner_shape, type(domain.inner_shape), sample_tensor.shape, type(sample_tensor.shape))
-        return (domain.inner_shape == sample_tensor.shape)
+        return (tuple(self._domain.initial_shape) == tuple(domain.initial_shape)
+                and tuple(self.inner_shape) == tuple(domain.inner_shape)
+                and sample_tensor.shape == (int(np.prod(domain.inner_shape)),))
 
     @property
     def ID(self) -> int:
         return self._cache_id
 
     def raw_field(self, var_name: str) -> np.ndarray:
-        """The observed field of ``var_name`` on the FULL grid, as handed to
-        ``createTrajectory`` (before any preprocessing)."""
+        """Return the original observations of ``var_name`` on the full grid."""
         for entry in self._entries:
             if entry.var_name == var_name:
                 return entry.raw_tensor
@@ -977,7 +959,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
                        f'has {self.variable_names}')
 
     def raw_token(self, label: str) -> np.ndarray:
-        """The full-grid tensor of the stored token ``label`` as uploaded (before the domain mask)."""
+        """Return the full-grid copy of stored token ``label`` for this build."""
         try:
             return self._raw_token_tensors[label]
         except KeyError:
@@ -1148,7 +1130,8 @@ class TrajectoriesManager(object):
             np.ndarray of values (checked in unnormalized data); (np.ndarray, normalized), where normalized is bool
             (T if norm, else F) and np.ndarray is np.ndarray of tensor values. Does not support scaled vals
         '''
-        return all([obj in trajectory._cache for trajectory in self._traj.values()])
+        return all(trajectory._cache.contains(obj, trajectory.ID)
+                   for trajectory in self._traj.values())
 
     @property
     def trajecatoryIDs(self) -> List[int]:
@@ -1201,14 +1184,14 @@ class TrajectoriesManager(object):
 
     @property
     def grid_keys(self) -> list:
-        # A bit too hard-coded as: 
         traj_ID = self.trajecatoryIDs[0]
-        return self._traj[traj_ID]._domain._grid_cache.getKeys()
+        domain = self._traj[traj_ID]._domain
+        return domain._grid_cache.getKeys(subcache_ID=domain.ID)
 
     @property
     def ndim(self) -> int:
         traj_ID = self.trajecatoryIDs[0]
-        return self._traj[traj_ID]._domain._grid_cache.get(label = None).ndim
+        return len(self._traj[traj_ID]._domain.initial_shape)
 
     def raw_fields(self, key: int) -> Dict[str, np.ndarray]:
         """Every observed field of trajectory ``key`` on its full grid, raw."""

@@ -419,13 +419,13 @@ class TestTestFunctionSupport:
         domain.g_func = g
         return domain
 
-    def test_a_shifted_box_with_the_right_count_passes_only_unstrided(self):
-        """The count alone lets a shifted box through; on a lattice the support is checked too."""
+    def test_a_shifted_box_is_rejected_with_or_without_a_stride(self):
+        """Equal row counts do not align a shifted mask with the declared solver grid."""
         search = _search()
-        self._domain(search, slice(11, 111)).validateTestFunction()
-        strided = _quiet(self._domain, search, slice(11, 111), evaluation_stride=2)
-        with pytest.raises(ValueError, match='interior box'):
-            strided.validateTestFunction()
+        for stride in (None, 2):
+            domain = _quiet(self._domain, search, slice(11, 111), evaluation_stride=stride)
+            with pytest.raises(ValueError, match='interior box'):
+                domain.validateTestFunction()
 
     def test_a_wider_support_with_the_lattice_count_raises(self):
         search = _search()
@@ -549,11 +549,8 @@ class TestRowFloor:
         """At width 6 (blocks of 28) one level of 90 or 100 rows is three flat
         blocks and passes every block floor. Two whole levels of that size make
         two blocks: enough for tile's and dyad's two slabs, not for het's
-        three, which three levels give again. The het estimator itself scores
-        one and three levels and raises on two (``TestLevelSlabCount`` in
-        test_instability_estimators.py). The row-total floor passed two levels
-        on their 180 or 200 rows and het raised mid-search; the floor now
-        refuses them at fit start."""
+        three, which three levels give again. Reject two-level grids for het
+        at fit start, even when the total row count would pass."""
         assert [survival.row_floor(metric, (n0,) + cross, self.W) is None
                 for n0 in (1, 2, 3)] == verdicts
 
@@ -1050,7 +1047,10 @@ class TestWarnings:
             search.create_pool(data=[trajectory], additional_tokens=[family], max_deriv_order=(1,))
         removed = [w for w in _usage_warnings(records) if 'Constant on the row-budget lattice' in str(w.message)]
         assert len(removed) == int(warned)
-        assert ('f' in family._token_family.tokens) is not warned
+        pooled = next(f for f in search.pool.families if f.ftype == family.token_family.ftype)
+        assert ('f' in pooled.tokens) is not warned
+        # Keep the declared token available to later fits.
+        assert 'f' in family.token_family.tokens
 
     @pytest.mark.parametrize('budget, factor, warned', [(dict(evaluation_stride=2), 2.0, True),
                                                         (dict(evaluation_stride=2), 0.1, False),

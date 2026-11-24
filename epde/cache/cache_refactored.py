@@ -63,6 +63,8 @@ class Cache(object):
         # memory: the codes name tensors, and kept they only piled up again on
         # every rebuild.
         self._deriv_codes = []
+        # Derivative codes are local to each subcache. Keep the flat list for compatibility.
+        self._deriv_codes_by_subcache = {}
         # subcache ID -> the object (a Trajectory) whose build filled it. A
         # subcache is not proof of ownership: every trajectory build also
         # copies its variables into subcache 0.
@@ -73,6 +75,11 @@ class Cache(object):
         self.memory_default.pop(subcache_ID, None)
         self.memory_normalized.pop(subcache_ID, None)
         getattr(self, '_owners', {}).pop(subcache_ID, None)
+        codes = getattr(self, '_deriv_codes_by_subcache', None)
+        if codes is not None:
+            codes.pop(subcache_ID, None)
+            remaining = [record for records in codes.values() for record in records]
+            self._deriv_codes = [record for record in self._deriv_codes if record in remaining]
 
     def claim_subcache(self, subcache_ID, owner) -> None:
         self._owners[subcache_ID] = owner
@@ -178,7 +185,12 @@ class Cache(object):
             self.memory_normalized[subcache_ID] = {}
 
         if deriv_code is not None:
-            self._deriv_codes.append((deriv_code, label))
+            record = (deriv_code, label)
+            if record not in self._deriv_codes:
+                self._deriv_codes.append(record)
+            records = self._deriv_codes_by_subcache.setdefault(subcache_ID, [])
+            if record not in records:
+                records.append(record)
         
         if normalized:
             if self.max_allowed_tensors is None:
@@ -236,7 +248,12 @@ class Cache(object):
 
         if deriv_code is not None: # Condition not verified in rework due to looking plausible
             assert label is None, 'Get method got both deriv_code and explicit label'
-            label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code][0]
+            codes = getattr(self, '_deriv_codes_by_subcache', None)
+            records = self._deriv_codes if codes is None else codes.get(subcache_ID, [])
+            labels = [entry_label for code, entry_label in records if code == deriv_code]
+            if not labels:
+                raise KeyError(f'No derivative code {deriv_code!r} in subcache {subcache_ID!r}.')
+            label = labels[0]
 
         if label is None:
             # print(f'[subcache_ID]: {subcache_ID}, keys: {self.memory_default.keys()}')
@@ -275,7 +292,14 @@ class Cache(object):
 
         return list(self.memory_default[subcache_ID].keys())
 
+    def contains(self, obj, subcache_ID) -> bool:
+        """Check membership in a single subcache. None is a valid key."""
+        return self._contains(obj, (subcache_ID,))
+
     def __contains__(self, obj):
+        return self._contains(obj, self.memory_default)
+
+    def _contains(self, obj, subcache_IDs):
         '''
         Valid input type:
             'label' (checked in unnormalized data); ('label1', normalized), where normalized is bool (T if norm, else F);
@@ -284,21 +308,22 @@ class Cache(object):
         
         Method returns True if only the required entry is present in every subcache.
         '''
-        # subcache_IDs = list(self.memory_default.keys())
+        memory_default = [self.memory_default.get(key, {}) for key in subcache_IDs]
+        memory_normalized = [self.memory_normalized.get(key, {}) for key in subcache_IDs]
 
         if isinstance(obj, (tuple, list)) and isinstance(obj[0], str):
-            return all([obj in memdict.keys() for memdict in self.memory_default.values()])
+            return all([obj in memdict.keys() for memdict in memory_default])
 
         elif isinstance(obj, (tuple, list)) and isinstance(obj[0], (tuple, frozenset)) and isinstance(obj[1], bool):
             if obj[1]:
-                return all([obj[0] in memdict.keys() for memdict in self.memory_normalized.values()])
+                return all([obj[0] in memdict.keys() for memdict in memory_normalized])
             else:
-                return all([obj[0] in memdict.keys() for memdict in self.memory_default.values()])
+                return all([obj[0] in memdict.keys() for memdict in memory_default])
 
         elif isinstance(obj, np.ndarray):
             try:
                 return all([any([np.isclose(obj, entry_values) for entry_values in memdict.values()])
-                            for memdict in self.memory_default.values()])
+                            for memdict in memory_default])
             except:
                 return False
 
@@ -309,10 +334,10 @@ class Cache(object):
             try:
                 if obj[1]:
                     return all([any([np.isclose(obj[0], entry_values) for entry_values in memdict.values()]) 
-                                for memdict in self.memory_normalized.values()])
+                                for memdict in memory_normalized])
                 else:
                     return all([any([np.isclose(obj[0], entry_values) for entry_values in memdict.values()]) 
-                                for memdict in self.memory_default.values()])
+                                for memdict in memory_default])
             except:
                 return False
             
@@ -450,4 +475,4 @@ def prepareVarTensor(var_tensor, derivs_tensor, time_axis):
             assert derivs_tensor.ndim == var_tensor.ndim + 1, 'The shape of tensor of derivatives does not correspond '
             result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer],
                                                          source=time_axis, destination=0)
-    return result    
+    return result

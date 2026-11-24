@@ -41,7 +41,6 @@ class CustomEvaluator(EvaluatorTemplate):
         non-vectorising callable should leave the default ``False``.
         """
         self._evaluation_functions_np = evaluation_functions_np
-        self.indexes_vect = {}
 
         # if evaluation_functions_np is None:
         #     raise ValueError('No evaluation function set in the initialization of CustomEvaluator.')
@@ -88,7 +87,6 @@ class CustomEvaluator(EvaluatorTemplate):
                     eval_fun_kwargs[key] = factor.params[param_idx]
 
         if func_args is None or all([all([grid_like is None for grid_like in sample]) for sample in func_args.values()]):
-            new_grid = False
             func_args : Dict[int, List[np.ndarray]] = global_var.samples_manager.grids() # factor.grids
         else:
             assert isinstance(func_args, dict), \
@@ -97,8 +95,6 @@ class CustomEvaluator(EvaluatorTemplate):
                 f'Arg. func_args for CustomEvaluator must be None or dict of LISTS of np.ndarrays, got {func_args}.'
             assert all([all([(isinstance(arr, np.ndarray) or arr is None) for arr in func_arg]) for func_arg in func_args.values()]), \
                 f'Arg. func_args for CustomEvaluator must be None or dict of lists of NP.NDARRAYS, got {func_args}.'
-
-            new_grid = True
 
         if self.native_vectorized:
             # Fast path: call funcs once with the full grid arrays. The
@@ -111,29 +107,10 @@ class CustomEvaluator(EvaluatorTemplate):
                       for sample_ID, func_arg in func_args.items()}
             return values
         else:
-            grid_function = np.vectorize(lambda args: funcs(*args, **eval_fun_kwargs))
-
-            values = {}
-            # Two single-trajectory assumptions survived the multisample port
-            # here, on the path custom (non-vectorized) evaluators take:
-            #   * ``sampleIDs`` never existed on TrajectoriesManager -- the
-            #     property is ``trajecatoryIDs``. The identical slip is called
-            #     out and fixed in integrate/interface.py; this occurrence was
-            #     missed, so any CustomTokens evaluator raised AttributeError.
-            #   * ``func_args[0]`` indexed the per-sample dict with a literal
-            #     0 while iterating sample IDs, which only happened to work
-            #     when a trajectory was keyed 0.
-            for sample_ID in global_var.samples_manager.trajecatoryIDs:
-                if sample_ID in self.indexes_vect.keys():
-                    assert not new_grid, 'Trying to call pre-computed vectorized indexes, while a new grid is passed.'
-                else:
-                    self.indexes_vect[sample_ID] = np.empty_like(func_args[sample_ID][0], dtype=object)
-                    for tensor_idx, _ in np.ndenumerate(func_args[sample_ID][0]):
-                        self.indexes_vect[sample_ID][tensor_idx] = tuple([subarg[tensor_idx]
-                                                                          for subarg in func_args[sample_ID]])
-                
-                values[sample_ID] = grid_function(self.indexes_vect[sample_ID])
-            return values
+            # Use the supplied coordinates so a reused sample ID can have a new grid.
+            grid_function = np.vectorize(lambda *args: funcs(*args, **eval_fun_kwargs))
+            return {sample_ID: grid_function(*func_arg)
+                    for sample_ID, func_arg in func_args.items()}
 
 
 
@@ -201,12 +178,14 @@ def simple_function_evaluator(factor,
         none_cond = True
 
     if not none_cond: # grids is not None or any([for grid in ]):
-        if isinstance(grids[0], np.ndarray):
+        if isinstance(grids, list):
             values = factor.predict_with_ann(grids)
             values = {-1: values**(factor.params[power_param_idx])}
         else:
             values = {}
             for key, domain_grids in grids.items():
+                if isinstance(domain_grids, np.ndarray):
+                    domain_grids = [domain_grids]
                 assert all([isinstance(domain_grid, np.ndarray) for domain_grid in domain_grids]), \
                     'In multiple grids evalutation, the grids have to be passed as a dict with values - lists of np.ndarrays!' 
                 values[key] = factor.predict_with_ann(domain_grids)**(factor.params[power_param_idx])

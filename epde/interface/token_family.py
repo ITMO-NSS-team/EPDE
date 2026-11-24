@@ -381,43 +381,35 @@ class TokenFamily(object):
         print('Test evaluation performed correctly')
 
     def chech_constancy(self, **tfkwargs) -> None:
-        '''
-        Method to check, if any single simple token in the studied domain is constant, or close to it. The constant token is to be displayed and deleted from tokens and cache.
+        """Filter tokens constant across the active records.
 
-        Args:
-            test_function (`callable`): the method used to evaluate
-
-        Returns:
-            None
-        '''
+        A token can vary between records even if it is constant within each one.
+        """
         assert self.params_set
+        manager = global_var.samples_manager
+        active_ids = [] if manager is None else manager.trajecatoryIDs
+        if not active_ids:
+            return
         constant_tokens_labels = []
         for label in self.tokens:
             data_label = (label, (1.0,))
-            domain_constancies = []
-            for domain_dict in global_var.tensor_cache.memory_default.values():
-                data = domain_dict.get(data_label)
-
-                try:
-                    constancy = math.isclose(np.min(data), np.max(data))
-                    domain_constancies.append(constancy)
-
-                except TypeError:
-                    print(f"No {label} data in cache for constancy check. Functionality of eval-d token check TBD.")
-                    domain_constancies.append(False)
-                    # continue
-
-            # print(label, domain_constancies)
-            if all(domain_constancies):
+            blocks = [global_var.tensor_cache.memory_default.get(key, {}).get(data_label)
+                      for key in active_ids]
+            # Evaluated-on-demand tokens need not have cached values yet.
+            if any(data is None or np.size(data) == 0 for data in blocks):
+                continue
+            # Leave invalid columns for the fit to reject.
+            if any(not np.isrealobj(data) or not np.all(np.isfinite(data)) for data in blocks):
+                continue
+            minimum = min(float(np.min(data)) for data in blocks)
+            maximum = max(float(np.max(data)) for data in blocks)
+            if math.isclose(minimum, maximum):
                 constant_tokens_labels.append(label)
 
         for label in constant_tokens_labels:
             print(f'Function {label} is assumed to be constant in the studied domain. \
                     Removed from the equaton search.')
-            data_label = (label, (1.0,))
             self.tokens.remove(label)
-            # the live cache is cache_refactored.Cache (globals.py), whose method is deleteEntry
-            global_var.tensor_cache.deleteEntry(data_label)
 
     def evaluate(self, token) -> None:
         """

@@ -1,27 +1,7 @@
-"""Grouped, file-loadable search configuration for :class:`EpdeSearch`.
+"""Grouped search configuration for ``EpdeSearch``.
 
-The pre-config interface spread its defaults across ``__init__``,
-``set_preprocessor``, ``set_moeadd_params``, ``set_singleobjective_params``,
-``createDomain``, ``createTrajectory``, ``create_pool``, ``fit`` and
-``predict``, so one setting could be spelled differently at different entry
-points and every script restated the defaults. This module gathers them into
-one grouped declaration, with an optional user config and explicit kwargs on
-top. The per-operator parameters that used to live in
-``operators/utils/parameters/*.json`` are here too, as
-:data:`MULTI_OBJECTIVE_OPERATORS` / :data:`SINGLE_OBJECTIVE_OPERATORS`.
-
-Precedence, strictly::
-
-    the dataclass defaults below  <  user config  <  explicit kwargs
-
-**The dataclasses are the only place a default is written.** They used to
-document values that were really supplied by a shipped JSON file, which meant
-editing a field here changed nothing at all -- ``pinn_loss_mult`` was set to
-0.0 in this module while every run kept reading 1e4 from the JSON, with the
-whole unit suite green (the guard compared key *sets*, not values). The file
-is gone; a caller who wants settings in a file passes one as ``config=``.
-
-Groups are by *concern*, not by which method consumes them:
+The dataclasses define the defaults. A user config overrides them, and
+explicit keyword arguments take precedence over both.
 
 ``domain``
     Geometry of the sampled region.
@@ -156,7 +136,7 @@ class DomainConfig:
     ``evaluation_form`` selects the rows the solver-free search fits and scores on.
     - ``'strong'`` (the default) uses pointwise values on the interior box.
     - ``'weak'`` uses window averages against compact test functions, after
-      integration by parts (:mod:`epde.preprocessing.weak_form`). Each equation
+      integration by parts. Each equation
       slot gets one window per trajectory, chosen once per fit from the data, and
       every candidate of the slot is fitted and scored on that window's rows.
       Weak rows are computed from the RAW fields, so the preprocessor's smoothing
@@ -723,6 +703,10 @@ class ObjectivesConfig:
     anchor_on_residual: bool = False
     sparsity_cls: Any = 'vwsr'
     sparsity_kwargs: dict = field(default_factory=dict)
+    #: ``mean`` averages separate fits. ``joint`` fits shared coefficients.
+    multisample_mode: str = 'mean'
+    #: Joint fit weights: equal record totals or the original row weights.
+    multisample_weighting: str = 'samples'
 
     @property
     def gram_mode(self):
@@ -1096,7 +1080,7 @@ class RuntimeConfig:
 # ---------------------------------------------------------------------------
 # Operator parameters
 # ---------------------------------------------------------------------------
-# What ``operators/utils/parameters/default_parameters_*.json`` used to hold.
+# Default parameters for each evolutionary operator.
 # ``add_base_param_to_operator`` reads the block for an operator's ``key`` and
 # takes exactly the parameters named there, so a block declares BOTH which
 # parameters an operator has and what they default to.
@@ -1237,12 +1221,7 @@ GROUP_CLASSES = {
 
 @dataclass(frozen=True)
 class SearchConfig:
-    """The resolved configuration of one :class:`EpdeSearch` instance.
-
-    Resolved per instance and never shared: ``pic_test_cases.py`` builds many
-    searches in one process, and the ``EvolutionaryParams`` singleton's
-    reset-before-use ritual is exactly the hazard this avoids.
-    """
+    """The resolved configuration of one search instance."""
 
     domain: DomainConfig
     preprocessing: PreprocessingConfig
@@ -1658,6 +1637,19 @@ def _check_types(resolved: dict) -> None:
 
     space = resolved['search_space']
     rps_mode = space['system_rps_mode']
+    objectives = resolved['objectives']
+    if objectives['multisample_mode'] not in ('mean', 'joint'):
+        raise ValueError("objectives.multisample_mode must be 'mean' or 'joint'.")
+    if objectives['multisample_weighting'] not in ('samples', 'points'):
+        raise ValueError("objectives.multisample_weighting must be 'samples' or 'points'.")
+    if objectives['multisample_mode'] == 'joint' and rps_mode not in ('plain', 'assignment', 'repair'):
+        raise ValueError("objectives.multisample_mode='joint' requires "
+                         "system_rps_mode='plain', 'assignment' or 'repair'.")
+    if (objectives['multisample_mode'] == 'joint' and rps_mode == 'repair'
+            and objectives['instability_metric'] in ('cv', 'vcoef')):
+        raise ValueError("objectives.multisample_mode='joint' with system_rps_mode='repair' "
+                         "needs a basis-free instability_metric (not 'cv' or 'vcoef'): the "
+                         'joint sparse fit averages each record\'s column scores.')
     # The mode's settings, defaults filled in; a key of another mode raises.
     space['system_rps_params'] = resolve_rps_params(rps_mode, space['system_rps_params'])
     pick = space['system_rps_params'].get('variant_pick')
@@ -1758,19 +1750,27 @@ def _check_types(resolved: dict) -> None:
 
 
 def check_plain_sparsity(resolved: dict) -> None:
-    """``'plain'`` mode keeps the weighted least-squares fit of a candidate's
-    own terms. Refused with a sparsity class that does not declare its weights
-    physical (``fits_physical_scale``; e.g. ``'lasso'``), since the
-    coefficient step would then refit them."""
-    if resolved['search_space']['system_rps_mode'] != 'plain':
+    """Reject operators that would replace the selected fit or its row weights."""
+    mode = resolved['search_space']['system_rps_mode']
+    plain = mode == 'plain'
+    joint = resolved['objectives']['multisample_mode'] == 'joint'
+    if not (plain or joint):
         return
     sparsity_cls = resolved['objectives']['sparsity_cls']
+    default = resolve_sparsity('vwsr')
+    if sparsity_cls is None:
+        sparsity_cls = default
     name = getattr(sparsity_cls, '__name__', sparsity_cls)
+    if joint and mode == 'repair' and sparsity_cls is not default:
+        raise ValueError("Joint fitting in repair mode requires objectives.sparsity_cls='vwsr'; "
+                         f"got {name!r}.")
     if not getattr(sparsity_cls, 'fits_physical_scale', False):
+        setting = ("search_space.system_rps_mode='plain'" if plain else
+                   "objectives.multisample_mode='joint'")
         raise ValueError(
-            "search_space.system_rps_mode='plain' keeps the least-squares fit of each "
-            'candidate; objectives.sparsity_cls={0!r} would have it refitted. Use a sparsity '
-            "class whose weights are physical (the default 'vwsr').".format(name))
+            "{0} keeps the least-squares fit of each candidate; "
+            'objectives.sparsity_cls={1!r} would have it refitted. Use a sparsity '
+            "class whose weights are physical (the default 'vwsr').".format(setting, name))
 
 
 def load_search_config(user_config=None, overrides=None) -> SearchConfig:
