@@ -88,13 +88,14 @@ class ToneColumn:
     A term with an opaque factor has no integration-by-parts reductions. Collapse
     axes without a tone once. Pure trigonometric products are separable.
     """
-    def __init__(self, rows, key, slot, term):
+    def __init__(self, rows, key, slot, term, *, tones=None):
         fields = rows.fields[key]
         plan = rows._plan(key, slot)
-        tones = fitted_factors(term)
+        tones = fitted_factors(term) if tones is None else tones
         self.tones = [(f.label, int(_param(f, 'dim')), int(_param(f, 'power'))) for f in tones]
         symbolic, opaque = weak_term(term, fields.D, frozenset(rows.tokens.get(key, {})))
-        fixed = [opaque[label] for label in symbolic.opaque if not opaque[label].status.get('fit_frequencies')]
+        moving = {id(f) for f in tones}
+        fixed = [opaque[label] for label in symbolic.opaque if id(opaque[label]) not in moving]
         self.base = None
         if symbolic.data or any(symbolic.coords) or fixed:
             base = fields.point(symbolic.data, symbolic.coords)
@@ -114,9 +115,13 @@ class ToneColumn:
 
     def integrate(self, values, axis):
         kernel = self.kernels[axis]
-        windows = np.lib.stride_tricks.sliding_window_view(values, len(kernel), axis=axis)
-        slices = [slice(None)] * windows.ndim
-        slices[axis] = slice(None, None, self.strides[axis])
+        # Pure tone factors are 1D even on a multidimensional field.
+        dimension = 0 if values.ndim == 1 else axis
+        slices = [slice(None)] * values.ndim
+        slices[dimension] = slice(None, None, self.strides[axis])
+        if len(kernel) == 1:  # the pointwise measurement is the identity
+            return values[tuple(slices)]
+        windows = np.lib.stride_tricks.sliding_window_view(values, len(kernel), axis=dimension)
         return windows[tuple(slices)] @ kernel
 
     def __call__(self, frequencies):
@@ -128,9 +133,7 @@ class ToneColumn:
         value = self.base
         for axis, factor in factors.items():
             if self.base is None:
-                kernel = self.kernels[axis]
-                windows = np.lib.stride_tricks.sliding_window_view(factor, len(kernel))
-                factor = windows[::self.strides[axis]] @ kernel
+                factor = self.integrate(factor, axis)
             shape = [1] * len(self.shape)
             shape[axis] = -1
             factor = factor.reshape(shape)
@@ -142,6 +145,88 @@ class ToneColumn:
         return value.ravel()
 
 
+class _FrequencyBlock:
+    """Weighted rows sharing one coefficient vector throughout a frequency search.
+
+    With Q spanning the fixed design, the original least-squares residual is
+    the residual of regressing (I-QQᵀ)y on (I-QQᵀ) times the changing columns.
+    Each trajectory gets its own Q in mean mode. Joint mode stacks rows first.
+    """
+
+    def __init__(self, samples, weighted_target, intercept, count):
+        self.count = count
+        self.target = weighted_target
+        self.dynamic = []
+        fixed = []
+        fixed_positions, moving_positions = [], []
+        for j, (_, indices) in enumerate(samples[0][2]):
+            if indices is None:
+                fixed.append(np.concatenate([cols[j][0] * weight for _, weight, cols in samples]))
+                fixed_positions.append(j)
+            else:
+                self.dynamic.append([(cols[j][0], cols[j][1], weight) for _, weight, cols in samples])
+                moving_positions.append(j)
+        if intercept:
+            fixed.append(np.concatenate([weight for _, weight, _ in samples]))
+            fixed_positions.append(len(samples[0][2]))
+        self.fixed_positions, self.moving_positions = fixed_positions, moving_positions
+        self.fixed = np.column_stack(fixed) if fixed else np.empty((self.target.size, 0))
+        self.q = None
+        self.projected_target = self.target
+        self.fixed_min = 1.
+        width = len(fixed) + len(self.dynamic)
+        # A conservative guard for cancellation in the orthogonal projection.
+        # Uncertain ranks use lstsq on the full design with its native cutoff.
+        self.guard = max(np.sqrt(np.finfo(float).eps), self.target.size * np.finfo(float).eps) * width
+        if fixed:
+            norms = np.linalg.norm(self.fixed, axis=0)
+            q, r = np.linalg.qr(self.fixed / np.where(norms > 0, norms, 1.), mode='reduced')
+            self.fixed_min = np.linalg.svd(r, compute_uv=False)[-1] if width <= self.target.size else 0.
+            if self.fixed_min > self.guard:
+                self.q = q
+                self.projected_target = self.target - q @ (q.T @ self.target)
+                self.count()
+
+    def residual(self, frequencies):
+        columns = []
+        for parts in self.dynamic:
+            blocks = [fn(frequencies[indices]) * weight for fn, indices, weight in parts]
+            columns.append(blocks[0] if len(blocks) == 1 else np.concatenate(blocks))
+        if len(columns) == 1:
+            column = columns[0]
+            norm = np.linalg.norm(column)
+            unit = column / norm if norm else column
+            if self.fixed_min > self.guard:
+                v = unit if self.q is None else unit - self.q @ (self.q.T @ unit)
+                power = v @ v
+                if power * self.fixed_min**2 > self.guard**2:
+                    self.count()
+                    return self.projected_target - v * ((v @ self.projected_target) / power), True
+            changing = column[:, None]
+        elif columns:
+            changing = np.column_stack(columns)
+            if self.q is not None:
+                norms = np.linalg.norm(changing, axis=0)
+                unit = changing / np.where(norms > 0, norms, 1.)
+                v = unit - self.q @ (self.q.T @ unit)
+                self.count()
+                coeff, _, rank, singular = np.linalg.lstsq(v, self.projected_target, rcond=None)
+                if rank == v.shape[1] and singular[-1] * self.fixed_min > self.guard:
+                    return self.projected_target - v @ coeff, True
+        else:
+            changing = np.empty((self.target.size, 0))
+        design = changing
+        if self.fixed_positions:
+            design = np.empty((len(self.target), self.fixed.shape[1] + changing.shape[1]))
+            design[:, self.fixed_positions] = self.fixed
+            design[:, self.moving_positions] = changing
+        norms = np.linalg.norm(design, axis=0)
+        unit = design / np.where(norms > 0, norms, 1.)
+        self.count()
+        coeff, _, rank, _ = np.linalg.lstsq(unit, self.target, rcond=None)
+        return self.target - unit @ coeff, rank == unit.shape[1]
+
+
 def project_frequencies(samples, axes, upper, subcycle, spectral, intercept, count, row_periods=(),
                         observed_peaks=None, shared_coefficients=False):
     """Return frequencies minimizing the profiled training residual across trajectories.
@@ -150,32 +235,20 @@ def project_frequencies(samples, axes, upper, subcycle, spectral, intercept, cou
     columns. Each callable owns its own consecutive frequency coordinates.
     Observed peaks are ranked by energy separately on each axis.
     """
-    normalizer = np.linalg.norm(np.concatenate([y * weight for y, weight, _ in samples]))
+    groups = [samples] if shared_coefficients else [[sample] for sample in samples]
+    targets = [np.concatenate([y * weight for y, weight, _ in group]) for group in groups]
+    normalizer = np.linalg.norm(targets[0] if len(targets) == 1 else np.concatenate(targets))
     if not np.isfinite(normalizer) or normalizer == 0:
         return None
+    blocks = [_FrequencyBlock(group, target, intercept, count) for group, target in zip(groups, targets)]
 
     def evaluate(w):
-        blocks = []
-        targets = []
-        for target, weights, columns in samples:
-            design = [col(w[indices]) if indices is not None else col for col, indices in columns]
-            if intercept:
-                design.append(np.ones(len(target)))
-            x = np.column_stack(design) * weights[:, None]
-            blocks.append(x)
-            targets.append(target * weights)
-        if shared_coefficients:
-            blocks = [np.vstack(blocks)]
-            targets = [np.concatenate(targets)]
         residuals = []
         full_rank = True
-        for x, y in zip(blocks, targets):
-            count()
-            norms = np.linalg.norm(x, axis=0)
-            unit = x / np.where(norms > 0, norms, 1.)
-            coef, _, rank, _ = np.linalg.lstsq(unit, y, rcond=None)
-            residuals.append(y - unit @ coef)
-            full_rank &= rank == unit.shape[1]
+        for block in blocks:
+            values, rank_ok = block.residual(w)
+            residuals.append(values)
+            full_rank &= rank_ok
         return np.concatenate(residuals) / normalizer, full_rank
 
     def residual(w):

@@ -4,9 +4,39 @@ import pytest
 
 import epde
 from epde.interface.prepared_tokens import TrigonometricTokens
-from epde.operators.common.frequency_fit import ToneColumn, project_frequencies, residual_modes
+from epde.operators.common.frequency_fit import _FrequencyBlock, ToneColumn, project_frequencies, residual_modes
 from epde.preprocessing import weak_form as wf
 from epde.structure.weak_rows import WeakRows
+
+
+@pytest.mark.parametrize('joint', [False, True])
+@pytest.mark.parametrize('intercept', [False, True])
+@pytest.mark.parametrize('tones', [1, 2])
+def test_projected_trial_matches_full_weighted_design(joint, intercept, tones):
+    samples = []
+    for length, shift in [(54, .7), (81, 1.2)]:
+        t = np.linspace(0, 3, length)
+        columns = [(lambda w, t=t: np.sin(w[0]*t), slice(0, 1)), (np.cos(2*t), None)]
+        if tones == 2:
+            columns.append((lambda w, t=t: np.cos(w[0]*t), slice(1, 2)))
+        samples.append((np.exp(-shift*t), np.sqrt(t), columns))
+    for group in ([samples] if joint else [[s] for s in samples]):
+        y = np.concatenate([target * weight for target, weight, _ in group])
+        block = _FrequencyBlock(group, y, intercept, lambda: None)
+        for w in (np.array([1.1, .8]), np.array([0., 2.]), np.array([1.1, 2.+1e-13])):
+            design = []
+            for _, weight, cols in group:
+                values = [c if idx is None else c(w[idx]) for c, idx in cols]
+                if intercept:
+                    values.append(np.ones_like(weight))
+                design.append(np.column_stack(values) * weight[:, None])
+            x = np.vstack(design)
+            norms = np.linalg.norm(x, axis=0)
+            x = x / np.where(norms > 0, norms, 1.)
+            coeff, _, rank, _ = np.linalg.lstsq(x, y, rcond=None)
+            actual, full_rank = block.residual(w)
+            assert full_rank == (rank == x.shape[1])
+            np.testing.assert_allclose(actual, y - x @ coeff, atol=2e-12)
 
 
 def test_subcycle_duffing_with_linear_nuisance_and_intercept():
