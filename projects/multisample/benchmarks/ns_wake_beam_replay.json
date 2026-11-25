@@ -1,0 +1,1586 @@
+{
+  "dataset": "PIC cylinder wake, Re=100, clean",
+  "data_sha256": "99d9e1f9da7d2dff113ff2723373237b455e2de6c6747ac681846fe86fbba3d0",
+  "input": "Two disjoint windows from one flow. Frames [0, 50) and [100, 150), each with shape (50, 20, 36) in (t, y, x) order.",
+  "baseline_revision": "30c28f8",
+  "optimized_changes": "Native plain fit memoization, frequency projection and no-op swap changes applied in isolation to the baseline.",
+  "module_sha256": {
+    "baseline": {
+      "interface/interface.py": "e72ac13811553014da0cc6a750e7b16853fe0d100c6040a9d2a19e36cf8e16d2",
+      "operators/common/plain_fit.py": "5cb2036c8dc9cb7a94ce8bb13309cc2ba89cde6bae79b8ef1208ab5529451f9f",
+      "operators/common/frequency_fit.py": "8381099719dcc615cf0799480f015606eaa844581f2438b216e4ddc3d16af01b",
+      "operators/multiobjective/plain_moves.py": "763ccfa825eef95abfdc73baa24f6dce465ddfd9fea2e82ac7761831d9cf94fd",
+      "structure/domain.py": "9b5770ee2ebd3d13883fcae41d18340133a6f44f2419a2d842f5c6ebaf1112c8"
+    },
+    "optimized": {
+      "interface/interface.py": "f297433fce78859dcc9c9979635a354f114537dce60767adff2b3ea6ff1558f8",
+      "operators/common/plain_fit.py": "f1583b2d362fd13de96f370035503ba713fceca984d48fca1eddb765100481aa",
+      "operators/common/frequency_fit.py": "7ff1c800a662a4b340ff2fc814e96619733f1cb168fa88820b5eca2f12684096",
+      "operators/multiobjective/plain_moves.py": "be92446a199e5e8c39ae106d8124825b7855b44a30c930a9a0b385047ac99ff2",
+      "structure/domain.py": "5609bba22d591abfe490495644a1496058fae97e01ff7d4651fddcea2e1a5ec2"
+    }
+  },
+  "seed": 0,
+  "host_cpu_cap_percent": 2,
+  "worker_affinity_count": 1,
+  "math_threads": 1,
+  "config": {
+    "engine": "nsga2",
+    "niching": "auto",
+    "system_rps_mode": "plain",
+    "system_rps_params": {
+      "plain_target": true,
+      "target_axes": null
+    },
+    "multisample_mode": "joint",
+    "multisample_weighting": "samples",
+    "use_solver": false,
+    "device": "cpu",
+    "evaluation_form": "weak",
+    "default_preprocessor_type": "FD",
+    "boundary_width": [
+      2,
+      4,
+      7
+    ],
+    "data_fun_pow": 1,
+    "deriv_fun_pow": 1,
+    "equation_terms_max_number": 7,
+    "equation_factors_max_number": 2,
+    "population_size": 8,
+    "training_epochs": 3,
+    "early_stopping_patience": null,
+    "verbose_params": {
+      "show_iter_idx": false
+    }
+  },
+  "beam": {
+    "fill_probability": 0.25,
+    "fill_beam_width": 1000,
+    "fill_top": 20,
+    "fill_prune_alpha": 0.3,
+    "fill_levels": "all"
+  },
+  "measurements": [
+    {
+      "trajectory": "wake_frames_0_49",
+      "variable": "u",
+      "form": "weak",
+      "time_axis": 0,
+      "shape": [
+        23,
+        8,
+        16
+      ],
+      "rows": 2944,
+      "half_widths": [
+        2,
+        2,
+        2
+      ],
+      "strides": [
+        2,
+        2,
+        2
+      ],
+      "smoothness": [
+        3,
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "trajectory": "wake_frames_0_49",
+      "variable": "v",
+      "form": "weak",
+      "time_axis": 0,
+      "shape": [
+        11,
+        8,
+        7
+      ],
+      "rows": 616,
+      "half_widths": [
+        4,
+        2,
+        4
+      ],
+      "strides": [
+        4,
+        2,
+        4
+      ],
+      "smoothness": [
+        3,
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "trajectory": "wake_frames_0_49",
+      "variable": "p",
+      "form": "weak",
+      "time_axis": 0,
+      "shape": [
+        11,
+        8,
+        16
+      ],
+      "rows": 1408,
+      "half_widths": [
+        4,
+        2,
+        2
+      ],
+      "strides": [
+        4,
+        2,
+        2
+      ],
+      "smoothness": [
+        4,
+        5,
+        5
+      ],
+      "cut": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "trajectory": "wake_frames_100_149",
+      "variable": "u",
+      "form": "weak",
+      "time_axis": 0,
+      "shape": [
+        11,
+        8,
+        16
+      ],
+      "rows": 1408,
+      "half_widths": [
+        4,
+        2,
+        2
+      ],
+      "strides": [
+        4,
+        2,
+        2
+      ],
+      "smoothness": [
+        5,
+        6,
+        6
+      ],
+      "cut": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "trajectory": "wake_frames_100_149",
+      "variable": "v",
+      "form": "weak",
+      "time_axis": 0,
+      "shape": [
+        23,
+        3,
+        7
+      ],
+      "rows": 483,
+      "half_widths": [
+        2,
+        4,
+        4
+      ],
+      "strides": [
+        2,
+        4,
+        4
+      ],
+      "smoothness": [
+        2,
+        3,
+        3
+      ],
+      "cut": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "trajectory": "wake_frames_100_149",
+      "variable": "p",
+      "form": "weak",
+      "time_axis": 0,
+      "shape": [
+        2,
+        8,
+        16
+      ],
+      "rows": 256,
+      "half_widths": [
+        16,
+        2,
+        2
+      ],
+      "strides": [
+        16,
+        2,
+        2
+      ],
+      "smoothness": [
+        3,
+        4,
+        4
+      ],
+      "cut": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "objectives": "WAPE for u, v, p, then dyadic coefficient instability for u, v, p. Minimize all six.",
+  "pareto_scope": "All returned systems across all levels in each arm, using strict full-vector Pareto dominance. Equal scores retained.",
+  "results": {
+    "baseline": {
+      "counts": {
+        "fit": 3439,
+        "fit_requests": null,
+        "fit_reused": null,
+        "beam_fills": 151,
+        "beam_fallbacks": {
+          "no_gene_target": 43,
+          "same_structure": 1
+        }
+      },
+      "initial_population": 32,
+      "returned_systems": 77,
+      "cpu_seconds": 49.34375,
+      "wall_seconds": 325.3265598999569
+    },
+    "optimized": {
+      "counts": {
+        "fit": 1684,
+        "fit_requests": 1787,
+        "fit_reused": 916,
+        "beam_fills": 151,
+        "beam_fallbacks": {
+          "no_gene_target": 43,
+          "same_structure": 1
+        }
+      },
+      "initial_population": 32,
+      "returned_systems": 77,
+      "cpu_seconds": 40.671875,
+      "wall_seconds": 280.8956175999483
+    }
+  },
+  "front_sizes": {
+    "baseline": 63,
+    "optimized": 63
+  },
+  "shared_fitted_systems": 63,
+  "shared_system_supports": 63,
+  "front_systems_with_reference_support": {
+    "baseline": {
+      "y_momentum": 27,
+      "continuity": 6
+    },
+    "optimized": {
+      "y_momentum": 27,
+      "continuity": 6
+    }
+  },
+  "front_for_both_arms": [
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.3196467469893884 * dv/dx0{power: 1.0} + 0.22683304174189975 * p{power: 1.0} * du/dx1{power: 1.0} + -0.169347103542899 * du/dx1{power: 1.0} * d^2p/dx2^2{power: 1.0} + -0.4480074992191269 * dv/dx0{power: 1.0} * dv/dx1{power: 1.0} + -1.3035848162811094 * dv/dx1{power: 1.0} * dp/dx1{power: 1.0} = dv/dx2{power: 1.0}",
+        "p": "-2.00504447617788 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + -0.004954281938371708 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.9957374682104533 * d^2p/dx1^2{power: 1.0} + 2.000120572228246 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + 0.011073103922513329 * dv/dx1{power: 1.0} * d^2p/dx1^2{power: 1.0} = d^2p/dx2^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.09030389051265264,
+        0.018278459780888767,
+        4.240358636662598,
+        0.9135667224757296,
+        4.007914560172095
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0163401954272193 * dp/dx2{power: 1.0} + 0.9968236160655488 * u{power: 1.0} * dv/dx1{power: 1.0} + -0.9900019829175729 * v{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "-1.2553568896553464 * dv/dx0{power: 1.0} + -0.16045512284604016 * du/dx1{power: 1.0} * d^2p/dx1^2{power: 1.0} = dv/dx2{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.08904037606526727,
+        0.14597854097457635,
+        0.010992434912784286,
+        0.058936145117862326,
+        0.593051383241904,
+        4.436981374097728
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0004827192496986 * dv/dx1{power: 1.0} + -0.00044802205651366773 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018122684831079288,
+        0.0010211388342555305,
+        0.013110487060915086,
+        0.4780083389281924,
+        0.007623831344104221,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004827192496986 * dv/dx1{power: 1.0} + -0.00044802205651366773 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018122684831079288,
+        0.0010207986716872124,
+        0.013110487060915086,
+        0.4780083389281924,
+        3.457353259843226,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0004944023675955 * dv/dx1{power: 1.0} + 0.0001961620257406808 * d^2p/dx2^2{power: 1.0} * dv/dx1{power: 1.0} + -0.00045200204802586173 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018068665894754492,
+        0.0010211388342555305,
+        0.013110487060915086,
+        2.306965950805225,
+        0.007623831344104221,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004944023675955 * dv/dx1{power: 1.0} + 0.0001961620257406808 * d^2p/dx2^2{power: 1.0} * dv/dx1{power: 1.0} + -0.00045200204802586173 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018068665894754492,
+        0.0010207986716872124,
+        0.013110487060915086,
+        2.306965950805225,
+        3.457353259843226,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0000236967954377 * dv/dx1{power: 1.0} + 0.0009489829163171277 * dp/dx0{power: 1.0} + 0.00030134433021479723 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.00024332973349337498 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.3327570586704975 * dv/dx0{power: 1.0} + 1.1888362684688787 * du/dx2{power: 1.0} * dp/dx1{power: 1.0} = dv/dx2{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017935648663168521,
+        0.17095671049622235,
+        0.010992434912784286,
+        3.935976299770192,
+        0.1355096790577554,
+        4.436981374097728
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0000236967954377 * dv/dx1{power: 1.0} + 0.0009489829163171277 * dp/dx0{power: 1.0} + 0.00030134433021479723 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.00024332973349337498 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.3333046643386515 * dv/dx0{power: 1.0} + 1.184511717178135 * du/dx2{power: 1.0} * dp/dx1{power: 1.0} + 0.0036260406626975167 = dv/dx2{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017935648663168521,
+        0.1709227689365687,
+        0.010992434912784286,
+        3.935976299770192,
+        4.66117703774744,
+        4.436981374097728
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.00020910181473737975 * u{power: 1.0} * dv/dx1{power: 1.0} + -1.0002645491886089 * dv/dx1{power: 1.0} + 0.0008290779835468777 * d^2u/dx1^2{power: 1.0} * dp/dx0{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-0.6738868688091878 * dv/dx2{power: 1.0} + 0.0347491464014302 * dp/dx1{power: 1.0} + -0.008237172695322731 * d^2u/dx1^2{power: 1.0} * d^2v/dx2^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018070424401505638,
+        0.20313692119141274,
+        0.010992434912784286,
+        2.2063151127334413,
+        1.510836813796944,
+        4.436981374097728
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.00020910181473737975 * u{power: 1.0} * dv/dx1{power: 1.0} + -1.0002645491886089 * dv/dx1{power: 1.0} + 0.0008290779835468777 * d^2u/dx1^2{power: 1.0} * dp/dx0{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-0.6744035039599684 * dv/dx2{power: 1.0} + 0.03935192232100246 * dp/dx1{power: 1.0} + -0.00824438335823483 * d^2u/dx1^2{power: 1.0} * d^2v/dx2^2{power: 1.0} + 0.0065469974961025225 = dv/dx0{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018070424401505638,
+        0.20070638524275364,
+        0.010992434912784286,
+        2.2063151127334413,
+        7.483076182698418,
+        4.436981374097728
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "6.337871295535349 * p{power: 1.0} * dv/dx0{power: 1.0} = dv/dx2{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.4286435174446296,
+        0.013110487060915086,
+        4.240358636662598,
+        0.04165214217840647,
+        0.007334690327278811
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0010211388342555305,
+        0.010992434912784286,
+        4.240358636662598,
+        0.007623831344104221,
+        4.436981374097728
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0010207986716872124,
+        0.010992434912784286,
+        4.240358636662598,
+        3.457353259843226,
+        4.436981374097728
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9999602030082658 * dv/dx1{power: 1.0} + -0.004764480585852222 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0005201882749465081 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0002816516933109595 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + 0.0010946665060106084 * d^2u/dx1^2{power: 1.0} * dp/dx0{power: 1.0} + 3.5613167677810255e-05 = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017777996232545975,
+        0.0010211388342555305,
+        0.013110487060915086,
+        12.75766646642596,
+        0.007623831344104221,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-0.9999602030082658 * dv/dx1{power: 1.0} + -0.004764480585852222 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0005201882749465081 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0002816516933109595 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + 0.0010946665060106084 * d^2u/dx1^2{power: 1.0} * dp/dx0{power: 1.0} + 3.5613167677810255e-05 = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017777996232545975,
+        0.0010207986716872124,
+        0.013110487060915086,
+        12.75766646642596,
+        3.457353259843226,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.03778341591254274 * dv/dx2{power: 1.0} = d^2u/dx1^2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0017655290755247 * d^2p/dx2^2{power: 1.0} + -0.0014426602356879977 * dp/dx0{power: 1.0} * d^2u/dx1^2{power: 1.0} + -7.245152767489173 * p{power: 1.0} * du/dx2{power: 1.0} + -7.2671776378035355 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.009979440896456 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0095122621133625 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9997914122516214,
+        0.0010211388342555305,
+        0.010837726552380869,
+        17.242660965028165,
+        0.007623831344104221,
+        3.141001486589968
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "0.03778341591254274 * dv/dx2{power: 1.0} = d^2u/dx1^2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0017655290755247 * d^2p/dx2^2{power: 1.0} + -0.0014426602356879977 * dp/dx0{power: 1.0} * d^2u/dx1^2{power: 1.0} + -7.245152767489173 * p{power: 1.0} * du/dx2{power: 1.0} + -7.2671776378035355 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.009979440896456 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0095122621133625 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9997914122516214,
+        0.0010207986716872124,
+        0.010837726552380869,
+        17.242660965028165,
+        3.457353259843226,
+        3.141001486589968
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.035394662787522374 * dv/dx2{power: 1.0} + 0.12498346166947709 = d^2u/dx1^2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0017655290755247 * d^2p/dx2^2{power: 1.0} + -0.0014426602356879977 * dp/dx0{power: 1.0} * d^2u/dx1^2{power: 1.0} + -7.245152767489173 * p{power: 1.0} * du/dx2{power: 1.0} + -7.2671776378035355 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.009979440896456 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0095122621133625 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9982813728967079,
+        0.0010211388342555305,
+        0.010837726552380869,
+        24.71612650040948,
+        0.007623831344104221,
+        3.141001486589968
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "0.035394662787522374 * dv/dx2{power: 1.0} + 0.12498346166947709 = d^2u/dx1^2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0017655290755247 * d^2p/dx2^2{power: 1.0} + -0.0014426602356879977 * dp/dx0{power: 1.0} * d^2u/dx1^2{power: 1.0} + -7.245152767489173 * p{power: 1.0} * du/dx2{power: 1.0} + -7.2671776378035355 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.009979440896456 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0095122621133625 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9982813728967079,
+        0.0010207986716872124,
+        0.010837726552380869,
+        24.71612650040948,
+        3.457353259843226,
+        3.141001486589968
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0004015109369355 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001818548996606957,
+        0.0010211388342555305,
+        0.013110487060915086,
+        0.0001599030086054866,
+        0.007623831344104221,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum",
+        "continuity"
+      ],
+      "registered_laws": [
+        "continuity",
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004015109369355 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001818548996606957,
+        0.0010207986716872124,
+        0.013110487060915086,
+        0.0001599030086054866,
+        3.457353259843226,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum",
+        "continuity"
+      ],
+      "registered_laws": [
+        "continuity"
+      ]
+    },
+    {
+      "equations": {
+        "u": "0.1403742239258691 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + -0.0012418644231324029 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009904976663046475 * d^2v/dx1^2{power: 1.0} + -0.999113967910232 * dp/dx1{power: 1.0} + -1.0001202784190342 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.998651164757142 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.009935758267021436 * d^2v/dx2^2{power: 1.0} + -0.0008420718925074175 * dv/dx2{power: 1.0} * du/dx2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.161759990191964 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 1.1862038506023123 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -12.314689117839247 * p{power: 1.0} * du/dx2{power: 1.0} + -11.746872675572574 * p{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9720675579321874,
+        0.0009995686837312372,
+        0.4066206025955409,
+        8.890009913880657,
+        0.2427113023041167,
+        2.8438026874275506
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.1403742239258691 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + -0.0012418644231324029 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009904976663046475 * d^2v/dx1^2{power: 1.0} + -0.999113967910232 * dp/dx1{power: 1.0} + -1.0001202784190342 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.998651164757142 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.009935758267021436 * d^2v/dx2^2{power: 1.0} + -0.0008420718925074175 * dv/dx2{power: 1.0} * du/dx2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.1453322009535476 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 1.4610618282749 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -13.62306551454108 * p{power: 1.0} * du/dx2{power: 1.0} + -12.810802396077595 * p{power: 1.0} * dv/dx1{power: 1.0} + 0.04593272854882618 = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9720675579321874,
+        0.0009995686837312372,
+        0.4030613416550257,
+        8.890009913880657,
+        0.2427113023041167,
+        5.097585485436178
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.16420172272251635 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + -0.00167823462474572 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.0569777914522019 = du/dx2{power: 1.0}",
+        "v": "0.009904976663046475 * d^2v/dx1^2{power: 1.0} + -0.999113967910232 * dp/dx1{power: 1.0} + -1.0001202784190342 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.998651164757142 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.009935758267021436 * d^2v/dx2^2{power: 1.0} + -0.0008420718925074175 * dv/dx2{power: 1.0} * du/dx2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.161759990191964 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 1.1862038506023123 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -12.314689117839247 * p{power: 1.0} * du/dx2{power: 1.0} + -11.746872675572574 * p{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9696614327999591,
+        0.0009995686837312372,
+        0.4066206025955409,
+        36.93241409200283,
+        0.2427113023041167,
+        2.8438026874275506
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.16420172272251635 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + -0.00167823462474572 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.0569777914522019 = du/dx2{power: 1.0}",
+        "v": "0.009904976663046475 * d^2v/dx1^2{power: 1.0} + -0.999113967910232 * dp/dx1{power: 1.0} + -1.0001202784190342 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.998651164757142 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.009935758267021436 * d^2v/dx2^2{power: 1.0} + -0.0008420718925074175 * dv/dx2{power: 1.0} * du/dx2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.1453322009535476 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 1.4610618282749 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -13.62306551454108 * p{power: 1.0} * du/dx2{power: 1.0} + -12.810802396077595 * p{power: 1.0} * dv/dx1{power: 1.0} + 0.04593272854882618 = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9696614327999591,
+        0.0009995686837312372,
+        0.4030613416550257,
+        36.93241409200283,
+        0.2427113023041167,
+        5.097585485436178
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0004827192496986 * dv/dx1{power: 1.0} + -0.00044802205651366773 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018122684831079288,
+        0.0010211388342555305,
+        0.010863443131845358,
+        0.4780083389281924,
+        0.007623831344104221,
+        2.064287999518724
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004827192496986 * dv/dx1{power: 1.0} + -0.00044802205651366773 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018122684831079288,
+        0.0010207986716872124,
+        0.010863443131845358,
+        0.4780083389281924,
+        3.457353259843226,
+        2.064287999518724
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0004768955494696 * dv/dx1{power: 1.0} + -0.00044291628978580176 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + 1.030701456827979e-05 = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018095303090528525,
+        0.0010211388342555305,
+        0.010863443131845358,
+        4.495447310557765,
+        0.007623831344104221,
+        2.064287999518724
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004768955494696 * dv/dx1{power: 1.0} + -0.00044291628978580176 * d^2u/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + 1.030701456827979e-05 = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018095303090528525,
+        0.0010207986716872124,
+        0.010863443131845358,
+        4.495447310557765,
+        3.457353259843226,
+        2.064287999518724
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009870132219468161 * d^2v/dx1^2{power: 1.0} + 0.00998183126991327 * d^2v/dx2^2{power: 1.0} + -0.9999344281829446 * dp/dx1{power: 1.0} + -1.000766987458024 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.000070405474233 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.00019543141275732605 * d^2u/dx2^2{power: 1.0} * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-0.45387018252383843 * dp/dx2{power: 1.0} = dp/dx0{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0009991079691039938,
+        0.5273515304199108,
+        4.240358636662598,
+        0.33647225900227107,
+        0.11897520730349859
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009870132219468161 * d^2v/dx1^2{power: 1.0} + 0.00998183126991327 * d^2v/dx2^2{power: 1.0} + -0.9999344281829446 * dp/dx1{power: 1.0} + -1.000766987458024 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.000070405474233 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.00019543141275732605 * d^2u/dx2^2{power: 1.0} * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-0.515123469786677 * dp/dx2{power: 1.0} + 0.026248632265675323 = dp/dx0{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0009991079691039938,
+        0.4769090005783948,
+        4.240358636662598,
+        0.33647225900227107,
+        0.4159556839993952
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-2.1391740987713708 * dv/dx1{power: 1.0} = d^2u/dx1^2{power: 1.0}",
+        "v": "-10.232185563336737 * dv/dx0{power: 1.0} + -7.256061289409014 * dp/dx1{power: 1.0} + -10.642031267198456 * u{power: 1.0} * dv/dx2{power: 1.0} + -11.000910580918958 * v{power: 1.0} * du/dx0{power: 1.0} = d^2v/dx1^2{power: 1.0}",
+        "p": "-1.0017950417217782 * d^2p/dx2^2{power: 1.0} + -7.181186057412674 * p{power: 1.0} * du/dx2{power: 1.0} + -7.202151206092099 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.0099917674295353 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010354131221484 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9269849030800534,
+        0.5640177266755979,
+        0.010874633211435086,
+        0.24409324333796084,
+        0.28122157657853475,
+        0.8454492031283571
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-2.1391740987713708 * dv/dx1{power: 1.0} = d^2u/dx1^2{power: 1.0}",
+        "v": "-10.235012892430518 * dv/dx0{power: 1.0} + -7.247069194894897 * dp/dx1{power: 1.0} + -10.645350732352382 * u{power: 1.0} * dv/dx2{power: 1.0} + -11.047070041835333 * v{power: 1.0} * du/dx0{power: 1.0} + 0.03105103289263276 = d^2v/dx1^2{power: 1.0}",
+        "p": "-1.0017950417217782 * d^2p/dx2^2{power: 1.0} + -7.181186057412674 * p{power: 1.0} * du/dx2{power: 1.0} + -7.202151206092099 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.0099917674295353 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010354131221484 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9269849030800534,
+        0.5603476097678481,
+        0.010874633211435086,
+        0.24409324333796084,
+        7.576535703057459,
+        0.8454492031283571
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-2.128237725523355 * dv/dx1{power: 1.0} + 0.02301266766982321 = d^2u/dx1^2{power: 1.0}",
+        "v": "-10.232185563336737 * dv/dx0{power: 1.0} + -7.256061289409014 * dp/dx1{power: 1.0} + -10.642031267198456 * u{power: 1.0} * dv/dx2{power: 1.0} + -11.000910580918958 * v{power: 1.0} * du/dx0{power: 1.0} = d^2v/dx1^2{power: 1.0}",
+        "p": "-1.0017950417217782 * d^2p/dx2^2{power: 1.0} + -7.181186057412674 * p{power: 1.0} * du/dx2{power: 1.0} + -7.202151206092099 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.0099917674295353 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010354131221484 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.9247996281276616,
+        0.5640177266755979,
+        0.010874633211435086,
+        6.002790488425802,
+        0.28122157657853475,
+        0.8454492031283571
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.17449449570543127 * dv/dx1{power: 1.0} * dp/dx1{power: 1.0} + -0.15650544886133705 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + 0.054574960419026555 = du/dx2{power: 1.0}",
+        "v": "-0.9105219832851851 * dp/dx1{power: 1.0} + 0.26037916531518884 * du/dx1{power: 1.0} + 0.8179226595835472 * v{power: 1.0} * du/dx0{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0017655290755247 * d^2p/dx2^2{power: 1.0} + -0.0014426602356879977 * dp/dx0{power: 1.0} * d^2u/dx1^2{power: 1.0} + -7.245152767489173 * p{power: 1.0} * du/dx2{power: 1.0} + -7.2671776378035355 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.009979440896456 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0095122621133625 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.8909104059038256,
+        0.7660324900251911,
+        0.010837726552380869,
+        3.029880780972041,
+        0.9710412695861529,
+        3.141001486589968
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.17449449570543127 * dv/dx1{power: 1.0} * dp/dx1{power: 1.0} + -0.15650544886133705 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + 0.054574960419026555 = du/dx2{power: 1.0}",
+        "v": "-0.9096397300688809 * dp/dx1{power: 1.0} + 0.2604784454424831 * du/dx1{power: 1.0} + 0.815163308701995 * v{power: 1.0} * du/dx0{power: 1.0} + 0.002412304703622622 = dv/dx0{power: 1.0}",
+        "p": "-1.0017655290755247 * d^2p/dx2^2{power: 1.0} + -0.0014426602356879977 * dp/dx0{power: 1.0} * d^2u/dx1^2{power: 1.0} + -7.245152767489173 * p{power: 1.0} * du/dx2{power: 1.0} + -7.2671776378035355 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.009979440896456 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0095122621133625 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.8909104059038256,
+        0.7658935138038265,
+        0.010837726552380869,
+        3.029880780972041,
+        4.531026757737478,
+        3.141001486589968
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0001692469903178 * dv/dx1{power: 1.0} + -0.0001367637445351734 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0001444179421018367 * dv/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017809795543302547,
+        0.0010211388342555305,
+        0.013110487060915086,
+        2.9367147557193256,
+        0.007623831344104221,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0001692469903178 * dv/dx1{power: 1.0} + -0.0001367637445351734 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0001444179421018367 * dv/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017809795543302547,
+        0.0010207986716872124,
+        0.013110487060915086,
+        2.9367147557193256,
+        3.457353259843226,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0001598222804642 * dv/dx1{power: 1.0} + -0.0001409560367481131 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.00012929898033131783 * dv/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} + 2.535399505926077e-05 = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017788059188392608,
+        0.0010211388342555305,
+        0.013110487060915086,
+        11.912898353375855,
+        0.007623831344104221,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0001598222804642 * dv/dx1{power: 1.0} + -0.0001409560367481131 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.00012929898033131783 * dv/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} + 2.535399505926077e-05 = du/dx2{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0017788059188392608,
+        0.0010207986716872124,
+        0.013110487060915086,
+        11.912898353375855,
+        3.457353259843226,
+        0.007334690327278811
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.6208526861650119 * du/dx2{power: 1.0} + -0.2159359008801834 * v{power: 1.0} * d^2v/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.3814676270363533,
+        0.0010211388342555305,
+        0.010863443131845358,
+        0.19238112307819993,
+        0.007623831344104221,
+        2.064287999518724
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-0.6208526861650119 * du/dx2{power: 1.0} + -0.2159359008801834 * v{power: 1.0} * d^2v/dx1^2{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.3814676270363533,
+        0.0010207986716872124,
+        0.010863443131845358,
+        0.19238112307819993,
+        3.457353259843226,
+        2.064287999518724
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-0.9454469299587321 * dp/dx1{power: 1.0} + -1.0042736984099774 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.8949046442595086 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-0.9855559690376112 * du/dx0{power: 1.0} + 0.010972017710183465 * d^2u/dx1^2{power: 1.0} + -0.9954558113463065 * u{power: 1.0} * du/dx2{power: 1.0} + -0.9830782886961669 * v{power: 1.0} * du/dx1{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.034940232175861466,
+        0.02902514247034542,
+        4.240358636662598,
+        0.020693469599128232,
+        0.06448236900162442
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-0.9454590077296195 * dp/dx1{power: 1.0} + -1.0042731578063684 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.8948785245991961 * v{power: 1.0} * dv/dx1{power: 1.0} + -3.10027204780271e-05 = dv/dx0{power: 1.0}",
+        "p": "-0.9855559690376112 * du/dx0{power: 1.0} + 0.010972017710183465 * d^2u/dx1^2{power: 1.0} + -0.9954558113463065 * u{power: 1.0} * du/dx2{power: 1.0} + -0.9830782886961669 * v{power: 1.0} * du/dx1{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.03493734519856488,
+        0.02902514247034542,
+        4.240358636662598,
+        4.566252002245828,
+        0.06448236900162442
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009870132219468161 * d^2v/dx1^2{power: 1.0} + 0.00998183126991327 * d^2v/dx2^2{power: 1.0} + -0.9999344281829446 * dp/dx1{power: 1.0} + -1.000766987458024 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.000070405474233 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.00019543141275732605 * d^2u/dx2^2{power: 1.0} * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0026299781137524 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0009991079691039938,
+        0.5591682066409156,
+        4.240358636662598,
+        0.33647225900227107,
+        0.05631847716233232
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009870132219468161 * d^2v/dx1^2{power: 1.0} + 0.00998183126991327 * d^2v/dx2^2{power: 1.0} + -0.9999344281829446 * dp/dx1{power: 1.0} + -1.000766987458024 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.000070405474233 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.00019543141275732605 * d^2u/dx2^2{power: 1.0} * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0843005783506159 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + -0.09182509148853676 = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0009991079691039938,
+        0.5002887273145296,
+        4.240358636662598,
+        0.33647225900227107,
+        0.38005247420137966
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9999419296110458 * dv/dx1{power: 1.0} + -0.0005415113464349471 * u{power: 1.0} * dv/dx1{power: 1.0} + -0.00021788758885908202 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "1.1141529084062272 * d^2v/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + -0.05154100513811644 * d^2v/dx2^2{power: 1.0} + -0.9898487271052087 * dp/dx1{power: 1.0} + -0.4578729803088894 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.1177770176778672 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + -3.9248427660923224 * du/dx2{power: 1.0} * dp/dx0{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018104732481160186,
+        0.7800233970939008,
+        0.43660311741942925,
+        2.27925105893085,
+        2.852352006255133,
+        0.13150842839564575
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.0004928138666403042 * u{power: 1.0} * dv/dx1{power: 1.0} + -1.000720909149043 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-0.7279003876574733 * dv/dx2{power: 1.0} + -0.11373642443070929 * v{power: 1.0} * du/dx0{power: 1.0} + 0.27131296243760594 * dp/dx1{power: 1.0} + -0.4655563340248728 * dp/dx1{power: 1.0} * u{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-0.9968627359415371 * d^2p/dx1^2{power: 1.0} + -7.151749966618839 * p{power: 1.0} * du/dx2{power: 1.0} + -7.17344151165146 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.0048271363915795 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.00515596317421 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx2^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001801288777841584,
+        0.17659962359439701,
+        0.014686976337876606,
+        1.6917576975926363,
+        1.3937398478483605,
+        0.845410148576791
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.0004928138666403042 * u{power: 1.0} * dv/dx1{power: 1.0} + -1.000720909149043 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-0.7279003876574733 * dv/dx2{power: 1.0} + -0.11373642443070929 * v{power: 1.0} * du/dx0{power: 1.0} + 0.27131296243760594 * dp/dx1{power: 1.0} + -0.4655563340248728 * dp/dx1{power: 1.0} * u{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-0.9968068164327233 * d^2p/dx1^2{power: 1.0} + -7.148266994688772 * p{power: 1.0} * du/dx2{power: 1.0} + -7.1705123641817705 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.0047972566890024 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.004502608421976 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -9.809997099976961e-05 = d^2p/dx2^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001801288777841584,
+        0.17659962359439701,
+        0.014674342325226285,
+        1.6917576975926363,
+        1.3937398478483605,
+        3.417576564021952
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-1.0163401954272193 * dp/dx2{power: 1.0} + 0.9968236160655488 * u{power: 1.0} * dv/dx1{power: 1.0} + -0.9900019829175729 * v{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "0.009870132219468161 * d^2v/dx1^2{power: 1.0} + 0.00998183126991327 * d^2v/dx2^2{power: 1.0} + -0.9999344281829446 * dp/dx1{power: 1.0} + -1.000766987458024 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.000070405474233 * v{power: 1.0} * dv/dx1{power: 1.0} + 0.00019543141275732605 * d^2u/dx2^2{power: 1.0} * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0021598946524815 * d^2p/dx2^2{power: 1.0} + -2.0092005290859687 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0112555816335007 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.08904037606526727,
+        0.0009991079691039938,
+        0.013110487060915086,
+        0.058936145117862326,
+        0.33647225900227107,
+        0.007334690327278811
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9997074794905295 * dv/dx1{power: 1.0} + -0.005508452277409456 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0006184453571379834 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.0003288210398461026 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.0003956564188667333 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "0.011520063053745339 * u{power: 1.0} * du/dx2{power: 1.0} + -1.5523795449194673 * dp/dx0{power: 1.0} + -0.0029779597619128155 * d^2u/dx1^2{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.001772237417407306,
+        0.0010211388342555305,
+        0.526072906958899,
+        4.240358636662598,
+        0.007623831344104221,
+        4.1472348434590085
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004015109369355 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.0548551320982507 * u{power: 1.0} * dv/dx2{power: 1.0} + 0.2547416193547712 * v{power: 1.0} * dv/dx1{power: 1.0} + -0.13553849399632137 * d^2v/dx1^2{power: 1.0} + 0.007782438905899425 * d^2v/dx2^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0022180260426694 * d^2p/dx2^2{power: 1.0} + -2.0094485727877123 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0110053461595396 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + 0.0023011977574953217 * p{power: 1.0} * du/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001818548996606957,
+        0.3121408050873181,
+        0.01309883400950269,
+        0.0001599030086054866,
+        2.5091634525739126,
+        3.4948888793848334
+      ],
+      "reference_supports": [
+        "continuity"
+      ],
+      "registered_laws": [
+        "continuity"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004015109369355 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.0548551320982507 * u{power: 1.0} * dv/dx2{power: 1.0} + 0.2547416193547712 * v{power: 1.0} * dv/dx1{power: 1.0} + -0.13553849399632137 * d^2v/dx1^2{power: 1.0} + 0.007782438905899425 * d^2v/dx2^2{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.0023506115071976 * d^2p/dx2^2{power: 1.0} + -2.0096446686236873 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009724045932382 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + 0.003631150043545548 * p{power: 1.0} * du/dx2{power: 1.0} + -0.00023230955588069931 = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001818548996606957,
+        0.3121408050873181,
+        0.013098149581698991,
+        0.0001599030086054866,
+        2.5091634525739126,
+        40.319856825867085
+      ],
+      "reference_supports": [
+        "continuity"
+      ],
+      "registered_laws": [
+        "continuity"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004015109369355 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.0549243189673012 * u{power: 1.0} * dv/dx2{power: 1.0} + 0.24575025527407804 * v{power: 1.0} * dv/dx1{power: 1.0} + -0.13543907436316835 * d^2v/dx1^2{power: 1.0} + 0.00796796197438842 * d^2v/dx2^2{power: 1.0} + 0.006280026855179804 = dv/dx0{power: 1.0}",
+        "p": "-1.0022180260426694 * d^2p/dx2^2{power: 1.0} + -2.0094485727877123 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.0110053461595396 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + 0.0023011977574953217 * p{power: 1.0} * du/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001818548996606957,
+        0.31117655400929867,
+        0.01309883400950269,
+        0.0001599030086054866,
+        7.0955842798233775,
+        3.4948888793848334
+      ],
+      "reference_supports": [
+        "continuity"
+      ],
+      "registered_laws": [
+        "continuity"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-1.0004015109369355 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "-1.0549243189673012 * u{power: 1.0} * dv/dx2{power: 1.0} + 0.24575025527407804 * v{power: 1.0} * dv/dx1{power: 1.0} + -0.13543907436316835 * d^2v/dx1^2{power: 1.0} + 0.00796796197438842 * d^2v/dx2^2{power: 1.0} + 0.006280026855179804 = dv/dx0{power: 1.0}",
+        "p": "-1.0023506115071976 * d^2p/dx2^2{power: 1.0} + -2.0096446686236873 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009724045932382 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + 0.003631150043545548 * p{power: 1.0} * du/dx2{power: 1.0} + -0.00023230955588069931 = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.001818548996606957,
+        0.31117655400929867,
+        0.013098149581698991,
+        0.0001599030086054866,
+        7.0955842798233775,
+        40.319856825867085
+      ],
+      "reference_supports": [
+        "continuity"
+      ],
+      "registered_laws": [
+        "continuity"
+      ]
+    },
+    {
+      "equations": {
+        "u": "0.01122143690567501 * d^2u/dx1^2{power: 1.0} + -1.012807037685477 * dp/dx2{power: 1.0} + -1.0098343981871156 * u{power: 1.0} * du/dx2{power: 1.0} + -0.9959513713588025 * v{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "-0.9454469299587321 * dp/dx1{power: 1.0} + -1.0042736984099774 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.8949046442595086 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.021349091622467817,
+        0.034940232175861466,
+        0.010863443131845358,
+        0.07358616848559889,
+        0.020693469599128232,
+        2.064287999518724
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "0.01122143690567501 * d^2u/dx1^2{power: 1.0} + -1.012807037685477 * dp/dx2{power: 1.0} + -1.0098343981871156 * u{power: 1.0} * du/dx2{power: 1.0} + -0.9959513713588025 * v{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "-0.9454590077296195 * dp/dx1{power: 1.0} + -1.0042731578063684 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.8948785245991961 * v{power: 1.0} * dv/dx1{power: 1.0} + -3.10027204780271e-05 = dv/dx0{power: 1.0}",
+        "p": "-1.002331933082149 * d^2p/dx2^2{power: 1.0} + -2.011075235896457 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.009547732921932 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} + -7.2131212490256145 * p{power: 1.0} * du/dx2{power: 1.0} + -7.241252827299363 * p{power: 1.0} * dv/dx1{power: 1.0} + -0.0028917848005094037 * dp/dx2{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.021349091622467817,
+        0.03493734519856488,
+        0.010863443131845358,
+        0.07358616848559889,
+        4.566252002245828,
+        2.064287999518724
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9992987820747118 * dv/dx1{power: 1.0} + 0.0007304514652402126 * u{power: 1.0} * d^2p/dx1^2{power: 1.0} + -0.005332285311146493 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0005762854165778121 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.000396163547336433 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.00046392842210731374 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.006687148218740319 * d^2v/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + 0.012644792440179525 * d^2v/dx2^2{power: 1.0} + -0.9791588329286409 * dp/dx1{power: 1.0} + -1.0032182427466243 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9820188821338639 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-0.9949771227589735 * du/dx0{power: 1.0} + 0.009853867945029512 * d^2u/dx1^2{power: 1.0} + 0.01035167942908783 * d^2u/dx2^2{power: 1.0} + -0.5890965392239828 * u{power: 1.0} * du/dx2{power: 1.0} + 0.4058420650693356 * u{power: 1.0} * dv/dx1{power: 1.0} + -1.00201574697823 * v{power: 1.0} * du/dx1{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018433330897035293,
+        0.012477749105949319,
+        0.007049691610360634,
+        5.076467354137322,
+        1.9902391421303398,
+        0.49653365261011895
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9992987820747118 * dv/dx1{power: 1.0} + 0.0007304514652402126 * u{power: 1.0} * d^2p/dx1^2{power: 1.0} + -0.005332285311146493 * du/dx0{power: 1.0} * dp/dx2{power: 1.0} + 0.0005762854165778121 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.000396163547336433 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.00046392842210731374 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = du/dx2{power: 1.0}",
+        "v": "0.006660257302271401 * d^2v/dx1^2{power: 1.0} * dp/dx2{power: 1.0} + 0.012647088157699545 * d^2v/dx2^2{power: 1.0} + -0.9791385388360196 * dp/dx1{power: 1.0} + -1.0032228666478529 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9820810874564723 * v{power: 1.0} * dv/dx1{power: 1.0} + 5.650214415612111e-05 = dv/dx0{power: 1.0}",
+        "p": "-0.9949771227589735 * du/dx0{power: 1.0} + 0.009853867945029512 * d^2u/dx1^2{power: 1.0} + 0.01035167942908783 * d^2u/dx2^2{power: 1.0} + -0.5890965392239828 * u{power: 1.0} * du/dx2{power: 1.0} + 0.4058420650693356 * u{power: 1.0} * dv/dx1{power: 1.0} + -1.00201574697823 * v{power: 1.0} * du/dx1{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.0018433330897035293,
+        0.012469763402897814,
+        0.007049691610360634,
+        5.076467354137322,
+        4.608472192425641,
+        0.49653365261011895
+      ],
+      "reference_supports": [],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.8280937979540338 * u{power: 1.0} * du/dx2{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "0.009923433272628499 * d^2v/dx1^2{power: 1.0} + 0.009965986392278423 * d^2v/dx2^2{power: 1.0} + -0.9997136346057457 * dp/dx1{power: 1.0} + -1.0004850953402313 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9997013540206711 * v{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.4315133571217725,
+        0.0010211388342555305,
+        0.010992434912784286,
+        0.050094081592543464,
+        0.007623831344104221,
+        4.436981374097728
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": [
+        "y_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-0.8280937979540338 * u{power: 1.0} * du/dx2{power: 1.0} = du/dx0{power: 1.0}",
+        "v": "0.009923935108171324 * d^2v/dx1^2{power: 1.0} + 0.009965709973193959 * d^2v/dx2^2{power: 1.0} + -0.9997181378360175 * dp/dx1{power: 1.0} + -1.0004847436766404 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.9996931313574225 * v{power: 1.0} * dv/dx1{power: 1.0} + -9.68983851460687e-06 = dv/dx0{power: 1.0}",
+        "p": "-1.001734359242616 * d^2p/dx2^2{power: 1.0} + 0.0015083816093746623 * u{power: 1.0} * d^2v/dx1^2{power: 1.0} + -7.291084800195176 * p{power: 1.0} * du/dx2{power: 1.0} + -7.312329327989605 * p{power: 1.0} * dv/dx1{power: 1.0} + -2.010017560324817 * du/dx1{power: 1.0} * dv/dx2{power: 1.0} + 2.010537953930501 * du/dx2{power: 1.0} * dv/dx1{power: 1.0} = d^2p/dx1^2{power: 1.0}"
+      },
+      "objectives": [
+        0.4315133571217725,
+        0.0010207986716872124,
+        0.010992434912784286,
+        0.050094081592543464,
+        3.457353259843226,
+        4.436981374097728
+      ],
+      "reference_supports": [
+        "y_momentum"
+      ],
+      "registered_laws": []
+    },
+    {
+      "equations": {
+        "u": "-0.9994143603066938 * dv/dx1{power: 1.0} + 0.0004383383274908668 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.00033735988872969793 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.00039038644846124026 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} + 0.0007876462500869428 * u{power: 1.0} * d^2p/dx1^2{power: 1.0} + -0.00010612619494184741 = du/dx2{power: 1.0}",
+        "v": "-0.7096985224456284 * dp/dx1{power: 1.0} + -0.9976150383391581 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.014087047921458299 * d^2u/dx2^2{power: 1.0} * dp/dx2{power: 1.0} + 0.0014414473801095656 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} = dv/dx0{power: 1.0}",
+        "p": "0.010516608455947332 * d^2u/dx2^2{power: 1.0} + -1.0014622242448772 * v{power: 1.0} * du/dx1{power: 1.0} + -0.9938769624489447 * du/dx0{power: 1.0} + 0.009742838328983918 * d^2u/dx1^2{power: 1.0} + 0.9946568397444251 * u{power: 1.0} * dv/dx1{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.00187476892193714,
+        0.18545683528402304,
+        0.009252220640317962,
+        5.585038269933902,
+        9.105802494530664,
+        0.054732519261275286
+      ],
+      "reference_supports": [],
+      "registered_laws": [
+        "x_momentum"
+      ]
+    },
+    {
+      "equations": {
+        "u": "-0.9994143603066938 * dv/dx1{power: 1.0} + 0.0004383383274908668 * du/dx1{power: 1.0} * d^2v/dx1^2{power: 1.0} + -0.00033735988872969793 * du/dx1{power: 1.0} * d^2v/dx2^2{power: 1.0} + -0.00039038644846124026 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} + 0.0007876462500869428 * u{power: 1.0} * d^2p/dx1^2{power: 1.0} + -0.00010612619494184741 = du/dx2{power: 1.0}",
+        "v": "-0.7133703322368955 * dp/dx1{power: 1.0} + -0.9973541630236963 * u{power: 1.0} * dv/dx2{power: 1.0} + -0.040016302162675 * d^2u/dx2^2{power: 1.0} * dp/dx2{power: 1.0} + -0.003710896229109921 * d^2u/dx1^2{power: 1.0} * dv/dx1{power: 1.0} + -0.006790345633081268 = dv/dx0{power: 1.0}",
+        "p": "0.010516608455947332 * d^2u/dx2^2{power: 1.0} + -1.0014622242448772 * v{power: 1.0} * du/dx1{power: 1.0} + -0.9938769624489447 * du/dx0{power: 1.0} + 0.009742838328983918 * d^2u/dx1^2{power: 1.0} + 0.9946568397444251 * u{power: 1.0} * dv/dx1{power: 1.0} = dp/dx2{power: 1.0}"
+      },
+      "objectives": [
+        0.00187476892193714,
+        0.18455736536557288,
+        0.009252220640317962,
+        5.585038269933902,
+        10.848738769073922,
+        0.054732519261275286
+      ],
+      "reference_supports": [],
+      "registered_laws": [
+        "x_momentum"
+      ]
+    }
+  ],
+  "registered_support_criterion": "All active terms and the intercept must match in one equation, independent of slot and target. Both registered continuity-based momentum rewrites are allowed. Complete requires all three laws in one system.",
+  "registered_support_counts": {
+    "baseline": {
+      "continuity": 6,
+      "y_momentum": 14,
+      "x_momentum": 2,
+      "complete": 0
+    },
+    "optimized": {
+      "continuity": 6,
+      "y_momentum": 14,
+      "x_momentum": 2,
+      "complete": 0
+    }
+  },
+  "reference_supports_description": "reference_supports lists direct nonconstant term matches under the PIC canonical token metric. registered_laws also checks the intercept and accepts registered momentum rewrites.",
+  "registered_law_combinations": {
+    "baseline": {
+      "none": 42,
+      "y_momentum": 13,
+      "continuity, y_momentum": 1,
+      "continuity": 5,
+      "x_momentum": 2
+    },
+    "optimized": {
+      "none": 42,
+      "y_momentum": 13,
+      "continuity, y_momentum": 1,
+      "continuity": 5,
+      "x_momentum": 2
+    }
+  },
+  "beam_disabled_registered_support_counts": {
+    "continuity": 0,
+    "y_momentum": 0,
+    "x_momentum": 0,
+    "complete": 0
+  },
+  "registered_coefficient_ranges": {
+    "baseline": {
+      "y_momentum": {
+        "y_diffusion": {
+          "min": 0.009923433272628499,
+          "max": 0.009923433272628499
+        },
+        "x_diffusion": {
+          "min": 0.009965986392278423,
+          "max": 0.009965986392278423
+        }
+      },
+      "continuity": {
+        "v_y_on_rhs_of_u_x": {
+          "min": -1.0004015109369355,
+          "max": -1.0004015109369355
+        }
+      },
+      "x_momentum": {
+        "y_diffusion": {
+          "min": 0.009802861618783527,
+          "max": 0.009802861618783527
+        },
+        "x_diffusion": {
+          "min": 0.010581398757884549,
+          "max": 0.010581398757884549
+        }
+      }
+    },
+    "optimized": {
+      "y_momentum": {
+        "y_diffusion": {
+          "min": 0.009923433272628499,
+          "max": 0.009923433272628499
+        },
+        "x_diffusion": {
+          "min": 0.009965986392278423,
+          "max": 0.009965986392278423
+        }
+      },
+      "continuity": {
+        "v_y_on_rhs_of_u_x": {
+          "min": -1.0004015109369355,
+          "max": -1.0004015109369355
+        }
+      },
+      "x_momentum": {
+        "y_diffusion": {
+          "min": 0.009802861618783527,
+          "max": 0.009802861618783527
+        },
+        "x_diffusion": {
+          "min": 0.010581398757884549,
+          "max": 0.010581398757884549
+        }
+      }
+    }
+  }
+}
