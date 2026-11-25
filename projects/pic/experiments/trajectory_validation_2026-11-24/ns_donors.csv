@@ -1,0 +1,7 @@
+seed,family,x_momentum,y_momentum,continuity,assembled,recombinable_in_original_slots,all_donors_any_slot
+923701,gaussian,1,1,1,1,1,1
+923701,correlated,0,0,1,0,0,0
+923702,gaussian,0,1,1,0,0,0
+923702,correlated,0,1,1,0,0,0
+923703,gaussian,1,1,1,1,1,1
+923703,correlated,0,0,1,0,0,0
