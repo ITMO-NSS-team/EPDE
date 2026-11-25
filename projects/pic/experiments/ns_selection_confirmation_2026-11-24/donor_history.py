@@ -122,8 +122,8 @@ def verify(problem, fields, supports, scores, native, groups, *, later_native=()
                 surviving_all_native=sum(not dominated(later_native, *checks[r]) for r in survivors))
 
 
-def run(seed):
-    archive = read_archive(ROOT/'results'/str(seed))
+def score_archive(archive, checkpoint=CHECKPOINT):
+    seed = archive['seed']
     problem = live.load_data('ns', **OPTIONS['ns'])
     assert archive['noise_percent'] == 0 and archive['epochs_completed'] == 150
     assert archive['train_hashes'] == {k:live.R.digest(v) for k,v in problem.data.items()}
@@ -133,9 +133,11 @@ def run(seed):
                              system_rps_mode='plain', equation_terms_max_number=7)))
     assert archive['settings']['equation_terms_max_number'] == 7
     op = archive['operator']
-    state = op['epoch_clock'][CHECKPOINT-1]
+    assert 1 <= checkpoint <= archive['epochs_completed']
+    state = op['epoch_clock'][checkpoint-1]
     budget = op['full_cost'][-1]
-    fronts = archive['epoch_fronts'][:CHECKPOINT]
+    fronts = archive['epoch_fronts'][:checkpoint]
+    assert state['epoch'] == fronts[-1]['epoch'] == checkpoint
     prefix = blind_input(archive, state, fronts[-1]['members'])
     historical = {tuple(r) for h in fronts for r in h['members']}
     full_supports, full_scores = native_points(archive)
@@ -159,7 +161,12 @@ def run(seed):
         if 'fit_milliseconds' in op:
             elapsed = op['fit_milliseconds'][op['full_cost'].index(cutoff)]/1000
             result[name].update(native_cutoff_seconds=elapsed, native_full_seconds=archive['seconds'])
-        print(seed, name, result[name], flush=True)
+        print(seed, checkpoint, name, result[name], flush=True)
+    return result
+
+
+def run(seed):
+    result = score_archive(read_archive(ROOT/'results'/str(seed)))
     path = ROOT/'results'/str(seed)/'donor_history.json'
     temp = path.with_suffix('.pending')
     temp.write_text(json.dumps(result, indent=2, allow_nan=False), encoding='utf8')

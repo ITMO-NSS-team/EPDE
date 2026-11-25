@@ -1,0 +1,82 @@
+{
+  "100": {
+    "current": {
+      "requested_fits": 1103,
+      "archived_fits": 113,
+      "new_fits": 990,
+      "accepted_fits": 1056,
+      "over_budget_fits": 0,
+      "donor_supports": 76,
+      "native_fits": 253712,
+      "total_fits": 254702,
+      "native_complete": 0,
+      "assembled_complete": 0,
+      "complete_generated": 0,
+      "unbeaten_by_native": 0,
+      "complete_nondominated": 0,
+      "surviving_all_native": 0,
+      "seconds": 51.25317620008718,
+      "native_cutoff_seconds": 3079.283,
+      "native_full_seconds": 3089.011171299964
+    },
+    "historical": {
+      "requested_fits": 9635,
+      "archived_fits": 792,
+      "new_fits": 8843,
+      "accepted_fits": 9108,
+      "over_budget_fits": 0,
+      "donor_supports": 619,
+      "native_fits": 245859,
+      "total_fits": 254702,
+      "native_complete": 0,
+      "assembled_complete": 0,
+      "complete_generated": 0,
+      "unbeaten_by_native": 0,
+      "complete_nondominated": 0,
+      "surviving_all_native": 0,
+      "seconds": 107.87749770004302,
+      "native_cutoff_seconds": 3010.514,
+      "native_full_seconds": 3089.011171299964
+    }
+  },
+  "125": {
+    "current": {
+      "requested_fits": 1490,
+      "archived_fits": 105,
+      "new_fits": 1385,
+      "accepted_fits": 1426,
+      "over_budget_fits": 0,
+      "donor_supports": 71,
+      "native_fits": 253317,
+      "total_fits": 254702,
+      "native_complete": 0,
+      "assembled_complete": 6,
+      "complete_generated": 6,
+      "unbeaten_by_native": 4,
+      "complete_nondominated": 4,
+      "surviving_all_native": 4,
+      "seconds": 40.05346650001593,
+      "native_cutoff_seconds": 3075.801,
+      "native_full_seconds": 3089.011171299964
+    },
+    "historical": {
+      "requested_fits": 12293,
+      "archived_fits": 924,
+      "new_fits": 11369,
+      "accepted_fits": 11625,
+      "over_budget_fits": 0,
+      "donor_supports": 712,
+      "native_fits": 243333,
+      "total_fits": 254702,
+      "native_complete": 0,
+      "assembled_complete": 6,
+      "complete_generated": 6,
+      "unbeaten_by_native": 4,
+      "complete_nondominated": 4,
+      "surviving_all_native": 4,
+      "seconds": 136.09630410000682,
+      "native_cutoff_seconds": 2987.617,
+      "native_full_seconds": 3089.011171299964
+    }
+  }
+}
