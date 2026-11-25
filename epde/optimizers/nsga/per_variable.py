@@ -214,6 +214,21 @@ def variable_fronts(systems) -> dict:
     systems = list(systems)
     if not systems:
         return {}
+    if any(getattr(f, 'full_vector_dominance', False) for f in getattr(systems[0], 'obj_funs', ()) or ()):
+        keys = systems[0].vals.equation_keys
+        values = np.array([s.obj_fun for s in systems])
+        result = {}
+        for e,key in enumerate(keys):
+            plane = values[:, e::len(keys)]
+            unique, inverse = np.unique(plane, axis=0, return_inverse=True)
+            # Lexicographic order makes any strict dominator an earlier point.
+            kept = []
+            for i, row in enumerate(unique):
+                if not kept or not np.any(np.all(unique[kept] <= row, axis=1)):
+                    kept.append(i)
+            indices = np.flatnonzero(np.isin(inverse.ravel(), kept))
+            result[key] = [(systems[i].vals[key], tuple(plane[i])) for i in indices]
+        return result
     T = plane_table(systems)
     fronts = {}
     for e, key in enumerate(T.keys):

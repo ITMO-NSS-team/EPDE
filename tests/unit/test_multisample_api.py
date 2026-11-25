@@ -175,7 +175,7 @@ def _decay_records(rate, offset=0.0):
     return records, derivatives
 
 
-def _joint_adapter(records=None, *, retain_cache=False):
+def _joint_adapter(records=None, *, retain_cache=False, **options):
     return epde.EpdeMultisample(
         records, use_solver=False, device='cpu', engine='nsga2',
         config={'runtime': {'free_tensor_cache_after_fit': not retain_cache}},
@@ -185,7 +185,139 @@ def _joint_adapter(records=None, *, retain_cache=False):
         equation_terms_max_number=2, equation_factors_max_number=1,
         data_fun_pow=1, deriv_fun_pow=1, population_size=4, training_epochs=2,
         system_rps_params={'variable_order_seed': 11, 'fill_probability': 0.0},
-        verbose_params={'show_iter_idx': False})
+        verbose_params={'show_iter_idx': False}, **options)
+
+
+@pytest.mark.parametrize('count', [1,2])
+def test_per_record_search_reports_physical_fit_and_all_labeled_objectives(count):
+    from epde.interface.results import DiscoveryResult
+    records, derivatives = _decay_records(0.4)
+    observed = []
+    for order in (list(range(count)), list(reversed(range(count)))):
+        with _joint_adapter([records[i] for i in order], retain_cache=True,
+                            multisample_discrepancy='per_record') as obj:
+            np.random.seed(11)
+            obj.fit(derivs=[derivatives[i] for i in order], max_deriv_order=(1,))
+            _assert_decay_front(obj, 0.4)
+            assert obj.optimizer._mu == obj.config.evolution.population_size
+            front = obj.optimizer.reported_front()
+            assert front
+            for member in front:
+                eq = member.vals['u']
+                np.testing.assert_allclose(member.obj_fun, [*eq._record_wape,eq.coefficients_stability])
+                assert len(eq._record_wape) == count
+                assert np.mean(eq._record_wape) == pytest.approx(eq.fitness_value)
+            result = DiscoveryResult.from_search(obj)
+            assert all([label['metric'] for label in s['objective_labels']] == ['wape']*count+['instability']
+                       for s in result.front)
+            assert len(result.front) == len(front)
+            assert DiscoveryResult.from_dict(result.as_dict()).front == result.front
+            observed.append(min(max(eq.vals['u']._record_wape) for eq in front))
+    np.testing.assert_allclose(observed, 0, atol=1e-11)
+
+
+@pytest.mark.parametrize('incompatible', [
+    {'engine': 'moeadd'}, {'multiobjective_mode': False}, {'use_solver': True},
+    {'discrepancy_metric': 'l2'}, {'niching': 'per_variable'},
+])
+def test_per_record_objectives_reject_incompatible_search_modes(incompatible):
+    from epde.interface.search_config import load_search_config
+    options = dict(multisample_discrepancy='per_record', engine='nsga2', use_solver=False,
+                   discrepancy_metric='wape', system_rps_mode='plain')
+    with pytest.raises(ValueError, match='per_record'):
+        load_search_config(overrides={**options, **incompatible})
+
+
+def test_per_record_archive_keeps_tradeoffs_and_distinct_fits_at_equal_values():
+    from types import SimpleNamespace
+    from epde.eq_mo_objectives import RecordFitness
+    from epde.optimizers.nsga.optimizer import NSGAOptimizer
+    from epde.optimizers.moeadd.supplementary import check_dominance, cycle_safe_nds
+
+    class Equations(dict):
+        equation_keys = ('u',)
+
+        def __iter__(self):
+            return iter(self.values())
+
+    def candidate(values, intercept):
+        target = SimpleNamespace(structure=[SimpleNamespace(ftype='u',label='du/dx0',params=[1.])])
+        eq = SimpleNamespace(target=target,target_idx=0,structure=[target],main_var_to_explain='u',
+                             weights_final=np.array([intercept]))
+        return SimpleNamespace(vals=Equations(u=eq),obj_fun=np.array(values),
+                               obj_funs=[RecordFitness((0,1))],equations_labels=('same terms',))
+    candidates = [candidate([.1,.8,.2],1.),candidate([.7,.2,.2],2.),
+                  candidate([.1,.8,.2],3.),candidate([.9,.9,.2],4.)]
+    optimizer = object.__new__(NSGAOptimizer)
+    optimizer._archive = []
+    optimizer._record_archive_values = None
+    for c in reversed(candidates):
+        optimizer._archive_insert(c)
+    optimizer._archive_insert(candidates[0])
+    assert {s.vals['u'].weights_final[0] for s in optimizer.reported_front()} == {1.,2.,3.}
+    assert check_dominance(candidates[0],candidates[3])
+    assert {id(s) for s in cycle_safe_nds(candidates)[0]} == set(map(id,candidates[:3]))
+
+
+def test_per_record_wape_uses_shared_weights_on_each_recording():
+    records, derivatives = _decay_records(0.4)
+    derivatives[1] = derivatives[1] * 1.35
+    with _joint_adapter(records, retain_cache=True, multisample_discrepancy='per_record') as obj:
+        np.random.seed(11)
+        obj.fit(derivs=derivatives, max_deriv_order=(1,))
+        distinct_errors = False
+        for member in obj.optimizer.reported_front():
+            eq = member.vals['u']
+            targets, features = eq.evaluate()
+            expected = []
+            for key in sorted(targets):
+                target = targets[key].ravel()
+                residual = target - features[key] @ eq.weights_final[:-1] - eq.weights_final[-1]
+                expected.append(np.abs(residual).sum() / np.abs(target).sum())
+            np.testing.assert_allclose(member.obj_fun[:2], expected)
+            distinct_errors |= not np.isclose(*expected)
+        assert distinct_errors
+
+
+def test_per_record_front_matches_all_fitted_siblings_before_population_selection(monkeypatch):
+    from epde.operators.common import plain_fit
+    from epde.operators.common.objectives import LOSS_NAN_VAL
+    from epde.optimizers.nsga.optimizer import _fitted_identity
+
+    samples, derivatives = _decay_records(0.4)
+    derivatives[1] *= 1.35
+    evaluated = set()
+    hand_over = plain_fit._hand_over
+    def observe(system, siblings):
+        for candidate in (system, *siblings):
+            vec = candidate.obj_fun
+            if np.isfinite(vec).all() and (vec < LOSS_NAN_VAL).all():
+                evaluated.add((_fitted_identity(candidate), tuple(vec)))
+        return hand_over(system, siblings)
+    monkeypatch.setattr(plain_fit, '_hand_over', observe)
+    with _joint_adapter(samples, multisample_discrepancy='per_record') as search:
+        np.random.seed(11)
+        search.fit(derivs=derivatives, max_deriv_order=(1,))
+        assert evaluated
+        def dominates(a, b):
+            return all(x <= y for x, y in zip(a, b)) and any(x < y for x, y in zip(a, b))
+        expected = {(law, v) for law, v in evaluated if not any(dominates(other, v) for _, other in evaluated)}
+        assert {(_fitted_identity(s), tuple(s.obj_fun)) for s in search.optimizer.reported_front()} == expected
+
+
+def test_per_record_constant_uses_the_same_intercept_even_on_short_recordings():
+    from types import SimpleNamespace
+    from epde.operators.common.objectives import Discrepancy, LOSS_NAN_VAL
+    with _joint_adapter(multisample_discrepancy='per_record'):
+        equation = SimpleNamespace(weights_final=np.array([2.0]),
+                                   evaluate=lambda **kwargs: ({8: np.array([4.]), 2: np.array([1., 1.])}, None))
+        metric = Discrepancy('wape')
+        ctx = SimpleNamespace(for_rps=False)
+        metric._compute_wape(equation, ctx)
+        assert equation._record_wape == (1., 0.5)
+        equation.evaluate = lambda **kwargs: ({2: np.array([0.])}, None)
+        metric._compute_wape(equation, ctx)
+        assert equation._record_wape == (LOSS_NAN_VAL,)
 
 
 def _assert_decay_front(obj, rate):

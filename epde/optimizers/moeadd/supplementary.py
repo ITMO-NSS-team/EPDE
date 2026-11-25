@@ -65,6 +65,8 @@ def _dominance_view(system):
     each equation's structure label. A sort compares every pair, so it reads
     each member once instead of once per comparison."""
     keys = system.vals.equation_keys
+    if any(getattr(reader, 'full_vector_dominance', False) for reader in getattr(system, 'obj_funs', ()) or ()):
+        return keys, system.obj_fun, None
     return keys, system.obj_fun, {key: _structure_label(system.vals[key]) for key in keys}
 
 
@@ -74,6 +76,8 @@ def _view_dominates(target, compared_with) -> bool:
 
     eq_keys, t_obj, t_labels = target
     _, c_obj, c_labels = compared_with
+    if t_labels is None and c_labels is None:
+        return bool(np.all(t_obj <= c_obj) and np.any(t_obj < c_obj))
     for obj_fun_idx in range(len(t_obj)):
         # Deliberate noise guard: structurally identical equation genes can
         # still differ in objective values through numerical noise (e.g.
@@ -311,6 +315,14 @@ def _dominance_matrix(views):
     keys, n_obj = tuple(views[0][0]), len(views[0][1])
     if any(tuple(view[0]) != keys or len(view[1]) != n_obj for view in views):
         return None
+    if all(view[2] is None for view in views):
+        obj = np.asarray([view[1] for view in views], dtype=float)
+        D = np.empty((n, n), dtype=bool)
+        step = max(1, _MATRIX_BLOCK // max(1, n * n_obj))
+        for lo in range(0, n, step):
+            block = obj[lo:lo+step, None, :]
+            D[lo:lo+step] = np.all(block <= obj, axis=2) & np.any(block < obj, axis=2)
+        return D
     ids = np.empty((n, len(keys)), dtype=np.int64)
     try:
         for e, key in enumerate(keys):

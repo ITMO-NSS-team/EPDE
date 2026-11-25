@@ -17,6 +17,28 @@ def generate_partial(obj_function, equation_key):
     return partial(obj_function, equation_key=equation_key)
 
 
+class RecordFitness:
+    """Recording-major WAPE, with equation slots in chromosome order for every recording."""
+    ideal_value = 0.
+    full_vector_dominance = True
+
+    def __init__(self, record_keys):
+        self.record_keys = tuple(sorted(record_keys))
+
+    def __call__(self, system):
+        from epde.operators.common.objectives import LOSS_NAN_VAL
+        rows = []
+        for eq in system.vals:
+            if eq.fitness_value >= LOSS_NAN_VAL:
+                rows.append((LOSS_NAN_VAL,) * len(self.record_keys))
+            else:
+                scores = eq._record_wape
+                if scores is None or len(scores) != len(self.record_keys):
+                    raise ValueError("Fitted equation has incomplete per-record discrepancies.")
+                rows.append(scores)
+        return tuple(value for recording in zip(*rows) for value in recording)
+
+
 def equation_fitness(system, equation_key = None):
     '''
     Evaluate the quality of the system of PDEs, using the individual values of fitness function for equations.

@@ -512,6 +512,7 @@ _EQ_STATE_GROUPS = (
     ('scores', (
         ('fitness_calculated', False),
         ('_fitness_value', None),
+        ('_record_wape', None),
         ('stability_calculated', False),
         ('_coefficients_stability', None),
         ('complexity_calculated', False),
@@ -545,7 +546,7 @@ class Equation(ComplexStructure):
                  '_target_term', 'right_part_selected', '_weights_final', 'weights_final_evald',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated',
                  'complexity_calculated',
-                 '_fitness_value', '_coefficients_stability', '_aic', '_complexity_value', 'metaparameters', 'main_var_to_explain',
+                 '_fitness_value', '_record_wape', '_coefficients_stability', '_aic', '_complexity_value', 'metaparameters', 'main_var_to_explain',
                  '_eval_cache', '_cached_sw_weights', '_cached_vc_score',
                  '_cached_alt_instability',
                  '_terms_labels_cache', '_terms_labels_without_power_cache',
@@ -1249,6 +1250,7 @@ class Equation(ComplexStructure):
         new_equation.weights_final_evald = self.weights_final_evald
         new_equation.right_part_selected = self.right_part_selected
         new_equation.fitness_calculated = self.fitness_calculated
+        new_equation._record_wape = getattr(self, '_record_wape', None)
         new_equation.stability_calculated = self.stability_calculated
         new_equation.complexity_calculated = getattr(self, 'complexity_calculated', False)
         new_equation.aic_calculated = self.aic_calculated
@@ -1784,6 +1786,13 @@ class SoEq(moeadd.MOEADDSolution):
 
     def use_new_multiobjective_function(self):
         from epde.eq_mo_objectives import equation_fitness, equation_terms_stability
+        from epde.interface.search_config import active_config
+        if active_config().objectives.multisample_discrepancy == 'per_record':
+            from epde.eq_mo_objectives import RecordFitness
+            import epde.globals as global_var
+            self.set_objective_functions([RecordFitness(global_var.samples_manager.trajecatoryIDs),
+                                          equation_terms_stability])
+            return
         # Both objectives return per-equation tuples when called without an
         # equation_key (flattened by ``obj_fun``), so no per-variable
         # generate_partial expansion is needed here.

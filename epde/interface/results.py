@@ -54,8 +54,15 @@ def _equation(eq):
 
 
 def _system(system):
-    return dict(equations=[_equation(eq) for eq in system.vals],
-                objectives=np.atleast_1d(system.obj_fun).astype(float).tolist())
+    result = dict(equations=[_equation(eq) for eq in system.vals],
+                  objectives=np.atleast_1d(system.obj_fun).astype(float).tolist())
+    for reader in getattr(system, 'obj_funs', ()) or ():
+        if getattr(reader, 'full_vector_dominance', False):
+            keys = system.vals.equation_keys
+            result['objective_labels'] = [dict(metric='wape', trajectory=_json_value(r), variable=v)
+                                          for r in reader.record_keys for v in keys]
+            result['objective_labels'].extend(dict(metric='instability', variable=v) for v in keys)
+    return result
 
 
 @dataclass

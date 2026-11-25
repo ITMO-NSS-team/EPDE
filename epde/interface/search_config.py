@@ -759,6 +759,8 @@ class ObjectivesConfig:
     sparsity_kwargs: dict = field(default_factory=dict)
     #: ``mean`` averages separate fits. ``joint`` fits shared coefficients.
     multisample_mode: str = 'mean'
+    #: Give NSGA-II one WAPE axis per recording and equation with ``per_record``.
+    multisample_discrepancy: str = 'mean'
     #: Joint fit weights: equal record totals or the original row weights.
     multisample_weighting: str = 'samples'
 
@@ -1712,6 +1714,16 @@ def _check_types(resolved: dict) -> None:
     space = resolved['search_space']
     rps_mode = space['system_rps_mode']
     objectives = resolved['objectives']
+    if objectives['multisample_discrepancy'] not in ('mean', 'per_record'):
+        raise ValueError("objectives.multisample_discrepancy must be 'mean' or 'per_record'.")
+    if objectives['multisample_discrepancy'] == 'per_record':
+        if (not objectives['multiobjective_mode'] or resolved['solver']['use_solver']
+                or resolved['evolution']['engine'] != 'nsga2' or objectives['discrepancy_metric'] != 'wape'
+                or objectives['second_objective'] != 'instability'):
+            raise ValueError("per_record requires solver-free multiobjective NSGA-II with WAPE and instability.")
+        if resolved['evolution']['niching'] not in ('auto', 'system'):
+            raise ValueError("per_record uses system Pareto dominance; use niching='system' or 'auto'.")
+        resolved['evolution']['niching'] = 'system'
     if objectives['multisample_mode'] not in ('mean', 'joint'):
         raise ValueError("objectives.multisample_mode must be 'mean' or 'joint'.")
     if objectives['multisample_weighting'] not in ('samples', 'points'):

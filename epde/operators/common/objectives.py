@@ -420,8 +420,11 @@ class Discrepancy(EquationObjective):
         # non-target term on the in-place pass. ``active_only`` selects columns;
         # nothing here is normalised (see Equation.evaluate).
         targets, features = equation.evaluate(active_only=ctx.for_rps)
+        per_record = active_config().objectives.multisample_discrepancy == 'per_record'
         if features is None:
-            discr = dictSubtr(targets, {key: tg.mean() for key, tg in targets.items()})
+            baseline = (float(equation.weights_final[-1]) if per_record else
+                        {key: tg.mean() for key, tg in targets.items()})
+            discr = dictSubtr(targets, baseline)
         else:
             coefs, intercept = _extract_coefs_intercept(equation, features)
             discr = dictSubtr(targets,
@@ -432,9 +435,17 @@ class Discrepancy(EquationObjective):
         # stricter -- with three trajectories every RPS candidate above a mean
         # WAPE of 0.33 was declined, the sweep hit inf fitness and rerolled the
         # whole equation. Identical to the legacy value when len(targets) == 1.
-        rl_error = np.mean([np.sum(np.abs(discr[key])) / np.sum(np.abs(targets[key]))
-                            for key in targets.keys()])
-        return float(rl_error)
+        if per_record:
+            scores = []
+            for key in sorted(targets):
+                scale = np.sum(np.abs(targets[key]))
+                value = np.sum(np.abs(discr[key])) / scale if scale > 0 else np.inf
+                scores.append(float(value) if np.isfinite(value) else LOSS_NAN_VAL)
+            if not ctx.for_rps:
+                equation._record_wape = tuple(scores)
+            return float(np.mean(scores))
+        return float(np.mean([np.sum(np.abs(discr[key])) / np.sum(np.abs(targets[key]))
+                              for key in targets]))
 
     def _compute_l2(self, equation, ctx: FitContext) -> float:
         targets, features = equation.evaluate(active_only=True)

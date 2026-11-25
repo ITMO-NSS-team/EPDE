@@ -13,6 +13,9 @@ def observations(offset=0, engine=None):
     fields = {'u': np.sin(t) + offset}
     if engine != 'single':
         fields['v'] = np.cos(t)
+    if engine == 'nsga2-records':
+        other = {'u': 1.1 * np.sin(t + 0.2) + offset, 'v': 1.1 * np.cos(t + 0.2)}
+        return [TrajectoryData({'t': t}, fields), TrajectoryData({'t': t}, other)]
     return TrajectoryData({'t': t}, fields)
 
 
@@ -215,7 +218,10 @@ def engine_search(engine):
     np.random.seed(19)
     torch.manual_seed(19)
     options = dict(training_epochs=2)
-    if engine.startswith('nsga2-'):
+    if engine == 'nsga2-records':
+        options.update(multisample_discrepancy='per_record', multisample_mode='joint',
+                       discrepancy_metric='wape', use_solver=False)
+    elif engine.startswith('nsga2-'):
         options.update(evaluation_form=engine.split('-')[1], early_stopping_patience=1)
     elif engine != 'nsga2':
         options.update(engine='moeadd', system_rps_mode='repair', multiobjective_mode=engine != 'single')
@@ -237,7 +243,7 @@ def test_plain_fit_cache_preserves_front_history_and_random_draws(monkeypatch):
     assert discover() == cached
 
 
-@pytest.mark.parametrize('engine', ['nsga2', 'moeadd', 'single', 'nsga2-forward', 'nsga2-weak'])
+@pytest.mark.parametrize('engine', ['nsga2', 'moeadd', 'single', 'nsga2-forward', 'nsga2-weak', 'nsga2-records'])
 def test_checkpoint_continues_in_fresh_process(tmp_path, monkeypatch, engine):
     from epde.interface.checkpoint import EpochCheckpoint
     d = observations(engine=engine)

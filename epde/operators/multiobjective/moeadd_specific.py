@@ -976,6 +976,11 @@ class InitialParetoLevelSorting(CompoundOperator):
         slot: a fresh random system (``SoEq.create``), drawn like any other."""
         if idx != len(objective.unplaced_candidates) - 1 or pool_exhausted or first_level.holds():
             return
+        from epde.interface.search_config import active_config
+        config = active_config()
+        if (config.objectives.multisample_discrepancy == 'per_record'
+                and isinstance(config.evolution.population_size, int)):
+            return  # An explicit working-population budget is independent of the number of Pareto axes.
         extra = copy.deepcopy(candidate)
         extra.create()
         objective.unplaced_candidates.append(extra)
@@ -1198,19 +1203,24 @@ class InitialParetoLevelSorting(CompoundOperator):
                 # One weight vector per member: the optimizer adopts the resized
                 # weights after this call (MOEADDOptimizer._sync_weights).
                 objective.resize_weights(final)
+            from epde.interface.search_config import active_config
+            per_record = active_config().objectives.multisample_discrepancy == 'per_record'
             if extension and first_level.holds():
                 warnings.warn(
                     f'Initial population extended from {requested} to {final} systems so that at '
                     f'most half are on the first Pareto level ({first_level.size} of {final}).',
                     global_var.EPDEUsageWarning)
-            elif not first_level.holds():
+            elif not first_level.holds() and not per_record:
                 warnings.warn(
                     f'Initial population: {first_level.size} of {final} systems are on the first '
                     'Pareto level, more than half, and the pool yields no further system.',
                     global_var.EPDEUsageWarning)
-            if global_var.verbose.show_iter_idx:
-                print('\n========== Marriage (weight assignment) ==========')
-            objective.associate_weights()
+            # Per-record NSGA-II uses full-vector levels and crowding; MOEA/D sector
+            # weights have no role in either selection or placement for this mode.
+            if not per_record:
+                if global_var.verbose.show_iter_idx:
+                    print('\n========== Marriage (weight assignment) ==========')
+                objective.associate_weights()
             objective.initial_placing()
             # Initialize the PBI objective normalizer from the placed
             # population; MOEADDOptimizer.optimize refreshes it per epoch.

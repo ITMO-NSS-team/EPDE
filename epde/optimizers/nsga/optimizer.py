@@ -7,7 +7,10 @@ parents, crossover and mutation make about as many offspring, and parents and
 offspring together are sorted into non-dominated levels and cut back to the
 population size -- whole levels first, the level that overflows by crowding.
 
-EPDE's rules carry over unchanged: dominance is ``check_dominance`` (the same
+With per-record objectives, dominance compares all record/equation errors and
+instabilities, including for fits with the same terms. The archive keeps
+distinct fits at equal objective values. With the default mean discrepancy,
+dominance is ``check_dominance`` (the same
 structure of an equation is the same equation), crowding is measured in each
 equation's own plane (``operators.plane_crowding``), and the sort never loses a
 member of a dominance cycle (``supplementary.cycle_safe_nds``). Under
@@ -30,6 +33,7 @@ make the offspring of one MOEA/DD epoch at the same population size, so
 for both engines.
 """
 import warnings
+from copy import deepcopy
 
 import numpy as np
 
@@ -46,6 +50,19 @@ def _values_dominate(system, other) -> bool:
     in one, compared value by value (no structure is skipped)."""
     new, old = np.asarray(system.obj_fun, dtype=float), np.asarray(other.obj_fun, dtype=float)
     return bool(new.shape == old.shape and np.all(new <= old) and np.any(new < old))
+
+
+def _fitted_identity(system):
+    """Target, unrounded active terms, physical coefficients and intercept in equation order."""
+    def term_key(term):
+        return tuple(sorted((f.ftype, f.label, tuple(f.params)) for f in term.structure))
+    result = []
+    for eq in system.vals:
+        terms = tuple(sorted((term_key(term), float(eq.weights_final[eq.weight_index(i, eq.target_idx)]))
+                             for i, term in enumerate(eq.structure) if i != eq.target_idx
+                             and eq.weights_final[eq.weight_index(i, eq.target_idx)] != 0))
+        result.append((eq.main_var_to_explain, term_key(eq.target), terms, float(eq.weights_final[-1])))
+    return tuple(result)
 
 
 def moeadd_parents_per_sector(population_size: int, parents_fraction: float = 0.2) -> int:
@@ -80,6 +97,7 @@ class NSGAOptimizer(MOEADDOptimizer):
                          passed_population=passed_population, best_sol_vals=best_sol_vals,
                          weights_assigner=weights_assigner, population_floor=population_floor)
         self._archive = []
+        self._record_archive_values = None
         self._mu = None
 
     # ------------------------------------------------------------------ archive
@@ -99,6 +117,8 @@ class NSGAOptimizer(MOEADDOptimizer):
         self._inserts += 1
         label = system.equations_labels
         view = _dominance_view(system)
+        if view[2] is None:
+            return self._insert_record_fit(system, view[1])
         rows = self._archive_rows(view)
         if rows is None:
             return self._archive_insert_scalar(system, label)
@@ -113,6 +133,28 @@ class NSGAOptimizer(MOEADDOptimizer):
         rows.keep(keep)
         rows.append(view, label)
         self._rows_of = self._archive
+        return True
+
+    def _insert_record_fit(self, system, values):
+        """Strict Pareto archive of distinct fitted systems, including objective ties."""
+        from epde.operators.common.objectives import LOSS_NAN_VAL
+        if not np.isfinite(values).all() or np.any(values >= LOSS_NAN_VAL):
+            return False
+        rows = self._record_archive_values
+        if rows is None:
+            rows = np.empty((0, len(values)))
+        no_worse = np.all(rows <= values, axis=1)
+        if np.any(no_worse & np.any(rows < values, axis=1)):
+            return False
+        ties = np.flatnonzero(no_worse)
+        if len(ties):
+            key = _fitted_identity(system)
+            if any(_fitted_identity(self._archive[idx]) == key for idx in ties):
+                return False
+        keep = ~(np.all(values <= rows, axis=1) & np.any(values < rows, axis=1))
+        self._archive = [member for member, retain in zip(self._archive, keep) if retain]
+        self._archive.append(deepcopy(system))
+        self._record_archive_values = np.vstack((rows[keep], values))
         return True
 
     def _archive_insert_scalar(self, system, label) -> bool:
@@ -233,6 +275,24 @@ class NSGAOptimizer(MOEADDOptimizer):
         """After the epochs: the population is the archive plus the last
         generation, sorted, so the first level is the archive."""
         levels_obj = self.pareto_levels
+        from epde.interface.search_config import active_config
+        if active_config().objectives.multisample_discrepancy == 'per_record':
+            from epde.operators.common.objectives import LOSS_NAN_VAL
+            # The archive holds all nondominated feasible fits. Only final
+            # population fits missing from that first level need sorting.
+            seen = {(tuple(member.obj_fun), _fitted_identity(member)) for member in self._archive}
+            rest = []
+            for member in levels_obj.population:
+                values = member.obj_fun
+                if not np.isfinite(values).all() or np.any(values >= LOSS_NAN_VAL):
+                    continue
+                key = (tuple(values), _fitted_identity(member))
+                if key not in seen:
+                    seen.add(key)
+                    rest.append(member)
+            levels_obj.population = self._archive + rest
+            levels_obj.levels = [list(self._archive)] + (cycle_safe_nds(rest) if rest else [])
+            return
         archived = {id(member) for member in self._archive}
         labels = {member.equations_labels for member in self._archive}
         # A candidate is listed once: a copy of an archived one (the duplicates
@@ -255,6 +315,18 @@ class NSGAOptimizer(MOEADDOptimizer):
 
     # ----------------------------------------------------------------- optimize
     def optimize(self, epochs, early_stopping_callback=None, *, start_epoch=0, epoch_observer=None):
+        from epde.interface.search_config import active_config
+        from epde.operators.common.plain_fit import evaluated_system_observer
+        token = None
+        if active_config().objectives.multisample_discrepancy == 'per_record':
+            token = evaluated_system_observer.set(self._archive_insert)
+        try:
+            return self._optimize(epochs, early_stopping_callback, start_epoch=start_epoch, epoch_observer=epoch_observer)
+        finally:
+            if token is not None:
+                evaluated_system_observer.reset(token)
+
+    def _optimize(self, epochs, early_stopping_callback=None, *, start_epoch=0, epoch_observer=None):
         """Run ``epochs`` NSGA-II epochs (see the module docstring). The
         callback gets ``(snapshot, epoch_idx)`` after every epoch, the snapshot
         listing the archive, and a truthy return stops the run."""
@@ -267,8 +339,14 @@ class NSGAOptimizer(MOEADDOptimizer):
             linked.initial[0][1].set_output(levels_obj)
             init_block.apply(self.form_processer_args(0))
             self._sync_weights()
+        from epde.interface.search_config import active_config
         if getattr(levels_obj, '_init_collapsed', False):
-            self._archive = list(levels_obj.levels[0])
+            if active_config().objectives.multisample_discrepancy == 'per_record':
+                for member in levels_obj.population:
+                    self._archive_insert(member)
+                self._report()
+            else:
+                self._archive = list(levels_obj.levels[0])
             if not self._pareto_history:
                 self._pareto_history.append(self._snapshot())
             if epoch_observer:
@@ -276,10 +354,17 @@ class NSGAOptimizer(MOEADDOptimizer):
             return
         if self._mu is None:
             self._mu = len(levels_obj.population)
+            config = active_config()
+            if (config.objectives.multisample_discrepancy == 'per_record'
+                    and isinstance(config.evolution.population_size, int)):
+                # A fit can produce more siblings than there are initialization
+                # slots. Archive them all, then apply the requested survivor cap.
+                self._mu = min(self._mu, config.evolution.population_size)
         if not start_epoch:
             for member in levels_obj.population:
                 self._archive_insert(member)
-        from epde.interface.search_config import active_config
+            if len(levels_obj.population) > self._mu:
+                self._truncate()
         fraction = active_config().evolution.operators.get('MOEADDSelection', {}).get('parents_fraction', 0.2)
         generations = moeadd_parents_per_sector(self._mu, fraction)
 

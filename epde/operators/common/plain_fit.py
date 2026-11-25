@@ -440,6 +440,7 @@ class _CachedVersion:
     target: int
     weights: tuple
     scores: tuple
+    record_wape: tuple = None
 
     def restore(self, equation, coeff_calc, coeff_args, host):
         variant = equation.clone_shell()
@@ -448,6 +449,7 @@ class _CachedVersion:
         variant.weights_internal = np.array(self.weights)
         variant.weights_internal_evald = True
         coeff_calc.apply(variant, coeff_args)
+        variant._record_wape = self.record_wape
         for filler, value in zip(host.objectives, self.scores):
             setattr(variant, filler.value_attr, value)
             setattr(variant, filler.flag_attr, True)
@@ -475,7 +477,8 @@ def _linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, int
     for version in versions:
         kept = tuple(positions[_term_key(term)] for term in version.structure)
         scores = tuple(getattr(version, f.value_attr) for f in host.objectives)
-        entries.append(_CachedVersion(kept, version.target_idx, tuple(version.weights_internal), scores))
+        entries.append(_CachedVersion(kept, version.target_idx, tuple(version.weights_internal), scores,
+                                      getattr(version, '_record_wape', None)))
     cache[key] = tuple(entries)
     if len(cache) > _FIT_CACHE_SIZE:
         cache.popitem(last=False)
@@ -613,6 +616,13 @@ def _fit_linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args,
 
 def _pareto_versions(versions, host):
     if len(versions) == 2:
+        if active_config().objectives.multisample_discrepancy == 'per_record':
+            a,b = [np.asarray((*v._record_wape, v.coefficients_stability)) for v in versions]
+            if np.all(a <= b) and np.any(a < b):
+                return [versions[0]]
+            if np.all(b <= a) and np.any(b < a):
+                return [versions[1]]
+            return versions
         attrs = [filler.value_attr for filler in host.objectives]
         if _dominates(versions[1], versions[0], attrs):
             versions = [versions[1]]

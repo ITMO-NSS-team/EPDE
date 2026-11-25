@@ -20,3 +20,19 @@ Joint fitting works in the `plain`, `assignment`, and `repair` right-part modes.
 Joint `repair` uses VWSR with a basis-free instability metric such as `dyad`
 or `chi2`. Its sparse fit uses normal equations, so extreme magnitudes may
 require rescaling the data.
+
+## Comparing complete systems across recordings
+
+Use `multisample_discrepancy='per_record'` with solver-free multiobjective
+NSGA-II, WAPE and instability to expose every recording's error to the
+optimizer. Pair it with `multisample_mode='joint'` to fit one coefficient
+vector per equation. With R recordings and E equations, each system has
+R × E WAPE values ordered by trajectory ID and then equation, followed by E instabilities.
+The default discrepancy setting, `'mean'`, averages each equation's WAPE
+over its recordings.
+
+Read the complete system front from `DiscoveryResult.from_search(search).front`.
+Each system carries `objective_labels` alongside its `objectives`.
+Distinct fitted systems with equal objectives and incomparable fits of the
+same structure remain on the front. For a runnable example, the noise
+design and numerical output, see the [joint discovery protocol](../pic/experiments/joint_multisample_2026-11-24/protocol.md).
