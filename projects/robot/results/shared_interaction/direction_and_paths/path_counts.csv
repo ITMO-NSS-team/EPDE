@@ -1,0 +1,146 @@
+recording,rule,class,events
+Experiment_1,path,later clearance,1324
+Experiment_1,path,"near, large turn",2751
+Experiment_1,path,"near, small turn",3706
+Experiment_1,path_1.20_10,early clearance,9
+Experiment_1,path_1.20_10,later clearance,2708
+Experiment_1,path_1.20_10,"near, large turn",1984
+Experiment_1,path_1.20_10,"near, small turn",3054
+Experiment_1,path_1.20_10,reapproach,26
+Experiment_1,path_1.30_15,later clearance,1324
+Experiment_1,path_1.30_15,"near, large turn",1387
+Experiment_1,path_1.30_15,"near, small turn",5070
+Experiment_1,path_1.30_5,later clearance,1324
+Experiment_1,path_1.30_5,"near, large turn",4873
+Experiment_1,path_1.30_5,"near, small turn",1584
+Experiment_1,path_1.40_10,later clearance,586
+Experiment_1,path_1.40_10,"near, large turn",3209
+Experiment_1,path_1.40_10,"near, small turn",3986
+Experiment_2,path,later clearance,1156
+Experiment_2,path,"near, large turn",2820
+Experiment_2,path,"near, small turn",3962
+Experiment_2,path_1.20_10,early clearance,14
+Experiment_2,path_1.20_10,later clearance,2469
+Experiment_2,path_1.20_10,"near, large turn",2130
+Experiment_2,path_1.20_10,"near, small turn",3292
+Experiment_2,path_1.20_10,reapproach,33
+Experiment_2,path_1.30_15,later clearance,1156
+Experiment_2,path_1.30_15,"near, large turn",1377
+Experiment_2,path_1.30_15,"near, small turn",5405
+Experiment_2,path_1.30_5,later clearance,1156
+Experiment_2,path_1.30_5,"near, large turn",5027
+Experiment_2,path_1.30_5,"near, small turn",1755
+Experiment_2,path_1.40_10,later clearance,583
+Experiment_2,path_1.40_10,"near, large turn",3154
+Experiment_2,path_1.40_10,"near, small turn",4201
+Experiment_3,path,later clearance,887
+Experiment_3,path,"near, large turn",3273
+Experiment_3,path,"near, small turn",4382
+Experiment_3,path_1.20_10,early clearance,6
+Experiment_3,path_1.20_10,later clearance,2166
+Experiment_3,path_1.20_10,"near, large turn",2597
+Experiment_3,path_1.20_10,"near, small turn",3754
+Experiment_3,path_1.20_10,reapproach,19
+Experiment_3,path_1.30_15,later clearance,887
+Experiment_3,path_1.30_15,"near, large turn",1665
+Experiment_3,path_1.30_15,"near, small turn",5990
+Experiment_3,path_1.30_5,later clearance,887
+Experiment_3,path_1.30_5,"near, large turn",5803
+Experiment_3,path_1.30_5,"near, small turn",1852
+Experiment_3,path_1.40_10,later clearance,345
+Experiment_3,path_1.40_10,"near, large turn",3590
+Experiment_3,path_1.40_10,"near, small turn",4607
+N30_PWM10_D41,path,later clearance,277
+N30_PWM10_D41,path,"near, large turn",1430
+N30_PWM10_D41,path,"near, small turn",2035
+N30_PWM10_D41,path_1.20_10,early clearance,3
+N30_PWM10_D41,path_1.20_10,later clearance,705
+N30_PWM10_D41,path_1.20_10,"near, large turn",1221
+N30_PWM10_D41,path_1.20_10,"near, small turn",1805
+N30_PWM10_D41,path_1.20_10,reapproach,8
+N30_PWM10_D41,path_1.30_15,later clearance,277
+N30_PWM10_D41,path_1.30_15,"near, large turn",766
+N30_PWM10_D41,path_1.30_15,"near, small turn",2699
+N30_PWM10_D41,path_1.30_5,later clearance,277
+N30_PWM10_D41,path_1.30_5,"near, large turn",2547
+N30_PWM10_D41,path_1.30_5,"near, small turn",918
+N30_PWM10_D41,path_1.40_10,later clearance,98
+N30_PWM10_D41,path_1.40_10,"near, large turn",1539
+N30_PWM10_D41,path_1.40_10,"near, small turn",2105
+N40_PWM10_D40,path,later clearance,122
+N40_PWM10_D40,path,"near, large turn",863
+N40_PWM10_D40,path,"near, small turn",2297
+N40_PWM10_D40,path_1.20_10,early clearance,4
+N40_PWM10_D40,path_1.20_10,later clearance,415
+N40_PWM10_D40,path_1.20_10,"near, large turn",753
+N40_PWM10_D40,path_1.20_10,"near, small turn",2083
+N40_PWM10_D40,path_1.20_10,reapproach,27
+N40_PWM10_D40,path_1.30_15,later clearance,122
+N40_PWM10_D40,path_1.30_15,"near, large turn",302
+N40_PWM10_D40,path_1.30_15,"near, small turn",2858
+N40_PWM10_D40,path_1.30_5,later clearance,122
+N40_PWM10_D40,path_1.30_5,"near, large turn",2064
+N40_PWM10_D40,path_1.30_5,"near, small turn",1096
+N40_PWM10_D40,path_1.40_10,later clearance,36
+N40_PWM10_D40,path_1.40_10,"near, large turn",884
+N40_PWM10_D40,path_1.40_10,"near, small turn",2362
+N40_PWM10_D41,path,later clearance,114
+N40_PWM10_D41,path,"near, large turn",1339
+N40_PWM10_D41,path,"near, small turn",2353
+N40_PWM10_D41,path_1.20_10,early clearance,4
+N40_PWM10_D41,path_1.20_10,later clearance,405
+N40_PWM10_D41,path_1.20_10,"near, large turn",1218
+N40_PWM10_D41,path_1.20_10,"near, small turn",2164
+N40_PWM10_D41,path_1.20_10,reapproach,15
+N40_PWM10_D41,path_1.30_15,later clearance,114
+N40_PWM10_D41,path_1.30_15,"near, large turn",605
+N40_PWM10_D41,path_1.30_15,"near, small turn",3087
+N40_PWM10_D41,path_1.30_5,later clearance,114
+N40_PWM10_D41,path_1.30_5,"near, large turn",2585
+N40_PWM10_D41,path_1.30_5,"near, small turn",1107
+N40_PWM10_D41,path_1.40_10,later clearance,36
+N40_PWM10_D41,path_1.40_10,"near, large turn",1377
+N40_PWM10_D41,path_1.40_10,"near, small turn",2393
+N40_PWM20_D40,path,later clearance,734
+N40_PWM20_D40,path,"near, large turn",1859
+N40_PWM20_D40,path,"near, small turn",2783
+N40_PWM20_D40,path,reapproach,9
+N40_PWM20_D40,path_1.20_10,early clearance,35
+N40_PWM20_D40,path_1.20_10,later clearance,1629
+N40_PWM20_D40,path_1.20_10,"near, large turn",1432
+N40_PWM20_D40,path_1.20_10,"near, small turn",2125
+N40_PWM20_D40,path_1.20_10,reapproach,164
+N40_PWM20_D40,path_1.30_15,later clearance,734
+N40_PWM20_D40,path_1.30_15,"near, large turn",803
+N40_PWM20_D40,path_1.30_15,"near, small turn",3839
+N40_PWM20_D40,path_1.30_15,reapproach,9
+N40_PWM20_D40,path_1.30_5,later clearance,734
+N40_PWM20_D40,path_1.30_5,"near, large turn",3750
+N40_PWM20_D40,path_1.30_5,"near, small turn",892
+N40_PWM20_D40,path_1.30_5,reapproach,9
+N40_PWM20_D40,path_1.40_10,later clearance,256
+N40_PWM20_D40,path_1.40_10,"near, large turn",2044
+N40_PWM20_D40,path_1.40_10,"near, small turn",3085
+N40_PWM20_D41,path,early clearance,2
+N40_PWM20_D41,path,later clearance,840
+N40_PWM20_D41,path,"near, large turn",2232
+N40_PWM20_D41,path,"near, small turn",2910
+N40_PWM20_D41,path,reapproach,7
+N40_PWM20_D41,path_1.20_10,early clearance,33
+N40_PWM20_D41,path_1.20_10,later clearance,1917
+N40_PWM20_D41,path_1.20_10,"near, large turn",1708
+N40_PWM20_D41,path_1.20_10,"near, small turn",2201
+N40_PWM20_D41,path_1.20_10,reapproach,132
+N40_PWM20_D41,path_1.30_15,early clearance,2
+N40_PWM20_D41,path_1.30_15,later clearance,840
+N40_PWM20_D41,path_1.30_15,"near, large turn",1023
+N40_PWM20_D41,path_1.30_15,"near, small turn",4119
+N40_PWM20_D41,path_1.30_15,reapproach,7
+N40_PWM20_D41,path_1.30_5,early clearance,2
+N40_PWM20_D41,path_1.30_5,later clearance,840
+N40_PWM20_D41,path_1.30_5,"near, large turn",4138
+N40_PWM20_D41,path_1.30_5,"near, small turn",1004
+N40_PWM20_D41,path_1.30_5,reapproach,7
+N40_PWM20_D41,path_1.40_10,later clearance,328
+N40_PWM20_D41,path_1.40_10,"near, large turn",2464
+N40_PWM20_D41,path_1.40_10,"near, small turn",3199

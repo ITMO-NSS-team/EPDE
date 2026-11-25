@@ -1,0 +1,295 @@
+design,scope,recording,family,measure,pairs,blocks,mean_mm_s
+primary,all,N30_PWM10_D41,swarm,lead,11,8,-1.358912350226828
+primary,all,N40_PWM10_D40,swarm,lead,19,11,-2.590241248231781
+primary,all,N40_PWM10_D41,swarm,lead,16,9,-4.632988350414932
+primary,all,N40_PWM20_D40,swarm,lead,18,8,-4.886015748691518
+primary,all,N40_PWM20_D41,swarm,lead,20,10,-10.492337209883939
+primary,all,N30_PWM10_D41,swarm,incoming,11,8,-0.02920706274725259
+primary,all,N40_PWM10_D40,swarm,incoming,19,11,-1.1747283963291872
+primary,all,N40_PWM10_D41,swarm,incoming,16,9,-0.21824849984979489
+primary,all,N40_PWM20_D40,swarm,incoming,18,8,-0.17529706001377302
+primary,all,N40_PWM20_D41,swarm,incoming,20,10,0.20225437296487306
+primary,all,N30_PWM10_D41,swarm,slide_40,11,8,13.099306340108877
+primary,all,N40_PWM10_D40,swarm,slide_40,19,11,-0.4226992655720217
+primary,all,N40_PWM10_D41,swarm,slide_40,16,9,4.102735620041285
+primary,all,N40_PWM20_D40,swarm,slide_40,18,8,28.923799207290806
+primary,all,N40_PWM20_D41,swarm,slide_40,20,10,21.941992261640692
+primary,all,N30_PWM10_D41,swarm,change_40,11,8,14.458218690335702
+primary,all,N40_PWM10_D40,swarm,change_40,19,11,2.167541982659759
+primary,all,N40_PWM10_D41,swarm,change_40,16,9,8.735723970456213
+primary,all,N40_PWM20_D40,swarm,change_40,18,8,33.80981495598233
+primary,all,N40_PWM20_D41,swarm,change_40,20,10,32.434329471524634
+primary,all,N30_PWM10_D41,swarm,adjusted_40,11,8,13.165530003316126
+primary,all,N40_PWM10_D40,swarm,adjusted_40,19,11,0.3970224113843108
+primary,all,N40_PWM10_D41,swarm,adjusted_40,16,9,4.491320623998394
+primary,all,N40_PWM20_D40,swarm,adjusted_40,18,8,29.29207918105502
+primary,all,N40_PWM20_D41,swarm,adjusted_40,20,10,21.899435043538354
+primary,all,N30_PWM10_D41,swarm,forecast_40,11,8,9.979665798867224
+primary,all,N40_PWM10_D40,swarm,forecast_40,19,11,8.417641158145459
+primary,all,N40_PWM10_D41,swarm,forecast_40,16,9,8.747299770127288
+primary,all,N40_PWM20_D40,swarm,forecast_40,18,8,9.741722932256543
+primary,all,N40_PWM20_D41,swarm,forecast_40,20,10,7.866141513583723
+primary,all,N30_PWM10_D41,swarm,slide_80,11,8,18.968150525391685
+primary,all,N40_PWM10_D40,swarm,slide_80,19,11,3.038021365288232
+primary,all,N40_PWM10_D41,swarm,slide_80,16,9,2.7925911445632217
+primary,all,N40_PWM20_D40,swarm,slide_80,18,8,22.369639210454082
+primary,all,N40_PWM20_D41,swarm,slide_80,20,10,21.25660086443998
+primary,all,N30_PWM10_D41,swarm,change_80,11,8,20.327062875618513
+primary,all,N40_PWM10_D40,swarm,change_80,19,11,5.628262613520012
+primary,all,N40_PWM10_D41,swarm,change_80,16,9,7.4255794949781535
+primary,all,N40_PWM20_D40,swarm,change_80,18,8,27.2556549591456
+primary,all,N40_PWM20_D41,swarm,change_80,20,10,31.748938074323924
+primary,all,N30_PWM10_D41,swarm,adjusted_80,11,8,19.039544549247204
+primary,all,N40_PWM10_D40,swarm,adjusted_80,19,11,3.808156836355677
+primary,all,N40_PWM10_D41,swarm,adjusted_80,16,9,3.204968207943825
+primary,all,N40_PWM20_D40,swarm,adjusted_80,18,8,22.764874421885825
+primary,all,N40_PWM20_D41,swarm,adjusted_80,20,10,21.23634963540419
+primary,all,N30_PWM10_D41,swarm,forecast_80,11,8,11.038659787741226
+primary,all,N40_PWM10_D40,swarm,forecast_80,19,11,9.445744224072284
+primary,all,N40_PWM10_D41,swarm,forecast_80,16,9,9.691274966617472
+primary,all,N40_PWM20_D40,swarm,forecast_80,18,8,10.785723602154032
+primary,all,N40_PWM20_D41,swarm,forecast_80,20,10,8.672590362420236
+primary,all,N30_PWM10_D41,swarm,slide_400,11,8,9.366036369227482
+primary,all,N40_PWM10_D40,swarm,slide_400,19,11,3.188666266827941
+primary,all,N40_PWM10_D41,swarm,slide_400,16,9,16.731492871669108
+primary,all,N40_PWM20_D40,swarm,slide_400,18,8,5.385645274441534
+primary,all,N40_PWM20_D41,swarm,slide_400,20,10,16.454983535820556
+primary,all,N30_PWM10_D41,swarm,change_400,11,8,10.724948719454307
+primary,all,N40_PWM10_D40,swarm,change_400,19,11,5.778907515059721
+primary,all,N40_PWM10_D41,swarm,change_400,16,9,21.364481222084038
+primary,all,N40_PWM20_D40,swarm,change_400,18,8,10.271661023133056
+primary,all,N40_PWM20_D41,swarm,change_400,20,10,26.947320745704495
+primary,all,N30_PWM10_D41,swarm,adjusted_400,11,8,9.479934835479618
+primary,all,N40_PWM10_D40,swarm,adjusted_400,19,11,3.551164016805833
+primary,all,N40_PWM10_D41,swarm,adjusted_400,16,9,17.339459428328404
+primary,all,N40_PWM20_D40,swarm,adjusted_400,18,8,6.002473799119347
+primary,all,N40_PWM20_D41,swarm,adjusted_400,20,10,16.618105129664425
+primary,all,N30_PWM10_D41,swarm,forecast_400,11,8,15.374747295953405
+primary,all,N40_PWM10_D40,swarm,forecast_400,19,11,13.879570239122748
+primary,all,N40_PWM10_D41,swarm,forecast_400,16,9,13.477643634884679
+primary,all,N40_PWM20_D40,swarm,forecast_400,18,8,14.97066666501027
+primary,all,N40_PWM20_D41,swarm,forecast_400,20,10,11.899197646372276
+primary,all,Experiment_1,sweep,lead,25,17,-10.226326755415498
+primary,all,Experiment_2,sweep,lead,28,19,-5.7698346678027
+primary,all,Experiment_3,sweep,lead,41,21,-13.210821956321416
+primary,all,Experiment_1,sweep,incoming,25,17,0.44263374870567873
+primary,all,Experiment_2,sweep,incoming,28,19,-0.027103994547346133
+primary,all,Experiment_3,sweep,incoming,41,21,1.316031274362684
+primary,all,Experiment_1,sweep,slide_40,25,17,16.983860132431587
+primary,all,Experiment_2,sweep,slide_40,28,19,4.371021901521526
+primary,all,Experiment_3,sweep,slide_40,41,21,-2.3039133118433366
+primary,all,Experiment_1,sweep,change_40,25,17,27.210186887847087
+primary,all,Experiment_2,sweep,change_40,28,19,10.140856569324225
+primary,all,Experiment_3,sweep,change_40,41,21,10.906908644478078
+primary,all,Experiment_1,sweep,adjusted_40,25,17,16.79082918716942
+primary,all,Experiment_2,sweep,adjusted_40,28,19,4.147289694040816
+primary,all,Experiment_3,sweep,adjusted_40,41,21,-2.936061946296921
+primary,all,Experiment_1,sweep,forecast_40,25,17,10.077729757069978
+primary,all,Experiment_2,sweep,forecast_40,28,19,9.969960853199467
+primary,all,Experiment_3,sweep,forecast_40,41,21,10.276606823108082
+primary,all,Experiment_1,sweep,slide_80,25,17,14.568563001214336
+primary,all,Experiment_2,sweep,slide_80,28,19,2.5017370593411146
+primary,all,Experiment_3,sweep,slide_80,41,21,-1.7011368245940384
+primary,all,Experiment_1,sweep,change_80,25,17,24.794889756629836
+primary,all,Experiment_2,sweep,change_80,28,19,8.271571727143817
+primary,all,Experiment_3,sweep,change_80,41,21,11.509685131727377
+primary,all,Experiment_1,sweep,adjusted_80,25,17,14.403457840319275
+primary,all,Experiment_2,sweep,adjusted_80,28,19,2.2499410737591106
+primary,all,Experiment_3,sweep,adjusted_80,41,21,-2.256772059073605
+primary,all,Experiment_1,sweep,forecast_80,25,17,11.999279468984104
+primary,all,Experiment_2,sweep,forecast_80,28,19,11.920190828543554
+primary,all,Experiment_3,sweep,forecast_80,41,21,12.10218829437397
+primary,all,Experiment_1,sweep,slide_400,25,17,14.101778884054658
+primary,all,Experiment_2,sweep,slide_400,28,19,10.315985753815712
+primary,all,Experiment_3,sweep,slide_400,41,21,2.91051440027085
+primary,all,Experiment_1,sweep,change_400,25,17,24.328105639470156
+primary,all,Experiment_2,sweep,change_400,28,19,16.08582042161841
+primary,all,Experiment_3,sweep,change_400,41,21,16.121336356592266
+primary,all,Experiment_1,sweep,adjusted_400,25,17,14.056971793440345
+primary,all,Experiment_2,sweep,adjusted_400,28,19,9.943297251626396
+primary,all,Experiment_3,sweep,adjusted_400,41,21,2.6844818815644076
+primary,all,Experiment_1,sweep,forecast_400,25,17,13.014676272944085
+primary,all,Experiment_2,sweep,forecast_400,28,19,13.160868796064019
+primary,all,Experiment_3,sweep,forecast_400,41,21,12.880678191053514
+primary,one third,N30_PWM10_D41,swarm,lead,1,1,-62.02336313288495
+primary,one third,N30_PWM10_D41,swarm,incoming,1,1,5.793647792379498
+primary,one third,N30_PWM10_D41,swarm,slide_40,1,1,-5.320690216665412
+primary,one third,N30_PWM10_D41,swarm,change_40,1,1,56.70267291621954
+primary,one third,N30_PWM10_D41,swarm,adjusted_40,1,1,-9.60085731480806
+primary,one third,N30_PWM10_D41,swarm,forecast_40,1,1,8.700190659396357
+primary,one third,N30_PWM10_D41,swarm,slide_80,1,1,3.8620327224335913
+primary,one third,N30_PWM10_D41,swarm,change_80,1,1,65.88539585531855
+primary,one third,N30_PWM10_D41,swarm,adjusted_80,1,1,-0.20673622120127444
+primary,one third,N30_PWM10_D41,swarm,forecast_80,1,1,8.957007043351489
+primary,one third,N30_PWM10_D41,swarm,slide_400,1,1,40.9474467344588
+primary,one third,N30_PWM10_D41,swarm,change_400,1,1,102.97080986734375
+primary,one third,N30_PWM10_D41,swarm,adjusted_400,1,1,38.61653735078277
+primary,one third,N30_PWM10_D41,swarm,forecast_400,1,1,9.145654803612578
+primary,one third,Experiment_1,sweep,lead,5,5,-30.79759814632588
+primary,one third,Experiment_2,sweep,lead,3,3,-39.07098126088772
+primary,one third,Experiment_3,sweep,lead,5,5,-2.68383190561548
+primary,one third,Experiment_1,sweep,incoming,5,5,0.8627954466112946
+primary,one third,Experiment_2,sweep,incoming,3,3,0.2860856392894462
+primary,one third,Experiment_3,sweep,incoming,5,5,-2.100869460159154
+primary,one third,Experiment_1,sweep,slide_40,5,5,35.91589241513379
+primary,one third,Experiment_2,sweep,slide_40,3,3,18.860451710902357
+primary,one third,Experiment_3,sweep,slide_40,5,5,-7.3682160487034
+primary,one third,Experiment_1,sweep,change_40,5,5,66.71349056145966
+primary,one third,Experiment_2,sweep,change_40,3,3,57.93143297179008
+primary,one third,Experiment_3,sweep,change_40,5,5,-4.684384143087916
+primary,one third,Experiment_1,sweep,adjusted_40,5,5,35.32604811488373
+primary,one third,Experiment_2,sweep,adjusted_40,3,3,18.433666156318875
+primary,one third,Experiment_3,sweep,adjusted_40,5,5,-5.901959912380649
+primary,one third,Experiment_1,sweep,forecast_40,5,5,10.620569350170786
+primary,one third,Experiment_2,sweep,forecast_40,3,3,9.430041202993833
+primary,one third,Experiment_3,sweep,forecast_40,5,5,9.734510781836558
+primary,one third,Experiment_1,sweep,slide_80,5,5,20.682437373096352
+primary,one third,Experiment_2,sweep,slide_80,3,3,13.749420029292748
+primary,one third,Experiment_3,sweep,slide_80,5,5,-6.962347599145883
+primary,one third,Experiment_1,sweep,change_80,5,5,51.48003551942222
+primary,one third,Experiment_2,sweep,change_80,3,3,52.82040129018046
+primary,one third,Experiment_3,sweep,change_80,5,5,-4.278515693530403
+primary,one third,Experiment_1,sweep,adjusted_80,5,5,20.1231310906525
+primary,one third,Experiment_2,sweep,adjusted_80,3,3,13.306892842641176
+primary,one third,Experiment_3,sweep,adjusted_80,5,5,-5.5670925677524625
+primary,one third,Experiment_1,sweep,forecast_80,5,5,12.568306347825411
+primary,one third,Experiment_2,sweep,forecast_80,3,3,11.221418755537842
+primary,one third,Experiment_3,sweep,forecast_80,5,5,12.014544358288969
+primary,one third,Experiment_1,sweep,slide_400,5,5,24.439454820786867
+primary,one third,Experiment_2,sweep,slide_400,3,3,16.611826890139465
+primary,one third,Experiment_3,sweep,slide_400,5,5,-3.8217849473188155
+primary,one third,Experiment_1,sweep,change_400,5,5,55.237052967112746
+primary,one third,Experiment_2,sweep,change_400,3,3,55.68280815102719
+primary,one third,Experiment_3,sweep,change_400,5,5,-1.137953041703335
+primary,one third,Experiment_1,sweep,adjusted_400,5,5,24.01169952949847
+primary,one third,Experiment_2,sweep,adjusted_400,3,3,16.101488252394287
+primary,one third,Experiment_3,sweep,adjusted_400,5,5,-2.7323868902011132
+primary,one third,Experiment_1,sweep,forecast_400,5,5,13.589227803327091
+primary,one third,Experiment_2,sweep,forecast_400,3,3,12.32365234594481
+primary,one third,Experiment_3,sweep,forecast_400,5,5,13.607304840572748
+tighter,all,N30_PWM10_D41,swarm,lead,4,3,-3.8329622040981843
+tighter,all,N40_PWM10_D40,swarm,lead,8,6,-7.7253772755930195
+tighter,all,N40_PWM10_D41,swarm,lead,1,1,-0.5588422521136701
+tighter,all,N40_PWM20_D40,swarm,lead,6,3,10.743069792335026
+tighter,all,N40_PWM20_D41,swarm,lead,5,3,3.2935636589348065
+tighter,all,N30_PWM10_D41,swarm,incoming,4,3,0.2342792718076585
+tighter,all,N40_PWM10_D40,swarm,incoming,8,6,-2.2140905277580885
+tighter,all,N40_PWM10_D41,swarm,incoming,1,1,-8.390885292326054
+tighter,all,N40_PWM20_D40,swarm,incoming,6,3,-2.8365962680771513
+tighter,all,N40_PWM20_D41,swarm,incoming,5,3,-2.206452120003819
+tighter,all,N30_PWM10_D41,swarm,slide_40,4,3,-1.4012742678706251
+tighter,all,N40_PWM10_D40,swarm,slide_40,8,6,6.553313522312358
+tighter,all,N40_PWM10_D41,swarm,slide_40,1,1,-28.947227171120527
+tighter,all,N40_PWM20_D40,swarm,slide_40,6,3,13.47046643545827
+tighter,all,N40_PWM20_D41,swarm,slide_40,5,3,25.626820306827238
+tighter,all,N30_PWM10_D41,swarm,change_40,4,3,2.4316879362275583
+tighter,all,N40_PWM10_D40,swarm,change_40,8,6,14.278690797905377
+tighter,all,N40_PWM10_D41,swarm,change_40,1,1,-28.388384919006857
+tighter,all,N40_PWM20_D40,swarm,change_40,6,3,2.7273966431232477
+tighter,all,N40_PWM20_D41,swarm,change_40,5,3,22.333256647892433
+tighter,all,N30_PWM10_D41,swarm,adjusted_40,4,3,-1.4570663770456105
+tighter,all,N40_PWM10_D40,swarm,adjusted_40,8,6,8.071956232477294
+tighter,all,N40_PWM10_D41,swarm,adjusted_40,1,1,-22.326579516955118
+tighter,all,N40_PWM20_D40,swarm,adjusted_40,6,3,15.718347186814212
+tighter,all,N40_PWM20_D41,swarm,adjusted_40,5,3,27.589486717001375
+tighter,all,N30_PWM10_D41,swarm,forecast_40,4,3,13.885862297064662
+tighter,all,N40_PWM10_D40,swarm,forecast_40,8,6,5.445588118756322
+tighter,all,N40_PWM10_D41,swarm,forecast_40,1,1,3.7394102805210796
+tighter,all,N40_PWM20_D40,swarm,forecast_40,6,3,8.1103281473154
+tighter,all,N40_PWM20_D41,swarm,forecast_40,5,3,5.149636529961265
+tighter,all,N30_PWM10_D41,swarm,slide_80,4,3,19.165242371912164
+tighter,all,N40_PWM10_D40,swarm,slide_80,8,6,9.905931491543146
+tighter,all,N40_PWM10_D41,swarm,slide_80,1,1,-30.116875441310263
+tighter,all,N40_PWM20_D40,swarm,slide_80,6,3,9.742320928151992
+tighter,all,N40_PWM20_D41,swarm,slide_80,5,3,30.269517241039324
+tighter,all,N30_PWM10_D41,swarm,change_80,4,3,22.998204576010348
+tighter,all,N40_PWM10_D40,swarm,change_80,8,6,17.631308767136165
+tighter,all,N40_PWM10_D41,swarm,change_80,1,1,-29.558033189196593
+tighter,all,N40_PWM20_D40,swarm,change_80,6,3,-1.0007488641830335
+tighter,all,N40_PWM20_D41,swarm,change_80,5,3,26.975953582104516
+tighter,all,N30_PWM10_D41,swarm,adjusted_80,4,3,19.134380780138265
+tighter,all,N40_PWM10_D40,swarm,adjusted_80,8,6,11.327436269420291
+tighter,all,N40_PWM10_D41,swarm,adjusted_80,1,1,-23.7434889323794
+tighter,all,N40_PWM20_D40,swarm,adjusted_80,6,3,11.90797177446926
+tighter,all,N40_PWM20_D41,swarm,adjusted_80,5,3,32.19813244107935
+tighter,all,N30_PWM10_D41,swarm,forecast_80,4,3,15.325955628562653
+tighter,all,N40_PWM10_D40,swarm,forecast_80,8,6,6.280449295756339
+tighter,all,N40_PWM10_D41,swarm,forecast_80,1,1,5.084115744120851
+tighter,all,N40_PWM20_D40,swarm,forecast_80,6,3,9.289806501730716
+tighter,all,N40_PWM20_D41,swarm,forecast_80,5,3,5.937096311876687
+tighter,all,N30_PWM10_D41,swarm,slide_400,4,3,21.966000417512305
+tighter,all,N40_PWM10_D40,swarm,slide_400,8,6,5.758033947945486
+tighter,all,N40_PWM10_D41,swarm,slide_400,1,1,-23.644313364723907
+tighter,all,N40_PWM20_D40,swarm,slide_400,6,3,-4.5860516139366565
+tighter,all,N40_PWM20_D41,swarm,slide_400,5,3,27.371882522256954
+tighter,all,N30_PWM10_D41,swarm,change_400,4,3,25.798962621610485
+tighter,all,N40_PWM10_D40,swarm,change_400,8,6,13.483411223538504
+tighter,all,N40_PWM10_D41,swarm,change_400,1,1,-23.085471112610236
+tighter,all,N40_PWM20_D40,swarm,change_400,6,3,-15.32912140627168
+tighter,all,N40_PWM20_D41,swarm,change_400,5,3,24.078318863322146
+tighter,all,N30_PWM10_D41,swarm,adjusted_400,4,3,22.140087341495672
+tighter,all,N40_PWM10_D40,swarm,adjusted_400,8,6,6.3809883096469
+tighter,all,N40_PWM10_D41,swarm,adjusted_400,1,1,-19.303608484697243
+tighter,all,N40_PWM20_D40,swarm,adjusted_400,6,3,-3.096395441833549
+tighter,all,N40_PWM20_D41,swarm,adjusted_400,5,3,29.020569918776175
+tighter,all,N30_PWM10_D41,swarm,forecast_400,4,3,21.148968522261665
+tighter,all,N40_PWM10_D40,swarm,forecast_400,8,6,10.11442282352575
+tighter,all,N40_PWM10_D41,swarm,forecast_400,1,1,11.632322499188618
+tighter,all,N40_PWM20_D40,swarm,forecast_400,6,3,14.480520383006615
+tighter,all,N40_PWM20_D41,swarm,forecast_400,5,3,9.316985798385923
+tighter,all,Experiment_1,sweep,lead,4,4,19.7983690766304
+tighter,all,Experiment_2,sweep,lead,6,6,9.325421458805776
+tighter,all,Experiment_3,sweep,lead,9,6,-5.571360488877458
+tighter,all,Experiment_1,sweep,incoming,4,4,-1.9867806138650992
+tighter,all,Experiment_2,sweep,incoming,6,6,-0.9592538185971272
+tighter,all,Experiment_3,sweep,incoming,9,6,2.0173797227381196
+tighter,all,Experiment_1,sweep,slide_40,4,4,-3.7505053030972775
+tighter,all,Experiment_2,sweep,slide_40,6,6,-10.734327141341877
+tighter,all,Experiment_3,sweep,slide_40,9,6,4.189871773233329
+tighter,all,Experiment_1,sweep,change_40,4,4,-23.548874379727675
+tighter,all,Experiment_2,sweep,change_40,6,6,-20.059748600147653
+tighter,all,Experiment_3,sweep,change_40,9,6,9.761232262110786
+tighter,all,Experiment_1,sweep,adjusted_40,4,4,-2.729700950770674
+tighter,all,Experiment_2,sweep,adjusted_40,6,6,-10.3637122005171
+tighter,all,Experiment_3,sweep,adjusted_40,9,6,3.1914651444324837
+tighter,all,Experiment_1,sweep,forecast_40,4,4,4.744670411340165
+tighter,all,Experiment_2,sweep,forecast_40,6,6,7.929969259802284
+tighter,all,Experiment_3,sweep,forecast_40,9,6,9.721397291554139
+tighter,all,Experiment_1,sweep,slide_80,4,4,-8.940906348096714
+tighter,all,Experiment_2,sweep,slide_80,6,6,-19.818740045450603
+tighter,all,Experiment_3,sweep,slide_80,9,6,-5.101558734788886
+tighter,all,Experiment_1,sweep,change_80,4,4,-28.73927542472711
+tighter,all,Experiment_2,sweep,change_80,6,6,-29.144161504256378
+tighter,all,Experiment_3,sweep,change_80,9,6,0.4698017540885691
+tighter,all,Experiment_1,sweep,adjusted_80,4,4,-8.028176281841073
+tighter,all,Experiment_2,sweep,adjusted_80,6,6,-19.513982547507016
+tighter,all,Experiment_3,sweep,adjusted_80,9,6,-5.985961744621503
+tighter,all,Experiment_1,sweep,forecast_80,4,4,5.9898204940727116
+tighter,all,Experiment_2,sweep,forecast_80,6,6,9.632880679948984
+tighter,all,Experiment_3,sweep,forecast_80,9,6,11.32775530171454
+tighter,all,Experiment_1,sweep,slide_400,4,4,-11.849093407333042
+tighter,all,Experiment_2,sweep,slide_400,6,6,-1.7453344931604657
+tighter,all,Experiment_3,sweep,slide_400,9,6,3.5830440030670396
+tighter,all,Experiment_1,sweep,change_400,4,4,-31.647462483963444
+tighter,all,Experiment_2,sweep,change_400,6,6,-11.070755951966241
+tighter,all,Experiment_3,sweep,change_400,9,6,9.154404491944497
+tighter,all,Experiment_1,sweep,adjusted_400,4,4,-11.401923337186938
+tighter,all,Experiment_2,sweep,adjusted_400,6,6,-1.7242762169856896
+tighter,all,Experiment_3,sweep,adjusted_400,9,6,3.1897432371897745
+tighter,all,Experiment_1,sweep,forecast_400,4,4,7.117800282764987
+tighter,all,Experiment_2,sweep,forecast_400,6,6,10.870269144994959
+tighter,all,Experiment_3,sweep,forecast_400,9,6,11.838874366910721
+tighter,one third,Experiment_3,sweep,lead,1,1,42.41280000851097
+tighter,one third,Experiment_3,sweep,incoming,1,1,6.536208106521976
+tighter,one third,Experiment_3,sweep,slide_40,1,1,12.916331917328112
+tighter,one third,Experiment_3,sweep,change_40,1,1,-29.49646809118286
+tighter,one third,Experiment_3,sweep,adjusted_40,1,1,9.965438922420397
+tighter,one third,Experiment_3,sweep,forecast_40,1,1,17.68791547818445
+tighter,one third,Experiment_3,sweep,slide_80,1,1,-12.942359064376786
+tighter,one third,Experiment_3,sweep,change_80,1,1,-55.35515907288776
+tighter,one third,Experiment_3,sweep,adjusted_80,1,1,-15.492123805459709
+tighter,one third,Experiment_3,sweep,forecast_80,1,1,20.193245455031768
+tighter,one third,Experiment_3,sweep,slide_400,1,1,-3.938721610696663
+tighter,one third,Experiment_3,sweep,change_400,1,1,-46.35152161920763
+tighter,one third,Experiment_3,sweep,adjusted_400,1,1,-4.760515017622659
+tighter,one third,Experiment_3,sweep,forecast_400,1,1,20.158472994656886
