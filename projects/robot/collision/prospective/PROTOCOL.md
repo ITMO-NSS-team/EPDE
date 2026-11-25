@@ -1,5 +1,26 @@
 # Prospective collision tests
 
+## Frozen shared interaction test at 40, 80 and 400 ms
+
+Use the first independently acquired compatible recording and register its identity, sampling rate, motor setting and spatial calibration before examining its outcomes. One population-sweep ZIP counts as one recording across all occupancy stages. The model was developed on five 25 Hz swarms and three 50 Hz sweeps. Replays and excerpts of those sessions are development material. A new session is needed to test independent replication.
+
+The [version 1 coefficient file](shared_pair_v1.json) freezes the validation-selected, horizon-specific EPDE equations with recent-velocity persistence as the primary model. The secondary compact equations use two corrections per direction. The endpoints with historical bidirectional gains are normal motion at 40 and 80 ms and sideways motion at 40, 80 and 400 ms. Report normal motion at 400 ms as a secondary endpoint. All speeds and prediction errors in the scorer output use mm/s. Evaluate each component and horizon against the strongest of five frozen forecasts: recent-velocity persistence, its clearance clamp, a velocity-history regression, the learned isolated-motion forecast and its clearance clamp. The same gate events contribute to all forecasts.
+
+From the repository root, score one acquisition into a new directory.
+
+```powershell
+python projects/robot/collision/shared_interaction_score.py "D:/data/new_session.npz" --output "projects/robot/results/shared_interaction/prospective/session_01"
+python projects/robot/collision/shared_interaction_score.py "D:/data/new_sweep.zip" --calibration "D:/data/new_sweep_scale.csv" --output "projects/robot/results/shared_interaction/prospective/sweep_01"
+```
+
+- A calibrated NPZ contains `raw_pos[frame,robot,xy]`, unwrapped `phi[frame,robot]` in radians, per-pose `quality_flags` (zero is usable), unique `ids`, contiguous zero-based `frame`, `recording`, `fps`, and `pwm`. Supply `arena=[center_x,center_y,center_radius]` and `diameter` or `cap_px` in the units of the positions. The radius describes the outer envelope of **robot centers**. The command also accepts `--arena CX CY R` and `--diameter D`. The physical robot diameter is 48.7 mm.
+- A 50 Hz sweep ZIP uses the existing paired `data_N=…` and `time_N=…` stage exports. The stage calibration CSV contains `N,center_x,center_y,radius,diameter_archive_units`. A shared CSV can include `experiment` matching the ZIP stem. A single independently measured calibration can instead be passed with `--arena` and `--diameter`. The filename encodes PWM, or the operator can pass the recorded value with `--pwm`.
+- Keep every eligible inward crossing of 1.10 diameters after clearance of 1.30 diameters, including passes and sustained encounters. Use the gate normal throughout. The scorer applies the study's 440 ms history, 400 ms follow-up, tracking-quality and wall masks. It scores all primary and secondary endpoints on the same crossings.
+- Keep the receipt with the coverage, forecasts and scores. It records input and model fingerprints, known overlap, calibration and whether scoring code matches the freeze. A previously unseen file still needs an independent acquisition history. A recording with zero eligible crossings produces coverage and a receipt.
+- Report RMSE, MAE and within-recording (R^2) for every forecast. For each endpoint report the full and compact improvements over the lowest reference RMSE, including their paired 95% intervals. Each of 2,000 draws resamples occupied ten-second blocks and reselects the strongest frozen reference. Intervals describe within-recording uncertainty and are reported per endpoint. Keep negative gains and inconclusive intervals. The outcome concerns finite-window motion after approach.
+
+The [cross-family comparison](../../results/shared_interaction/compact/transfer.csv) records the development results. [Replay checks](../../results/shared_interaction/compact/replay.csv) compare native acquisition inputs against the archived encounter features.
+
 ## Independent swarm recording
 
 Use the first independent, technically valid swarm recording collected under the existing 25 Hz acquisition geometry, with PWM 10 or 20 and a 40 or 41 cm arena. The five development recordings and their excerpts remain development data. A new session can repeat a setup. Record the session ID, physical robot IDs, run duration, PWM, camera coordinate system and arena before inspecting trajectory outcomes. Record six minutes if practical, or the previous 330-second duration. Report the actual duration and the overlap in robot IDs with training. Preserve the original tracks.

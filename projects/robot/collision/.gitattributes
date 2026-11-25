@@ -1,0 +1,7 @@
+# The prospective scorer verifies the published SHA-256 of these files.
+shared_interaction_score.py text eol=lf
+shared_interaction_data.py text eol=lf
+shared_interaction_fit.py text eol=lf
+impacts.py text eol=lf
+new_pair_interactions.py text eol=lf
+prospective/shared_pair_v1.json text eol=lf

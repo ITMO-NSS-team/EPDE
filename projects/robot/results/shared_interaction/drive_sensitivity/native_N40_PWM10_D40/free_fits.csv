@@ -1,0 +1,4 @@
+mode,fold,horizon,model,coeff,validation_vector_rmse,training
+native,N40_PWM10_D40,40,fixed persistence,"[1.0, 0.0, 0.0, 0.0, 0.0]",{},"Experiment_1,Experiment_2,Experiment_3,N30_PWM10_D41,N40_PWM10_D41,N40_PWM20_D40,N40_PWM20_D41"
+native,N40_PWM10_D40,80,fixed persistence,"[1.0, 0.0, 0.0, 0.0, 0.0]",{},"Experiment_1,Experiment_2,Experiment_3,N30_PWM10_D41,N40_PWM10_D41,N40_PWM20_D40,N40_PWM20_D41"
+native,N40_PWM10_D40,400,fixed persistence,"[1.0, 0.0, 0.0, 0.0, 0.0]",{},"Experiment_1,Experiment_2,Experiment_3,N30_PWM10_D41,N40_PWM10_D41,N40_PWM20_D40,N40_PWM20_D41"

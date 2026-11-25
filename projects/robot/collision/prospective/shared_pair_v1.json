@@ -1,0 +1,337 @@
+{
+  "horizons": {
+    "40": {
+      "isolated_motion": [
+        0.6853061621568476,
+        -0.6398974229671255,
+        0.8336754580885466,
+        -0.004667078352767465,
+        -0.01732789178586749
+      ],
+      "n": {
+        "compact": [
+          1.1977984530485,
+          0.4640595277891,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "full": [
+          1.0712796814086456,
+          0.6226721636546947,
+          -0.11226053860380178,
+          -0.045354677508752786,
+          0.10513242570683232,
+          0.5378252726590593
+        ],
+        "history": [
+          -0.4591460899134,
+          -0.0430819258767,
+          0.1186771423434,
+          0.0138846583624,
+          0.0158045706398
+        ]
+      },
+      "t": {
+        "compact": [
+          -0.5314729448271,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.7907305955521
+        ],
+        "full": [
+          -0.23214353024156395,
+          -0.03563826369362244,
+          0.07504259101056404,
+          -0.03568252651963886,
+          -0.3836782537383422,
+          0.7861431928911538
+        ],
+        "history": [
+          0.668439116488,
+          -0.0845969467101,
+          -0.0457411746339
+        ]
+      }
+    },
+    "80": {
+      "isolated_motion": [
+        0.6214745465052829,
+        -0.7239325768193317,
+        0.9831573988027852,
+        0.02495104881916234,
+        -0.06360019678431811
+      ],
+      "n": {
+        "compact": [
+          0.7284272404956,
+          0.7258492469424,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "full": [
+          0.7224019253308334,
+          0.7074542979842463,
+          -0.026509908348429242,
+          -0.010102227890981018,
+          0.19467283828854964,
+          0.3161796709283114
+        ],
+        "history": [
+          -0.4504240049648,
+          0.019274788473,
+          -0.1244012908539,
+          0.0397566168472,
+          0.0368274988676
+        ]
+      },
+      "t": {
+        "compact": [
+          -0.5950527468903,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9218942742243
+        ],
+        "full": [
+          -0.2707659885899313,
+          -0.052308716266167725,
+          0.0,
+          -0.01819221229541226,
+          -0.4014384959300731,
+          0.9179572714775405
+        ],
+        "history": [
+          0.6407925170396,
+          -0.0945031177892,
+          -0.0594092755186
+        ]
+      }
+    },
+    "400": {
+      "isolated_motion": [
+        0.6998818029082364,
+        -1.0553165767342072,
+        1.1350001255373359,
+        0.1315400863307484,
+        -1.0021580519653444
+      ],
+      "n": {
+        "compact": [
+          0.1040489281899,
+          1.2984063234409,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "full": [
+          0.4088627514026584,
+          0.8286267591445852,
+          0.10144138972069848,
+          0.04439565315725376,
+          0.10210483129724689,
+          0.2994377464736883
+        ],
+        "history": [
+          -0.1845423737883,
+          0.1103251370872,
+          -0.0155957783417,
+          -0.0872011058097,
+          0.0358800265385
+        ]
+      },
+      "t": {
+        "compact": [
+          -0.9350661188471,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0743158407518
+        ],
+        "full": [
+          -0.7541021974858095,
+          0.007047653825102661,
+          0.2059784438675426,
+          -0.07891930730699237,
+          -0.20051826792605618,
+          1.0709391194869753
+        ],
+        "history": [
+          0.6063377505717,
+          -0.2932568015546,
+          -0.1490388370094
+        ]
+      }
+    }
+  },
+  "version": "shared-pair-v1",
+  "diameter_mm": 48.7,
+  "training_recordings": [
+    "Experiment_1",
+    "Experiment_2",
+    "Experiment_3",
+    "N30_PWM10_D41",
+    "N40_PWM10_D40",
+    "N40_PWM10_D41",
+    "N40_PWM20_D40",
+    "N40_PWM20_D41"
+  ],
+  "training_period": "first 75% with 400 ms outcome guard",
+  "development_inputs": {
+    "82f0b8e86322ae9e7f7947bcb9c5e69ef97a58491990bb29994a9b4d0425385a": "N30_PWM10_D41",
+    "f1ec0a66ef895003cf331086fe6c1a44b6be73284a8d8612f8d283457bf77392": "N40_PWM10_D40",
+    "1b615362f6a63ab73014467ede167fcb5f7b09c5b693acdfd58908f081292660": "N40_PWM10_D41",
+    "21ffb15bb1e79d9e910212ced2cdb20afdfb977c140f8b21934abe9c60f89135": "N40_PWM20_D40",
+    "49d89caa5ff3fba5b341e2707e60910a56f242143453f271114aa4ab51456218": "N40_PWM20_D41",
+    "e879c09958e81767aab21c44bb45da545c93d0f27ec1e8be17577ef1b6c78eba": "Experiment_1",
+    "8143b4426e5515ec5debaac8c43b3f3805554300abfbcd0c1d15c7033d7ddcc6": "Experiment_2",
+    "0dd168d128f6232d3d1b04e6edb68dee7adf3a628f59250f5c8086d17a9f2926": "Experiment_3"
+  },
+  "development_members": {
+    "601cb1d0479ebdda682d2ddc7bbb48400400038ab713469c9416704a883d5da1": "Experiment_1",
+    "28527dc235f1e3d2e0d36de1d3e2398ebf89573bc232476686bb401cb5c1dfbe": "Experiment_1",
+    "1bbb77714ec971b98a52f8cef9c8c70fb884bcc8e7af781038cb1bcb6391cdf4": "Experiment_1",
+    "af6368eb28d4932090cd42c26a05c0f99531c4ad9999ff3e578c75cf791bba6a": "Experiment_1",
+    "8391800b134bb9ff78539201de7ab03beb72d1ae2ad30d430da49a97b7c928c1": "Experiment_1",
+    "7232b4c5992c39e6ace546fdae2adf32c3e1bedd97c34af9b887c608a3c66f11": "Experiment_1",
+    "e50b6c8758bd08756c9319c0dab2eae7111e89c89cf0d72bd955984284dca2f2": "Experiment_1",
+    "46b0a77c4f0424a1f29301a2165ccd8f8785a7d8b84f93168c7514d8153d6788": "Experiment_1",
+    "1de36151701194aeb55ebe24dce980b21916c9661a2a19c462e2c549c7aadae7": "Experiment_1",
+    "a910373c9a1c312ae9961deb57bc62202e5792ab61fbca9ee8b55e2c734fa8c2": "Experiment_1",
+    "f27c756328b3c3e6783604347f7bf71c55fc0d903c83f234682c4ac788cc80a4": "Experiment_1",
+    "eb8c4d3d77ce51ab9fd1fdf975e6f48cbfb79368a278510f202f78f041172eca": "Experiment_1",
+    "c5193008cdbfb2daf23c50bc0efa3a866e2477df3306070c228860a653c4cb5a": "Experiment_1",
+    "7a6f268039e12389a8125afecbb5a790aa5df1133fdeb7fa6828ee39faf9a299": "Experiment_1",
+    "52536771ddc24f5cbe5b08348edc5e34f604c900109e1bdd48e2b619f029c6af": "Experiment_1",
+    "0ca3c5d2a0abee7efa3fe73a5943a7d479f61a995a23c6db38aa26906e9f7453": "Experiment_1",
+    "b107364a6df4870cc05f803e864aae9f92950df82f91f6e236cf7dd5ad02fded": "Experiment_1",
+    "06113d5647d3584441f9af1eee81d51e53bc63c9a6e42e59573bc26b4de47581": "Experiment_1",
+    "12d396fe52df84c8caefac020fda856779942f1437a86139f0579361884ac6c6": "Experiment_1",
+    "65b06866ca040b36257a968b7f7ed909a2588018b1fbec34555d178db8e600ea": "Experiment_1",
+    "3bc1e7bce0072955f68760233b5259ef27b75af30c5368936540d6cff2a37f31": "Experiment_1",
+    "c5e8893af8641f651899f06b086d8c390ef29672080d7d532eaf63fe2020ea5c": "Experiment_1",
+    "13b77414c009b62214f0b85b9761c9854707f38bc1af1ba3047cea19363efa2f": "Experiment_1",
+    "2c66337263f89aafef010d4033bd3ff52c19bb688b95d440fed1aabdbf88ca1d": "Experiment_1",
+    "42867a7a0d4bb93e9bacd85422e96659895400d9a2ef84a67af344257288b8f2": "Experiment_1",
+    "da1bf31defa651c3006f8f4be16ba7406c6f6eb2a86406db4279c644e4c0aecd": "Experiment_1",
+    "ba5c22e885d765824fe2c918fab71d56ce9bda343a5b985910ee8d35da46a3e0": "Experiment_1",
+    "7b8ba28a7677573ada0ee145ceb14c3ef521d4e5b9d5b83b1f0544f488bc864d": "Experiment_1",
+    "d57c1671ebfa8331b78da585c7b0a5a4bab13fdf0b4a085235cc4da2bbca02ec": "Experiment_1",
+    "88d56b46e6aed14845c34b657e8c685a420af5ce01a196213f043036fd531394": "Experiment_1",
+    "fff61f1332dbd5f85f81af9fd46ccc1082487b1a88743a09269ef2f83cd8ee0e": "Experiment_2",
+    "0b6243db8198c348fdfed17d2a4e6252d9622db8422160a3cf79491fa9a0d61f": "Experiment_2",
+    "28508837fbd896bbee1cfe2d08fc7ebdf1030fd6108d12c5e7d158babb6fdaa9": "Experiment_2",
+    "88f0206a63010af8672d21d901ee4c80037ec1f9b9f274941ed272e4de1bc7c7": "Experiment_2",
+    "ee2b1587f0087afa1a2c3e1b81ff8db2c678e27f182a4c346e5a588441fe6f27": "Experiment_2",
+    "8657438aa924ae05b9e9aba527878c1babd3059e5e954bf7e14b82cb67de8482": "Experiment_2",
+    "9449e4abeb880355e20728739674af8ba9aad3da5353065b8759d16ff6e9510b": "Experiment_2",
+    "fb97652caf2e65d4038422ddeb6488e5fdba38bd9225983908511b4a9a472ae0": "Experiment_2",
+    "c4f24df3f66c04d4f47ff4bcc7089b57841e4b53fbd52cf9551b1bba67bcc9c5": "Experiment_2",
+    "1b9d1fc71d0f91da6ae2193ffa7380e59f132ac47992c969d15c8571d11bc423": "Experiment_2",
+    "5370345017b68197db9a62163ffdb55fff5df58dabcc9c938833d50d2f0976a6": "Experiment_2",
+    "bcc48c6f4e88a6aefd893d6004e7aac907d571ce7da2d2efab4e7cc749aac540": "Experiment_2",
+    "41eaa4ebe58f1b4a726a662a38ac1318301127d5f890c9ea03d94c95634378c7": "Experiment_2",
+    "9ddea26bffe3cca79de4408318ae2edd03b6839cd2130dac8f6d295cfc9c8212": "Experiment_2",
+    "8c841fb0d9d002dd4efd19551dcd5935a0a24993351c19af67de3e91a32e2d69": "Experiment_2",
+    "fe65668455b54eebc458d463753f6c286efe2ec4dd31399973324f82cab9644e": "Experiment_2",
+    "54a57872ac79dedc4d676475848c432e10c3bc8174c4abc094316e075f03c1f8": "Experiment_2",
+    "34e3751bd0be6d6b7b2f2270f065742bea11be28cd234a1a356d9f8cfa84e0ce": "Experiment_2",
+    "5d9d156e95843838c3fb5df43b914a1550371b13c8d09c955c7d6eae9937e06e": "Experiment_2",
+    "334205cde6cf7e80b9d929be23a4e7521b216792170a18e311fab8702c71bfbf": "Experiment_2",
+    "c071d7d6a9a86931f7f52a9601b29bacffc222ba78e1bc21993d86637d80d060": "Experiment_2",
+    "663c0fb0d5c9335f4556461b2f8feebe13c7a737567320b0ec75b34ec616aa47": "Experiment_2",
+    "c6988fdec7f2983e4e3239d914b9b2744213230b26c2db2089b2bec3f50eddc5": "Experiment_2",
+    "51906b9358c643f67a8678a4f9edc8a1f629b8767521c002b6bd32b6b9c69653": "Experiment_2",
+    "f375e0d4b0179f1f8d8deb964542f442b5a29d44d24dbcc51481aa5d995ff822": "Experiment_2",
+    "a538eff7d92883db3819a001016232c9c73ff2866cfeea072b64763fc76f098c": "Experiment_2",
+    "dac530dee187391040a3e7aba7fdff57d6821dad02fc7f1766f064b4655086b0": "Experiment_2",
+    "f68e3c00646de7348f1f239f2b43233bf6a6b9156599b6339639b31ec75ab32f": "Experiment_2",
+    "9ea5ddd2c3f933c3f2039e04729f8e9bc3bd7ef9a52666cac009d80bbe77b34a": "Experiment_2",
+    "b5b74c079d576de8a1c62668445a13ba3f432213fa3da939237ad00a254ca778": "Experiment_2",
+    "34434583526b1b67d01169bbe062e0e79078ed6adbaa7b3317226996f64205d1": "Experiment_3",
+    "7f9b28d3c76e7063fa4f6412e07f9e55c0086339f56c4927c9617d7958b5de3f": "Experiment_3",
+    "b8d02cae026bcdcd3f5155cd279a1f13e4087004d7d00e899b339e849edf0327": "Experiment_3",
+    "8b77715bc0d8144e5cce6933bc45e588a8317fd1bf8969d84b819267d325b00a": "Experiment_3",
+    "80205c747826478e108b1420d439df7ca71af457f6af3534614cf23a6a707818": "Experiment_3",
+    "1121506e89ab7096fdbcde5c7b73d14a091c9c23a31a5a66a83033aa7dba07c9": "Experiment_3",
+    "871bd489bce8ca2aed900b73f3a9870ffc67087561882efe93d031b437e27dd0": "Experiment_3",
+    "f0ba0306da0ca0e580c319ff81b33a705fc2913dfcdbe9f55571887238879c1e": "Experiment_3",
+    "221d190e513f06d1689feaef9366fe8d5adecde0def5afcc20e5e7ff8a405fea": "Experiment_3",
+    "0996db06008fc2ac9bf4ef44c823fcdc10c7f9ad49611403d1439498ef53dae6": "Experiment_3",
+    "b4b810367ba4b5c3a55d116527ce1182ea3de33d98889fb91f165d67b20aae0d": "Experiment_3",
+    "66a96be5e0b198b81c0a941fdeb47328d245dd40c0e2e60ff6eada045f02393d": "Experiment_3",
+    "d936628f7e2e727228c0c4a217e00198dcd9e4a9901aefee468b9e62417454b8": "Experiment_3",
+    "2204fd0d94346f669176bac3a8bdd3f45891029ddce16ecbc29449fd802064b5": "Experiment_3",
+    "e9a5f24efb9613ff1f754a763e194bf8039a606301ced8ab30f1613f2166afe4": "Experiment_3",
+    "b10ddb1b475031d7b668a8192b08dfd2c3520122d057df4842e94f0b8d9ea03c": "Experiment_3",
+    "772750c3912ca9c1bef00a2ff98ad673668d18513036560127b83a4c9114844f": "Experiment_3",
+    "10773637f9470f18a18f293032a43998d988a3fd75ef80ed20e1a9ded4e0c373": "Experiment_3",
+    "c9a214c6d53f1f496abb48c84bc12212b76c2d1797d1fc92df289d0ac5ec2c1d": "Experiment_3",
+    "a93a28820fd5380ec7b6e7daeb26290d76bcea91a31c1823c7ded42fce35f58a": "Experiment_3",
+    "b5694b9de9c8c2bc24d1c697315bff0335cec1a9cd7870a52133e9864a575ad1": "Experiment_3",
+    "2db7c90de0694e5dc45d90c81e853f1c3df1065daa871ba3d1852ee6f5d851e7": "Experiment_3",
+    "97ed3e2bd0640fb35cdabc38a423d3dac55a70c2690aa22a4a27c489f6e18c01": "Experiment_3",
+    "2d4d1da85cd281d04b50021bf6cfdc53732845c104a04d8c527fcd47fa8c8ffb": "Experiment_3",
+    "c413055991926209b5718a618f4518a8dc990df5da116d2521bae60554d4cda0": "Experiment_3",
+    "ba72e35dbdd13da136d364052d4da7238fc5ec3bcce8e6e9fb928a02c8002edc": "Experiment_3",
+    "bf9c84d30f0768b2d685a98ac15cd511f375bec8a53511937286763a010aabc9": "Experiment_3",
+    "735c022c8525d8d7ca5ab3d3206b94bcf7d9a2cfba4a2dbfe3100cdfb3e7d312": "Experiment_3",
+    "cab0e1b6adef42b701371cd8d56cc6bd6062249276e8d641b37f05925667b059": "Experiment_3",
+    "12c7d3a9409a3cb75872444cb7079f22bc702dcfb6e3a4a8738bda17477833c9": "Experiment_3"
+  },
+  "development_poses": {
+    "3fa5ca7e6fd1b1148913fce9966d82e35ce1ab867e9bec7347268e75693f2bda": "N30_PWM10_D41",
+    "8ee3e04aff2874054d5d2424dd120593da66399ad626258393bda43f0078c187": "N40_PWM10_D40",
+    "635930905a72d25d9ec396133b25c16dd331fc44046da24974700294495efead": "N40_PWM10_D41",
+    "dba87c4df5b5b628d3f41d6af92ea58cde3fcf5c4cebd16e59cd240852b54506": "N40_PWM20_D40",
+    "012842cdc050710deb484d181c9dafebbc98c16a5c1cd0d3c3873bc097f6039e": "N40_PWM20_D41"
+  },
+  "term_order": {
+    "n": [
+      "hinge",
+      "approach",
+      "side_magnitude",
+      "spin_magnitude",
+      "recent_closing",
+      "third_normal"
+    ],
+    "t": [
+      "slide",
+      "slide_closing",
+      "same_slide",
+      "spin_modulated_slide",
+      "recent_slide",
+      "third_side"
+    ]
+  },
+  "primary_model": "full",
+  "secondary_model": "compact",
+  "primary_endpoints": [
+    "n40",
+    "n80",
+    "t40",
+    "t80",
+    "t400"
+  ],
+  "secondary_endpoints": [
+    "n400"
+  ],
+  "comparison": "Each endpoint against lowest RMSE of the five frozen reference forecasts on the same recording.",
+  "uncertainty": "2000 paired draws of occupied 10-second blocks within a recording, seed 731; conditional intervals per endpoint.",
+  "gate": "Inward crossing of 1.10 diameters after 1.30 clearance; axis points from i to j at gate.",
+  "implementation_sha256": {
+    "shared_interaction_score.py": "c29fef29e8d1b978355385754f0b0abf08c24a128334e3b88567a9980e01d5b7",
+    "shared_interaction_data.py": "aa1457d1d8db03e28a42bf593958531ae6568304586d0090a8719f86c2785f85",
+    "shared_interaction_fit.py": "85b019d9b7de0dc70c119405cbdd722c81e90f036f24c38c05edea246c89dea8",
+    "impacts.py": "0c84485088927f0e3c932bf7c3ae8e3fb9a53aaf9d6f6732e5cdac63900b142e",
+    "new_pair_interactions.py": "ccc781c30fe9da62eab74bc5deb2039f8e5824591232b3651e68f7ae93cd6d94"
+  }
+}

@@ -1,0 +1,4 @@
+mode,fold,horizon,model,coeff,validation_vector_rmse,training
+native,train_sweep,40,heading/history/PWM/spin,"[0.5607116007122865, -0.5674281461892006, 0.90521634223888, 0.0, 0.11648604070027468]","{""zero"": 0.7688781431559845, ""persistence"": 0.5524855345738695, ""heading/history/PWM/spin"": 0.4998069439833771}","Experiment_1,Experiment_2,Experiment_3"
+native,train_sweep,80,heading/history/PWM/spin,"[0.517598576806998, -0.6648514831761437, 1.0275747314283472, 0.0, 0.07374031672299523]","{""zero"": 0.7231154051776146, ""persistence"": 0.5302918282287892, ""heading/history/PWM/spin"": 0.45022783872188676}","Experiment_1,Experiment_2,Experiment_3"
+native,train_sweep,400,heading/history/PWM/spin,"[0.5806160683365806, -0.9663031818193887, 1.1293862434604014, 0.0, -0.7907057698631913]","{""zero"": 0.6144780410691086, ""persistence"": 0.7258069471252768, ""heading/history/PWM/spin"": 0.43819404144108925}","Experiment_1,Experiment_2,Experiment_3"
