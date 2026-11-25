@@ -23,6 +23,7 @@ Pinned here:
   (every mode).
 """
 import warnings
+from collections import OrderedDict
 from copy import deepcopy
 from types import SimpleNamespace
 
@@ -223,6 +224,53 @@ def _prepared(system, var):
     eq.reset_state(True)
     plain_fit._install_target(eq, target)
     return eq
+
+
+@pytest.mark.parametrize('duplicate_target', [False, True])
+def test_identical_swap_keeps_the_live_term_and_fit(uv_pool, monkeypatch, duplicate_target):
+    from epde.operators.multiobjective.plain_moves import _swap, MAX_REGEN_RETRIES
+    eq = _run(_fresh(uv_pool)).vals['u']
+    term = next(t for t in eq.structure if t is not eq.target)
+    factors, weights, memo = term.structure, eq.weights_final, eq._eval_cache
+    draws = []
+
+    def redraw(proposal):
+        draws.append(True)
+        proposal.structure = deepcopy(eq.target.structure if duplicate_target else factors)
+        proposal.descr_variable_marker = 'redrawn'
+
+    monkeypatch.setattr(type(term), 'randomize', redraw)
+    assert not _swap(eq, term)
+    assert len(draws) == (MAX_REGEN_RETRIES if duplicate_target else 1)
+    assert term.structure is factors and eq.right_part_selected
+    assert eq.weights_final is weights and eq._eval_cache is memo
+    assert getattr(term, '_descr_variable_marker', None) != 'redrawn'
+
+
+def test_cached_fit_rebuilds_candidate_and_reuses_declines(uv_pool, monkeypatch):
+    host, coeff = _host_and_coeffs()
+    eq = _prepared(_fresh(uv_pool), 'u')
+    cache = OrderedDict()
+    monkeypatch.setattr(global_var.samples_manager, 'plain_fits', cache, raising=False)
+    with using_config(**PLAIN):
+        original = plain_fit._linear_versions(eq, 5, coeff, {}, host, {})
+        assert original
+        calls = []
+        def decline(*args):
+            calls.append(True)
+            return []
+        monkeypatch.setattr(plain_fit, '_fit_linear_versions', decline)
+        replay = plain_fit._linear_versions(eq, 5, coeff, {}, host, {})
+        assert len(replay) == len(original) and not calls
+        for before, after in zip(original, replay):
+            assert before.text_form == after.text_form and before.target_idx == after.target_idx
+            assert all(getattr(before, f.value_attr) == getattr(after, f.value_attr) for f in host.objectives)
+            assert not np.shares_memory(before.weights_final, after.weights_final)
+            assert all(a is not b for a, b in zip(before.structure, after.structure))
+            after.assert_state_invariants('cached plain fit')
+        for _ in range(2):
+            assert plain_fit._linear_versions(eq, 5, coeff, {}, host, {}, intercept=False) == []
+        assert len(calls) == 1
 
 
 class TestTheConstant:

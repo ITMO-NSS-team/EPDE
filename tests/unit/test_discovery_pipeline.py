@@ -224,6 +224,19 @@ def engine_search(engine):
     return search(**options)
 
 
+def test_plain_fit_cache_preserves_front_history_and_random_draws(monkeypatch):
+    from epde.operators.common import plain_fit
+    data = observations()
+    def discover():
+        with engine_search('nsga2') as s:
+            result = s.discover(data)
+            return result, s.pareto_history, random.random(), np.random.random()
+
+    cached = discover()
+    monkeypatch.setattr(plain_fit, '_FIT_CACHE_SIZE', 0)
+    assert discover() == cached
+
+
 @pytest.mark.parametrize('engine', ['nsga2', 'moeadd', 'single', 'nsga2-forward', 'nsga2-weak'])
 def test_checkpoint_continues_in_fresh_process(tmp_path, monkeypatch, engine):
     from epde.interface.checkpoint import EpochCheckpoint

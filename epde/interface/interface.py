@@ -957,6 +957,7 @@ class EpdeSearch(object):
 
     def _remember_pool_data(self, data, additional_tokens):
         self._pool_data = list(data)
+        self._builtin_pool = self._builtin_token_families(additional_tokens)
         uploads = tuple(family for family in additional_tokens if getattr(family, 'token_tensors', None))
         _pool_records[self.pool] = tuple(ref(sample) for sample in data), uploads
 
@@ -1657,17 +1658,20 @@ class EpdeSearch(object):
         return self._checkpointed(data, EpochCheckpoint(checkpoint, resume=True, total_epochs=total_epochs),
                                   fit_options)
 
-    def _checkpointed(self, data, checkpoint, options):
+    @staticmethod
+    def _builtin_token_families(families):
         from epde.interface import prepared_tokens
         from epde.interface.search_config import TOKEN_REGISTRY
         supported_tokens = tuple(getattr(prepared_tokens, name) for name in TOKEN_REGISTRY.values()) + (CacheStoredTokens,)
+        return all(type(family) in supported_tokens for family in families)
+
+    def _checkpointed(self, data, checkpoint, options):
         families = options.get('additional_tokens') or []
         if isinstance(families, (PreparedTokens, TokenFamily)):
             families = [families]
         if (self._custom_director or self.optimizer_exec_params.get('early_stopping_callback') is not None
                 or any(options.get(key) is not None for key in ('optimizer', 'pool', 'population'))
-                or any(type(f) not in supported_tokens
-                       for f in families)):
+                or not self._builtin_token_families(families)):
             raise ValueError('Epoch checkpoints require built-in token families, optimizer and director')
         if self._config.solver.use_solver and str(self._config.solver.device) != 'cpu':
             raise ValueError('Epoch checkpoints require a CPU solver')
@@ -1798,7 +1802,8 @@ class EpdeSearch(object):
             # draws on its own, is seeded once per fit
             # (system_rps_params['variable_order_seed']).
             from epde.operators.common.plain_fit import start_fit
-            start_fit(resolve_plain_params(active_config())['variable_order_seed'])
+            start_fit(resolve_plain_params(active_config())['variable_order_seed'],
+                      cache_fits=not self._custom_fit and not self._custom_director and self._builtin_pool)
         checkpoint = getattr(self, '_checkpoint', None)
         if checkpoint is not None:
             checkpoint.prepare(self, init_params)
@@ -1821,7 +1826,10 @@ class EpdeSearch(object):
         # EpdeSearch built multiobjective-by-default is run single-objective).
         _exec_keys = set(inspect.signature(self.optimizer.optimize).parameters) - {'self'}
         _exec_params = {k: v for k, v in exec_params.items() if k in _exec_keys}
-        self.optimizer.optimize(**_exec_params)
+        try:
+            self.optimizer.optimize(**_exec_params)
+        finally:
+            global_var.samples_manager.plain_fits = None
 
         print('The optimization has been conducted.')
         self.search_conducted = True

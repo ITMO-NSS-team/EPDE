@@ -32,6 +32,7 @@ under ``evolution.engine='nsga2'``, ``search_config.resolve_plain_params``):
   installs nothing, the drawn move runs.
 """
 from contextlib import contextmanager
+from copy import copy
 
 import numpy as np
 
@@ -73,15 +74,23 @@ def _allowed_feature(term):
 
 
 def _swap(equation, term) -> bool:
-    original = term.structure
+    # Draw off the live term. randomize() also replaces its occupancy and
+    # variable marker. A rejected or identical draw must preserve all three.
+    proposal = copy(term)
+    original = term.cache_label
+    others = {other.factors_labels for other in equation.structure if other is not term}
     for _ in range(MAX_REGEN_RETRIES):
-        term.randomize()
+        proposal.randomize()
+        if proposal.factors_labels in others or not _allowed_feature(proposal):
+            continue
+        if proposal.cache_label == original:
+            return False
+        term.structure = proposal.structure
+        term.occupied_tokens_labels = proposal.occupied_tokens_labels
+        term.descr_variable_marker = proposal.descr_variable_marker
         term.resetSavedState()
-        if not _duplicated(equation) and _allowed_feature(term):
-            return True
-    term.structure = original
-    term.resetSavedState()
-    equation._invalidate_label_cache()
+        equation._invalidate_label_cache()
+        return True
     return False
 
 

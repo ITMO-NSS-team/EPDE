@@ -47,7 +47,10 @@ resolve by ``search_config.resolve_plain_params``: on under
 """
 import itertools
 import weakref
+from collections import OrderedDict
+from contextvars import ContextVar
 from copy import deepcopy
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -62,9 +65,16 @@ from epde.structure.evaluation_rows import current_rows, slot_of
 # (with a weak reference to check it) rather than by the system: SoEq hashes and
 # compares structurally, so a dict keyed by it would merge distinct systems.
 _SIBLINGS = {}
+evaluated_system_observer = ContextVar('epde_evaluated_system_observer', default=None)
+# Entries contain only term positions, coefficients and scalar objectives.
+_FIT_CACHE_SIZE = 4096
 
 
 def _hand_over(system, siblings) -> None:
+    observe = evaluated_system_observer.get()
+    if observe is not None:
+        for fitted in (system, *siblings):
+            observe(fitted)
     for key in [key for key, (ref, _) in _SIBLINGS.items() if ref() is None]:
         del _SIBLINGS[key]
     if siblings:
@@ -242,6 +252,9 @@ def release() -> None:
     _SIBLINGS.clear()
     _PLAIN_TOKENS.clear()
     _ORDER['rng'] = None
+    manager = getattr(global_var, 'samples_manager', None)
+    if manager is not None:
+        manager.plain_fits = None
     fill_prune.reset()
     invariant_terms.reset()
     product_rule.reset()
@@ -256,11 +269,14 @@ def checkpoint_state():
               if (pool := ref()) is not None]
     siblings = [(system, others) for ref, others in _SIBLINGS.values()
                 if (system := ref()) is not None]
-    return dict(order=_ORDER['rng'], tokens=tokens, siblings=siblings)
+    return dict(order=_ORDER['rng'], tokens=tokens, siblings=siblings,
+                fits=getattr(global_var.samples_manager, 'plain_fits', None))
 
 
 def restore_checkpoint_state(state):
     _ORDER['rng'] = state['order']
+    if getattr(global_var.samples_manager, 'plain_fits', None) is not None:
+        global_var.samples_manager.plain_fits.update(state.get('fits') or {})
     _PLAIN_TOKENS.clear()
     for pool, var, axes, found in state['tokens']:
         _PLAIN_TOKENS[id(pool), var, axes] = weakref.ref(pool), found
@@ -269,10 +285,12 @@ def restore_checkpoint_state(state):
         _hand_over(system, others)
 
 
-def start_fit(seed=None) -> None:
+def start_fit(seed=None, *, cache_fits=False) -> None:
     """The per-fit state of plain mode, so that a fit does not depend on the fits before it in the process:
     every cache released, then a new variable-order generator (:func:`start_variable_order`)."""
     release()
+    if cache_fits:
+        global_var.samples_manager.plain_fits = OrderedDict()
     start_variable_order(seed)
 
 
@@ -388,6 +406,7 @@ def _read_only(result):
 
 
 def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
+    _loop_stats.record('SoEqRPS.plain.candidates', 1, 1)
     rows = current_rows()
     if getattr(rows, 'fit_frequencies', False):
         from epde.operators.common.frequency_fit import fitted_factors, fit_support
@@ -408,7 +427,62 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
     return _linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args)
 
 
+def _term_key(term):
+    # Preserve multiplication order and full-precision parameters in numeric fits.
+    return tuple((factor.ftype, factor.cache_label) for factor in term.structure)
+
+
+@dataclass(frozen=True)
+class _CachedVersion:
+    """A pruned native fit, independent of candidate objects and training arrays."""
+
+    kept: tuple
+    target: int
+    weights: tuple
+    scores: tuple
+
+    def restore(self, equation, coeff_calc, coeff_args, host):
+        variant = equation.clone_shell()
+        variant.structure = [deepcopy(equation.structure[i]) for i in self.kept]
+        variant.target_idx = self.target
+        variant.weights_internal = np.array(self.weights)
+        variant.weights_internal_evald = True
+        coeff_calc.apply(variant, coeff_args)
+        for filler, value in zip(host.objectives, self.scores):
+            setattr(variant, filler.value_attr, value)
+            setattr(variant, filler.flag_attr, True)
+        variant.aic = None
+        variant.aic_calculated = True
+        variant.right_part_selected = True
+        return variant
+
+
 def _linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, intercept=None) -> list:
+    """Reuse only ordered native fits on the current manager's data and fit settings."""
+    _loop_stats.record('SoEqRPS.plain.fit_requests', 1, 1)
+    cache = getattr(global_var.samples_manager, 'plain_fits', None)
+    if cache is None:
+        return _fit_linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, intercept)
+    terms = tuple(map(_term_key, equation.structure))
+    key = (equation.main_var_to_explain, equation.target_idx, terms, cap, intercept)
+    if key in cache:
+        cache.move_to_end(key)
+        _loop_stats.record('SoEqRPS.plain.fit_reused', 1, 1)
+        return [entry.restore(equation, coeff_calc, coeff_args, host) for entry in cache[key]]
+    versions = _fit_linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, intercept)
+    positions = {term: i for i, term in enumerate(terms)}
+    entries = []
+    for version in versions:
+        kept = tuple(positions[_term_key(term)] for term in version.structure)
+        scores = tuple(getattr(version, f.value_attr) for f in host.objectives)
+        entries.append(_CachedVersion(kept, version.target_idx, tuple(version.weights_internal), scores))
+    cache[key] = tuple(entries)
+    if len(cache) > _FIT_CACHE_SIZE:
+        cache.popitem(last=False)
+    return versions
+
+
+def _fit_linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, intercept=None) -> list:
     """The fitted versions of ``equation`` -- S, and S+{1} when the cap leaves
     room for the constant -- that the fitness host accepts, minus one the other
     dominates. Each is a fitted, pruned and scored copy, built exactly as
@@ -484,12 +558,12 @@ def _linear_versions(equation, cap, coeff_calc, coeff_args, host, host_args, int
     if not joint:
         disc = np.mean([s[5] for s in samples], axis=0)
         amp = np.mean([s[6] for s in samples], axis=0)
+        X0 = finite[0][1]
+        norms = np.linalg.norm(X0, axis=0)
+        unit_cols = X0 / np.where(norms > 0, norms, 1.0)
+        unit_constant = np.full(X0.shape[0], 1.0 / np.sqrt(X0.shape[0]))
 
     work_target = equation.target
-    X0 = finite[0][1]
-    norms = np.linalg.norm(X0, axis=0)
-    unit_cols = X0 / np.where(norms > 0, norms, 1.0)
-    unit_constant = np.full(X0.shape[0], 1.0 / np.sqrt(X0.shape[0]))
 
     inst_attr = host.objectives[1].value_attr if len(host.objectives) > 1 else None
     versions = []

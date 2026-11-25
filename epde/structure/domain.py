@@ -1057,6 +1057,7 @@ class TrajectoriesManager(object):
         self._axis_ranges_memo = None                 # (grid state, ranges): axis_ranges()
         #: Fit-local measurement provider. Strong evaluation reads the pointwise cache directly.
         self.evaluation_rows = None
+        self.plain_fits = None  # bounded numeric results for this fit's native plain evaluator
 
     @property
     def weak(self):
