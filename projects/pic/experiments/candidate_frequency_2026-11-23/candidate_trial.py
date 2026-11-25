@@ -131,11 +131,16 @@ class Trial(Timeline):
                 return cache[value]
             install(value)
             targets, features = eq.evaluate()
-            key, = targets
-            y = targets[key].ravel()
-            x = features[key]
-            if intercept:
-                x = np.column_stack((x, np.ones(len(y))))
+            blocks, observations = [], []
+            for key in sorted(targets):
+                y = targets[key].ravel()
+                x = features[key]
+                if intercept:
+                    x = np.column_stack((x, np.ones(len(y))))
+                scale = np.sqrt(len(y)) if len(targets) > 1 else 1.
+                blocks.append(x / scale)
+                observations.append(y / scale)
+            x, y = np.vstack(blocks), np.concatenate(observations)
             self.extra += 1
             norms = np.linalg.norm(x, axis=0)
             sse = np.inf

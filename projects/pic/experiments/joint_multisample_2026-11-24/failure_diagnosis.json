@@ -1,0 +1,5408 @@
+[
+  {
+    "dataset": "duffing",
+    "arm": "diverse3",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 68,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.08469274695400753,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.5454569222465637,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u^3",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u^3",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u^2",
+          "u^3",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u^2",
+          "u^3",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u",
+          "u^3",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^3",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^3",
+          "u",
+          "u^3"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse3",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 53,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.044262103341259684,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.42005043562666644,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse3",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 63,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.04598148493595089,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.4693995490831844,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]^2",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]^2",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse3",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 66,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.3877089367746567,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.04076528457417339,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse3",
+    "draw": 4,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 72,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.05122588723196775,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.3788049560694211,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u",
+          "u^3",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*u",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*u",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u^3"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse5",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 63,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.0584511413642268,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.6534014678970995,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*u^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse5",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 54,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0,
+      "exact_raw_fit_calls": 1,
+      "exact_raw_calls_returning_catalog_terms": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.035224894567149834,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.5843349573481044,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse5",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 74,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0,
+      "exact_raw_fit_calls": 1,
+      "exact_raw_calls_returning_catalog_terms": 1
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.05159538447944412,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.7064697675818871,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^3",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^3",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u",
+          "x[0]"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "du/dx0",
+        "seed": 1.4780016922337955,
+        "first_epoch": 37,
+        "slots_spent": 12,
+        "lower": 1.3210789822642721,
+        "upper": 1.634924402203319,
+        "proposed": 1.41407219759785,
+        "children": [
+          {
+            "values": [
+              1.1374426654514829,
+              1.0994174041052733,
+              0.8886272498178834,
+              0.8154781776636169,
+              0.8700898106679745,
+              15.333140632249501
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          },
+          {
+            "values": [
+              1.137271723739211,
+              1.0997943115831932,
+              0.8892562725684485,
+              0.8154084603783498,
+              0.8697168567703312,
+              20.8912394078555
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse5",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 74,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.05456806860048935,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.666601144270676,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "diverse5",
+    "draw": 4,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 60,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.04581188511172429,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.692994859062437,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u^3"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "one",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 57,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0,
+      "exact_raw_fit_calls": 4,
+      "exact_raw_calls_returning_catalog_terms": 4
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.04197250968883903,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.020653309008576315,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u",
+          "u^3",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u",
+          "u^3",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "cos[0]*u^3",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 4,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": [
+      "('unbracketed', 0.9660255629877471)"
+    ]
+  },
+  {
+    "dataset": "duffing",
+    "arm": "one",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 50,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008311242697950472,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.010905270443300252,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u",
+          "u^2*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u",
+          "u^2*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]^2",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "one",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 49,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.009624101176252453,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.014804760977196074,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u",
+          "u^3",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*u",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0^2",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2",
+          "u",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "one",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 62,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.01182553960758459,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.013866611087732017,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0^2",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0^2",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]^2",
+          "sin[0]*x[0]^2",
+          "u^3*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "one",
+    "draw": 4,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 65,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.010513162192490988,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.014166553117145542,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]^2",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat3",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 63,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.02308477478876725,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.017502431147076947,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "u",
+          "u*x[0]",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "x[0]^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat3",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 59,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.006756978017461113,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008564618340265229,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]^2",
+          "u",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]^2",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]^2",
+          "u^3*x[0]"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat3",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 41,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008065243682444656,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.011185990186942218,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 4,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*u",
+          "du/dx0*x[0]",
+          "x[0]"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat3",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 56,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008035840156183194,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.009017548904286854,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2",
+          "u^3*x[0]^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat3",
+    "draw": 4,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 57,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.01061347439638538,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.014727392033753839,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^2",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat5",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 40,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.01774193269223423,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.01418490136111128,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u",
+          "u^3",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u",
+          "u^3",
+          "u^3*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "du/dx0*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat5",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 65,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0,
+      "exact_raw_fit_calls": 1,
+      "exact_raw_calls_returning_catalog_terms": 1
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.007323372186643695,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.010958807455080266,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^3",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^3",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "du/dx0",
+        "seed": 1.1247271183160918,
+        "first_epoch": 41,
+        "slots_spent": 12,
+        "lower": 0.9678044083465683,
+        "upper": 1.2816498282856152,
+        "proposed": 1.0110957647171452,
+        "children": [
+          {
+            "values": [
+              0.15198037239849693,
+              0.09514961301905173,
+              0.09275494566636042,
+              0.14324589806909133,
+              0.1492094041637175,
+              0.6247553917568716
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          },
+          {
+            "values": [
+              0.1483429425214032,
+              0.0867741923981398,
+              0.10393418340684554,
+              0.1384300688832659,
+              0.1473896370477614,
+              4.227371866024154
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat5",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 65,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008026472103268789,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.011273836071829524,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]",
+          "u",
+          "u*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "cos[0]*u^2",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "cos[0]*x[0]",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat5",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 54,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008990878468425612,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.012209438178978238,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^3",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*sin[0]",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "duffing",
+    "arm": "repeat5",
+    "draw": 4,
+    "exact_replay": true,
+    "counts": {
+      "fill_draws_at_catalog_size": 48,
+      "fill_draws_offering_catalog": 0,
+      "fill_draws_picking_catalog": 0
+    },
+    "beam_checks": [
+      {
+        "target": "d^2u/dx0^2",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.008984604631072202,
+        "options": 20,
+        "offered": false
+      },
+      {
+        "target": "du/dx0",
+        "eligible": false,
+        "unavailable": {
+          "cos[0]": "absent from library"
+        },
+        "best_catalog_rss": null,
+        "cutoff": 0.012040814529073574,
+        "options": 20,
+        "offered": false
+      }
+    ],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*u^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*du/dx0",
+          "d^2u/dx0^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "sin[0]*u^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "u",
+          "u^3*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "1",
+          "cos[0]*x[0]^2",
+          "d^2u/dx0^2",
+          "du/dx0",
+          "u",
+          "u^3*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 3,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse3",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 72,
+      "exact_raw_calls_returning_catalog_terms": 72
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*x[0]",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*d^2u/dx0^2",
+          "du/dx0"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9600161810866925,
+        "first_epoch": 8,
+        "slots_spent": 12,
+        "lower": 1.7636666402373304,
+        "upper": 2.1563657219360546,
+        "proposed": 2.0097022488102065,
+        "children": [
+          {
+            "values": [
+              0.18310450356369895,
+              0.07679039109462915,
+              0.3053244468149262,
+              0.12645014659639378
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.18188422059644924,
+              0.07376898839029819,
+              0.31118551981689857,
+              0.9468630215264412
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      },
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 4.055123588049143,
+        "first_epoch": 33,
+        "slots_spent": 12,
+        "lower": 3.8587740471997805,
+        "upper": 4.251473128898505,
+        "proposed": 4.10770323219261,
+        "children": [
+          {
+            "values": [
+              0.23224526990225922,
+              0.25073139281225043,
+              0.6714981923425153,
+              0.5140596514964119
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          },
+          {
+            "values": [
+              0.22002788886192035,
+              0.22964729369561024,
+              0.7509381528230741,
+              1.2478278117073096
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse3",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 20,
+      "exact_raw_calls_returning_catalog_terms": 20
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 2,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9668916585930578,
+        "first_epoch": 17,
+        "slots_spent": 12,
+        "lower": 1.7705421177436957,
+        "upper": 2.16324119944242,
+        "proposed": 1.98842827743082,
+        "children": [
+          {
+            "values": [
+              0.3316232570192239,
+              0.04302931765836644,
+              0.22564842697813686,
+              0.1866213444978566
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.3315893760339596,
+              0.04278031251715093,
+              0.22742367549036466,
+              1.5996751876149045
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse3",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 33,
+      "exact_raw_calls_returning_catalog_terms": 33
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*x[0]",
+          "u",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0",
+          "du/dx0*sin[0]",
+          "u*x[0]^2"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.954402751237011,
+        "first_epoch": 5,
+        "slots_spent": 12,
+        "lower": 1.758053210387649,
+        "upper": 2.150752292086373,
+        "proposed": 2.0023562702842344,
+        "children": [
+          {
+            "values": [
+              0.062078138168431767,
+              0.08629688111978695,
+              0.20143117641331407,
+              0.28641129203226995
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.06234602466173785,
+              0.08612837337342964,
+              0.2051326046065025,
+              6.543351256625709
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse3",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 14,
+      "exact_raw_calls_returning_catalog_terms": 14
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*u",
+          "u^2*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*u",
+          "u^2*x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "u",
+          "x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "du/dx0*x[0]",
+          "sin[0]*u^2",
+          "u",
+          "x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]^2",
+          "u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]",
+          "x[0]^2"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9656793086292847,
+        "first_epoch": 15,
+        "slots_spent": 12,
+        "lower": 1.7693297677799227,
+        "upper": 2.162028849478647,
+        "proposed": 1.9926868320815432,
+        "children": [
+          {
+            "values": [
+              0.08974088144968909,
+              0.30375209184497365,
+              0.21829712170564106,
+              0.21413252307588504
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.07454288878243834,
+              0.3057811106116507,
+              0.27488591344585817,
+              3.622629975220923
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse5",
+    "draw": 0,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 61,
+      "exact_raw_calls_returning_catalog_terms": 61
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u^2",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9600161810866925,
+        "first_epoch": 6,
+        "slots_spent": 12,
+        "lower": 1.7636666402373304,
+        "upper": 2.1563657219360546,
+        "proposed": 2.009346999311933,
+        "children": [
+          {
+            "values": [
+              0.1827486071125889,
+              0.07682937439339146,
+              0.3208292013461037,
+              0.11238376573214155,
+              0.277113391994754,
+              0.15037326695097014
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.1821482694845372,
+              0.07576900923062113,
+              0.31900880347037147,
+              0.11406347446541423,
+              0.27735765528923106,
+              0.8748305157644314
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      },
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 4.034803448711051,
+        "first_epoch": 27,
+        "slots_spent": 12,
+        "lower": 3.8384539078616884,
+        "upper": 4.231152989560413,
+        "proposed": 4.102600508531888,
+        "children": [
+          {
+            "values": [
+              0.24447897256045611,
+              0.27976625380925696,
+              0.5350172998834781,
+              0.21436713182981637,
+              0.6208202124565468,
+              0.9878106450366844
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          },
+          {
+            "values": [
+              0.24123462322459321,
+              0.27651039560210455,
+              0.5466150648448748,
+              0.214025032123602,
+              0.6279156191226914,
+              2.080104156779805
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse5",
+    "draw": 1,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 39,
+      "exact_raw_calls_returning_catalog_terms": 39
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*u",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u*x[0]"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9668916585930578,
+        "first_epoch": 9,
+        "slots_spent": 12,
+        "lower": 1.7705421177436957,
+        "upper": 2.16324119944242,
+        "proposed": 1.992364772087911,
+        "children": [
+          {
+            "values": [
+              0.33214879823952553,
+              0.04163989310292427,
+              0.2723062446624335,
+              0.11976416113633152,
+              0.14472604463873062,
+              0.21096661828681557
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.3319662990164442,
+              0.04226058807667476,
+              0.27124090903590836,
+              0.11931918533025565,
+              0.1465457596472038,
+              3.747718915765828
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse5",
+    "draw": 2,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 33,
+      "exact_raw_calls_returning_catalog_terms": 33
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^3",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*x[0]^2",
+          "d^2u/dx0^2^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*x[0]^2",
+          "d^2u/dx0^2^2*sin[0]",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "du/dx0",
+          "sin[0]*x[0]",
+          "u"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.954402751237011,
+        "first_epoch": 18,
+        "slots_spent": 12,
+        "lower": 1.758053210387649,
+        "upper": 2.150752292086373,
+        "proposed": 2.0045565837206705,
+        "children": [
+          {
+            "values": [
+              0.06184579888766756,
+              0.0863707468756574,
+              0.20886209595957517,
+              0.05864310336358122,
+              0.18498705864758827,
+              0.2499680398301682
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.06411883264207446,
+              0.08525601637426035,
+              0.23947152390224505,
+              0.056766638371485295,
+              0.18137674212630683,
+              40.907856515741045
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      },
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 3.964128119220559,
+        "first_epoch": 38,
+        "slots_spent": 12,
+        "lower": 3.7677785783711966,
+        "upper": 4.160477660069921,
+        "proposed": 4.160477660069921,
+        "children": [
+          {
+            "values": [
+              0.16662806616697678,
+              0.2610341560203785,
+              1.0627192873949323,
+              0.15085005456365524,
+              0.9881926497144052,
+              0.6423034849652332
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          },
+          {
+            "values": [
+              0.16445538443457308,
+              0.2605586678960131,
+              1.0690753403203586,
+              0.14826903259508775,
+              0.9918955815661983,
+              16.13673227925746
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse5",
+    "draw": 3,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 48,
+      "exact_raw_calls_returning_catalog_terms": 48
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^3",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "u^3",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "u^3",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u^2"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9656793086292847,
+        "first_epoch": 11,
+        "slots_spent": 12,
+        "lower": 1.7693297677799227,
+        "upper": 2.162028849478647,
+        "proposed": 1.9943138766397648,
+        "children": [
+          {
+            "values": [
+              0.09273325274193098,
+              0.3035870528948333,
+              0.2248129989490285,
+              0.08504450428442044,
+              0.11182752547275508,
+              0.20851335570644608
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.07733749268511023,
+              0.3057787128882915,
+              0.28822757963870727,
+              0.08088812306944668,
+              0.08044207510592709,
+              2.666391351528204
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      },
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 3.925774084322909,
+        "first_epoch": 17,
+        "slots_spent": 12,
+        "lower": 3.729424543473547,
+        "upper": 4.1221236251722715,
+        "proposed": 4.1221236251722715,
+        "children": [
+          {
+            "values": [
+              0.1107521697740541,
+              0.38954724813273783,
+              0.9534888761275199,
+              0.17446015864393347,
+              0.8075099291066397,
+              1.1248385485247225
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          },
+          {
+            "values": [
+              0.1158435709560094,
+              0.3912759600835738,
+              0.9296342638041937,
+              0.1789414797596936,
+              0.792933206107892,
+              2.797144421003865
+            ],
+            "catalog": false,
+            "on_augmented_front": false
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  },
+  {
+    "dataset": "ode",
+    "arm": "diverse5",
+    "draw": 4,
+    "exact_replay": true,
+    "counts": {
+      "exact_raw_fit_calls": 47,
+      "exact_raw_calls_returning_catalog_terms": 47
+    },
+    "beam_checks": [],
+    "profiles": [
+      {
+        "epoch": 0,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 0,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "cos[0]*u^3",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "cos[0]*u^3",
+          "d^2u/dx0^2*x[0]^2",
+          "du/dx0",
+          "u^2",
+          "x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "sin[0]*x[0]"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "d^2u/dx0^2^2",
+          "du/dx0",
+          "sin[0]*u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "u^3"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "x[0]",
+          "x[0]^2"
+        ]
+      },
+      {
+        "epoch": 1,
+        "terms": [
+          "1",
+          "d^2u/dx0^2*sin[0]",
+          "du/dx0",
+          "sin[0]*u",
+          "x[0]",
+          "x[0]^2"
+        ]
+      }
+    ],
+    "eligible_probes": [
+      {
+        "target": "d^2u/dx0^2",
+        "seed": 1.9558562118470346,
+        "first_epoch": 26,
+        "slots_spent": 12,
+        "lower": 1.7595066709976726,
+        "upper": 2.1522057526963967,
+        "proposed": 2.000199569731362,
+        "children": [
+          {
+            "values": [
+              0.06781100222749195,
+              0.06634065067607156,
+              0.20159977036961577,
+              0.08177638853724066,
+              0.14290942799075132,
+              0.20333024641009073
+            ],
+            "catalog": true,
+            "on_augmented_front": true
+          },
+          {
+            "values": [
+              0.06557561357242817,
+              0.06696588464946593,
+              0.2025607653866331,
+              0.08382787774967224,
+              0.14136080203848353,
+              1.4336080086955865
+            ],
+            "catalog": false,
+            "on_augmented_front": true
+          }
+        ]
+      }
+    ],
+    "ineligible": []
+  }
+]

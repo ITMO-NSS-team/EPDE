@@ -1,0 +1,6 @@
+dataset,arm,draw,generated,front_hit,terms_generated,terms_on_front,catalog_terms_profiled,front_size,front_structures,evaluated,epochs,frequency_profiles,profiled_children,profiled_children_on_front,seconds,generations,admission_cpu_pct,last_profile_epoch,profile_cache_hits,deletions,additive,multimodal_bands,proposed_frequencies,combined_front_hit
+duffing,one,0,1,1,1,1,1,26,15,19086,50,4562,8892,2,158.4,100,38.6,50,5397,7270,2969,3717,9341,0
+duffing,one,1,1,0,1,0,1,20,14,20543,50,5140,10349,5,175.56,100,25.3,50,6121,6295,2968,4600,10929,0
+duffing,one,3,1,1,1,1,1,14,9,21063,50,5314,10787,2,181.18,100,56.7,50,6605,6954,2966,4846,11309,1
+duffing,repeat3,1,1,1,1,1,1,153,69,23934,50,5550,11527,25,322.08,100,43.1,50,6651,6796,2967,4954,11722,1
+duffing,repeat5,2,1,1,1,1,1,380,138,27089,50,6562,13560,80,483.47,100,48.3,50,7563,7426,2968,5907,14002,1

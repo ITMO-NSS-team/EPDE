@@ -1,0 +1,6 @@
+dataset,arm,draw,per_support_terms_generated,systematic_terms_generated,per_support_generated,systematic_generated,per_support_front_hit,systematic_front_hit,per_support_seconds,systematic_seconds,combined_front_hit
+duffing,one,0,1,1,1,1,0,1,16.3,158.4,0
+duffing,one,1,0,1,0,1,0,0,15.3,175.56,0
+duffing,one,3,1,1,1,1,0,1,17.39,181.18,1
+duffing,repeat3,1,1,1,0,1,0,1,27.55,322.08,1
+duffing,repeat5,2,0,1,0,1,0,1,36.9,483.47,1

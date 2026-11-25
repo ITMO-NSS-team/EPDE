@@ -1,0 +1,112 @@
+[
+  {
+    "arm": "one",
+    "draw": 0,
+    "original": {
+      "terms_generated": 1,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1356
+    },
+    "standalone_trig": {
+      "terms_generated": 1,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1260
+    }
+  },
+  {
+    "arm": "repeat3",
+    "draw": 0,
+    "original": {
+      "terms_generated": 0,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1713
+    },
+    "standalone_trig": {
+      "terms_generated": 1,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1589
+    }
+  },
+  {
+    "arm": "diverse3",
+    "draw": 0,
+    "original": {
+      "terms_generated": 0,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1715
+    },
+    "standalone_trig": {
+      "terms_generated": 1,
+      "terms_on_front": 1,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1694
+    }
+  },
+  {
+    "arm": "repeat5",
+    "draw": 0,
+    "original": {
+      "terms_generated": 0,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1723
+    },
+    "standalone_trig": {
+      "terms_generated": 1,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1575
+    }
+  },
+  {
+    "arm": "diverse5",
+    "draw": 0,
+    "original": {
+      "terms_generated": 0,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1737
+    },
+    "standalone_trig": {
+      "terms_generated": 1,
+      "terms_on_front": 0,
+      "generated": 0,
+      "front_hit": 0,
+      "catalog_terms_profiled": 0,
+      "frequency_profiles": 12,
+      "evaluated": 1724
+    }
+  }
+]

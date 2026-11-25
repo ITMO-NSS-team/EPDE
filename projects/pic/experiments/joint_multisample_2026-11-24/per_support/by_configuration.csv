@@ -1,0 +1,8 @@
+dataset,arm,draws,generated,front_hits,terms_generated,terms_on_front,median_front_size,recurrent_structures
+ode,diverse3,4,4,4,4,4,104.5,24
+ode,diverse5,5,5,5,5,5,267,150
+duffing,one,5,4,2,4,2,13,7
+duffing,repeat3,5,4,4,5,4,52,19
+duffing,diverse3,5,5,5,5,5,61,33
+duffing,repeat5,5,4,4,4,4,89,38
+duffing,diverse5,5,5,5,5,5,123,71

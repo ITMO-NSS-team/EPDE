@@ -1,0 +1,14 @@
+{
+  "original_meaningful": false,
+  "False": {
+    "cosines": [],
+    "all_duffing_terms": false
+  },
+  "True": {
+    "cosines": [
+      1.1229482729572706,
+      3.4800794636500836
+    ],
+    "all_duffing_terms": true
+  }
+}
