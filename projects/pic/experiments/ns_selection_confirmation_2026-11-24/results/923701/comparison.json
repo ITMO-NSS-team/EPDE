@@ -1,0 +1,314 @@
+{
+  "seed": 923701,
+  "retrospective": true,
+  "native_seconds": 1857.8979548000498,
+  "checkpoint_epoch": 150,
+  "checkpoint_fits": 167152,
+  "native_budget": 167152,
+  "arms": {
+    "native": {
+      "recorded_systems": 99066,
+      "proposed_systems": 0,
+      "original_front_complete": 0,
+      "proposed_complete": 0,
+      "complete_nondominated": 0,
+      "native_complete": 0,
+      "complete_generated": 0,
+      "first_survivor": null,
+      "search_fits": 167152,
+      "new_fits": 0,
+      "total_fits": 167152,
+      "finalized_native_epoch": 150
+    },
+    "exchange": {
+      "recorded_systems": 99066,
+      "proposed_systems": 1107,
+      "original_front_complete": 0,
+      "proposed_complete": 0,
+      "complete_nondominated": 0,
+      "native_complete": 0,
+      "complete_generated": 0,
+      "first_survivor": null,
+      "requested_fits": 169,
+      "archived_fits": 2,
+      "new_fits": 167,
+      "accepted_fits": 168,
+      "over_budget_fits": 0,
+      "parent_front": 393,
+      "parent_slot_edits": 6671,
+      "relabelled_edits_verified": 6671,
+      "search_fits": 167152,
+      "total_fits": 167319,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 11.608742600074038
+    },
+    "exchange_local_target": {
+      "recorded_systems": 99066,
+      "proposed_systems": 3343,
+      "original_front_complete": 0,
+      "proposed_complete": 2,
+      "complete_nondominated": 0,
+      "native_complete": 0,
+      "complete_generated": 2,
+      "first_survivor": null,
+      "requested_fits": 462,
+      "archived_fits": 6,
+      "new_fits": 456,
+      "accepted_fits": 454,
+      "over_budget_fits": 0,
+      "parent_front": 393,
+      "parent_slot_edits": 21703,
+      "relabelled_edits_verified": 21703,
+      "search_fits": 167152,
+      "total_fits": 167608,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 7.141701800050214
+    },
+    "reassignment": {
+      "recorded_systems": 99066,
+      "proposed_systems": 786,
+      "original_front_complete": 0,
+      "proposed_complete": 0,
+      "complete_nondominated": 0,
+      "native_complete": 0,
+      "complete_generated": 0,
+      "first_survivor": null,
+      "requested_fits": 59,
+      "archived_fits": 40,
+      "new_fits": 19,
+      "accepted_fits": 44,
+      "over_budget_fits": 0,
+      "parent_front": 393,
+      "assignments": 393,
+      "relabelled_assignments_verified": 393,
+      "search_fits": 167152,
+      "total_fits": 167171,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 2.1524523000698537
+    },
+    "exchange_reassignment": {
+      "recorded_systems": 99066,
+      "proposed_systems": 9275,
+      "original_front_complete": 0,
+      "proposed_complete": 6,
+      "complete_nondominated": 4,
+      "native_complete": 0,
+      "complete_generated": 6,
+      "first_survivor": [
+        51703,
+        52159,
+        51858
+      ],
+      "surviving_supports": [
+        [
+          [
+            [
+              "du/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "du/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "requested_fits": 750,
+      "archived_fits": 49,
+      "new_fits": 701,
+      "accepted_fits": 720,
+      "over_budget_fits": 0,
+      "parent_front": 393,
+      "assignments": 3756,
+      "relabelled_assignments_verified": 3756,
+      "search_fits": 167152,
+      "total_fits": 167853,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 4.069143799948506
+    }
+  }
+}

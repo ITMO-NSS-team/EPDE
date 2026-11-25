@@ -1,0 +1,40 @@
+{
+  "current": {
+    "requested_fits": 6278,
+    "archived_fits": 609,
+    "new_fits": 5669,
+    "accepted_fits": 5901,
+    "over_budget_fits": 0,
+    "donor_supports": 393,
+    "native_fits": 167880,
+    "total_fits": 173549,
+    "native_complete": 0,
+    "assembled_complete": 6,
+    "complete_generated": 6,
+    "unbeaten_by_native": 4,
+    "complete_nondominated": 4,
+    "surviving_all_native": 4,
+    "seconds": 54.14046179992147,
+    "native_cutoff_seconds": 2069.615,
+    "native_full_seconds": 2129.7501739000436
+  },
+  "historical": {
+    "requested_fits": 20839,
+    "archived_fits": 1617,
+    "new_fits": 19222,
+    "accepted_fits": 19485,
+    "over_budget_fits": 0,
+    "donor_supports": 1115,
+    "native_fits": 154327,
+    "total_fits": 173549,
+    "native_complete": 0,
+    "assembled_complete": 9,
+    "complete_generated": 9,
+    "unbeaten_by_native": 6,
+    "complete_nondominated": 1,
+    "surviving_all_native": 1,
+    "seconds": 122.4962252000114,
+    "native_cutoff_seconds": 1904.007,
+    "native_full_seconds": 2129.7501739000436
+  }
+}

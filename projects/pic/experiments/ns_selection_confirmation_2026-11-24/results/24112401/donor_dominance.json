@@ -1,0 +1,1068 @@
+{
+  "seed": 24112401,
+  "native_cutoff": 256970,
+  "native_systems": 153971,
+  "witness_rule": "fewest changed slot structures, then earliest native handover cost",
+  "candidates": [
+    {
+      "candidate_ids": [
+        1821,
+        444,
+        105528
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "du/dx0",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "wape": 0.00018521787082045717,
+          "instability": 0.004362305259466549
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047996136028608297,
+          "instability": 0.005062579491630323
+        }
+      ],
+      "native_dominators": 3,
+      "changed_slots": {
+        "p": 3
+      },
+      "witness_ids": [
+        1821,
+        444,
+        789
+      ],
+      "witness_cost": 4604,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "du/dx2*v",
+              "dv/dx0",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047996136028608297,
+            "instability": 0.005062579491630323
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2^2"
+            ],
+            "wape": 0.00017322313241449394,
+            "instability": 0.00013803497667408944
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        1821,
+        444,
+        105710
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "du/dx0",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "wape": 0.00018521787082045717,
+          "instability": 0.004362305259466549
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047907572193707114,
+          "instability": 0.005118108427806424
+        }
+      ],
+      "native_dominators": 3,
+      "changed_slots": {
+        "p": 3
+      },
+      "witness_ids": [
+        1821,
+        444,
+        789
+      ],
+      "witness_cost": 4604,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2^2"
+            ],
+            "wape": 0.00017322313241449394,
+            "instability": 0.00013803497667408944
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        1894,
+        3638,
+        103676
+      ],
+      "candidate": [
+        {
+          "role": "Continuity",
+          "target": "du/dx2",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.430933077503177e-05,
+          "instability": 4.702366333228849e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dv/dx0",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00020352093392268797,
+          "instability": 0.004861891851192578
+        },
+        {
+          "role": "X momentum",
+          "target": "dp/dx2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "wape": 0.0003075634130040097,
+          "instability": 0.004536181778720151
+        }
+      ],
+      "native_dominators": 2,
+      "changed_slots": {
+        "p": 2
+      },
+      "witness_ids": [
+        1894,
+        3638,
+        1220
+      ],
+      "witness_cost": 14068,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "X momentum",
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.0003075634130040097,
+            "instability": 0.004536181778720151
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        1894,
+        3638,
+        104530
+      ],
+      "candidate": [
+        {
+          "role": "Continuity",
+          "target": "du/dx2",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.430933077503177e-05,
+          "instability": 4.702366333228849e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dv/dx0",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00020352093392268797,
+          "instability": 0.004861891851192578
+        },
+        {
+          "role": "X momentum",
+          "target": "dp/dx2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "wape": 0.00031036519457223457,
+          "instability": 0.003969402721197745
+        }
+      ],
+      "native_dominators": 2,
+      "changed_slots": {
+        "p": 2
+      },
+      "witness_ids": [
+        1894,
+        3638,
+        1220
+      ],
+      "witness_cost": 14068,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "X momentum",
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "dv/dx1*u"
+            ],
+            "wape": 0.00031036519457223457,
+            "instability": 0.003969402721197745
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        1894,
+        6006,
+        103676
+      ],
+      "candidate": [
+        {
+          "role": "Continuity",
+          "target": "du/dx2",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.430933077503177e-05,
+          "instability": 4.702366333228849e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dv/dx0",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00020303846466157604,
+          "instability": 0.004924052203068169
+        },
+        {
+          "role": "X momentum",
+          "target": "dp/dx2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "wape": 0.0003075634130040097,
+          "instability": 0.004536181778720151
+        }
+      ],
+      "native_dominators": 3,
+      "changed_slots": {
+        "p": 3
+      },
+      "witness_ids": [
+        1894,
+        6006,
+        1220
+      ],
+      "witness_cost": 18865,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "X momentum",
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "du/dx2*u"
+            ],
+            "wape": 0.0003075634130040097,
+            "instability": 0.004536181778720151
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        1894,
+        6006,
+        104530
+      ],
+      "candidate": [
+        {
+          "role": "Continuity",
+          "target": "du/dx2",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.430933077503177e-05,
+          "instability": 4.702366333228849e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dv/dx0",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00020303846466157604,
+          "instability": 0.004924052203068169
+        },
+        {
+          "role": "X momentum",
+          "target": "dp/dx2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "wape": 0.00031036519457223457,
+          "instability": 0.003969402721197745
+        }
+      ],
+      "native_dominators": 3,
+      "changed_slots": {
+        "p": 3
+      },
+      "witness_ids": [
+        1894,
+        6006,
+        1220
+      ],
+      "witness_cost": 18865,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "X momentum",
+            "target": "dp/dx2",
+            "terms": [
+              "d^2u/dx1^2",
+              "d^2u/dx2^2",
+              "dp/dx2",
+              "du/dx0",
+              "du/dx1*v",
+              "dv/dx1*u"
+            ],
+            "wape": 0.00031036519457223457,
+            "instability": 0.003969402721197745
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        4415,
+        444,
+        105528
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "d^2u/dx1^2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "wape": 0.0054506952755966065,
+          "instability": 0.015473456159431255
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047996136028608297,
+          "instability": 0.005062579491630323
+        }
+      ],
+      "native_dominators": 5,
+      "changed_slots": {
+        "p": 3,
+        "u,p": 2
+      },
+      "witness_ids": [
+        1821,
+        444,
+        789
+      ],
+      "witness_cost": 4604,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "du/dx2*v",
+              "dv/dx0",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047996136028608297,
+            "instability": 0.005062579491630323
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2^2"
+            ],
+            "wape": 0.00017322313241449394,
+            "instability": 0.00013803497667408944
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        4415,
+        444,
+        105710
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "d^2u/dx1^2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "wape": 0.0054506952755966065,
+          "instability": 0.015473456159431255
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047907572193707114,
+          "instability": 0.005118108427806424
+        }
+      ],
+      "native_dominators": 5,
+      "changed_slots": {
+        "p": 3,
+        "u,p": 2
+      },
+      "witness_ids": [
+        1821,
+        444,
+        789
+      ],
+      "witness_cost": 4604,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2^2"
+            ],
+            "wape": 0.00017322313241449394,
+            "instability": 0.00013803497667408944
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        5338,
+        444,
+        105528
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "du/dx0",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "wape": 0.0001865348963085128,
+          "instability": 0.003797648564867171
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047996136028608297,
+          "instability": 0.005062579491630323
+        }
+      ],
+      "native_dominators": 3,
+      "changed_slots": {
+        "p": 3
+      },
+      "witness_ids": [
+        5338,
+        444,
+        1220
+      ],
+      "witness_cost": 21701,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "du/dx2*v",
+              "dv/dx0",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047996136028608297,
+            "instability": 0.005062579491630323
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        5338,
+        444,
+        105710
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "du/dx0",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "wape": 0.0001865348963085128,
+          "instability": 0.003797648564867171
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047907572193707114,
+          "instability": 0.005118108427806424
+        }
+      ],
+      "native_dominators": 3,
+      "changed_slots": {
+        "p": 3
+      },
+      "witness_ids": [
+        5338,
+        444,
+        1220
+      ],
+      "witness_cost": 21701,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        6147,
+        444,
+        105528
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "d^2u/dx1^2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "wape": 0.005454371928030641,
+          "instability": 0.01426450420411565
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047996136028608297,
+          "instability": 0.005062579491630323
+        }
+      ],
+      "native_dominators": 5,
+      "changed_slots": {
+        "p": 3,
+        "u,p": 2
+      },
+      "witness_ids": [
+        5338,
+        444,
+        1220
+      ],
+      "witness_cost": 21701,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "du/dx2*v",
+              "dv/dx0",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047996136028608297,
+            "instability": 0.005062579491630323
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    },
+    {
+      "candidate_ids": [
+        6147,
+        444,
+        105710
+      ],
+      "candidate": [
+        {
+          "role": "X momentum",
+          "target": "d^2u/dx1^2",
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "wape": 0.005454371928030641,
+          "instability": 0.01426450420411565
+        },
+        {
+          "role": "Continuity",
+          "target": "dv/dx1",
+          "terms": [
+            "du/dx2",
+            "dv/dx1"
+          ],
+          "wape": 2.4309384158905537e-05,
+          "instability": 4.7024447994774314e-06
+        },
+        {
+          "role": "Y momentum",
+          "target": "dp/dx1",
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "wape": 0.00047907572193707114,
+          "instability": 0.005118108427806424
+        }
+      ],
+      "native_dominators": 5,
+      "changed_slots": {
+        "p": 3,
+        "u,p": 2
+      },
+      "witness_ids": [
+        5338,
+        444,
+        1220
+      ],
+      "witness_cost": 21701,
+      "changes": [
+        {
+          "slot": "p",
+          "candidate": {
+            "role": "Y momentum",
+            "target": "dp/dx1",
+            "terms": [
+              "d^2v/dx1^2",
+              "d^2v/dx2^2",
+              "dp/dx1",
+              "dv/dx0",
+              "dv/dx1*v",
+              "dv/dx2*u"
+            ],
+            "wape": 0.00047907572193707114,
+            "instability": 0.005118108427806424
+          },
+          "rival": {
+            "role": null,
+            "target": "d^2p/dx1^2",
+            "terms": [
+              "d^2p/dx1^2",
+              "d^2p/dx2^2",
+              "du/dx1*dv/dx2",
+              "du/dx2*dv/dx1"
+            ],
+            "wape": 0.00014442144493541798,
+            "instability": 7.716641772484407e-05
+          }
+        }
+      ]
+    }
+  ]
+}

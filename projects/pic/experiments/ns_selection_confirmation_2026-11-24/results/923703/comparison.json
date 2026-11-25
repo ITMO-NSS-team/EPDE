@@ -1,0 +1,924 @@
+{
+  "seed": 923703,
+  "retrospective": true,
+  "native_seconds": 1639.3706137000117,
+  "checkpoint_epoch": 150,
+  "checkpoint_fits": 175385,
+  "native_budget": 175385,
+  "arms": {
+    "native": {
+      "recorded_systems": 97515,
+      "proposed_systems": 0,
+      "original_front_complete": 4,
+      "proposed_complete": 0,
+      "complete_nondominated": 4,
+      "native_complete": 4,
+      "complete_generated": 4,
+      "first_survivor": [
+        535,
+        1399,
+        345
+      ],
+      "search_fits": 175385,
+      "new_fits": 0,
+      "total_fits": 175385,
+      "finalized_native_epoch": 150
+    },
+    "exchange": {
+      "recorded_systems": 97515,
+      "proposed_systems": 8283,
+      "original_front_complete": 4,
+      "proposed_complete": 0,
+      "complete_nondominated": 4,
+      "native_complete": 4,
+      "complete_generated": 4,
+      "first_survivor": [
+        535,
+        1399,
+        345
+      ],
+      "surviving_supports": [
+        [
+          [
+            [
+              "du/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "requested_fits": 2832,
+      "archived_fits": 64,
+      "new_fits": 2768,
+      "accepted_fits": 2703,
+      "over_budget_fits": 0,
+      "parent_front": 1307,
+      "parent_slot_edits": 22707,
+      "relabelled_edits_verified": 22707,
+      "search_fits": 175385,
+      "total_fits": 178153,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 64.45807379996404
+    },
+    "exchange_local_target": {
+      "recorded_systems": 97515,
+      "proposed_systems": 25118,
+      "original_front_complete": 4,
+      "proposed_complete": 2,
+      "complete_nondominated": 4,
+      "native_complete": 4,
+      "complete_generated": 4,
+      "first_survivor": [
+        535,
+        1399,
+        345
+      ],
+      "surviving_supports": [
+        [
+          [
+            [
+              "du/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "requested_fits": 8562,
+      "archived_fits": 185,
+      "new_fits": 8377,
+      "accepted_fits": 8099,
+      "over_budget_fits": 0,
+      "parent_front": 1307,
+      "parent_slot_edits": 72045,
+      "relabelled_edits_verified": 72045,
+      "search_fits": 175385,
+      "total_fits": 183762,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 33.73904609994497
+    },
+    "reassignment": {
+      "recorded_systems": 97515,
+      "proposed_systems": 2507,
+      "original_front_complete": 4,
+      "proposed_complete": 12,
+      "complete_nondominated": 8,
+      "native_complete": 4,
+      "complete_generated": 12,
+      "first_survivor": [
+        535,
+        1399,
+        345
+      ],
+      "surviving_supports": [
+        [
+          [
+            [
+              "du/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "requested_fits": 988,
+      "archived_fits": 557,
+      "new_fits": 431,
+      "accepted_fits": 842,
+      "over_budget_fits": 0,
+      "parent_front": 1307,
+      "assignments": 1600,
+      "relabelled_assignments_verified": 1600,
+      "search_fits": 175385,
+      "total_fits": 175816,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 3.2524181999033317
+    },
+    "exchange_reassignment": {
+      "recorded_systems": 97515,
+      "proposed_systems": 85546,
+      "original_front_complete": 4,
+      "proposed_complete": 12,
+      "complete_nondominated": 8,
+      "native_complete": 4,
+      "complete_generated": 12,
+      "first_survivor": [
+        535,
+        1399,
+        345
+      ],
+      "surviving_supports": [
+        [
+          [
+            [
+              "du/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dv/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2v/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              "dv/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "u",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx0",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "du/dx1",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ],
+            [
+              "v",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx1^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "d^2u/dx2^2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ],
+          [
+            [
+              "dp/dx2",
+              [
+                [
+                  "power",
+                  1.0
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "requested_fits": 13650,
+      "archived_fits": 808,
+      "new_fits": 12842,
+      "accepted_fits": 12897,
+      "over_budget_fits": 0,
+      "parent_front": 1307,
+      "assignments": 43043,
+      "relabelled_assignments_verified": 43043,
+      "search_fits": 175385,
+      "total_fits": 188227,
+      "finalized_native_epoch": 150,
+      "assembly_and_scoring_seconds": 33.73687000002246
+    }
+  }
+}

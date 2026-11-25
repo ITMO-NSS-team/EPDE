@@ -1,0 +1,248 @@
+{
+  "seed": 24112402,
+  "archive_calls": 163848,
+  "max_equation_terms": 7,
+  "archive_history": {
+    "u": {
+      "first_call": null,
+      "fitted_equations": 0,
+      "containing_systems": 0,
+      "front_epochs": [],
+      "time_target_systems": 128,
+      "common_partner_targets": [
+        "dv/dx1",
+        "d^2p/dx0^2"
+      ],
+      "common_partner_systems": 38,
+      "retention": {
+        "with_continuity": 0,
+        "dominated_by_epoch100": 0
+      }
+    },
+    "v": {
+      "first_call": 2136,
+      "fitted_equations": 1,
+      "containing_systems": 28,
+      "front_epochs": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "time_target_systems": 1425,
+      "common_partner_targets": [
+        "du/dx1",
+        "dp/dx0"
+      ],
+      "common_partner_systems": 546,
+      "retention": {
+        "with_continuity": 0,
+        "dominated_by_epoch100": 28,
+        "last_epoch_hits": 2,
+        "beaten_by_next_front": 2
+      }
+    }
+  },
+  "probe": {
+    "u": {
+      "candidates": 1521,
+      "target": "du/dx0",
+      "partner_targets": [
+        "dv/dx1",
+        "d^2p/dx0^2"
+      ],
+      "beam_width": 1000,
+      "draw_from_best": 20,
+      "forms": [
+        {
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "du/dx2*u"
+          ],
+          "rank_at_five": 2,
+          "all_predictors_admissible": true
+        },
+        {
+          "terms": [
+            "d^2u/dx1^2",
+            "d^2u/dx2^2",
+            "dp/dx2",
+            "du/dx0",
+            "du/dx1*v",
+            "dv/dx1*u"
+          ],
+          "rank_at_five": 1,
+          "all_predictors_admissible": true
+        }
+      ]
+    },
+    "v": {
+      "candidates": 1521,
+      "target": "dv/dx0",
+      "partner_targets": [
+        "du/dx1",
+        "dp/dx0"
+      ],
+      "beam_width": 1000,
+      "draw_from_best": 20,
+      "forms": [
+        {
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "du/dx2*v",
+            "dv/dx0",
+            "dv/dx2*u"
+          ],
+          "rank_at_five": 2,
+          "all_predictors_admissible": true
+        },
+        {
+          "terms": [
+            "d^2v/dx1^2",
+            "d^2v/dx2^2",
+            "dp/dx1",
+            "dv/dx0",
+            "dv/dx1*v",
+            "dv/dx2*u"
+          ],
+          "rank_at_five": 1,
+          "all_predictors_admissible": true
+        }
+      ]
+    }
+  },
+  "replay_calls": 5000,
+  "identical_points_and_labels": true,
+  "replay_stats": {
+    "u": {
+      "beam_requests_any_target": 87,
+      "beam_requests_time_target": 1,
+      "time_target_draws": 1
+    },
+    "v": {
+      "beam_requests_any_target": 81,
+      "beam_requests_time_target": 24,
+      "exact_available_at_size_five": 22,
+      "time_target_draws": 24,
+      "draw_containing_law": 4,
+      "exact_installs": 1
+    }
+  },
+  "missed_five_term_shortlists": {
+    "u": [
+      {
+        "max_predictors": 6,
+        "partner_targets": [
+          "d^2p/dx1^2"
+        ],
+        "missing_from_candidate_library": [
+          [],
+          []
+        ],
+        "best_true_subset_ranks_by_size_and_width": {
+          "1000": [
+            [
+              4,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              3,
+              null,
+              null,
+              null,
+              null
+            ]
+          ],
+          "2000": [
+            [
+              4,
+              1265,
+              1,
+              1,
+              2
+            ],
+            [
+              3,
+              1264,
+              2,
+              2,
+              1
+            ]
+          ],
+          "4000": [
+            [
+              4,
+              1265,
+              1,
+              1,
+              2
+            ],
+            [
+              3,
+              1264,
+              2,
+              2,
+              1
+            ]
+          ]
+        },
+        "drawn_predictors": [
+          "d^3v/dx1^3*x^2@2"
+        ]
+      }
+    ],
+    "v": [
+      {
+        "max_predictors": 6,
+        "partner_targets": [
+          "dp/dx1",
+          "du/dx1"
+        ],
+        "missing_from_candidate_library": [
+          [
+            "dp/dx1"
+          ],
+          [
+            "dp/dx1"
+          ]
+        ],
+        "drawn_predictors": [
+          "d^3u/dx1^3*p^3",
+          "d^3u/dx1^3*u^2",
+          "du/dx1*x^2@1",
+          "dv/dx2",
+          "dv/dx2*x@2"
+        ]
+      },
+      {
+        "max_predictors": 6,
+        "partner_targets": [
+          "dp/dx1"
+        ],
+        "missing_from_candidate_library": [
+          [
+            "dp/dx1"
+          ],
+          [
+            "dp/dx1"
+          ]
+        ],
+        "drawn_predictors": [
+          "d^4v/dx1^4*p^2",
+          "du/dx1",
+          "dv/dx2"
+        ]
+      }
+    ]
+  }
+}

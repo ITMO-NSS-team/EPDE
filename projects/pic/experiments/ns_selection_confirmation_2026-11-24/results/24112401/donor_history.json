@@ -1,0 +1,34 @@
+{
+  "current": {
+    "requested_fits": 4335,
+    "archived_fits": 340,
+    "new_fits": 3995,
+    "accepted_fits": 4040,
+    "over_budget_fits": 0,
+    "donor_supports": 180,
+    "native_fits": 269802,
+    "total_fits": 273797,
+    "native_complete": 0,
+    "assembled_complete": 12,
+    "complete_generated": 12,
+    "unbeaten_by_native": 0,
+    "complete_nondominated": 0,
+    "seconds": 63.74114059994463
+  },
+  "historical": {
+    "requested_fits": 18148,
+    "archived_fits": 1321,
+    "new_fits": 16827,
+    "accepted_fits": 16988,
+    "over_budget_fits": 0,
+    "donor_supports": 811,
+    "native_fits": 256970,
+    "total_fits": 273797,
+    "native_complete": 0,
+    "assembled_complete": 12,
+    "complete_generated": 12,
+    "unbeaten_by_native": 0,
+    "complete_nondominated": 0,
+    "seconds": 92.54185889998917
+  }
+}
